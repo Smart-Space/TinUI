@@ -84,15 +84,39 @@ class TinUI(Canvas):
         self.tkraise(label)
         return label
 
+    def add_checkbutton(self,pos:tuple,text:str,fg='black',font=('微软雅黑',12),command=None):#绘制复选框
+        def button_in(event):
+            self.itemconfig(check,outline='#82BDEB')
+        def button_out(event):
+            self.itemconfig(check,outline=fg)
+        def go_func(event):
+            if self.itemcget(check,'fill')!='lightgreen':
+                self.itemconfig(check,fill='lightgreen')
+            else:
+                self.itemconfig(check,fill=self['background'])
+            command(event)
+        checkbutton=self.create_text(pos,text=text,fill=fg,font=font,anchor='nw')
+        bbox=self.bbox(checkbutton)
+        dic=bbox[3]-bbox[1]#位移长度
+        self.move(checkbutton,dic-7,0)
+        check=self.create_rectangle((pos[0],pos[1]+5,pos[0]+dic-10,pos[1]+dic-5),outline=fg,fill=self['background'])
+        self.tag_bind(check,'<Enter>',button_in)
+        self.tag_bind(check,'<Leave>',button_out)
+        self.tag_bind(checkbutton,'<Enter>',button_in)
+        self.tag_bind(checkbutton,'<Leave>',button_out)
+        self.tag_bind(check,'<Button>',go_func)
+        self.tag_bind(checkbutton,'<Button>',go_func)
+        return checkbutton
+
+
 def test(event):
     a.title('TinUI Test')
     b.add_paragraph((50,150),'这是TinUI按钮触达的事件函数回显，此外，窗口标题也被改变、首行标题缩进减小')
     b.coords(m,100,0)
 def test1(event):
-    b.coords(m1,0,580)
+    pass
 def test2(event):
-    b.coords(m,590,0)
-    b.coords(m1,0,700)
+    pass
 
 a=Tk()
 a.geometry('700x700+5+5')
@@ -105,9 +129,7 @@ b.add_paragraph((20,290),'''     TinUI是基于tkinter画布开发的界面UI布
 angle=-18)
 b.add_paragraph((20,100),'下面的段落是测试画布的非平行字体显示效果，也是TinUI的简单介绍')
 b.add_button((250,450),'测试按钮',command=test)
-b.add_button((250,500),'缩进尾行',command=test1)
-b.add_button((250,550),'拓宽',command=test2)
+b.add_checkbutton((80,430),'允许TinUI测试',command=test1)
 b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
 
-#a.after(5000,lambda:b.coords(m,100,0))
 a.mainloop()

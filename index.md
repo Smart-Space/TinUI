@@ -25,6 +25,8 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 ## 基础函数
 
 > ==一般地==，会将每个函数的名称以及定义、参数内容、函数绘制说明列出来。
+>
+> 所有函数均会返回主要画布对象。
 
 ### add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,**kw)
 
@@ -56,7 +58,7 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 - font::字体名称+大小
 - command::绑定的函数。该函数**必须要有event参数**，因为TinUI的按钮会传递点击事件的event
 
-绘制一个按钮。这个按钮会响应鼠标的离开和进入事件，被被单击时也会调用绑定的函数。
+绘制一个按钮。这个按钮会响应鼠标的离开和进入事件，被单击时也会调用绑定的函数。
 
 ### add_label(self,pos:tuple,text:str,fg='black',bg='#f0f0f0',outline='grey',font=('微软雅黑',12)) 
 
@@ -68,3 +70,14 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 - font::字体名称+大小
 
 绘制一个类Label组件。
+
+### add_checkbutton(self,pos:tuple,text:str,fg='black',fill='lightgreen',font=('微软雅黑',12),command=None)
+
+- pos::位置
+- text::标题文字
+- fg::文字颜色
+- fill::选中的标识填充
+- font::字体名称+大小
+- command::绑定的函数。该函数**必须要有event参数**，因为TinUI的按钮会传递点击事件的event
+
+绘制一个复选框。这个复选框会响应鼠标的离开和进入事件，被单击时也会调用绑定的函数，并且会根据当前样式更改点击后的样式。

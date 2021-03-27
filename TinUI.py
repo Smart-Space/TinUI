@@ -84,14 +84,14 @@ class TinUI(Canvas):
         self.tkraise(label)
         return label
 
-    def add_checkbutton(self,pos:tuple,text:str,fg='black',font=('微软雅黑',12),command=None):#绘制复选框
+    def add_checkbutton(self,pos:tuple,text:str,fg='black',fill='lightgreen',font=('微软雅黑',12),command=None):#绘制复选框
         def button_in(event):
             self.itemconfig(check,outline='#82BDEB')
         def button_out(event):
             self.itemconfig(check,outline=fg)
         def go_func(event):
-            if self.itemcget(check,'fill')!='lightgreen':
-                self.itemconfig(check,fill='lightgreen')
+            if self.itemcget(check,'fill')!=fill:
+                self.itemconfig(check,fill=fill)
             else:
                 self.itemconfig(check,fill=self['background'])
             command(event)

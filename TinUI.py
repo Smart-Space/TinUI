@@ -5,7 +5,7 @@ from PIL import Image,ImageTk
 from TinEngine import TinText
 
 class TinUI(Canvas):
-    """基于tkinter的高级绘制组件"""
+    """基于tkinter的高级窗口绘制组件"""
 
     def __init__(self,master,update:bool=True,update_time:int=1000,**kw):
         self.frame = Frame(master)

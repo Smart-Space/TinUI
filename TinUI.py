@@ -108,6 +108,13 @@ class TinUI(Canvas):
         self.tag_bind(checkbutton,'<Button>',go_func)
         return checkbutton
 
+    def add_entry(self,pos:tuple,width:int,height:int,text:str='',fg='black',bg='white',font=('微软雅黑',12)):#绘制当行输入框
+        #这是一个伪绘制组件
+        entry=Entry(self,fg=fg,bg=bg,font=font,relief='groove',highlightcolor=fg,bd=2)
+        entry.insert(0,text)
+        self.create_window(pos,window=entry,width=width,height=height,anchor='nw')
+        return entry
+
 
 def test(event):
     a.title('TinUI Test')
@@ -118,18 +125,20 @@ def test1(event):
 def test2(event):
     pass
 
-a=Tk()
-a.geometry('700x700+5+5')
+if __name__=='__main__':
+    a=Tk()
+    a.geometry('700x700+5+5')
 
-b=TinUI(a,bg='white')
-b.pack(fill='both',expand=True)
-m=b.add_title((600,0),'TinUI is a test project for futher tin using')
-m1=b.add_title((0,680),'test TinUI scrolled',size=2,angle=24)
-b.add_paragraph((20,290),'''     TinUI是基于tkinter画布开发的界面UI布局方案，作为tkinter拓展和TinEngine的拓展而存在。目前，TinUI尚处于开发阶段。如果想要使用完整的TinUI，敬请期待。''',
-angle=-18)
-b.add_paragraph((20,100),'下面的段落是测试画布的非平行字体显示效果，也是TinUI的简单介绍')
-b.add_button((250,450),'测试按钮',command=test)
-b.add_checkbutton((80,430),'允许TinUI测试',command=test1)
-b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
+    b=TinUI(a,bg='white')
+    b.pack(fill='both',expand=True)
+    m=b.add_title((600,0),'TinUI is a test project for futher tin using')
+    m1=b.add_title((0,680),'test TinUI scrolled',size=2,angle=24)
+    b.add_paragraph((20,290),'''     TinUI是基于tkinter画布开发的界面UI布局方案，作为tkinter拓展和TinEngine的拓展而存在。目前，TinUI尚处于开发阶段。如果想要使用完整的TinUI，敬请期待。''',
+    angle=-18)
+    b.add_paragraph((20,100),'下面的段落是测试画布的非平行字体显示效果，也是TinUI的简单介绍')
+    b.add_button((250,450),'测试按钮',command=test)
+    b.add_checkbutton((80,430),'允许TinUI测试',command=test1)
+    b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
+    b.add_entry((250,300),350,30,'这里用来输入')
 
-a.mainloop()
+    a.mainloop()

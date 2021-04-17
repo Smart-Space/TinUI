@@ -81,3 +81,15 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 - command::绑定的函数。该函数**必须要有event参数**，因为TinUI的按钮会传递点击事件的event
 
 绘制一个复选框。这个复选框会响应鼠标的离开和进入事件，被单击时也会调用绑定的函数，并且会根据当前样式更改点击后的样式。
+
+### add_entry(self,pos:tuple,width:int,height:int,text:str='',fg='black',bg='white',font=('微软雅黑',12))
+
+- pos::位置
+- width::宽度
+- height::高度
+- text::初始文字
+- fg::文字颜色
+- bg::背景颜色
+- font::字体
+
+绘制一个单行输入框。这是一个伪绘制组件，其实就是简化了Entry控件的导入。

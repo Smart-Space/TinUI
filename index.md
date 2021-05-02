@@ -93,3 +93,14 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 - font::字体
 
 绘制一个单行输入框。这是一个伪绘制组件，其实就是简化了Entry控件的导入。
+
+通过`entry.get()`获取值。
+
+### add_separate(self,pos:tuple,width:int,direction='x',fg='grey')
+
+- pos::位置
+- width::长度
+- direction::方向。“x”或“y”（横向 或 纵向）
+- fg::颜色
+
+绘制一条分割线。

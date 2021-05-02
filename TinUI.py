@@ -13,7 +13,7 @@ class TinUI(Canvas):
         self.vbar.pack(side=RIGHT, fill=Y)
         ###
         kw.update({'yscrollcommand': self.vbar.set})
-        Canvas.__init__(self, self.frame, **kw)
+        Canvas.__init__(self, self.frame,selectborderwidth=0,highlightthickness=0,bd=0, **kw)
         self.pack(fill=BOTH, expand=True)
         self.vbar['command'] = self.yview
         ###
@@ -115,6 +115,17 @@ class TinUI(Canvas):
         self.create_window(pos,window=entry,width=width,height=height,anchor='nw')
         return entry
 
+    def add_separate(self,pos:tuple,width:int,direction='x',fg='grey'):#绘制分割线
+        bbox=list(pos)
+        if direction=='x':
+            bbox.append(pos[0]+width)
+            bbox.append(pos[1])
+        elif direction=='y':
+            bbox.append(pos[0])
+            bbox.append(pos[1]+width)
+        separate=self.create_line(bbox,fill=fg,width=3)
+        return separate
+
 
 def test(event):
     a.title('TinUI Test')
@@ -140,5 +151,6 @@ if __name__=='__main__':
     b.add_checkbutton((80,430),'允许TinUI测试',command=test1)
     b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
     b.add_entry((250,300),350,30,'这里用来输入')
+    b.add_separate((20,200),600)
 
     a.mainloop()

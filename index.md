@@ -38,6 +38,10 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 
 绘制一个大字体标题。
 
+### return: title
+
+---
+
 ### add_paragraph(self,pos:tuple,text:str,fg='black',font=('微软雅黑',12),side='left',width=500,**kw)
 
 - pos::位置
@@ -48,6 +52,10 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 - width::一行允许的最大字符宽度
 
 绘制一个段落。
+
+### return: paragraph
+
+---
 
 ### add_button(self,pos:tuple,text:str,fg='black',bg='#E1E1E1',font=('微软雅黑',12),command=None)
 
@@ -60,6 +68,10 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 
 绘制一个按钮。这个按钮会响应鼠标的离开和进入事件，被单击时也会调用绑定的函数。
 
+### return: button_text, button_back
+
+---
+
 ### add_label(self,pos:tuple,text:str,fg='black',bg='#f0f0f0',outline='grey',font=('微软雅黑',12)) 
 
 - pos::位置
@@ -71,6 +83,10 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 
 绘制一个类Label组件。
 
+### return: label
+
+---
+
 ### add_checkbutton(self,pos:tuple,text:str,fg='black',fill='lightgreen',font=('微软雅黑',12),command=None)
 
 - pos::位置
@@ -81,6 +97,10 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 - command::绑定的函数。该函数**必须要有event参数**，因为TinUI的按钮会传递点击事件的event
 
 绘制一个复选框。这个复选框会响应鼠标的离开和进入事件，被单击时也会调用绑定的函数，并且会根据当前样式更改点击后的样式。
+
+### return: check_text, check_mark
+
+---
 
 ### add_entry(self,pos:tuple,width:int,height:int,text:str='',fg='black',bg='white',font=('微软雅黑',12))
 
@@ -96,6 +116,10 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 
 通过`entry.get()`获取值。
 
+### return: entry
+
+---
+
 ### add_separate(self,pos:tuple,width:int,direction='x',fg='grey')
 
 - pos::位置
@@ -104,3 +128,23 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 - fg::颜色
 
 绘制一条分割线。
+
+### return: separate
+
+---
+
+### add_radiobutton(self,pos:tuple,width,text='',choices=('choose me'),fg='black',bg='white',font=('微软雅黑',12),command=None)
+
+- pos::位置
+- width::整体宽度
+- text::单选框文本提示
+- choices::选项（list, set, map...）
+- fg::文本和边框颜色
+- bg::选项背景色
+- font::字体
+- command::回调函数，有并且仅有一个参数，即该按钮所显示的文本
+
+绘制一个单选框，竖式排列。
+
+### return: text, choices_text_list
+

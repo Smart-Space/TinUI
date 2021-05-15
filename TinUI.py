@@ -74,7 +74,7 @@ class TinUI(Canvas):
         self.tag_bind(button,'<Enter>',in_button)
         self.tag_bind(button,'<Leave>',out_button)
         self.tkraise(button)
-        return button
+        return button,back
 
     def add_label(self,pos:tuple,text:str,fg='black',bg='#f0f0f0',outline='grey',font=('微软雅黑',12)):#绘制标签
         label=self.create_text(pos,text=text,fill=fg,font=font,anchor='nw')
@@ -106,7 +106,7 @@ class TinUI(Canvas):
         self.tag_bind(checkbutton,'<Leave>',button_out)
         self.tag_bind(check,'<Button>',go_func)
         self.tag_bind(checkbutton,'<Button>',go_func)
-        return checkbutton
+        return checkbutton,check
 
     def add_entry(self,pos:tuple,width:int,height:int,text:str='',fg='black',bg='white',font=('微软雅黑',12)):#绘制当行输入框
         #这是一个伪绘制组件
@@ -126,13 +126,40 @@ class TinUI(Canvas):
         separate=self.create_line(bbox,fill=fg,width=3)
         return separate
 
+    def add_radiobutton(self,pos:tuple,width,text='',choices=('choose me'),fg='black',bg='white',font=('微软雅黑',12),command=None):#绘制单选框
+        def button_in(tag):
+            self.itemconfig(tag,fill='#E5F1FB',outline='#82BDEB')
+        def button_out(tag):
+            self.itemconfig(tag,fill=bg,outline=fg)
+        def go_func(_text):
+            command(_text)
+        word=self.create_text(pos,text=text,fill=fg,font=font,anchor='nw',width=width)
+        start_x=pos[0]#起始x位置
+        height=self.bbox(word)[3]+3#变量y位置
+        choices_list=[]
+        for i in choices:
+            choice=self.create_text((start_x+2,height+2),text=i,fill=fg,font=font,anchor='nw',width=width-4)
+            bbox=self.bbox(choice)
+            h=bbox[3]-bbox[1]+4
+            back=self.create_rectangle((start_x,height,start_x+width,height+h),outline=fg,fill=bg)
+            self.tkraise(choice)
+            height+=h+2
+            choices_list.append(choice)
+            self.tag_bind(choice,'<Enter>',lambda event,back=back:button_in(back))
+            self.tag_bind(choice,'<Leave>',lambda event,back=back:button_out(back))
+            self.tag_bind(back,'<Enter>',lambda event,back=back:button_in(back))
+            self.tag_bind(back,'<Leave>',lambda event,back=back:button_out(back))
+            self.tag_bind(choice,'<Button>',lambda event,_text=i:go_func(_text))
+            self.tag_bind(back,'<Button>',lambda event,_text=i:go_func(_text))
+        return word,choices_list
+
 
 def test(event):
     a.title('TinUI Test')
     b.add_paragraph((50,150),'这是TinUI按钮触达的事件函数回显，此外，窗口标题也被改变、首行标题缩进减小')
     b.coords(m,100,0)
-def test1(event):
-    pass
+def test1(word):
+    print(word)
 def test2(event):
     pass
 
@@ -152,5 +179,6 @@ if __name__=='__main__':
     b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
     b.add_entry((250,300),350,30,'这里用来输入')
     b.add_separate((20,200),600)
+    b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
 
     a.mainloop()

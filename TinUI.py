@@ -157,7 +157,7 @@ class TinUI(Canvas):
 def test(event):
     a.title('TinUI Test')
     b.add_paragraph((50,150),'这是TinUI按钮触达的事件函数回显，此外，窗口标题也被改变、首行标题缩进减小')
-    b.coords(m,100,0)
+    b.coords(m,100,5)
 def test1(word):
     print(word)
 def test2(event):

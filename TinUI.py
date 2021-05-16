@@ -129,14 +129,22 @@ class TinUI(Canvas):
     def add_radiobutton(self,pos:tuple,width,text='',choices=('choose me'),fg='black',bg='white',font=('微软雅黑',12),command=None):#绘制单选框
         def button_in(tag):
             self.itemconfig(tag,fill='#E5F1FB',outline='#82BDEB')
-        def button_out(tag):
-            self.itemconfig(tag,fill=bg,outline=fg)
-        def go_func(_text):
+        def button_out(_tag):
+            for tag in back_list:
+                self.itemconfig(tag,fill=bg,outline=fg)
+        def go_func(tag,_text):
+            for i in choices_back:#判断是否为当前选中
+                if i not in back_list:
+                    back_list.append(i)
+                    button_out(tag)
+            back_list.remove(tag)
+            self.itemconfig(tag,fill='#E5F1FB',outline='#82BDEB')
             command(_text)
         word=self.create_text(pos,text=text,fill=fg,font=font,anchor='nw',width=width)
         start_x=pos[0]#起始x位置
         height=self.bbox(word)[3]+3#变量y位置
         choices_list=[]
+        choices_back=[]
         for i in choices:
             choice=self.create_text((start_x+2,height+2),text=i,fill=fg,font=font,anchor='nw',width=width-4)
             bbox=self.bbox(choice)
@@ -145,12 +153,14 @@ class TinUI(Canvas):
             self.tkraise(choice)
             height+=h+2
             choices_list.append(choice)
+            choices_back.append(back)
             self.tag_bind(choice,'<Enter>',lambda event,back=back:button_in(back))
             self.tag_bind(choice,'<Leave>',lambda event,back=back:button_out(back))
             self.tag_bind(back,'<Enter>',lambda event,back=back:button_in(back))
             self.tag_bind(back,'<Leave>',lambda event,back=back:button_out(back))
-            self.tag_bind(choice,'<Button>',lambda event,_text=i:go_func(_text))
-            self.tag_bind(back,'<Button>',lambda event,_text=i:go_func(_text))
+            self.tag_bind(choice,'<Button>',lambda event,_text=i,back=back:go_func(back,_text))
+            self.tag_bind(back,'<Button>',lambda event,_text=i,back=back:go_func(back,_text))
+        back_list=list(choices_back)
         return word,choices_list
 
 

@@ -13,7 +13,7 @@ TinUI基于tkinter的画布（Canvas），可以作为整个窗口的唯一控�
 TinEngine有以下第三方依赖项（实际上是[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845.html)的）：
 
 1. PIL（pillow）
-2. pywin32（win32gui）
+2. tinengine
 3. requests
 
 ## TinEngine支持
@@ -28,13 +28,14 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 >
 > 所有函数均会返回主要画布对象。
 
-### add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,**kw)
+### add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,anchor='nw',**kw)
 
 - pos::位置
 - text::标题文字
 - fg::文本颜色
 - font::文本字体
 - size::文本字体大小。依据字典：`{0:20,1:18,2:16,3:14,4:12}`
+- anchor::对齐方向
 
 绘制一个大字体标题。
 
@@ -42,7 +43,7 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 
 ---
 
-### add_paragraph(self,pos:tuple,text:str,fg='black',font=('微软雅黑',12),side='left',width=500,**kw)
+### add_paragraph(self,pos:tuple,text:str,fg='black',font=('微软雅黑',12),side='left',width=500,anchor='nw',**kw)
 
 - pos::位置
 - text::标题文字
@@ -50,6 +51,7 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 - font::字体名称+大小
 - side::对齐方向
 - width::一行允许的最大字符宽度
+- anchor::对齐方向
 
 绘制一个段落。
 
@@ -57,7 +59,7 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 
 ---
 
-### add_button(self,pos:tuple,text:str,fg='black',bg='#E1E1E1',font=('微软雅黑',12),command=None)
+### add_button(self,pos:tuple,text:str,fg='black',bg='#E1E1E1',font=('微软雅黑',12),command=None,anchor='nw')
 
 - pos::位置
 - text::标题文字
@@ -65,6 +67,7 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 - bg::按钮颜色
 - font::字体名称+大小
 - command::绑定的函数。该函数**必须要有event参数**，因为TinUI的按钮会传递点击事件的event
+- anchor::对齐方向
 
 绘制一个按钮。这个按钮会响应鼠标的离开和进入事件，被单击时也会调用绑定的函数。
 
@@ -72,7 +75,7 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 
 ---
 
-### add_label(self,pos:tuple,text:str,fg='black',bg='#f0f0f0',outline='grey',font=('微软雅黑',12)) 
+### add_label(self,pos:tuple,text:str,fg='black',bg='#f0f0f0',outline='grey',font=('微软雅黑',12),anchor='nw') 
 
 - pos::位置
 - text::标题文字
@@ -80,6 +83,7 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 - bg::背景色
 - outline::边框颜色
 - font::字体名称+大小
+- anchor::对齐方向
 
 绘制一个类Label组件。
 
@@ -87,7 +91,7 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 
 ---
 
-### add_checkbutton(self,pos:tuple,text:str,fg='black',fill='lightgreen',font=('微软雅黑',12),command=None)
+### add_checkbutton(self,pos:tuple,text:str,fg='black',fill='lightgreen',font=('微软雅黑',12),command=None,anchor='nw')
 
 - pos::位置
 - text::标题文字
@@ -95,6 +99,7 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 - fill::选中的标识填充
 - font::字体名称+大小
 - command::绑定的函数。该函数**必须要有event参数**，因为TinUI的按钮会传递点击事件的event
+- anchor::对齐方向
 
 绘制一个复选框。这个复选框会响应鼠标的离开和进入事件，被单击时也会调用绑定的函数，并且会根据当前样式更改点击后的样式。
 
@@ -102,7 +107,7 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 
 ---
 
-### add_entry(self,pos:tuple,width:int,height:int,text:str='',fg='black',bg='white',font=('微软雅黑',12))
+### add_entry(self,pos:tuple,width:int,height:int,text:str='',fg='black',bg='white',font=('微软雅黑',12),anchor='nw')
 
 - pos::位置
 - width::宽度
@@ -111,6 +116,7 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 - fg::文字颜色
 - bg::背景颜色
 - font::字体
+- anchor::对齐方向
 
 绘制一个单行输入框。这是一个伪绘制组件，其实就是简化了Entry控件的导入。
 
@@ -120,12 +126,13 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 
 ---
 
-### add_separate(self,pos:tuple,width:int,direction='x',fg='grey')
+### add_separate(self,pos:tuple,width:int,direction='x',fg='grey',anchor='nw')
 
 - pos::位置
 - width::长度
 - direction::方向。“x”或“y”（横向 或 纵向）
 - fg::颜色
+- anchor::对齐方向
 
 绘制一条分割线。
 
@@ -133,7 +140,7 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 
 ---
 
-### add_radiobutton(self,pos:tuple,width,text='',choices=('choose me'),fg='black',bg='white',font=('微软雅黑',12),command=None)
+### add_radiobutton(self,pos:tuple,width,text='',choices=('choose me'),fg='black',bg='white',font=('微软雅黑',12),command=None,anchor='nw')
 
 - pos::位置
 - width::整体宽度
@@ -143,8 +150,23 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 - bg::选项背景色
 - font::字体
 - command::回调函数，有并且仅有一个参数，即该按钮所显示的文本
+- anchor::对齐方向
 
 绘制一个单选框，竖式排列。
 
 ### return: text, choices_text_list
 
+---
+
+### add_link(self,pos:tuple,text,url,fg='#50B0F4',font=('微软雅黑',12),anchor='nw')
+
+- pos::位置
+- text::链接文本
+- url::链接
+- fg::文本颜色
+- font::字体
+- anchor::对齐方向
+
+绘制一个超链接文本。
+
+### return: link

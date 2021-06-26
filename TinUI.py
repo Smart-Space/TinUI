@@ -1,8 +1,9 @@
 from tkinter import *
 import io
+from webbrowser import open as webopen
 import requests
 from PIL import Image,ImageTk
-from TinEngine import TinText
+from tinengine.TinEngine import TinText
 
 class TinUI(Canvas):
     """基于tkinter的高级窗口绘制组件"""
@@ -55,18 +56,18 @@ class TinUI(Canvas):
         finally:
             self.after(self.update_time,self.update__)
 
-    def add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,**kw):#绘制标题
-        return self.create_text(pos,text=text,fill=fg,font=(font,self.title_size[size]),anchor='nw',**kw)
+    def add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,anchor='nw',**kw):#绘制标题
+        return self.create_text(pos,text=text,fill=fg,font=(font,self.title_size[size]),**kw)
 
-    def add_paragraph(self,pos:tuple,text:str,fg='black',font=('微软雅黑',12),side='left',width=500,**kw):#绘制段落
-        return self.create_text(pos,text=text,fill=fg,font=font,anchor='nw',justify=side,width=width,**kw)
+    def add_paragraph(self,pos:tuple,text:str,fg='black',font=('微软雅黑',12),side='left',width=500,anchor='nw',**kw):#绘制段落
+        return self.create_text(pos,text=text,fill=fg,font=font,justify=side,width=width,**kw)
 
-    def add_button(self,pos:tuple,text:str,fg='black',bg='#E1E1E1',font=('微软雅黑',12),command=None):#绘制按钮
+    def add_button(self,pos:tuple,text:str,fg='black',bg='#E1E1E1',font=('微软雅黑',12),command=None,anchor='nw'):#绘制按钮
         def in_button(event):
             self.itemconfig(back,fill='#E5F1FB',outline='#82BDEB')
         def out_button(event):
             self.itemconfig(back,fill=bg,outline='grey')
-        button=self.create_text(pos,text=text,fill=fg,font=font,anchor='nw')
+        button=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
         bbox=self.bbox(button)
         x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[2]+3,bbox[3]+3
         back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline='grey')
@@ -76,15 +77,15 @@ class TinUI(Canvas):
         self.tkraise(button)
         return button,back
 
-    def add_label(self,pos:tuple,text:str,fg='black',bg='#f0f0f0',outline='grey',font=('微软雅黑',12)):#绘制标签
-        label=self.create_text(pos,text=text,fill=fg,font=font,anchor='nw')
+    def add_label(self,pos:tuple,text:str,fg='black',bg='#f0f0f0',outline='grey',font=('微软雅黑',12),anchor='nw'):#绘制标签
+        label=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
         bbox=self.bbox(label)
         x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[2]+3,bbox[3]+3
         back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=outline)
         self.tkraise(label)
         return label
 
-    def add_checkbutton(self,pos:tuple,text:str,fg='black',fill='lightgreen',font=('微软雅黑',12),command=None):#绘制复选框
+    def add_checkbutton(self,pos:tuple,text:str,fg='black',fill='lightgreen',font=('微软雅黑',12),command=None,anchor='nw'):#绘制复选框
         def button_in(event):
             self.itemconfig(check,outline='#82BDEB')
         def button_out(event):
@@ -95,7 +96,7 @@ class TinUI(Canvas):
             else:
                 self.itemconfig(check,fill=self['background'])
             command(event)
-        checkbutton=self.create_text(pos,text=text,fill=fg,font=font,anchor='nw')
+        checkbutton=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
         bbox=self.bbox(checkbutton)
         dic=bbox[3]-bbox[1]#位移长度
         self.move(checkbutton,dic-7,0)
@@ -108,11 +109,11 @@ class TinUI(Canvas):
         self.tag_bind(checkbutton,'<Button>',go_func)
         return checkbutton,check
 
-    def add_entry(self,pos:tuple,width:int,height:int,text:str='',fg='black',bg='white',font=('微软雅黑',12)):#绘制当行输入框
+    def add_entry(self,pos:tuple,width:int,height:int,text:str='',fg='black',bg='white',font=('微软雅黑',12),anchor='nw'):#绘制当行输入框
         #这是一个伪绘制组件
         entry=Entry(self,fg=fg,bg=bg,font=font,relief='groove',highlightcolor=fg,bd=2)
         entry.insert(0,text)
-        self.create_window(pos,window=entry,width=width,height=height,anchor='nw')
+        self.create_window(pos,window=entry,width=width,height=height,anchor=anchor)
         return entry
 
     def add_separate(self,pos:tuple,width:int,direction='x',fg='grey'):#绘制分割线
@@ -126,7 +127,7 @@ class TinUI(Canvas):
         separate=self.create_line(bbox,fill=fg,width=3)
         return separate
 
-    def add_radiobutton(self,pos:tuple,width,text='',choices=('choose me'),fg='black',bg='white',font=('微软雅黑',12),command=None):#绘制单选框
+    def add_radiobutton(self,pos:tuple,width,text='',choices=('choose me'),fg='black',bg='white',font=('微软雅黑',12),command=None,anchor='nw'):#绘制单选框
         def button_in(tag):
             self.itemconfig(tag,fill='#E5F1FB',outline='#82BDEB')
         def button_out(_tag):
@@ -140,13 +141,13 @@ class TinUI(Canvas):
             back_list.remove(tag)
             self.itemconfig(tag,fill='#E5F1FB',outline='#82BDEB')
             command(_text)
-        word=self.create_text(pos,text=text,fill=fg,font=font,anchor='nw',width=width)
+        word=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor,width=width)
         start_x=pos[0]#起始x位置
         height=self.bbox(word)[3]+3#变量y位置
         choices_list=[]
         choices_back=[]
         for i in choices:
-            choice=self.create_text((start_x+2,height+2),text=i,fill=fg,font=font,anchor='nw',width=width-4)
+            choice=self.create_text((start_x+2,height+2),text=i,fill=fg,font=font,anchor=anchor,width=width-4)
             bbox=self.bbox(choice)
             h=bbox[3]-bbox[1]+4
             back=self.create_rectangle((start_x,height,start_x+width,height+h),outline=fg,fill=bg)
@@ -162,6 +163,27 @@ class TinUI(Canvas):
             self.tag_bind(back,'<Button>',lambda event,_text=i,back=back:go_func(back,_text))
         back_list=list(choices_back)
         return word,choices_list
+
+    def add_link(self,pos:tuple,text,url,fg='#50B0F4',font=('微软雅黑',12),anchor='nw'):#绘制超链接
+        def turn_red(event):
+            self.itemconfig(link,fill='red')
+            self['cursor']='hand2'
+        def turn_back(event):
+            self.itemconfig(link,fill=fg)
+            self['cursor']='arrow'
+        def go_url(event):
+            webopen(url)
+        link=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
+        bbox=self.bbox(link)
+        back=self.create_rectangle(bbox,width=0)
+        self.tkraise(link)
+        self.tag_bind(link,'<Enter>',turn_red)
+        self.tag_bind(link,'<Leave>',turn_back)
+        self.tag_bind(link,'<Button-1>',go_url)
+        self.tag_bind(back,'<Enter>',turn_red)
+        self.tag_bind(back,'<Leave>',turn_back)
+        self.tag_bind(back,'<Button-1>',go_url)
+        return link
 
 
 def test(event):
@@ -179,16 +201,17 @@ if __name__=='__main__':
 
     b=TinUI(a,bg='white')
     b.pack(fill='both',expand=True)
-    m=b.add_title((600,0),'TinUI is a test project for futher tin using')
+    m=b.add_title((600,0),'TinUI is a test project for futher tin using',anchor='sn')
     m1=b.add_title((0,680),'test TinUI scrolled',size=2,angle=24)
     b.add_paragraph((20,290),'''     TinUI是基于tkinter画布开发的界面UI布局方案，作为tkinter拓展和TinEngine的拓展而存在。目前，TinUI尚处于开发阶段。如果想要使用完整的TinUI，敬请期待。''',
     angle=-18)
     b.add_paragraph((20,100),'下面的段落是测试画布的非平行字体显示效果，也是TinUI的简单介绍')
-    b.add_button((250,450),'测试按钮',command=test)
+    b.add_button((250,450),'测试按钮',command=test,anchor='center')
     b.add_checkbutton((80,430),'允许TinUI测试',command=test1)
     b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
     b.add_entry((250,300),350,30,'这里用来输入')
     b.add_separate((20,200),600)
     b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
+    b.add_link((400,460),'TinGroup知识库','http://tinhome.baklib-free.com/')
 
     a.mainloop()

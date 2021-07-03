@@ -10,10 +10,9 @@ TinUI基于tkinter的画布（Canvas），可以作为整个窗口的唯一控�
 
 ## 依赖
 
-TinEngine有以下第三方依赖项（实际上是[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845.html)的）：
+TinEngine有以下第三方依赖项：
 
 1. PIL（pillow）
-2. tinengine
 3. requests
 
 ## TinEngine支持
@@ -154,7 +153,13 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 
 绘制一个单选框，竖式排列。
 
-### return: text, choices_text_list
+### return: text, choices_text_list, choices_back
+
+> text::文本提示画布对象
+>
+> choices_text_list::可选框的文本画布对象
+>
+> choices_back::可选框的背景方框画布对象
 
 ---
 

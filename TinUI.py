@@ -3,7 +3,6 @@ import io
 from webbrowser import open as webopen
 import requests
 from PIL import Image,ImageTk
-from tinengine.TinEngine import TinText
 
 class TinUI(Canvas):
     """基于tkinter的高级窗口绘制组件"""
@@ -57,9 +56,11 @@ class TinUI(Canvas):
             self.after(self.update_time,self.update__)
 
     def add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,anchor='nw',**kw):#绘制标题
+        kw['anchor']=anchor
         return self.create_text(pos,text=text,fill=fg,font=(font,self.title_size[size]),**kw)
 
     def add_paragraph(self,pos:tuple,text:str,fg='black',font=('微软雅黑',12),side='left',width=500,anchor='nw',**kw):#绘制段落
+        kw['anchor']=anchor
         return self.create_text(pos,text=text,fill=fg,font=font,justify=side,width=width,**kw)
 
     def add_button(self,pos:tuple,text:str,fg='black',bg='#E1E1E1',font=('微软雅黑',12),command=None,anchor='nw'):#绘制按钮
@@ -162,7 +163,7 @@ class TinUI(Canvas):
             self.tag_bind(choice,'<Button>',lambda event,_text=i,back=back:go_func(back,_text))
             self.tag_bind(back,'<Button>',lambda event,_text=i,back=back:go_func(back,_text))
         back_list=list(choices_back)
-        return word,choices_list
+        return word,choices_list,choices_back
 
     def add_link(self,pos:tuple,text,url,fg='#50B0F4',font=('微软雅黑',12),anchor='nw'):#绘制超链接
         def turn_red(event):
@@ -201,7 +202,7 @@ if __name__=='__main__':
 
     b=TinUI(a,bg='white')
     b.pack(fill='both',expand=True)
-    m=b.add_title((600,0),'TinUI is a test project for futher tin using',anchor='sn')
+    m=b.add_title((600,0),'TinUI is a test project for futher tin using')
     m1=b.add_title((0,680),'test TinUI scrolled',size=2,angle=24)
     b.add_paragraph((20,290),'''     TinUI是基于tkinter画布开发的界面UI布局方案，作为tkinter拓展和TinEngine的拓展而存在。目前，TinUI尚处于开发阶段。如果想要使用完整的TinUI，敬请期待。''',
     angle=-18)
@@ -212,6 +213,6 @@ if __name__=='__main__':
     b.add_entry((250,300),350,30,'这里用来输入')
     b.add_separate((20,200),600)
     b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
-    b.add_link((400,460),'TinGroup知识库','http://tinhome.baklib-free.com/')
+    b.add_link((400,500),'TinGroup知识库','http://tinhome.baklib-free.com/')
 
     a.mainloop()

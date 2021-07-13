@@ -63,11 +63,13 @@ class TinUI(Canvas):
         kw['anchor']=anchor
         return self.create_text(pos,text=text,fill=fg,font=font,justify=side,width=width,**kw)
 
-    def add_button(self,pos:tuple,text:str,fg='black',bg='#E1E1E1',font=('微软雅黑',12),command=None,anchor='nw'):#绘制按钮
+    def add_button(self,pos:tuple,text:str,fg='black',bg='#E1E1E1',activefg='black',activebg='#E5F1FB',font=('微软雅黑',12),command=None,anchor='nw'):#绘制按钮
         def in_button(event):
-            self.itemconfig(back,fill='#E5F1FB',outline='#82BDEB')
+            self.itemconfig(back,fill=activebg,outline='#82BDEB')
+            self.itemconfig(button,fill=activefg)
         def out_button(event):
             self.itemconfig(back,fill=bg,outline='grey')
+            self.itemconfig(button,fill=fg)
         button=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
         bbox=self.bbox(button)
         x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[2]+3,bbox[3]+3
@@ -207,7 +209,7 @@ if __name__=='__main__':
     b.add_paragraph((20,290),'''     TinUI是基于tkinter画布开发的界面UI布局方案，作为tkinter拓展和TinEngine的拓展而存在。目前，TinUI尚处于开发阶段。如果想要使用完整的TinUI，敬请期待。''',
     angle=-18)
     b.add_paragraph((20,100),'下面的段落是测试画布的非平行字体显示效果，也是TinUI的简单介绍')
-    b.add_button((250,450),'测试按钮',command=test,anchor='center')
+    b.add_button((250,450),'测试按钮',activefg='white',activebg='red',command=test,anchor='center')
     b.add_checkbutton((80,430),'允许TinUI测试',command=test1)
     b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
     b.add_entry((250,300),350,30,'这里用来输入')

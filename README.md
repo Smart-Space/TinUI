@@ -17,7 +17,7 @@ TinEngine有以下第三方依赖项：
 
 ## TinEngine支持
 
-TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845.html)的TinText控件，用以渲染[Tin标记语言](https://blog.csdn.net/tinga_kilin/category_10332845.html)富文本。
+[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845.html)使用了TinUI。
 
 ---
 
@@ -58,12 +58,14 @@ TinUI允许插入[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845
 
 ---
 
-### add_button(self,pos:tuple,text:str,fg='black',bg='#E1E1E1',font=('微软雅黑',12),command=None,anchor='nw')
+### add_button(self,pos:tuple,text:str,fg='black',bg='#E1E1E1',activefg='black',activebg='#E5F1FB',font=('微软雅黑',12),command=None,anchor='nw')
 
 - pos::位置
 - text::标题文字
 - fg::文字颜色
 - bg::按钮颜色
+- activefg::相应鼠标的文本颜色
+- activebg::相应鼠标的按钮颜色
 - font::字体名称+大小
 - command::绑定的函数。该函数**必须要有event参数**，因为TinUI的按钮会传递点击事件的event
 - anchor::对齐方向

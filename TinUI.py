@@ -1,8 +1,6 @@
 from tkinter import *
 import io
 from webbrowser import open as webopen
-import requests
-from PIL import Image,ImageTk
 
 class TinUINum:#数据结构，请忽略
     pass

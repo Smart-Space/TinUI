@@ -21,6 +21,21 @@ TinEngine有以下第三方依赖项：
 
 ---
 
+## 创建TinUI
+
+```python
+tinui=TinUI(root,bg='white',update=True,update_time=1000)
+'''
+update:bool::是否实时更新滚动画面
+update_time:int::每次更新滚动画面的间隔（毫秒）
+**kw::Canvas的参数
+'''
+```
+
+
+
+---
+
 ## 基础函数
 
 > ==一般地==，会将每个函数的名称以及定义、参数内容、函数绘制说明列出来。
@@ -177,3 +192,40 @@ TinEngine有以下第三方依赖项：
 绘制一个超链接文本。
 
 ### return: link
+
+---
+
+### add_waitbar1(self,pos:tuple,fg='blue',bg='',okfg='lightgreen',okbg='',bd=2,r=20)
+
+- pos::位置
+- fg::边框颜色
+- bg::内部填充颜色
+- okfg::完成时边框颜色
+- okbg::完成时内部填充颜色
+- bd::外框宽度
+- r::半径
+
+绘制一个扇形等待框。
+
+### return: waitbar1,ok
+
+> waitbar1::该画布对象
+>
+> ok::停止等待动画的函数。当你完成你需要等待的任务后，你可以调用此函数，停止等待动画
+
+---
+
+### add_labelframe(self,widgets:tuple=(),title='',fg='#A8A8A8',bg=''）
+
+- widgets::需要标题框囊括的画布对象
+- title::标题
+- fg::边框及标题颜色
+- bg::背景色
+
+绘制一个标题框，以包含所制定的所有画布对象
+
+### return: label,frame
+
+> label::标题文本
+>
+> frame::边框画布对象

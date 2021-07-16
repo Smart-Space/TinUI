@@ -4,6 +4,9 @@ from webbrowser import open as webopen
 import requests
 from PIL import Image,ImageTk
 
+class TinUINum:#数据结构，请忽略
+    pass
+
 class TinUI(Canvas):
     """基于tkinter的高级窗口绘制组件"""
 
@@ -28,13 +31,15 @@ class TinUI(Canvas):
             if m[0] != '_' and m != 'config' and m != 'configure':
                 setattr(self, m, getattr(self.frame, m))
         self.bind('<MouseWheel>',self.set_y_view)
+        self.bind('<Configure>',lambda event:self.update__())
         self.init()
         self.update_time=update_time
-        if update==True:#自动刷新滚动宽度
-            self.update__()
+        if update==False:
+            self.unbind("<Configure>")
 
     def init(self):
         self.title_size={0:20,1:18,2:16,3:14,4:12}
+        self.waitbar1_list=[i for i in range(0,360,5)]
     def set_y_view(self,event):
         self.yview_scroll(int(-1*(event.delta/120)), "units")
     def update__(self):#更新宽高
@@ -98,7 +103,8 @@ class TinUI(Canvas):
                 self.itemconfig(check,fill=fill)
             else:
                 self.itemconfig(check,fill=self['background'])
-            command(event)
+            if command!=None:
+                command(event)
         checkbutton=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
         bbox=self.bbox(checkbutton)
         dic=bbox[3]-bbox[1]#位移长度
@@ -188,6 +194,44 @@ class TinUI(Canvas):
         self.tag_bind(back,'<Button-1>',go_url)
         return link
 
+    def add_waitbar1(self,pos:tuple,fg='blue',bg='',okfg='lightgreen',okbg='',bd=2,r=20):#绘制圆形等待组件
+        def __start(i):
+            if ifok.re==True:
+                    return
+            self.itemconfig(waitbar1,extent=i)
+            if i==355:
+                start()
+        def start():
+            if ifok.re==True:
+                return
+            for i in self.waitbar1_list:
+                self.after(i*15,lambda i=i:__start(i))
+        def ok():
+            ifok.re=True
+            self.itemconfig(waitbar1,outline=okfg,fill=okbg,extent=359)
+        ifok=TinUINum
+        ifok.re=False
+        bbox=(pos[0],pos[1],pos[0]+2*r,pos[1]+2*r)
+        waitbar1=self.create_arc(bbox,outline=fg,fill=bg,extent=5,start=90,width=bd)
+        start()
+        return waitbar1,ok
+
+    def add_labelframe(self,widgets:tuple=(),title='',fg='#A8A8A8',bg=''):#绘制标题框
+        sx,sy,ex,ey=self.bbox(widgets[0])#获取直接的起始位置
+        for i in widgets:
+            nsx,nsy,nex,ney=self.bbox(i)
+            sx=nsx if nsx<sx else sx
+            sy=nsy if nsy<sy else sy
+            ex=nex if nex>ex else ex
+            ey=ney if ney>ey else ey
+        bg=self['background'] if bg=='' else bg
+        frame=self.create_rectangle((sx-5,sy-20,ex+5,ey+5),fill=bg,outline=fg)
+        label=self.create_text(((sx+ex)//2,sy-20),font='微软雅黑 10',text=title,fill=fg,anchor='center')
+        self.create_rectangle(self.bbox(label),fill=bg,outline=bg)
+        self.tag_raise(label)
+        self.tag_lower(frame)
+        return label,frame
+
 
 def test(event):
     a.title('TinUI Test')
@@ -196,7 +240,7 @@ def test(event):
 def test1(word):
     print(word)
 def test2(event):
-    pass
+    ok1()
 
 if __name__=='__main__':
     a=Tk()
@@ -216,5 +260,11 @@ if __name__=='__main__':
     b.add_separate((20,200),600)
     b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
     b.add_link((400,500),'TinGroup知识库','http://tinhome.baklib-free.com/')
+    waitbar1,ok1=b.add_waitbar1((500,220),bg='lightgreen')
+    b.add_button((500,270),'停止等待动画',activefg='blue',activebg='black',command=test2)
+    bu1=b.add_button((700,200),'nothing button 1')[1]
+    bu2=b.add_button((700,250),'nothing button 2')[1]
+    bu3=b.add_button((700,300),'nothing button 3')[1]
+    b.add_labelframe((bu1,bu2,bu3),'nothing buttons')
 
     a.mainloop()

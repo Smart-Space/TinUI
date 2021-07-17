@@ -229,3 +229,23 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > label::标题文本
 >
 > frame::边框画布对象
+
+---
+
+### add_waitbar2(self,pos:tuple,width:int=200,fg='grey',bg='white',okcolor='lightgreen')
+
+- pos::位置
+- width::宽度
+- fg::点状颜色
+- bg::背景颜色
+- okcolor::完成时背景填充颜色
+
+绘制一个点状运动的等待框
+
+### return: back,balls:list,stop
+
+> back::背景矩形画布对象
+>
+> balls::五个圆形画布对象的列表
+>
+> stop::停止等待动画的函数。当你完成你需要等待的任务后，你可以调用此函数，停止等待动画

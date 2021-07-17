@@ -203,7 +203,7 @@ class TinUI(Canvas):
             if ifok.re==True:
                 return
             for i in self.waitbar1_list:
-                self.after(i*15,lambda i=i:__start(i))
+                self.after(i*10,lambda i=i:__start(i))
         def ok():
             ifok.re=True
             self.itemconfig(waitbar1,outline=okfg,fill=okbg,extent=359)
@@ -230,6 +230,41 @@ class TinUI(Canvas):
         self.tag_lower(frame)
         return label,frame
 
+    def add_waitbar2(self,pos:tuple,width:int=200,fg='grey',bg='white',okcolor='lightgreen'):#绘制点状等待组件
+        def ball_go(ball,w):
+            self.move(ball,5,0)
+            if balls.index(ball)==4 and w>=width:
+                for i in balls:
+                    self.coords(i,ball_bbox)
+                start()
+        def _start(ball):
+            if ifok.re==True:
+                return
+            self.itemconfig(ball,state='normal')
+            for w in range(0,width+5,5):
+                self.after(w*15,lambda w=w:ball_go(ball,w))
+        def start():
+            if ifok.re==True:
+                return
+            for i in balls:
+                self.after(balls.index(i)*500,lambda i=i:_start(i))
+        def stop():
+            ifok.re=True
+            for i in balls:
+                self.itemconfig(i,state='hidden')
+            self.itemconfig(back,fill=okcolor)
+        ifok=TinUINum()
+        ifok.re=False
+        bbox=(pos[0],pos[1],pos[0]+width+10,pos[1]+10)
+        back=self.create_rectangle(bbox,fill=bg,outline=fg)
+        balls=[]
+        ball_bbox=(pos[0],pos[1],pos[0]+10,pos[1]+10)
+        for b in range(1,6):
+            ball=self.create_oval(ball_bbox,fill=fg,outline=fg,state='hidden')
+            balls.append(ball)
+        start()
+        return back,balls,stop
+
 
 def test(event):
     a.title('TinUI Test')
@@ -239,6 +274,8 @@ def test1(word):
     print(word)
 def test2(event):
     ok1()
+def test3(event):
+    ok2()
 
 if __name__=='__main__':
     a=Tk()
@@ -258,11 +295,12 @@ if __name__=='__main__':
     b.add_separate((20,200),600)
     b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
     b.add_link((400,500),'TinGroup知识库','http://tinhome.baklib-free.com/')
-    waitbar1,ok1=b.add_waitbar1((500,220),bg='lightgreen')
-    b.add_button((500,270),'停止等待动画',activefg='blue',activebg='black',command=test2)
-    bu1=b.add_button((700,200),'nothing button 1')[1]
+    _,ok1=b.add_waitbar1((500,220),bg='lightgreen')
+    b.add_button((500,270),'停止等待动画',activefg='cyan',activebg='black',command=test2)
+    bu1=b.add_button((700,200),'停止点状滚动条',activefg='white',activebg='black',command=test3)[1]
     bu2=b.add_button((700,250),'nothing button 2')[1]
     bu3=b.add_button((700,300),'nothing button 3')[1]
-    b.add_labelframe((bu1,bu2,bu3),'nothing buttons')
+    b.add_labelframe((bu1,bu2,bu3),'box buttons')
+    _,_,ok2=b.add_waitbar2((600,400),fg='blue')
 
     a.mainloop()

@@ -230,19 +230,22 @@ class TinUI(Canvas):
         self.tag_lower(frame)
         return label,frame
 
-    def add_waitbar2(self,pos:tuple,width:int=200,fg='grey',bg='white',okcolor='lightgreen'):#绘制点状等待组件
+    def add_waitbar2(self,pos:tuple,width:int=200,fg='grey',bg='white',okcolor='lightgreen'):#绘制点状等待框
+        #单点运动
         def ball_go(ball,w):
             self.move(ball,5,0)
             if balls.index(ball)==4 and w>=width:
                 for i in balls:
                     self.coords(i,ball_bbox)
                 start()
+        #单点运动控制
         def _start(ball):
             if ifok.re==True:
                 return
             self.itemconfig(ball,state='normal')
             for w in range(0,width+5,5):
                 self.after(w*15,lambda w=w:ball_go(ball,w))
+        #整体动画控制
         def start():
             if ifok.re==True:
                 return

@@ -1,5 +1,4 @@
 from tkinter import *
-import io
 from webbrowser import open as webopen
 
 class TinUINum:#数据结构，请忽略

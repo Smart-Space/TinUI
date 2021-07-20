@@ -10,10 +10,7 @@ TinUI基于tkinter的画布（Canvas），可以作为整个窗口的唯一控�
 
 ## 依赖
 
-TinEngine有以下第三方依赖项：
-
-1. PIL（pillow）
-3. requests
+目前，TinUI没有依赖项目。
 
 ## TinEngine支持
 

@@ -52,6 +52,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ### return: title
 
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E8%B5%B7%E6%AD%A5.gif)
+
 ---
 
 ### add_paragraph(self,pos:tuple,text:str,fg='black',font=('微软雅黑',12),side='left',width=500,anchor='nw',**kw)
@@ -67,6 +69,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 绘制一个段落。
 
 ### return: paragraph
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E8%B5%B7%E6%AD%A5.gif)
 
 ---
 
@@ -86,6 +90,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ### return: button_text, button_back
 
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E6%8C%89%E9%92%AE.gif)
+
 ---
 
 ### add_label(self,pos:tuple,text:str,fg='black',bg='#f0f0f0',outline='grey',font=('微软雅黑',12),anchor='nw') 
@@ -102,6 +108,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ### return: label
 
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E5%A4%8D%E9%80%89%E6%A1%86.gif)
+
 ---
 
 ### add_checkbutton(self,pos:tuple,text:str,fg='black',fill='lightgreen',font=('微软雅黑',12),command=None,anchor='nw')
@@ -117,6 +125,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 绘制一个复选框。这个复选框会响应鼠标的离开和进入事件，被单击时也会调用绑定的函数，并且会根据当前样式更改点击后的样式。
 
 ### return: check_text, check_mark
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E5%A4%8D%E9%80%89%E6%A1%86.gif)
 
 ---
 
@@ -137,6 +147,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ### return: entry
 
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E5%8D%95%E9%80%89%E6%A1%86.gif)
+
 ---
 
 ### add_separate(self,pos:tuple,width:int,direction='x',fg='grey',anchor='nw')
@@ -150,6 +162,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 绘制一条分割线。
 
 ### return: separate
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E5%A4%8D%E9%80%89%E6%A1%86.gif)
 
 ---
 
@@ -175,6 +189,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 >
 > choices_back::可选框的背景方框画布对象
 
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E5%8D%95%E9%80%89%E6%A1%86.gif)
+
 ---
 
 ### add_link(self,pos:tuple,text,url,fg='#50B0F4',font=('微软雅黑',12),anchor='nw')
@@ -189,6 +205,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 绘制一个超链接文本。
 
 ### return: link
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/%E8%B6%85%E9%93%BE%E6%8E%A5.gif)
 
 ---
 
@@ -210,6 +228,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 >
 > ok::停止等待动画的函数。当你完成你需要等待的任务后，你可以调用此函数，停止等待动画
 
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E7%AD%89%E5%BE%851.gif)
+
 ---
 
 ### add_labelframe(self,widgets:tuple=(),title='',fg='#A8A8A8',bg=''）
@@ -226,6 +246,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > label::标题文本
 >
 > frame::边框画布对象
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E6%A0%87%E9%A2%98%E8%BE%B9%E6%A1%86.gif)
 
 ---
 
@@ -246,6 +268,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > balls::五个圆形画布对象的列表
 >
 > stop::停止等待动画的函数。当你完成你需要等待的任务后，你可以调用此函数，停止等待动画
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E7%AD%89%E5%BE%852.gif)
 
 ---
 
@@ -271,3 +295,5 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > back::显示框背景
 >
 > box_tagname::所有选项框的tag名称
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E7%BB%84%E5%90%88%E6%A1%86.gif)

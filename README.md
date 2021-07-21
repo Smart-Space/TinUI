@@ -246,3 +246,28 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > balls::五个圆形画布对象的列表
 >
 > stop::停止等待动画的函数。当你完成你需要等待的任务后，你可以调用此函数，停止等待动画
+
+---
+
+### add_combobox(self,pos:tuple,width:int=200,text='',content:tuple=(),fg='black',bg='white',activefg='#757F87',activebg='#CCE4F7',font=('微软雅黑',12),command=None)
+
+- pos::位置
+- width::组合框显示区宽度
+- text::组合框显示区初始文字
+- content::拥有组合框所包含的内容的元组
+- fg::组合框文本、边框颜色
+- bg::组合框背景色
+- activefg::组合框选定时文本、边框颜色
+- activebg::组合框选定时文本、边框背景色
+- font::字体
+- command::当某一刻选择框被点击回调的函数。该函数需要接受一个参数：该选项框的文本内容。
+
+绘制一个组合框
+
+### return: main,back,box_tagname
+
+> main::显示框文字
+>
+> back::显示框背景
+>
+> box_tagname::所有选项框的tag名称

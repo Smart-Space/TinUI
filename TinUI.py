@@ -267,6 +267,49 @@ class TinUI(Canvas):
         start()
         return back,balls,stop
 
+    def add_combobox(self,pos:tuple,width:int=200,text='',content:tuple=(),fg='black',bg='white',activefg='#757F87',activebg='#CCE4F7',font=('微软雅黑',12),command=None):#绘制组合框
+        def button_in(_tag):
+            self.itemconfig(_tag,fill=activebg,outline=activefg)
+        def button_out(_tag):
+            self.itemconfig(_tag,fill=bg,outline=fg)
+        def open_box(event):
+            if self.itemcget(button_text,'text')=='∨':
+                self.itemconfig(button_text,text='∧',fill=activefg)
+                self.itemconfig(box_tagname,state='normal')
+            else:
+                self.itemconfig(button_text,text='∨',fill=activefg)
+                self.itemconfig(box_tagname,state='hidden')
+        def choose_this(back,word):
+            self.itemconfig(main,text=word)
+            if command!=None:
+                command(word)
+        main=self.create_text(pos,text=text,font=font,fill=fg,anchor='nw')
+        bbox=self.bbox(main)
+        x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[0]+width+3,bbox[3]+3
+        back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=fg)
+        self.tkraise(main)
+        button_text,button_back=self.add_button((x2+3,y1+3),'∨',fg,bg,activefg,activebg,font=font,command=open_box)
+        start_x=bbox[0]#起始x位置
+        height=bbox[3]+3#变量y位置
+        box_tagname='combobox>'+str(main)+'>'+str(back)#绑定独立的tag名称
+        for i in content:
+            choice=self.create_text((start_x+2,height+2),text=i,fill=fg,font=(font[0],10),anchor='nw',width=width-4)
+            pos=self.bbox(choice)
+            h=pos[3]-pos[1]+4
+            cho_back=self.create_rectangle((start_x,height,start_x+width,height+h),outline=fg,fill=bg)
+            self.tkraise(choice)
+            height+=h+2
+            self.tag_bind(choice,'<Enter>',lambda event,back=cho_back:button_in(back))
+            self.tag_bind(choice,'<Leave>',lambda event,back=cho_back:button_out(back))
+            self.tag_bind(cho_back,'<Enter>',lambda event,back=cho_back:button_in(back))
+            self.tag_bind(cho_back,'<Leave>',lambda event,back=cho_back:button_out(back))
+            self.tag_bind(choice,'<Button>',lambda event,_text=i,back=cho_back:choose_this(back,_text))
+            self.tag_bind(cho_back,'<Button>',lambda event,_text=i,back=cho_back:choose_this(back,_text))
+            self.addtag_withtag(box_tagname,choice)
+            self.addtag_withtag(box_tagname,cho_back)
+        self.itemconfig(box_tagname,state='hidden')
+        return main,back,box_tagname
+
 
 def test(event):
     a.title('TinUI Test')
@@ -304,5 +347,6 @@ if __name__=='__main__':
     bu3=b.add_button((700,300),'nothing button 3')[1]
     b.add_labelframe((bu1,bu2,bu3),'box buttons')
     _,_,ok2=b.add_waitbar2((600,400),fg='blue')
+    b.add_combobox((600,550),text='中考成绩预测',content=('730','740','750','760','770','780'))
 
     a.mainloop()

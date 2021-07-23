@@ -1,5 +1,7 @@
 # TinUI
 
+![](https://github.com/Smart-Space/TinUI/raw/main/image/LOGO.gif)
+
 ## 项目类型
 
 TinUI是一个基于tkinter（Python/tcl/tk）的拓展组件（Widget），可以绘制虚拟组件。

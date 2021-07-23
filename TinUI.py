@@ -196,6 +196,7 @@ class TinUI(Canvas):
             if ifok.re==True:
                     return
             self.itemconfig(waitbar1,extent=i)
+            self.update()
             if i==355:
                 start()
         def start():
@@ -233,9 +234,11 @@ class TinUI(Canvas):
         #单点运动
         def ball_go(ball,w):
             self.move(ball,5,0)
+            self.update()
             if balls.index(ball)==4 and w>=width:
                 for i in balls:
                     self.coords(i,ball_bbox)
+                    self.update()
                 start()
         #单点运动控制
         def _start(ball):
@@ -243,7 +246,7 @@ class TinUI(Canvas):
                 return
             self.itemconfig(ball,state='normal')
             for w in range(0,width+5,5):
-                self.after(w*15,lambda w=w:ball_go(ball,w))
+                self.after(w*10,lambda w=w:ball_go(ball,w))
         #整体动画控制
         def start():
             if ifok.re==True:

@@ -1,6 +1,6 @@
 # TinUI
 
-![](https://github.com/Smart-Space/TinUI/raw/main/image/LOGO.gif)
+![](https://github.com/Smart-Space/TinUI/raw/main/image/LOGO.png)
 
 ## 项目类型
 

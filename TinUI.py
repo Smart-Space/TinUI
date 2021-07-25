@@ -270,7 +270,7 @@ class TinUI(Canvas):
         start()
         return back,balls,stop
 
-    def add_combobox(self,pos:tuple,width:int=200,text='',content:tuple=(),fg='black',bg='white',activefg='#757F87',activebg='#CCE4F7',font=('微软雅黑',12),command=None):#绘制组合框
+    def add_combobox(self,pos:tuple,width:int=200,text='',content:tuple=(),fg='black',bg='white',activefg='#757F87',activebg='#CCE4F7',font=('微软雅黑',12),command=None):#绘制组合/下拉框
         def button_in(_tag):
             self.itemconfig(_tag,fill=activebg,outline=activefg)
         def button_out(_tag):
@@ -313,6 +313,30 @@ class TinUI(Canvas):
         self.itemconfig(box_tagname,state='hidden')
         return main,back,box_tagname
 
+    def add_progressbar(self,pos:tuple,width=250,fg='#3B3B3B',bg='#63ADE5',percentage=True,text=''):#绘制进度条
+        def goto(num:int):
+            if not 0<=num<=100:
+                return
+            pw=width*num//100
+            self.delete(pro_tagname)
+            new_progressbar=self.create_rectangle((pos[0],pos[1],pos[0]+pw,pos[1]+15),fill=bg,outline=bg)
+            self.lower(new_progressbar)
+            self.addtag_withtag(pro_tagname,new_progressbar)
+            if percentage==True:
+                self.itemconfig(text,text=str(num)+'%')
+            self.update()
+        bbox=(pos[0],pos[1],pos[0]+width,pos[1]+15)
+        back=self.create_rectangle((bbox),outline=fg)
+        progressbar=self.create_rectangle((pos[0],pos[1],pos[0],pos[1]+15),outline=bg,fill=bg)
+        pro_tagname='progressbar>'+str(back)
+        self.addtag_withtag(progressbar,pro_tagname)
+        #是否显示默认文本
+        if percentage==True:
+            text=self.create_text((pos[0]+width//2,pos[1]),anchor='n',text='0%',fill=fg,font='微软雅黑 10')
+        else:
+            text=self.create_text((pos[0]+width//2,pos[1]),anchor='n',text=text,fill=fg,font='微软雅黑 10')
+        return back,pro_tagname,text,goto
+
 
 def test(event):
     a.title('TinUI Test')
@@ -324,6 +348,11 @@ def test2(event):
     ok1()
 def test3(event):
     ok2()
+def test4(event):
+    from time import sleep
+    for i in range(1,101):
+        sleep(0.02)
+        progressgoto(i)
 
 if __name__=='__main__':
     a=Tk()
@@ -351,5 +380,7 @@ if __name__=='__main__':
     b.add_labelframe((bu1,bu2,bu3),'box buttons')
     _,_,ok2=b.add_waitbar2((600,400),fg='blue')
     b.add_combobox((600,550),text='中考成绩预测',content=('730','740','750','760','770','780'))
+    b.add_button((600,480),text='测试进度条（无事件版本）',command=test4)
+    _,_,_,progressgoto=b.add_progressbar((600,510))
 
     a.mainloop()

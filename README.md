@@ -299,3 +299,28 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > box_tagname::所有选项框的tag名称
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E7%BB%84%E5%90%88%E6%A1%86.gif)
+
+---
+
+### add_progressbar(self,pos:tuple,width=250,fg='#3B3B3B',bg='#63ADE5',percentage=True,text='')
+
+- pos::位置
+- width::宽度
+- fg::文本以及边框颜色
+- bg::填充颜色
+- percentage::是否显示进度文本，如果为False，则显示参数text的内容
+- text::当不显示进度文本时，进度条上的文本内容
+
+绘制一个进度条
+
+### return: back,pro_tagname,text,goto
+
+> back::背景矩形边框
+>
+> pro_tagname::进度框矩形所代表的tag名称
+>
+> text::进度条文本
+>
+> goto::进度改变函数：goto(num:int)，其中，num∈[0,100]。这将改变进度条的值
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI进度条.gif)

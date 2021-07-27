@@ -241,7 +241,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - fg::边框及标题颜色
 - bg::背景色
 
-绘制一个标题框，以包含所制定的所有画布对象
+绘制一个标题框，以包含所制定的所有画布对象。
 
 ### return: label,frame
 
@@ -261,7 +261,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - bg::背景颜色
 - okcolor::完成时背景填充颜色
 
-绘制一个点状运动的等待框
+绘制一个点状运动的等待框。
 
 ### return: back,balls:list,stop
 
@@ -288,7 +288,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - font::字体
 - command::当某一刻选择框被点击回调的函数。该函数需要接受一个参数：该选项框的文本内容。
 
-绘制一个组合框
+绘制一个组合框。
 
 ### return: main,back,box_tagname
 
@@ -311,7 +311,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - percentage::是否显示进度文本，如果为False，则显示参数text的内容
 - text::当不显示进度文本时，进度条上的文本内容
 
-绘制一个进度条
+绘制一个进度条。
 
 ### return: back,pro_tagname,text,goto
 
@@ -324,3 +324,23 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > goto::进度改变函数：goto(num:int)，其中，num∈[0,100]。这将改变进度条的值
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI进度条.gif)
+
+---
+
+### add_table(self,pos:tuple,outline='#E1E1E1',fg='black',bg='white',data=[['1','2','3'],['a','b','c']],minwidth=100,font=('微软雅黑',12))
+
+- pos::位置
+- outline::边框颜色
+- fg::文本颜色
+- bg::文本背景颜色
+- data::表格数据。格式：((title,...,...),(content1,...,...),(content2,...,...),...)
+- minwidth::单元格最小宽度
+- font::字体
+
+绘制一个表格。
+
+### return: None
+
+> 表格组件绘制较复杂，涉及到列宽度、行最大高度等内容，目前没有返回内容
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI表格.gif)

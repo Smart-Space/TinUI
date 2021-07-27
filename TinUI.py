@@ -337,6 +337,57 @@ class TinUI(Canvas):
             text=self.create_text((pos[0]+width//2,pos[1]),anchor='n',text=text,fill=fg,font='微软雅黑 10')
         return back,pro_tagname,text,goto
 
+    def add_table(self,pos:tuple,outline='#E1E1E1',fg='black',bg='white',data=[['1','2','3'],['a','b','c']],minwidth=100,font=('微软雅黑',12)):#绘制表格
+        def get_max_height(widths:dict):
+            height=0
+            for i in widths.values():
+                height=i[1] if i[1]>height else height
+            #重新绘制
+            for back in widths.keys():
+                self.delete(widths[back][0])
+                x1,y1,x2=widths[back][2]
+                y2=y1+height
+                newback=self.create_rectangle((x1,y1,x2,y2),outline=outline,fill=bg)
+                self.lower(newback)
+            return height
+        title_num=len(data[0])#获取表头个数
+        end_x,end_y=pos#起始位置
+        height=0
+        line_width={}#获取每列的固定宽度
+        count=1
+        for i in data[0]:
+            title=self.create_text((end_x,end_y),anchor='nw',text=i,fill=fg,font=font)
+            bbox=self.bbox(title)
+            if bbox[2]-bbox[0]<=100:
+                width=100
+            else:
+                width=bbox[2]-bbox[0]
+            line_width[count]=width
+            height=bbox[3]-bbox[1]
+            self.create_rectangle((end_x,end_y,end_x+width,end_y+height),outline=outline,fill=bg)
+            end_x=end_x+width+2
+            count+=1
+            self.tkraise(title)
+        end_y=pos[1]+height+2
+        for line in data[1:]:
+            count=1
+            a_dict={}
+            end_x=pos[0]
+            height=0
+            for a in line:
+                width=line_width[count]
+                cont=self.create_text((end_x,end_y),anchor='nw',text=a,fill=fg,width=width,font=font)
+                bbox=self.bbox(cont)
+                height=bbox[3]-bbox[1]
+                back=self.create_rectangle((end_x,end_y,end_x+width,end_y+height),outline=outline,fill=bg)
+                self.tkraise(cont)
+                a_dict[count]=(back,height,(end_x,end_y,end_x+width))#(end_x,end_y,width)为重新绘制确定位置范围
+                end_x=end_x+width+2
+                count+=1
+            height=get_max_height(a_dict)
+            end_y=end_y+height+2
+        return None
+
 
 def test(event):
     a.title('TinUI Test')
@@ -382,5 +433,7 @@ if __name__=='__main__':
     b.add_combobox((600,550),text='中考成绩预测',content=('730','740','750','760','770','780'))
     b.add_button((600,480),text='测试进度条（无事件版本）',command=test4)
     _,_,_,progressgoto=b.add_progressbar((600,510))
+    b.add_table((180,630),data=(('a','space fans over the world','c'),('you\ncan','2','3'),('I','II','have a dream, then try your best to get it!')))
+    b.add_paragraph((300,810),text='上面是一个表格')
 
     a.mainloop()

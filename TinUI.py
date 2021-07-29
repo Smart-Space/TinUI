@@ -432,7 +432,7 @@ if __name__=='__main__':
     bu3=b.add_button((700,300),'nothing button 3')[1]
     b.add_labelframe((bu1,bu2,bu3),'box buttons')
     _,_,ok2=b.add_waitbar2((600,400),fg='blue')
-    b.add_combobox((600,550),text='中考成绩预测',content=('730','740','750','760','770','780'))
+    b.add_combobox((600,550),text='你有多大可能去珠穆朗玛峰',content=('20%','40%','60%','80%','100%','1000%'))
     b.add_button((600,480),text='测试进度条（无事件版本）',command=test4)
     _,_,_,progressgoto=b.add_progressbar((600,510))
     b.add_table((180,630),data=(('a','space fans over the world','c'),('you\ncan','2','3'),('I','II','have a dream, then try your best to get it!')))

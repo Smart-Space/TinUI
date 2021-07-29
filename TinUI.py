@@ -65,7 +65,7 @@ class TinUI(Canvas):
         kw['anchor']=anchor
         return self.create_text(pos,text=text,fill=fg,font=font,justify=side,width=width,**kw)
 
-    def add_button(self,pos:tuple,text:str,fg='black',bg='#E1E1E1',activefg='black',activebg='#E5F1FB',font=('微软雅黑',12),command=None,anchor='nw'):#绘制按钮
+    def add_button(self,pos:tuple,text:str,fg='black',bg='#CCCCCC',activefg='black',activebg='#E5F1FB',font=('微软雅黑',12),command=None,anchor='nw'):#绘制按钮
         def in_button(event):
             self.itemconfig(back,fill=activebg,outline='#82BDEB')
             self.itemconfig(button,fill=activefg)
@@ -270,7 +270,7 @@ class TinUI(Canvas):
         start()
         return back,balls,stop
 
-    def add_combobox(self,pos:tuple,width:int=200,text='',content:tuple=(),fg='black',bg='white',activefg='#757F87',activebg='#CCE4F7',font=('微软雅黑',12),command=None):#绘制组合/下拉框
+    def add_combobox(self,pos:tuple,width:int=200,text='',content:tuple=(),fg='black',bg='#F2F2F2',activefg='',activebg='#7B8ADA',font=('微软雅黑',12),command=None):#绘制组合/下拉框
         def button_in(_tag):
             self.itemconfig(_tag,fill=activebg,outline=activefg)
         def button_out(_tag):
@@ -286,6 +286,8 @@ class TinUI(Canvas):
             self.itemconfig(main,text=word)
             if command!=None:
                 command(word)
+        if activefg=='':
+            activefg=self['background']
         main=self.create_text(pos,text=text,font=font,fill=fg,anchor='nw')
         bbox=self.bbox(main)
         x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[0]+width+3,bbox[3]+3

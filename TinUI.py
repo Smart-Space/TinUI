@@ -170,7 +170,7 @@ class TinUI(Canvas):
         back_list=list(choices_back)
         return word,choices_list,choices_back
 
-    def add_link(self,pos:tuple,text,url,fg='#50B0F4',font=('微软雅黑',12),anchor='nw'):#绘制超链接
+    def add_link(self,pos:tuple,text,url,fg='#50B0F4',font:tuple=('微软雅黑',12),anchor='nw'):#绘制超链接
         def turn_red(event):
             self.itemconfig(link,fill='red')
             self['cursor']='hand2'
@@ -180,6 +180,8 @@ class TinUI(Canvas):
         def go_url(event):
             webopen(url)
         link=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
+        font=self.itemcget(link,'font')+' underline'
+        self.itemconfig(link,font=font)
         bbox=self.bbox(link)
         back=self.create_rectangle(bbox,width=0)
         self.tkraise(link)
@@ -191,7 +193,7 @@ class TinUI(Canvas):
         self.tag_bind(back,'<Button-1>',go_url)
         return link
 
-    def add_waitbar1(self,pos:tuple,fg='blue',bg='',okfg='lightgreen',okbg='',bd=2,r=20):#绘制圆形等待组件
+    def add_waitbar1(self,pos:tuple,fg='#0078D7',bg='',okfg='lightgreen',okbg='',bd=2,r=20):#绘制圆形等待组件
         def __start(i):
             if ifok.re==True:
                     return
@@ -210,7 +212,7 @@ class TinUI(Canvas):
         ifok=TinUINum
         ifok.re=False
         bbox=(pos[0],pos[1],pos[0]+2*r,pos[1]+2*r)
-        waitbar1=self.create_arc(bbox,outline=fg,fill=bg,extent=5,start=90,width=bd)
+        waitbar1=self.create_arc(bbox,outline=fg,fill=bg,extent=5,start=90,width=bd,style='arc')
         start()
         return waitbar1,ok
 
@@ -230,12 +232,12 @@ class TinUI(Canvas):
         self.tag_lower(frame)
         return label,frame
 
-    def add_waitbar2(self,pos:tuple,width:int=200,fg='grey',bg='white',okcolor='lightgreen'):#绘制点状等待框
+    def add_waitbar2(self,pos:tuple,width:int=200,fg='#0078D7',bg='white',okcolor='lightgreen'):#绘制点状等待框
         #单点运动
-        def ball_go(ball,w):
-            self.move(ball,5,0)
+        def ball_go(ball,w,x,num):
+            self.move(ball,x,0)
             self.update()
-            if balls.index(ball)==4 and w>=width:
+            if num==4 and w>=width:
                 for i in balls:
                     self.coords(i,ball_bbox)
                     self.update()
@@ -245,8 +247,12 @@ class TinUI(Canvas):
             if ifok.re==True:
                 return
             self.itemconfig(ball,state='normal')
-            for w in range(0,width+5,5):
-                self.after(w*10,lambda w=w:ball_go(ball,w))
+            num=balls.index(ball)
+            fast=width//2
+            for w in range(0,width+5-fast,5):
+                self.after(w*20,lambda w=w:ball_go(ball,w,5,num))
+            for w in range(width+5-fast,width+5-fast//2,5):
+                self.after(w*20,lambda w=w:ball_go(ball,w+fast//2,10,num))
         #整体动画控制
         def start():
             if ifok.re==True:
@@ -260,10 +266,10 @@ class TinUI(Canvas):
             self.itemconfig(back,fill=okcolor)
         ifok=TinUINum()
         ifok.re=False
-        bbox=(pos[0],pos[1],pos[0]+width+10,pos[1]+10)
+        bbox=(pos[0],pos[1],pos[0]+width+10,pos[1]+5)
         back=self.create_rectangle(bbox,fill=bg,outline=fg)
         balls=[]
-        ball_bbox=(pos[0],pos[1],pos[0]+10,pos[1]+10)
+        ball_bbox=(pos[0],pos[1],pos[0]+5,pos[1]+5)
         for b in range(1,6):
             ball=self.create_oval(ball_bbox,fill=fg,outline=fg,state='hidden')
             balls.append(ball)
@@ -315,20 +321,20 @@ class TinUI(Canvas):
         self.itemconfig(box_tagname,state='hidden')
         return main,back,box_tagname
 
-    def add_progressbar(self,pos:tuple,width=250,fg='#3B3B3B',bg='#63ADE5',percentage=True,text=''):#绘制进度条
+    def add_progressbar(self,pos:tuple,width=250,fg='#1E1E27',bg='#0078D7',percentage=True,text=''):#绘制进度条
         def goto(num:int):
             if not 0<=num<=100:
                 return
             pw=width*num//100
             self.delete(pro_tagname)
             new_progressbar=self.create_rectangle((pos[0],pos[1],pos[0]+pw,pos[1]+15),fill=bg,outline=bg)
-            self.lower(new_progressbar)
+            self.tkraise(text)
             self.addtag_withtag(pro_tagname,new_progressbar)
             if percentage==True:
                 self.itemconfig(text,text=str(num)+'%')
             self.update()
         bbox=(pos[0],pos[1],pos[0]+width,pos[1]+15)
-        back=self.create_rectangle((bbox),outline=fg)
+        back=self.create_rectangle((bbox),outline=fg,fill='#CCCCCC')
         progressbar=self.create_rectangle((pos[0],pos[1],pos[0],pos[1]+15),outline=bg,fill=bg)
         pro_tagname='progressbar>'+str(back)
         self.addtag_withtag(progressbar,pro_tagname)
@@ -425,13 +431,13 @@ if __name__=='__main__':
     b.add_separate((20,200),600)
     b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
     b.add_link((400,500),'TinGroup知识库','http://tinhome.baklib-free.com/')
-    _,ok1=b.add_waitbar1((500,220),bg='lightgreen')
+    _,ok1=b.add_waitbar1((500,220),bg='#CCCCCC')
     b.add_button((500,270),'停止等待动画',activefg='cyan',activebg='black',command=test2)
     bu1=b.add_button((700,200),'停止点状滚动条',activefg='white',activebg='black',command=test3)[1]
     bu2=b.add_button((700,250),'nothing button 2')[1]
     bu3=b.add_button((700,300),'nothing button 3')[1]
     b.add_labelframe((bu1,bu2,bu3),'box buttons')
-    _,_,ok2=b.add_waitbar2((600,400),fg='blue')
+    _,_,ok2=b.add_waitbar2((600,400))
     b.add_combobox((600,550),text='你有多大可能去珠穆朗玛峰',content=('20%','40%','60%','80%','100%','1000%'))
     b.add_button((600,480),text='测试进度条（无事件版本）',command=test4)
     _,_,_,progressgoto=b.add_progressbar((600,510))

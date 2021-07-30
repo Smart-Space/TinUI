@@ -208,11 +208,14 @@ class TinUI(Canvas):
                 self.after(i*10,lambda i=i:__start(i))
         def ok():
             ifok.re=True
-            self.itemconfig(waitbar1,outline=okfg,fill=okbg,extent=359)
+            self.itemconfig(waitbar1,outline=okfg,extent=359)
+            self.itemconfig(back,fill=okbg)
         ifok=TinUINum
         ifok.re=False
         bbox=(pos[0],pos[1],pos[0]+2*r,pos[1]+2*r)
-        waitbar1=self.create_arc(bbox,outline=fg,fill=bg,extent=5,start=90,width=bd,style='arc')
+        back_bbox=(pos[0]+bd,pos[1]+bd,pos[0]+2*r-bd,pos[1]+2*r-bd)
+        back=self.create_oval(back_bbox,width=0,fill=bg)
+        waitbar1=self.create_arc(bbox,outline=fg,extent=5,start=90,width=bd,style='arc')
         start()
         return waitbar1,ok
 

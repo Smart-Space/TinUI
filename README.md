@@ -344,3 +344,23 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > 表格组件绘制较复杂，涉及到列宽度、行最大高度等内容，目前没有返回内容
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI表格.gif)
+
+---
+
+### add_onoff(self,pos:tuple,fg='#333333',bg='#FFFFFF',onfg='#FFFFFF',onbg='#4258CC',font=('微软雅黑',12),command=None)
+
+- pos::位置
+- fg::关闭状态下的文本、边框颜色
+- bg::关闭状态下的背景颜色
+- onfg::开启状态下的文本颜色
+- onbg::开启状态下的边框、背景颜色
+- font::字体
+- command::当被点击时调用的函数，函数只有一个参数：布尔值。调用参数True表示开启，False表示关闭
+
+绘制一个开关。
+
+### return: state, back
+
+> state::文本内容。“off”或“on”的画布对象
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI开关.gif)

@@ -1,8 +1,13 @@
 from tkinter import *
 from webbrowser import open as webopen
+import ctypes
 
-class TinUINum:#数据结构，请忽略
+
+
+
+class TinUINum:#数据载体，请忽略
     pass
+
 
 class TinUI(Canvas):
     """基于tkinter的高级窗口绘制组件"""
@@ -36,7 +41,6 @@ class TinUI(Canvas):
 
     def init(self):
         self.title_size={0:20,1:18,2:16,3:14,4:12}
-        self.waitbar1_list=[i for i in range(0,360,5)]
     def set_y_view(self,event):
         self.yview_scroll(int(-1*(event.delta/120)), "units")
     def update__(self):#更新宽高
@@ -204,7 +208,7 @@ class TinUI(Canvas):
         def start():
             if ifok.re==True:
                 return
-            for i in self.waitbar1_list:
+            for i in range(0,360,5):
                 self.after(i*10,lambda i=i:__start(i))
         def ok():
             ifok.re=True
@@ -235,7 +239,7 @@ class TinUI(Canvas):
         self.tag_lower(frame)
         return label,frame
 
-    def add_waitbar2(self,pos:tuple,width:int=200,fg='#0078D7',bg='white',okcolor='lightgreen'):#绘制点状等待框
+    def add_waitbar2(self,pos:tuple,width:int=240,fg='#0078D7',bg='white',okcolor='lightgreen'):#绘制点状等待框
         #单点运动
         def ball_go(ball,w,x,num):
             self.move(ball,x,0)
@@ -253,9 +257,9 @@ class TinUI(Canvas):
             num=balls.index(ball)
             fast=width//2
             for w in range(0,width+5-fast,5):
-                self.after(w*20,lambda w=w:ball_go(ball,w,5,num))
+                self.after(w*15,lambda w=w:ball_go(ball,w,5,num))
             for w in range(width+5-fast,width+5-fast//2,5):
-                self.after(w*20,lambda w=w:ball_go(ball,w+fast//2,10,num))
+                self.after(w*15,lambda w=w:ball_go(ball,w+fast//2,10,num))
         #整体动画控制
         def start():
             if ifok.re==True:
@@ -399,6 +403,36 @@ class TinUI(Canvas):
             end_y=end_y+height+2
         return None
 
+    def add_onoff(self,pos:tuple,fg='#333333',bg='#FFFFFF',onfg='#FFFFFF',onbg='#4258CC',font=('微软雅黑',12),command=None):#绘制开关控件
+        def __on():
+            if command!=None:
+                command(True)
+        def __off():
+            if command!=None:
+                command(False)
+        def __on_click(event):
+            if self.itemcget(state,'fill')==fg:
+                self.itemconfig(state,fill=onfg,text='on')
+                self.move(state,width//10,0)
+                self.itemconfig(back,fill=onbg,outline=onbg)
+                __on()
+            else:
+                self.itemconfig(state,fill=fg,text='off')
+                self.move(state,0-width//10,0)
+                self.itemconfig(back,fill=bg,outline=fg)
+                __off()
+        state=self.create_text(pos,anchor='nw',text=state,fill=fg,font=font)
+        bbox=self.bbox(state)
+        d=int(bbox[3]-bbox[1])#获得绘制半径
+        width=bbox[2]-bbox[0]#获取绘制宽度
+        self.move(state,d,0)
+        back=self.create_polygon((pos[0]+d,pos[1],pos[0],pos[1]+d/2,pos[0]+d,pos[1]+d,pos[0]+d+width,pos[1]+d,pos[0]+d*2+width,pos[1]+d/2,
+        pos[0]+d+width,pos[1],pos[0]+d,pos[1]),fill=bg,outline=fg,width=2,joinstyle='miter')
+        self.tkraise(state)
+        self.tag_bind(state,'<Button-1>',__on_click)
+        self.tag_bind(state,'<Button-1>',__on_click)
+        return state,back
+
 
 def test(event):
     a.title('TinUI Test')
@@ -446,5 +480,6 @@ if __name__=='__main__':
     _,_,_,progressgoto=b.add_progressbar((600,510))
     b.add_table((180,630),data=(('a','space fans over the world','c'),('you\ncan','2','3'),('I','II','have a dream, then try your best to get it!')))
     b.add_paragraph((300,810),text='上面是一个表格')
+    b.add_onoff((600,100))
 
     a.mainloop()

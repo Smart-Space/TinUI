@@ -14,10 +14,6 @@ TinUI基于tkinter的画布（Canvas），可以作为整个窗口的唯一控�
 
 目前，TinUI没有依赖项目。
 
-## TinEngine支持
-
-[TinEngine](https://blog.csdn.net/tinga_kilin/category_10332845.html)使用了TinUI。
-
 ---
 
 ## 创建TinUI

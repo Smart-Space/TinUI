@@ -293,10 +293,11 @@ class TinUI(Canvas):
                 self.itemconfig(button_text,text='∧',fill=activefg)
                 self.itemconfig(box_tagname,state='normal')
             else:
-                self.itemconfig(button_text,text='∨',fill=activefg)
+                self.itemconfig(button_text,text='∨',fill=fg)
                 self.itemconfig(box_tagname,state='hidden')
         def choose_this(back,word):
             self.itemconfig(main,text=word)
+            open_box(None)
             if command!=None:
                 command(word)
         if activefg=='':
@@ -421,7 +422,7 @@ class TinUI(Canvas):
                 self.move(state,0-width//10,0)
                 self.itemconfig(back,fill=bg,outline=fg)
                 __off()
-        state=self.create_text(pos,anchor='nw',text=state,fill=fg,font=font)
+        state=self.create_text(pos,anchor='nw',text='off',fill=fg,font=font)
         bbox=self.bbox(state)
         d=int(bbox[3]-bbox[1])#获得绘制半径
         width=bbox[2]-bbox[0]#获取绘制宽度
@@ -430,7 +431,7 @@ class TinUI(Canvas):
         pos[0]+d+width,pos[1],pos[0]+d,pos[1]),fill=bg,outline=fg,width=2,joinstyle='miter')
         self.tkraise(state)
         self.tag_bind(state,'<Button-1>',__on_click)
-        self.tag_bind(state,'<Button-1>',__on_click)
+        self.tag_bind(back,'<Button-1>',__on_click)
         return state,back
 
 

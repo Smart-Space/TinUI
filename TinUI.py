@@ -94,23 +94,26 @@ class TinUI(Canvas):
         self.tkraise(label)
         return label
 
-    def add_checkbutton(self,pos:tuple,text:str,fg='black',fill='lightgreen',font=('微软雅黑',12),command=None,anchor='nw'):#绘制复选框
+    def add_checkbutton(self,pos:tuple,text:str,fontfg='black',fg='#a6a6a6',bg='',onfg='white',onbg='#0067c0',font=('微软雅黑',12),command=None,anchor='nw'):#绘制复选框
         def button_in(event):
             self.itemconfig(check,outline='#82BDEB')
         def button_out(event):
             self.itemconfig(check,outline=fg)
         def go_func(event):
-            if self.itemcget(check,'fill')!=fill:
-                self.itemconfig(check,fill=fill)
+            if self.itemcget(check,'fill')==bg:
+                self.itemconfig(check,fill=onbg,outline=onbg)
+                self.itemconfig(state,state='normal')
             else:
-                self.itemconfig(check,fill=self['background'])
+                self.itemconfig(check,fill=bg,outline=fg)
+                self.itemconfig(state,state='hidden')
             if command!=None:
                 command(event)
-        checkbutton=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
+        checkbutton=self.create_text(pos,text=text,fill=fontfg,font=font,anchor=anchor)
         bbox=self.bbox(checkbutton)
         dic=bbox[3]-bbox[1]#位移长度
         self.move(checkbutton,dic-7,0)
-        check=self.create_rectangle((pos[0],pos[1]+5,pos[0]+dic-10,pos[1]+dic-5),outline=fg,fill=self['background'])
+        check=self.create_rectangle((pos[0]-2,pos[1]+4,pos[0]+dic-12,pos[1]+dic-4),outline=fg,fill=bg)
+        state=self.create_text((pos[0]-2,pos[1]),text='√',fill=onfg,font=font,anchor='nw',state='hidden')
         self.tag_bind(check,'<Enter>',button_in)
         self.tag_bind(check,'<Leave>',button_out)
         self.tag_bind(checkbutton,'<Enter>',button_in)
@@ -434,6 +437,48 @@ class TinUI(Canvas):
         self.tag_bind(back,'<Button-1>',__on_click)
         return state,back
 
+    def add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='black',bg='',activefg='black',activebg='#E5F1FB',font=('微软雅黑',12),command=None):#绘制选值框
+        def updata(event):
+            index=datanum.num-1
+            if index<0:
+                return
+            datanum.num-=1
+            wentry.delete(0,'end')
+            wentry.insert(0,data[index])
+            if command!=None:
+                command(data[index])
+        def downdata(event):
+            index=datanum.num+1
+            if index>maxnum:
+                return
+            datanum.num+=1
+            wentry.delete(0,'end')
+            wentry.insert(0,data[index])
+            if command!=None:
+                command(data[index])
+        def check_in_data():
+            val=wentry.get(0,'end')
+            if val in data:
+                return True
+            else:
+                return False
+        if bg=='':
+            bg=self['background']
+        wentry=Entry(self,font=font,fg=fg,bd=2,bg=bg,relief='groove')
+        if now=='' or now not in data:
+            now=data[0]
+        wentry.insert(0,now)
+        entry=self.create_window(pos,window=wentry,width=width,anchor='nw')
+        bbox=self.bbox(entry)
+        height=bbox[3]-bbox[1]
+        font=(font[0],font[1]//3)
+        button1=self.add_button((pos[0]+width+2,pos[1]+3),text='▲',activefg=activefg,activebg=activebg,font=font,command=updata)
+        button2=self.add_button((pos[0]+width+2,pos[1]-5+height),text='▼',activefg=activefg,activebg=activebg,font=font,anchor='sw',command=downdata)
+        datanum=TinUINum()
+        datanum.num=data.index(now)#记录数据位置
+        maxnum=len(data)-1#最大位置
+        return wentry,button1,button2
+
 
 def test(event):
     a.title('TinUI Test')
@@ -482,5 +527,6 @@ if __name__=='__main__':
     b.add_table((180,630),data=(('a','space fans over the world','c'),('you\ncan','2','3'),('I','II','have a dream, then try your best to get it!')))
     b.add_paragraph((300,810),text='上面是一个表格')
     b.add_onoff((600,100))
+    b.add_spinbox((680,100))
 
     a.mainloop()

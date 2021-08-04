@@ -110,12 +110,15 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_checkbutton(self,pos:tuple,text:str,fg='black',fill='lightgreen',font=('微软雅黑',12),command=None,anchor='nw')
+### add_checkbutton(self,pos:tuple,text:str,fontfg='black',fg='#a6a6a6',bg='',onfg='white',onbg='#0067c0',font=('微软雅黑',12),command=None,anchor='nw')
 
 - pos::位置
 - text::标题文字
-- fg::文字颜色
-- fill::选中的标识填充
+- fontfg::文本颜色
+- fg::复选框边框颜色
+- bg::复选框背景颜色
+- onfg::选定时文本图标颜色
+- obbg::选定时背景颜色
 - font::字体名称+大小
 - command::绑定的函数。该函数**必须要有event参数**，因为TinUI的按钮会传递点击事件的event
 - anchor::对齐方向
@@ -145,7 +148,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ### return: entry
 
-![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E5%8D%95%E9%80%89%E6%A1%86.gif)
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI输入框.gif)
 
 ---
 
@@ -161,7 +164,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ### return: separate
 
-![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E5%A4%8D%E9%80%89%E6%A1%86.gif)
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI分割线.gif)
 
 ---
 

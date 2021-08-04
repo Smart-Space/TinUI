@@ -363,3 +363,30 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > state::文本内容。“off”或“on”的画布对象
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI开关.gif)
+
+---
+
+### add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='black',bg='',activefg='black',activebg='#E5F1FB',font=('微软雅黑',12),command=None)
+
+- pos::位置
+- width::宽度
+- data::可选值的内容。格式：(ele1,ele2,ele3...)
+- now::当前显示值。如果为空或不再data中，则显示第一个值
+- fg::文本颜色
+- bg::输入框背景色
+- activefg::按钮响应文本颜色
+- activebg::按钮响应背景色
+- font::输入框字体，同时会影响按钮字体
+- command::选值时响应的函数，必须接受一个参数，这个参数是当前选定的值
+
+绘制一个选值框。
+
+### return: wentry,button1,button2
+
+> wentry::输入框组件
+>
+> button1::上调按钮
+>
+> button2::下调按钮
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI选值框.gif)

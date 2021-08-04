@@ -439,6 +439,9 @@ class TinUI(Canvas):
 
     def add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='black',bg='',activefg='black',activebg='#E5F1FB',font=('微软雅黑',12),command=None):#绘制选值框
         def updata(event):
+            val=check_in_data()
+            if val[0]==True:
+                datanum.num=data.index(val[1])
             index=datanum.num-1
             if index<0:
                 return
@@ -448,6 +451,9 @@ class TinUI(Canvas):
             if command!=None:
                 command(data[index])
         def downdata(event):
+            val=check_in_data()
+            if val[0]==True:
+                datanum.num=data.index(val[1])
             index=datanum.num+1
             if index>maxnum:
                 return
@@ -457,11 +463,11 @@ class TinUI(Canvas):
             if command!=None:
                 command(data[index])
         def check_in_data():
-            val=wentry.get(0,'end')
+            val=wentry.get()
             if val in data:
-                return True
+                return True,val
             else:
-                return False
+                return False,val
         if bg=='':
             bg=self['background']
         wentry=Entry(self,font=font,fg=fg,bd=2,bg=bg,relief='groove')

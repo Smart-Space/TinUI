@@ -106,7 +106,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ### return: label
 
-![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E5%A4%8D%E9%80%89%E6%A1%86.gif)
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI标签.gif)
 
 ---
 
@@ -127,7 +127,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ### return: check_text, check_mark
 
-![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E5%A4%8D%E9%80%89%E6%A1%86.gif)
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI复选框.gif)
 
 ---
 
@@ -190,7 +190,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 >
 > choices_back::可选框的背景方框画布对象
 
-![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E5%8D%95%E9%80%89%E6%A1%86.gif)
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI单选框.gif)
 
 ---
 

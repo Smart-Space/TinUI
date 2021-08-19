@@ -485,6 +485,45 @@ class TinUI(Canvas):
         maxnum=len(data)-1#最大位置
         return wentry,button1,button2
 
+    def add_scalebar(self,pos:tuple,width=200,fg='#4258cc',activefg='#aeb5d7',bg='#99a3d5',data=(1,2,3,4,5),start=1,command=None):#绘制调节框
+        def mousedown(event):
+            scale.startx=self.canvasx(event.x)
+        def drag(event):
+            move=self.canvasx(event.x)-scale.startx
+            if self.canvasx(event.x)<pos[0] or self.canvasx(event.x)>pos[0]+width:
+                return
+            self.move(button,move,0)
+            self.delete(name)
+            active=self.create_line((pos[0],pos[1],move+scale.startx,pos[1]),fill=fg,width=3,tags=name)
+            scale.startx=self.canvasx(event.x)
+        def check(event):
+            end=int(self.canvasx(event.x))
+            if end<pos[0]:end=pos[0]
+            if end>pos[0]+width:end=pos[0]+width
+            rend=min(dash,key=lambda x:abs(x-end))
+            num=dash.index(rend)
+            if command!=None:
+                command(data[num])
+        scale=TinUINum()#记录数据结构体
+        back=self.create_line((pos[0],pos[1],pos[0]+width,pos[1]),fill=bg,width=3)
+        dash_t=width//(len(data)-1)
+        s=pos[0]#调节线段起点
+        dash=[s]#调节线段的终点位置
+        for i in data[1:]:
+            s+=dash_t
+            dash.append(s)
+        del s
+        active=self.create_line((pos[0],pos[1],dash[start],pos[1]),fill=fg,width=3)
+        name='scaleactive'+str(active)
+        self.addtag_withtag(name,active)#为重绘绑定tag名称
+        button=self.create_rectangle((dash[start],pos[1]-15,dash[start]+10,pos[1]+17),width=0,fill=fg)
+        self.tag_bind(button,'<Enter>',lambda event:self.itemconfig(button,fill=activefg))
+        self.tag_bind(button,'<Leave>',lambda event:self.itemconfig(button,fill=fg))
+        self.tag_bind(button,'<Button-1>',mousedown)
+        self.tag_bind(button,'<B1-Motion>',drag)
+        self.tag_bind(button,'<ButtonRelease-1>',check)#矫正位置
+        return name,back,button
+
 
 def test(event):
     a.title('TinUI Test')
@@ -501,6 +540,8 @@ def test4(event):
     for i in range(1,101):
         sleep(0.02)
         progressgoto(i)
+def test5(result):
+    b.itemconfig(scale_text,text='当前选值：'+str(result))
 
 if __name__=='__main__':
     a=Tk()
@@ -534,5 +575,7 @@ if __name__=='__main__':
     b.add_paragraph((300,810),text='上面是一个表格')
     b.add_onoff((600,100))
     b.add_spinbox((680,100))
+    b.add_scalebar((680,50),command=test5)
+    scale_text=b.add_label((890,50),text='当前选值：2')
 
     a.mainloop()

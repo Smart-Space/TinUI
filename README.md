@@ -381,7 +381,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个选值框。
 
-### return: wentry,button1,button2
+### return: wentry, button1, button2
 
 > wentry::输入框组件
 >
@@ -390,3 +390,28 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > button2::下调按钮
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI选值框.gif)
+
+---
+
+### add_scalebar(self,pos:tuple,width=200,fg='#4258cc',activefg='#aeb5d7',bg='#99a3d5',data=(1,2,3,4,5),start=1,command=None)
+
+- pos::位置
+- width::长度（宽度）
+- fg::选值覆盖部分颜色
+- activefg::滑动按钮激活颜色
+- bg::选值未覆盖部分颜色
+- data::选值范围
+- start::初始位置，第一个位置是0，第二个位置是1……
+- command::选值完成后调用该函数，必须接受一个参数，这个参数为data中的一个值
+
+绘制一个滑动调节框。
+
+### return: name, back, button
+
+> name::选值覆盖区域的tag名称
+>
+> back::选值未覆盖区域的画布对象
+>
+> button::选值滑动按钮
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI调节框.gif)

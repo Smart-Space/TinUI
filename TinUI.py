@@ -504,8 +504,14 @@ class TinUI(Canvas):
             num=dash.index(rend)
             if command!=None:
                 command(data[num])
+        def checkval(event):
+            move=self.canvasx(event.x)
+            self.coords(button,move,pos[1]-15,move+10,pos[1]+17)
+            self.coords(name,pos[0],pos[1],move,pos[1])
+            check(event)
         scale=TinUINum()#记录数据结构体
         back=self.create_line((pos[0],pos[1],pos[0]+width,pos[1]),fill=bg,width=3)
+        self.tag_bind(back,'<ButtonRelease-1>',checkval)
         dash_t=width//(len(data)-1)
         s=pos[0]#调节线段起点
         dash=[s]#调节线段的终点位置
@@ -515,6 +521,7 @@ class TinUI(Canvas):
         del s
         active=self.create_line((pos[0],pos[1],dash[start],pos[1]),fill=fg,width=3)
         name='scaleactive'+str(active)
+        self.tag_bind(name,'<ButtonRelease-1>',checkval)
         self.addtag_withtag(name,active)#为重绘绑定tag名称
         button=self.create_rectangle((dash[start],pos[1]-15,dash[start]+10,pos[1]+17),width=0,fill=fg)
         self.tag_bind(button,'<Enter>',lambda event:self.itemconfig(button,fill=activefg))

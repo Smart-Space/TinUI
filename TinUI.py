@@ -76,15 +76,28 @@ class TinUI(Canvas):
         def out_button(event):
             self.itemconfig(back,fill=bg,outline='grey')
             self.itemconfig(button,fill=fg)
+        def on_click(event):
+            if command!=None:
+                command(event)
+        def change_command(new_func):
+            nonlocal command
+            command=new_func
+        def disable(fg='#7a7a7a',bg='#cccccc'):
+            self.itemconfig(button,state='disable',fill=fg)
+            self.itemconfig(back,fill=bg)
+        def active():
+            self.itemconfig(button,state='normal')
+            in_button(None)
         button=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
         bbox=self.bbox(button)
         x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[2]+3,bbox[3]+3
         back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline='grey')
-        self.tag_bind(button,'<Button-1>',command)
+        self.tag_bind(button,'<Button-1>',on_click)
         self.tag_bind(button,'<Enter>',in_button)
         self.tag_bind(button,'<Leave>',out_button)
         self.tkraise(button)
-        return button,back
+        funcs=[change_command,disable,active]
+        return button,back,funcs
 
     def add_label(self,pos:tuple,text:str,fg='black',bg='#f0f0f0',outline='grey',font=('微软雅黑',12),anchor='nw'):#绘制标签
         label=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
@@ -310,7 +323,7 @@ class TinUI(Canvas):
         x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[0]+width+3,bbox[3]+3
         back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=fg)
         self.tkraise(main)
-        button_text,button_back=self.add_button((x2+3,y1+3),'∨',fg,bg,activefg,activebg,font=font,command=open_box)
+        button_text,button_back,_=self.add_button((x2+3,y1+3),'∨',fg,bg,activefg,activebg,font=font,command=open_box)
         start_x=bbox[0]#起始x位置
         height=bbox[3]+3#变量y位置
         box_tagname='combobox>'+str(main)+'>'+str(back)#绑定独立的tag名称

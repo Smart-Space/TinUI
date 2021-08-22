@@ -86,7 +86,19 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个按钮。这个按钮会响应鼠标的离开和进入事件，被单击时也会调用绑定的函数。
 
-### return: button_text, button_back
+### return: button_text, button_back, funcs
+
+> button_text::按钮文本
+>
+> button_back::按钮背景
+>
+> funcs
+>
+> > `funcs[0](new_func)`::为按钮绑定新函数
+> >
+> > `func[1](fg='#7a7a7a',bg='#cccccc')`::禁用按钮
+> >
+> > `func[2]()`::激活按钮
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E6%8C%89%E9%92%AE.gif)
 

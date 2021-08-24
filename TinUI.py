@@ -69,7 +69,7 @@ class TinUI(Canvas):
         kw['anchor']=anchor
         return self.create_text(pos,text=text,fill=fg,font=font,justify=side,width=width,**kw)
 
-    def add_button(self,pos:tuple,text:str,fg='black',bg='#CCCCCC',activefg='black',activebg='#E5F1FB',font=('微软雅黑',12),command=None,anchor='nw'):#绘制按钮
+    def add_button(self,pos:tuple,text:str,fg='#000000',bg='#CCCCCC',activefg='black',activebg='#E5F1FB',font=('微软雅黑',12),command=None,anchor='nw'):#绘制按钮
         def in_button(event):
             self.itemconfig(back,fill=activebg,outline='#82BDEB')
             self.itemconfig(button,fill=activefg)
@@ -84,10 +84,11 @@ class TinUI(Canvas):
             command=new_func
         def disable(fg='#7a7a7a',bg='#cccccc'):
             self.itemconfig(button,state='disable',fill=fg)
-            self.itemconfig(back,fill=bg)
+            self.itemconfig(back,state='disable',disabledfill=bg)
         def active():
             self.itemconfig(button,state='normal')
-            in_button(None)
+            self.itemconfig(back,state='normal')
+            out_button(None)
         button=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
         bbox=self.bbox(button)
         x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[2]+3,bbox[3]+3
@@ -121,6 +122,20 @@ class TinUI(Canvas):
                 self.itemconfig(state,state='hidden')
             if command!=None:
                 command(event)
+        def flash():
+            go_func(None)
+        def on():
+            self.itemconfig(check,fill=bg)
+            go_func(None)
+        def off():
+            self.itemconfig(check,fill=onbg)
+            go_func(None)
+        def disable():
+            self.itemconfig(checkbutton,state='disable',fill='#7a7a7a')
+            self.itemconfig(check,state='disable')
+        def active():
+            self.itemconfig(checkbutton,state='normal',fill=fontfg)
+            self.itemconfig(check,state='normal')
         checkbutton=self.create_text(pos,text=text,fill=fontfg,font=font,anchor=anchor)
         bbox=self.bbox(checkbutton)
         dic=bbox[3]-bbox[1]#位移长度
@@ -133,7 +148,8 @@ class TinUI(Canvas):
         self.tag_bind(checkbutton,'<Leave>',button_out)
         self.tag_bind(check,'<Button>',go_func)
         self.tag_bind(checkbutton,'<Button>',go_func)
-        return checkbutton,check
+        funcs=[flash,on,off,disable,active]
+        return checkbutton,check,funcs
 
     def add_entry(self,pos:tuple,width:int,height:int,text:str='',fg='black',bg='white',font=('微软雅黑',12),anchor='nw'):#绘制当行输入框
         #这是一个伪绘制组件
@@ -166,7 +182,20 @@ class TinUI(Canvas):
                     button_out(tag)
             back_list.remove(tag)
             self.itemconfig(tag,fill='#E5F1FB',outline='#82BDEB')
-            command(_text)
+            if command!=None:
+                command(_text)
+        def select(num):
+            back=choices_back[num]
+            _text='select command'
+            go_func(back,_text)
+        def disable():
+            for f,b in zip(choices_list,choices_back):
+                self.itemconfig(f,state='disable',fill='#7a7a7a')
+                self.itemconfig(b,state='disable')
+        def active():
+            for f,b in zip(choices_list,choices_back):
+                self.itemconfig(f,state='normal',fill=fg)
+                self.itemconfig(b,state='normal')
         word=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor,width=width)
         start_x=pos[0]#起始x位置
         height=self.bbox(word)[3]+3#变量y位置
@@ -188,7 +217,8 @@ class TinUI(Canvas):
             self.tag_bind(choice,'<Button>',lambda event,_text=i,back=back:go_func(back,_text))
             self.tag_bind(back,'<Button>',lambda event,_text=i,back=back:go_func(back,_text))
         back_list=list(choices_back)
-        return word,choices_list,choices_back
+        funcs=[select,disable,active]
+        return word,choices_list,choices_back,funcs
 
     def add_link(self,pos:tuple,text,url,fg='#50B0F4',font:tuple=('微软雅黑',12),anchor='nw'):#绘制超链接
         def turn_red(event):

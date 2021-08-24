@@ -96,9 +96,9 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 >
 > > `funcs[0](new_func)`::为按钮绑定新函数
 > >
-> > `func[1](fg='#7a7a7a',bg='#cccccc')`::禁用按钮
+> > `funcs[1](fg='#7a7a7a',bg='#cccccc')`::禁用按钮
 > >
-> > `func[2]()`::激活按钮
+> > `funcs[2]()`::激活按钮
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E6%8C%89%E9%92%AE.gif)
 
@@ -137,7 +137,23 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个复选框。这个复选框会响应鼠标的离开和进入事件，被单击时也会调用绑定的函数，并且会根据当前样式更改点击后的样式。
 
-### return: check_text, check_mark
+### return: check_text, check_mark, funcs
+
+> check_text::复选框文本
+>
+> check_mark::复选框矩形标记部件
+>
+> funcs
+>
+> > `funcs[0]()`::切换复选框状态
+> >
+> > `funcs[1]()`::选定
+> >
+> > `funcs[2]()`::取消选定
+> >
+> > `funcs[3]()`::禁用
+> >
+> > `funcs[4]()`::激活
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI复选框.gif)
 
@@ -194,13 +210,21 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个单选框，竖式排列。
 
-### return: text, choices_text_list, choices_back
+### return: text, choices_text_list, choices_back, funcs
 
 > text::文本提示画布对象
 >
 > choices_text_list::可选框的文本画布对象
 >
 > choices_back::可选框的背景方框画布对象
+>
+> funcs
+>
+> > `funcs[0](num)`::选定一个选项
+> >
+> > `funcs[1]()`::禁用
+> >
+> > `funcs[2]()`::激活
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI单选框.gif)
 

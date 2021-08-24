@@ -10,9 +10,9 @@ def test2(event):
     print('2')
 
 def disable(event):
-    func[1]()
+    func2[1]()
 def active(event):
-    func[2]()
+    func2[2]()
 
 a=win()
 u=a.u
@@ -21,5 +21,6 @@ u.add_button((150,5),'切换到函数2',command=change2)
 u.add_button((250,5),'禁止按钮',command=disable)
 u.add_button((350,5),'激活按钮',command=active)
 _,_,func=u.add_button((5,100),'测试按钮',command=test1)
+_,_,func2=u.add_button((100,100),'测试按钮2',command=test1)
 
 a.go()

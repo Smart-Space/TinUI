@@ -346,6 +346,15 @@ class TinUI(Canvas):
             open_box(None)
             if command!=None:
                 command(word)
+        def select(num):
+            self.itemconfig(button_text,text='∧',fill=activefg)
+            choose_this(*info[num])
+        def disable():
+            self.itemconfig(button_text,text='∧',fill=activefg)
+            open_box(None)
+            button_funcs[1](bg=bg)
+        def active():
+            button_funcs[2]()
         if activefg=='':
             activefg=self['background']
         main=self.create_text(pos,text=text,font=font,fill=fg,anchor='nw')
@@ -353,10 +362,11 @@ class TinUI(Canvas):
         x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[0]+width+3,bbox[3]+3
         back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=fg)
         self.tkraise(main)
-        button_text,button_back,_=self.add_button((x2+3,y1+3),'∨',fg,bg,activefg,activebg,font=font,command=open_box)
+        button_text,button_back,button_funcs=self.add_button((x2+3,y1+3),'∨',fg,bg,activefg,activebg,font=font,command=open_box)
         start_x=bbox[0]#起始x位置
         height=bbox[3]+3#变量y位置
         box_tagname='combobox>'+str(main)+'>'+str(back)#绑定独立的tag名称
+        info=[]
         for i in content:
             choice=self.create_text((start_x+2,height+2),text=i,fill=fg,font=(font[0],10),anchor='nw',width=width-4)
             pos=self.bbox(choice)
@@ -370,10 +380,12 @@ class TinUI(Canvas):
             self.tag_bind(cho_back,'<Leave>',lambda event,back=cho_back:button_out(back))
             self.tag_bind(choice,'<Button>',lambda event,_text=i,back=cho_back:choose_this(back,_text))
             self.tag_bind(cho_back,'<Button>',lambda event,_text=i,back=cho_back:choose_this(back,_text))
+            info.append((back,i))
             self.addtag_withtag(box_tagname,choice)
             self.addtag_withtag(box_tagname,cho_back)
         self.itemconfig(box_tagname,state='hidden')
-        return main,back,box_tagname
+        funcs=[select,disable,active]
+        return main,back,box_tagname,funcs
 
     def add_progressbar(self,pos:tuple,width=250,fg='#1E1E27',bg='#0078D7',percentage=True,text=''):#绘制进度条
         def goto(num:int):
@@ -552,6 +564,17 @@ class TinUI(Canvas):
             self.coords(button,move,pos[1]-15,move+10,pos[1]+17)
             self.coords(name,pos[0],pos[1],move,pos[1])
             check(event)
+        def select(num):
+            self.coords(button,dash[num],pos[1]-15,dash[num]+10,pos[1]+17)
+            self.coords(name,pos[0],pos[1],dash[num],pos[1])
+        def disable():
+            self.itemconfig(button,state='disable',fill='#7a7a7a')
+            self.itemconfig(back,state='disable')
+            self.itemconfig(name,state='disable',fill='#7a7a7a')
+        def _active():
+            self.itemconfig(button,state='normal',fill=fg)
+            self.itemconfig(back,state='normal')
+            self.itemconfig(name,state='normal',fill=fg)
         scale=TinUINum()#记录数据结构体
         back=self.create_line((pos[0],pos[1],pos[0]+width,pos[1]),fill=bg,width=3)
         self.tag_bind(back,'<ButtonRelease-1>',checkval)
@@ -572,7 +595,8 @@ class TinUI(Canvas):
         self.tag_bind(button,'<Button-1>',mousedown)
         self.tag_bind(button,'<B1-Motion>',drag)
         self.tag_bind(button,'<ButtonRelease-1>',check)#矫正位置
-        return name,back,button
+        funcs=[select,disable,_active]
+        return name,back,button,funcs
 
 
 def test(event):

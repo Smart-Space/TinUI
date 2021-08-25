@@ -325,13 +325,21 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个组合框。
 
-### return: main,back,box_tagname
+### return: main, back, box_tagname, funcs
 
 > main::显示框文字
 >
 > back::显示框背景
 >
 > box_tagname::所有选项框的tag名称
+>
+> funcs
+>
+> > `funcs[0](num)`::选定选值，第一个值是0
+> >
+> > `funcs[1]()`::禁用
+> >
+> > `funcs[2]()`::激活
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E7%BB%84%E5%90%88%E6%A1%86.gif)
 
@@ -442,12 +450,20 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个滑动调节框。
 
-### return: name, back, button
+### return: name, back, button, funcs
 
 > name::选值覆盖区域的tag名称
 >
 > back::选值未覆盖区域的画布对象
 >
 > button::选值滑动按钮
+>
+> funcs
+>
+> > `funcs[0](num)`::选定选值，第一个值是0
+> >
+> > `funcs[1]()`::禁用
+> >
+> > `funcs[2]()`::激活
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI调节框.gif)

@@ -159,18 +159,20 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_entry(self,pos:tuple,width:int,height:int,text:str='',fg='black',bg='white',font=('微软雅黑',12),anchor='nw')
+### add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='white',font=('微软雅黑',12),outline='#999999',onoutline='#4258cc',icon='>',anchor='nw')
 
 - pos::位置
 - width::宽度
-- height::高度
 - text::初始文字
 - fg::文字颜色
 - bg::背景颜色
 - font::字体
+- outline::输入框边框颜色
+- onoutline::获取焦点时的边框颜色
+- icon::内容为空时，右侧显示的字符
 - anchor::对齐方向
 
-绘制一个单行输入框。这是一个伪绘制组件，其实就是简化了Entry控件的导入。
+绘制一个单行输入框。这是一个半绘制组件，其实就是简化了Entry控件的导入。
 
 通过`entry.get()`获取值。
 

@@ -151,11 +151,33 @@ class TinUI(Canvas):
         funcs=[flash,on,off,disable,active]
         return checkbutton,check,funcs
 
-    def add_entry(self,pos:tuple,width:int,height:int,text:str='',fg='black',bg='white',font=('微软雅黑',12),anchor='nw'):#绘制当行输入框
-        #这是一个伪绘制组件
-        entry=Entry(self,fg=fg,bg=bg,font=font,relief='groove',highlightcolor=fg,bd=2)
+    def add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='white',font=('微软雅黑',12),outline='#999999',onoutline='#4258cc',icon='>',anchor='nw'):#绘制当行输入框
+        #这是一个半绘制组件
+        def if_empty(event):
+            ch=entry.get()
+            if ch=='':
+                self.tag_unbind(funcw,'<Leave>')
+                self.tag_unbind(funcw,'<Enter>')
+                self.tag_unbind(funcw,'<Button-1>')
+                self.itemconfig(funcw,text=icon,fill=fg)
+            else:
+                if self.itemcget(funcw,'text')==icon:
+                    self.itemconfig(funcw,text='×')
+                    self.tag_bind(funcw,'<Enter>',lambda event:self.itemconfig(funcw,fill=onoutline))
+                    self.tag_bind(funcw,'<Leave>',lambda event:self.itemconfig(funcw,fill=fg))
+                    self.tag_bind(funcw,'<Button-1>',lambda event:(entry.delete(0,'end'),if_empty(None)))
+        entry=Entry(self,fg=fg,bg=bg,font=font,relief='flat',highlightcolor=fg,bd=2)
         entry.insert(0,text)
-        self.create_window(pos,window=entry,width=width,height=height,anchor=anchor)
+        entry.bind('<KeyRelease>',if_empty)
+        entry.bind('<FocusIn>',lambda event:self.itemconfig(back,outline=onoutline))
+        entry.bind('<FocusOut>',lambda event:self.itemconfig(back,outline=outline))
+        funce=self.create_window(pos,window=entry,width=width,anchor=anchor)#输入框画布对象
+        funcw=self.create_text((pos[0]+width,pos[1]),text=icon,fill=fg,font=font,anchor='nw')
+        w=self.bbox(funcw)[2]
+        h=self.bbox(funce)[3]
+        back=self.create_rectangle((pos[0]-2,pos[1]-2,w+2,h+2),outline=outline,fill=bg)
+        self.lower(back)
+        if_empty(None)
         return entry
 
     def add_separate(self,pos:tuple,width:int,direction='x',fg='grey'):#绘制分割线
@@ -631,7 +653,7 @@ if __name__=='__main__':
     b.add_button((250,450),'测试按钮',activefg='white',activebg='red',command=test,anchor='center')
     b.add_checkbutton((80,430),'允许TinUI测试',command=test1)
     b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
-    b.add_entry((250,300),350,30,'这里用来输入')
+    b.add_entry((250,300),350,'这里用来输入')
     b.add_separate((20,200),600)
     b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
     b.add_link((400,500),'TinGroup知识库','http://tinhome.baklib-free.com/')

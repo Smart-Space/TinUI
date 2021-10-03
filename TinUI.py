@@ -151,7 +151,7 @@ class TinUI(Canvas):
         funcs=[flash,on,off,disable,active]
         return checkbutton,check,funcs
 
-    def add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='white',font=('微软雅黑',12),outline='#999999',onoutline='#4258cc',icon='>',anchor='nw'):#绘制当行输入框
+    def add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='white',font=('微软雅黑',12),outline='#999999',onoutline='#4258cc',icon='>',anchor='nw'):#绘制单行输入框
         #这是一个半绘制组件
         def if_empty(event):
             ch=entry.get()

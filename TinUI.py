@@ -620,6 +620,29 @@ class TinUI(Canvas):
         funcs=[select,disable,_active]
         return name,back,button,funcs
 
+    def add_info(self,pos:tuple,font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black'):#绘制提示框
+        def showinfo(event):
+            self.itemconfig(infotagname,state='normal')
+        def hideinfo(event):
+            self.itemconfig(infotagname,state='hidden')
+        text=self.create_text(pos,anchor='nw',text='?',font=font,fill=fg)
+        bbox=self.bbox(text)
+        back=self.create_oval((bbox[0]-2,bbox[1]-2,bbox[2]+2,bbox[3]+2),fill=bg,outline=fg,width=2)
+        self.tkraise(text)
+        self.tag_bind(back,'<Enter>',showinfo)
+        self.tag_bind(back,'<Leave>',hideinfo)
+        self.tag_bind(text,'<Enter>',showinfo)
+        self.tag_bind(text,'<Leave>',hideinfo)
+        info=self.create_text((bbox[2]+10,(bbox[3]+bbox[1])//2),anchor='nw',text=info_text,font=info_font,fill=info_fg,width=info_width)
+        ibbox=self.bbox(info)
+        info_back=self.create_rectangle((ibbox[0]-2,ibbox[1]-2,ibbox[2]+2,ibbox[3]+2),width=1,fill=bg,outline=fg)
+        self.tkraise(info)
+        infotagname='info'+str(info)+str(info_back)
+        self.addtag_withtag(infotagname,info)
+        self.addtag_withtag(infotagname,info_back)
+        self.itemconfig(infotagname,state='hidden')
+        return text,back,infotagname
+
 
 def test(event):
     a.title('TinUI Test')
@@ -673,5 +696,6 @@ if __name__=='__main__':
     b.add_spinbox((680,100))
     b.add_scalebar((680,50),command=test5)
     scale_text=b.add_label((890,50),text='当前选值：2')
+    b.add_info((680,140),info_text='this is info widget in TinUI')
 
     a.mainloop()

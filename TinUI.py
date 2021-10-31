@@ -176,7 +176,7 @@ class TinUI(Canvas):
         w=self.bbox(funcw)[2]
         h=self.bbox(funce)[3]
         back=self.create_rectangle((pos[0]-2,pos[1]-2,w+2,h+2),outline=outline,fill=bg)
-        self.lower(back)
+        self.tkraise(funcw)
         if_empty(None)
         return entry
 
@@ -444,7 +444,7 @@ class TinUI(Canvas):
                 x1,y1,x2=widths[back][2]
                 y2=y1+height
                 newback=self.create_rectangle((x1,y1,x2,y2),outline=outline,fill=bg)
-                self.lower(newback)
+                self.tkraise(widths[back][3])
             return height
         title_num=len(data[0])#获取表头个数
         end_x,end_y=pos#起始位置
@@ -477,7 +477,7 @@ class TinUI(Canvas):
                 height=bbox[3]-bbox[1]
                 back=self.create_rectangle((end_x,end_y,end_x+width,end_y+height),outline=outline,fill=bg)
                 self.tkraise(cont)
-                a_dict[count]=(back,height,(end_x,end_y,end_x+width))#(end_x,end_y,width)为重新绘制确定位置范围
+                a_dict[count]=(back,height,(end_x,end_y,end_x+width),cont)#(end_x,end_y,width)为重新绘制确定位置范围
                 end_x=end_x+width+2
                 count+=1
             height=get_max_height(a_dict)

@@ -684,6 +684,7 @@ class TinUI(Canvas):
                 y=sy
             menu.geometry(f'{winw}x{winh}+{x}+{y}')
             menu.deiconify()
+            menu.focus_set()
         self.tag_bind(cid,bind,show)
         menu=Toplevel(self)
         menu.overrideredirect(True)
@@ -708,7 +709,6 @@ class TinUI(Canvas):
                 widths.append(width)
         repaint()
         readyshow()
-        menu.focus_set()
         menu.bind('<FocusOut>',lambda event:menu.withdraw())
         return menu,bar,funcs
 

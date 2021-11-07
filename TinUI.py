@@ -643,6 +643,76 @@ class TinUI(Canvas):
         self.itemconfig(infotagname,state='hidden')
         return text,back,infotagname
 
+    def add_menubar(self,cid='all',bind='<Button-3>',font='微软雅黑 12',fg='#ecf3e8',bg='#2b2a33',activefg='#ecf3e8',activebg='#616161',cont=(('command',lambda event:print('')),'-')):#绘制菜单
+        '''cont格式
+        (('名称','绑定的函数（至少接受event参数）'),#常规格式
+        '-',#分割线
+        )
+        '''
+        def endy():#获取最低位置
+            pos=bar.bbox('all')
+            return 0 if pos==None else pos[3]+10
+        def repaint():#重新绘制以适配
+            maxwidth=max(widths)
+            for back in backs:
+                pos=bar.bbox(back)
+                bar.coords(back,(5,pos[1],10+maxwidth,pos[3]))
+            for sep in seps:
+                pos=bar.bbox(sep)
+                bar.delete(sep)
+                bar.add_separate((5,pos[1]),maxwidth+5,fg=activebg)
+        def readyshow():#计算显示位置
+            allpos=bar.bbox('all')
+            #菜单尺寸
+            winw=allpos[2]-allpos[0]+5
+            winh=allpos[3]-allpos[1]+5
+            #屏幕尺寸
+            maxx=self.winfo_screenwidth()
+            maxy=self.winfo_screenheight()
+            wind.data=(maxx,maxy,winw,winh)
+        def show(event):#显示的起始位置
+            #初始位置
+            maxx,maxy,winw,winh=wind.data
+            sx,sy=event.x_root,event.y_root
+            if sx+winw>maxx:
+                x=sx-winw
+            else:
+                x=sx
+            if sy+winh>maxy:
+                y=sy-winh
+            else:
+                y=sy
+            menu.geometry(f'{winw}x{winh}+{x}+{y}')
+            menu.deiconify()
+        self.tag_bind(cid,bind,show)
+        menu=Toplevel(self)
+        menu.overrideredirect(True)
+        menu.withdraw()
+        bar=TinUI(menu,bg=bg)
+        bar.pack(fill='both',expand=True)
+        wind=TinUINum()#记录数据
+        backs=[]#按钮
+        funcs=[]#按钮函数接口
+        seps=[]#分割线
+        widths=[]#寻找最宽位置
+        for i in cont:#添加菜单内容
+            if i=='-':
+                sep=bar.add_separate((5,endy()),100,fg=activebg)
+                seps.append(sep)
+            else:
+                button=bar.add_button((5,endy()),i[0],fg,bg,activefg,activebg,font,command=lambda event,i=i:(i[1](event),menu.withdraw()))
+                backs.append(button[1])
+                funcs.append(button[2])
+                pos=bar.bbox(button[1])
+                width=pos[2]-pos[0]
+                widths.append(width)
+        repaint()
+        readyshow()
+        menu.focus_set()
+        menu.bind('<FocusOut>',lambda event:menu.withdraw())
+        return menu,bar,funcs
+
+
 
 def test(event):
     a.title('TinUI Test')
@@ -697,5 +767,7 @@ if __name__=='__main__':
     b.add_scalebar((680,50),command=test5)
     scale_text=b.add_label((890,50),text='当前选值：2')
     b.add_info((680,140),info_text='this is info widget in TinUI')
+    mtb=b.add_paragraph((0,720),'测试菜单（右键单击）')
+    b.add_menubar(mtb,cont=(('command',print),('menu',test1),'-',('TinUI文本移动',test)))
 
     a.mainloop()

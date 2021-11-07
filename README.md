@@ -494,3 +494,37 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > infotagname::提示文本以及文本边框背景
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI气泡提示.gif)
+
+---
+
+### add_menubar(self,cid='all',bind='\<Button-3\>',font='微软雅黑 12',fg='#ecf3e8',bg='#2b2a33',activefg='#ecf3e8',activebg='#616161',cont=(('command',lambda event:print('')),'-'))
+
+- cid::绑定的画布对象
+- bind::绑定事件的类型
+- font::菜单字体
+- fg::字体颜色
+- bg::背景颜色
+- activefg::选定时字体颜色
+- activebg::选定时菜单选项颜色
+- cont::菜单内容
+
+> cont的格式如下：
+>
+> ```
+> (('名称','绑定的函数（接受event参数）'),#常规格式
+> '-',#分割线
+> ...,
+> )
+> ```
+
+为绑定的画布对象被指定事件激活后，显示菜单。
+
+### return: menu, bar, funcs
+
+>menu::菜单窗口（Toplevel）
+>
+>bar::菜单窗口中的TinUI
+>
+>funcs::所有菜单按钮的函数集，每一个元素为每一个TinUI按钮的函数集
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI菜单.gif)

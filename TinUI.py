@@ -69,14 +69,17 @@ class TinUI(Canvas):
         kw['anchor']=anchor
         return self.create_text(pos,text=text,fill=fg,font=font,justify=side,width=width,**kw)
 
-    def add_button(self,pos:tuple,text:str,fg='#000000',bg='#CCCCCC',activefg='black',activebg='#E5F1FB',font=('微软雅黑',12),command=None,anchor='nw'):#绘制按钮
+    def add_button(self,pos:tuple,text:str,fg='#000000',bg='#CCCCCC',line='#CCCCCC',linew='3',activefg='black',activebg='#999999',activeline='#7a7a7a',font=('微软雅黑',12),command=None,anchor='nw'):#绘制按钮
         def in_button(event):
-            self.itemconfig(back,fill=activebg,outline='#82BDEB')
+            self.itemconfig(back,fill=bg,outline=activeline)
             self.itemconfig(button,fill=activefg)
         def out_button(event):
-            self.itemconfig(back,fill=bg,outline='grey')
+            self.itemconfig(back,fill=bg,outline=line)
             self.itemconfig(button,fill=fg)
         def on_click(event):
+            self.itemconfig(back,fill=activebg,outline=activeline)
+            self.itemconfig(button,fill=activefg)
+            self.after(500,lambda : out_button(None))
             if command!=None:
                 command(event)
         def change_command(new_func):
@@ -92,7 +95,7 @@ class TinUI(Canvas):
         button=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
         bbox=self.bbox(button)
         x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[2]+3,bbox[3]+3
-        back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline='grey')
+        back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=line,width=linew)
         self.tag_bind(button,'<Button-1>',on_click)
         self.tag_bind(button,'<Enter>',in_button)
         self.tag_bind(button,'<Leave>',out_button)
@@ -384,7 +387,7 @@ class TinUI(Canvas):
         x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[0]+width+3,bbox[3]+3
         back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=fg)
         self.tkraise(main)
-        button_text,button_back,button_funcs=self.add_button((x2+3,y1+3),'∨',fg,bg,activefg,activebg,font=font,command=open_box)
+        button_text,button_back,button_funcs=self.add_button((x2+3,y1+3),'∨',fg,bg,'#CCCCCC',1,activefg,activebg,'#7a7a7a',font=font,command=open_box)
         start_x=bbox[0]#起始x位置
         height=bbox[3]+3#变量y位置
         box_tagname='combobox>'+str(main)+'>'+str(back)#绑定独立的tag名称
@@ -555,8 +558,8 @@ class TinUI(Canvas):
         bbox=self.bbox(entry)
         height=bbox[3]-bbox[1]
         font=(font[0],font[1]//3)
-        button1=self.add_button((pos[0]+width+2,pos[1]+3),text='▲',activefg=activefg,activebg=activebg,font=font,command=updata)
-        button2=self.add_button((pos[0]+width+2,pos[1]-5+height),text='▼',activefg=activefg,activebg=activebg,font=font,anchor='sw',command=downdata)
+        button1=self.add_button((pos[0]+width+2,pos[1]+3),text='▲',linew=1,activefg=activefg,activebg=activebg,font=font,command=updata)
+        button2=self.add_button((pos[0]+width+2,pos[1]-5+height),text='▼',linew=1,activefg=activefg,activebg=activebg,font=font,anchor='sw',command=downdata)
         datanum=TinUINum()
         datanum.num=data.index(now)#记录数据位置
         maxnum=len(data)-1#最大位置
@@ -702,7 +705,7 @@ class TinUI(Canvas):
                 sep=bar.add_separate((5,endy()),100,fg=activebg)
                 seps.append(sep)
             else:
-                button=bar.add_button((5,endy()),i[0],fg,bg,activefg,activebg,font,command=lambda event,i=i:(i[1](event),menu.withdraw()))
+                button=bar.add_button((5,endy()),i[0],fg,bg,bg,3,activefg,activebg,activebg,font,command=lambda event,i=i:(i[1](event),menu.withdraw()))
                 backs.append(button[1])
                 funcs.append(button[2])
                 pos=bar.bbox(button[1])

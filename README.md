@@ -72,14 +72,17 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_button(self,pos:tuple,text:str,fg='black',bg='#E1E1E1',activefg='black',activebg='#E5F1FB',font=('微软雅黑',12),command=None,anchor='nw')
+### add_button(self,pos:tuple,text:str,fg='black',bg='#CCCCCC',line='#CCCCCC',linew=3,activefg='black',activebg='#999999',activeline='#7a7a7a',font=('微软雅黑',12),command=None,anchor='nw')
 
 - pos::位置
 - text::标题文字
 - fg::文字颜色
 - bg::按钮颜色
-- activefg::相应鼠标的文本颜色
-- activebg::相应鼠标的按钮颜色
+- line::边框颜色
+- linew::边框宽度
+- activefg::响应鼠标的文本颜色
+- activebg::响应鼠标的按钮颜色
+- activeline::响应鼠标的边框颜色
 - font::字体名称+大小
 - command::绑定的函数。该函数**必须要有event参数**，因为TinUI的按钮会传递点击事件的event
 - anchor::对齐方向

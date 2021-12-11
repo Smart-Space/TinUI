@@ -457,8 +457,8 @@ class TinUI(Canvas):
         for i in data[0]:
             title=self.create_text((end_x,end_y),anchor='nw',text=i,fill=fg,font=font)
             bbox=self.bbox(title)
-            if bbox[2]-bbox[0]<=100:
-                width=100
+            if bbox[2]-bbox[0]<=minwidth:
+                width=minwidth
             else:
                 width=bbox[2]-bbox[0]
             line_width[count]=width

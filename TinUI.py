@@ -99,6 +99,9 @@ class TinUI(Canvas):
         self.tag_bind(button,'<Button-1>',on_click)
         self.tag_bind(button,'<Enter>',in_button)
         self.tag_bind(button,'<Leave>',out_button)
+        self.tag_bind(back,'<Button-1>',on_click)
+        self.tag_bind(back,'<Enter>',in_button)
+        self.tag_bind(back,'<Leave>',out_button)
         self.tkraise(button)
         funcs=[change_command,disable,active]
         return button,back,funcs
@@ -436,7 +439,7 @@ class TinUI(Canvas):
             text=self.create_text((pos[0]+width//2,pos[1]),anchor='n',text=text,fill=fg,font='微软雅黑 10')
         return back,pro_tagname,text,goto
 
-    def add_table(self,pos:tuple,outline='#E1E1E1',fg='black',bg='white',data=[['1','2','3'],['a','b','c']],minwidth=100,font=('微软雅黑',12)):#绘制表格
+    def add_table(self,pos:tuple,outline='#E1E1E1',fg='black',bg='white',data=[['1','2','3'],['a','b','c']],minwidth=100,font=('微软雅黑',12),headbg='#d9ebf9'):#绘制表格
         def get_max_height(widths:dict):
             height=0
             for i in widths.values():
@@ -463,7 +466,7 @@ class TinUI(Canvas):
                 width=bbox[2]-bbox[0]
             line_width[count]=width
             height=bbox[3]-bbox[1]
-            self.create_rectangle((end_x,end_y,end_x+width,end_y+height),outline=outline,fill=bg)
+            self.create_rectangle((end_x,end_y,end_x+width,end_y+height),outline=outline,fill=headbg)
             end_x=end_x+width+2
             count+=1
             self.tkraise(title)
@@ -646,9 +649,9 @@ class TinUI(Canvas):
         self.itemconfig(infotagname,state='hidden')
         return text,back,infotagname
 
-    def add_menubar(self,cid='all',bind='<Button-3>',font='微软雅黑 12',fg='#ecf3e8',bg='#2b2a33',activefg='#ecf3e8',activebg='#616161',cont=(('command',lambda event:print('')),'-')):#绘制菜单
+    def add_menubar(self,cid='all',bind='<Button-3>',font='微软雅黑 12',fg='#ecf3e8',bg='#2b2a33',activefg='#ecf3e8',activebg='#616161',cont=(('command',print),'-'),tran='white'):#绘制菜单
         '''cont格式
-        (('名称','绑定的函数（至少接受event参数）'),#常规格式
+        (('名称',绑定的函数（至少接受event参数）),#常规格式
         '-',#分割线
         ...
         )
@@ -686,14 +689,14 @@ class TinUI(Canvas):
                 y=sy-winh
             else:
                 y=sy
-            menu.geometry(f'{winw}x{winh}+{x}+{y}')
+            menu.geometry(f'{winw+5}x{winh+5}+{x}+{y}')
             menu.deiconify()
             menu.focus_set()
         self.tag_bind(cid,bind,show)
         menu=Toplevel(self)
         menu.overrideredirect(True)
         menu.withdraw()
-        bar=TinUI(menu,bg=bg)
+        bar=TinUI(menu,bg=tran)
         bar.pack(fill='both',expand=True)
         wind=TinUINum()#记录数据
         backs=[]#按钮
@@ -713,7 +716,14 @@ class TinUI(Canvas):
                 widths.append(width)
         repaint()
         readyshow()
+        #绘制圆角边框
+        bbox=bar.bbox('all')
+        start=bbox[2]-bbox[0]
+        gomap=((start,bbox[1]),(bbox[2],bbox[1]),(bbox[2],bbox[3]),(bbox[0],bbox[3]),(bbox[0],bbox[1]),(start,bbox[1]))
+        mback=bar.create_polygon(gomap,fill=bg,outline=bg,width=5)
+        bar.lower(mback)
         menu.bind('<FocusOut>',lambda event:menu.withdraw())
+        menu.attributes('-transparent',tran)
         return menu,bar,funcs
 
 

@@ -375,7 +375,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_table(self,pos:tuple,outline='#E1E1E1',fg='black',bg='white',data=[['1','2','3'],['a','b','c']],minwidth=100,font=('微软雅黑',12))
+### add_table(self,pos:tuple,outline='#E1E1E1',fg='black',bg='white',data=[['1','2','3'],['a','b','c']],minwidth=100,font=('微软雅黑',12),headbg='#d9ebf9')
 
 - pos::位置
 - outline::边框颜色
@@ -384,6 +384,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - data::表格数据。格式：((title,...,...),(content1,...,...),(content2,...,...),...)
 - minwidth::单元格最小宽度
 - font::字体
+- headbg::表头背景色
 
 绘制一个表格。
 
@@ -500,7 +501,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_menubar(self,cid='all',bind='\<Button-3\>',font='微软雅黑 12',fg='#ecf3e8',bg='#2b2a33',activefg='#ecf3e8',activebg='#616161',cont=(('command',lambda event:print('')),'-'))
+### add_menubar(self,cid='all',bind='\<Button-3\>',font='微软雅黑 12',fg='#ecf3e8',bg='#2b2a33',activefg='#ecf3e8',activebg='#616161',cont=(('command',print('')),'-'),tran='white')
 
 - cid::绑定的画布对象
 - bind::绑定事件的类型
@@ -510,11 +511,12 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - activefg::选定时字体颜色
 - activebg::选定时菜单选项颜色
 - cont::菜单内容
+- tran::透明色
 
 > cont的格式如下：
 >
 > ```
-> (('名称','绑定的函数（接受event参数）'),#常规格式
+> (('名称',绑定的函数（接受event参数）),#常规格式
 > '-',#分割线
 > ...,
 > )

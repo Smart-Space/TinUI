@@ -77,7 +77,7 @@ class TinUI(Canvas):
             self.itemconfig(back,fill=bg,outline=line)
             self.itemconfig(button,fill=fg)
         def on_click(event):
-            self.itemconfig(back,fill=activebg,outline=activeline)
+            self.itemconfig(back,fill=activebg,outline=activebg)
             self.itemconfig(button,fill=activefg)
             self.after(500,lambda : out_button(None))
             if command!=None:
@@ -689,7 +689,7 @@ class TinUI(Canvas):
                 y=sy-winh
             else:
                 y=sy
-            menu.geometry(f'{winw+5}x{winh+5}+{x}+{y}')
+            menu.geometry(f'{winw+20}x{winh+20}+{x}+{y}')
             menu.deiconify()
             menu.focus_set()
         self.tag_bind(cid,bind,show)
@@ -720,7 +720,7 @@ class TinUI(Canvas):
         bbox=bar.bbox('all')
         start=bbox[2]-bbox[0]
         gomap=((start,bbox[1]),(bbox[2],bbox[1]),(bbox[2],bbox[3]),(bbox[0],bbox[3]),(bbox[0],bbox[1]),(start,bbox[1]))
-        mback=bar.create_polygon(gomap,fill=bg,outline=bg,width=5)
+        mback=bar.create_polygon(gomap,fill=bg,outline=bg,width=15)
         bar.lower(mback)
         menu.bind('<FocusOut>',lambda event:menu.withdraw())
         menu.attributes('-transparent',tran)

@@ -454,9 +454,10 @@ class TinUI(Canvas):
             return height
         title_num=len(data[0])#获取表头个数
         end_x,end_y=pos#起始位置
-        height=0
+        height,relheight=0,0
         line_width={}#获取每列的固定宽度
         count=1
+        ti_list=[]
         for i in data[0]:
             title=self.create_text((end_x,end_y),anchor='nw',text=i,fill=fg,font=font)
             bbox=self.bbox(title)
@@ -466,11 +467,15 @@ class TinUI(Canvas):
                 width=bbox[2]-bbox[0]
             line_width[count]=width
             height=bbox[3]-bbox[1]
-            self.create_rectangle((end_x,end_y,end_x+width,end_y+height),outline=outline,fill=headbg)
+            relheight=height if height>relheight else relheight
+            ti_back=self.create_rectangle((end_x,end_y,end_x+width,end_y+height),outline=outline,fill=headbg)
+            ti_list.append((ti_back,end_x,end_y,end_x+width))
             end_x=end_x+width+2
             count+=1
             self.tkraise(title)
-        end_y=pos[1]+height+2
+        for i in ti_list:#保持表头高度一致
+            self.coords(i[0],i[1],i[2],i[3],i[2]+relheight)
+        end_y=pos[1]+relheight+2
         for line in data[1:]:
             count=1
             a_dict={}
@@ -774,8 +779,8 @@ if __name__=='__main__':
     b.add_combobox((600,550),text='你有多大可能去珠穆朗玛峰',content=('20%','40%','60%','80%','100%','1000%'))
     b.add_button((600,480),text='测试进度条（无事件版本）',command=test4)
     _,_,_,progressgoto=b.add_progressbar((600,510))
-    b.add_table((180,630),data=(('a','space fans over the world','c'),('you\ncan','2','3'),('I','II','have a dream, then try your best to get it!')))
-    b.add_paragraph((300,810),text='上面是一个表格')
+    b.add_table((180,630),data=(('a','space fans over the\nworld','c'),('you\ncan','2','3'),('I','II','have a dream, then try your best to get it!')))
+    b.add_paragraph((300,850),text='上面是一个表格')
     b.add_onoff((600,100))
     b.add_spinbox((680,100))
     b.add_scalebar((680,50),command=test5)

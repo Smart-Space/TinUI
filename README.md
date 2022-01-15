@@ -162,14 +162,17 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='white',font=('微软雅黑',12),outline='#999999',onoutline='#4258cc',icon='>',anchor='nw')
+### add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='#cfd3d6',activefg='black',activebg='white',font=('微软雅黑',12),linew=3,outline='#63676b',onoutline='#4258cc',icon='>',anchor='nw')
 
 - pos::位置
 - width::宽度
 - text::初始文字
 - fg::文字颜色
 - bg::背景颜色
+- activefg::激活时字体颜色
+- activebg::激活时背景色
 - font::字体
+- linew::边框宽度
 - outline::输入框边框颜色
 - onoutline::获取焦点时的边框颜色
 - icon::内容为空时，右侧显示的字符

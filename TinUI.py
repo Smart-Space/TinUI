@@ -34,6 +34,7 @@ class TinUI(Canvas):
                 setattr(self, m, getattr(self.frame, m))
         self.bind('<MouseWheel>',self.set_y_view)
         self.bind('<Configure>',lambda event:self.update__())
+        self.bind('<Button-1>',lambda event:self.focus_set())
         self.init()
         self.update_time=update_time
         if update==False:
@@ -157,7 +158,7 @@ class TinUI(Canvas):
         funcs=[flash,on,off,disable,active]
         return checkbutton,check,funcs
 
-    def add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='white',font=('微软雅黑',12),outline='#999999',onoutline='#4258cc',icon='>',anchor='nw'):#绘制单行输入框
+    def add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='#cfd3d6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#63676b',onoutline='#4258cc',icon='>',anchor='nw'):#绘制单行输入框
         #这是一个半绘制组件
         def if_empty(event):
             ch=entry.get()
@@ -172,16 +173,16 @@ class TinUI(Canvas):
                     self.tag_bind(funcw,'<Enter>',lambda event:self.itemconfig(funcw,fill=onoutline))
                     self.tag_bind(funcw,'<Leave>',lambda event:self.itemconfig(funcw,fill=fg))
                     self.tag_bind(funcw,'<Button-1>',lambda event:(entry.delete(0,'end'),if_empty(None)))
-        entry=Entry(self,fg=fg,bg=bg,font=font,relief='flat',highlightcolor=fg,bd=2)
+        entry=Entry(self,fg=fg,bg=bg,font=font,relief='flat',bd=0,insertbackground=insert,insertborderwidth=2)
         entry.insert(0,text)
         entry.bind('<KeyRelease>',if_empty)
-        entry.bind('<FocusIn>',lambda event:self.itemconfig(back,outline=onoutline))
-        entry.bind('<FocusOut>',lambda event:self.itemconfig(back,outline=outline))
+        entry.bind('<FocusIn>',lambda event:(self.itemconfig(back,outline=onoutline),entry.config(background=activebg,foreground=activefg)))
+        entry.bind('<FocusOut>',lambda event:(self.itemconfig(back,outline=outline),entry.config(background=bg,foreground=fg)))
         funce=self.create_window(pos,window=entry,width=width,anchor=anchor)#输入框画布对象
         funcw=self.create_text((pos[0]+width,pos[1]),text=icon,fill=fg,font=font,anchor='nw')
         w=self.bbox(funcw)[2]
         h=self.bbox(funce)[3]
-        back=self.create_rectangle((pos[0]-2,pos[1]-2,w+2,h+2),outline=outline,fill=bg)
+        back=self.create_rectangle((pos[0]-2,pos[1]-2,w+2,h+2),width=linew,outline=outline,fill=bg)
         self.tkraise(funcw)
         if_empty(None)
         return entry
@@ -759,13 +760,13 @@ if __name__=='__main__':
     b.pack(fill='both',expand=True)
     m=b.add_title((600,0),'TinUI is a test project for futher tin using')
     m1=b.add_title((0,680),'test TinUI scrolled',size=2,angle=24)
-    b.add_paragraph((20,290),'''     TinUI是基于tkinter画布开发的界面UI布局方案，作为tkinter拓展和TinEngine的拓展而存在。目前，TinUI尚处于开发阶段。如果想要使用完整的TinUI，敬请期待。''',
+    b.add_paragraph((20,290),'''     TinUI是基于tkinter画布开发的界面UI布局方案，作为tkinter拓展和TinEngine的拓展而存在。目前，TinUI已可应用于项目。''',
     angle=-18)
     b.add_paragraph((20,100),'下面的段落是测试画布的非平行字体显示效果，也是TinUI的简单介绍')
     b.add_button((250,450),'测试按钮',activefg='white',activebg='red',command=test,anchor='center')
     b.add_checkbutton((80,430),'允许TinUI测试',command=test1)
     b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
-    b.add_entry((250,300),350,'这里用来输入')
+    b.add_entry((250,330),350,'这里用来输入')
     b.add_separate((20,200),600)
     b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
     b.add_link((400,500),'TinGroup知识库','http://tinhome.baklib-free.com/')

@@ -115,15 +115,22 @@ class TinUI(Canvas):
         self.tkraise(label)
         return label
 
-    def add_checkbutton(self,pos:tuple,text:str,fontfg='black',fg='#a6a6a6',bg='',onfg='white',onbg='#0067c0',font=('微软雅黑',12),command=None,anchor='nw'):#绘制复选框
+    def add_checkbutton(self,pos:tuple,text:str,fontfg='black',fg='#868686',bg='#ededed',activefg='#868686',activebg='#e5e5e5',onfg='white',onbg='#334ac0',font=('微软雅黑',12),command=None,anchor='nw'):#绘制复选框
         def button_in(event):
-            self.itemconfig(check,outline='#82BDEB')
+            if self.itemcget(check,'fill')==onbg:
+                pass
+            else:
+                self.itemconfig(check,outline=activefg,fill=activebg)
         def button_out(event):
-            self.itemconfig(check,outline=fg)
+            if self.itemcget(check,'fill')==onbg:
+                pass
+            else:
+                self.itemconfig(check,outline=fg,fill=bg)
         def go_func(event):
-            if self.itemcget(check,'fill')==bg:
+            if self.itemcget(check,'fill')!=onbg:
                 self.itemconfig(check,fill=onbg,outline=onbg)
                 self.itemconfig(state,state='normal')
+                self.tkraise(state)
             else:
                 self.itemconfig(check,fill=bg,outline=fg)
                 self.itemconfig(state,state='hidden')
@@ -147,14 +154,16 @@ class TinUI(Canvas):
         bbox=self.bbox(checkbutton)
         dic=bbox[3]-bbox[1]#位移长度
         self.move(checkbutton,dic-7,0)
-        check=self.create_rectangle((pos[0]-2,pos[1]+4,pos[0]+dic-12,pos[1]+dic-4),outline=fg,fill=bg)
+        check=self.create_rectangle((pos[0]-2,pos[1]+4,pos[0]+dic-12,pos[1]+dic-4),outline=fg,fill=bg,width=2)
         state=self.create_text((pos[0]-2,pos[1]),text='√',fill=onfg,font=font,anchor='nw',state='hidden')
+        self.tkraise(state)
         self.tag_bind(check,'<Enter>',button_in)
         self.tag_bind(check,'<Leave>',button_out)
         self.tag_bind(checkbutton,'<Enter>',button_in)
         self.tag_bind(checkbutton,'<Leave>',button_out)
         self.tag_bind(check,'<Button>',go_func)
         self.tag_bind(checkbutton,'<Button>',go_func)
+        self.tag_bind(state,'<Button>',go_func)
         funcs=[flash,on,off,disable,active]
         return checkbutton,check,funcs
 
@@ -637,9 +646,9 @@ class TinUI(Canvas):
             self.itemconfig(infotagname,state='normal')
         def hideinfo(event):
             self.itemconfig(infotagname,state='hidden')
-        text=self.create_text(pos,anchor='nw',text='?',font=font,fill=fg)
+        text=self.create_text(pos,anchor='nw',text='i',font=font,fill=fg)
         bbox=self.bbox(text)
-        back=self.create_oval((bbox[0]-2,bbox[1]-2,bbox[2]+2,bbox[3]+2),fill=bg,outline=fg,width=2)
+        back=self.create_rectangle((bbox[0]-2,bbox[1]-2,bbox[2]+2,bbox[3]+2),fill=bg,outline=fg,width=2)
         self.tkraise(text)
         self.tag_bind(back,'<Enter>',showinfo)
         self.tag_bind(back,'<Leave>',hideinfo)

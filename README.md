@@ -125,13 +125,15 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_checkbutton(self,pos:tuple,text:str,fontfg='black',fg='#a6a6a6',bg='',onfg='white',onbg='#0067c0',font=('微软雅黑',12),command=None,anchor='nw')
+### add_checkbutton(self,pos:tuple,text:str,fontfg='black',fg='#868686',bg='#ededed',activefg='#868686',activebg='#e5e5e5',onfg='white',onbg='#334ac0',font=('微软雅黑',12),command=None,anchor='nw')
 
 - pos::位置
 - text::标题文字
 - fontfg::文本颜色
 - fg::复选框边框颜色
 - bg::复选框背景颜色
+- activefg::响应鼠标边框颜色
+- activebg::响应鼠标背景颜色
 - onfg::选定时文本图标颜色
 - obbg::选定时背景颜色
 - font::字体名称+大小

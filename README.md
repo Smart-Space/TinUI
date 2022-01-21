@@ -33,9 +33,11 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ## 基础函数
 
-> ==一般地==，会将每个函数的名称以及定义、参数内容、函数绘制说明列出来。
+> - ==一般地==，会将每个函数的名称以及定义、参数内容、函数绘制说明列出来。
 >
-> 所有函数均会返回主要画布对象。
+> 所有函数均会返回主要画布对象。`TinUI.add_...(...)`。
+>
+> - 除了`title`, `paragraph`, `separate`, `menu`, `labelframe`等组件，其余组件的最后一个返回值均为整个组件的画布`tag_name`。
 
 ### add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,anchor='nw',**kw)
 
@@ -89,7 +91,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个按钮。这个按钮会响应鼠标的离开和进入事件，被单击时也会调用绑定的函数。
 
-### return: button_text, button_back, funcs
+### return: button_text, button_back, funcs, uid
 
 > button_text::按钮文本
 >
@@ -119,7 +121,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个类Label组件。
 
-### return: label
+### return: label, uid
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI标签.gif)
 
@@ -142,7 +144,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个复选框。这个复选框会响应鼠标的离开和进入事件，被单击时也会调用绑定的函数，并且会根据当前样式更改点击后的样式。
 
-### return: check_text, check_mark, funcs
+### return: check_text, check_mark, funcs, uid
 
 > check_text::复选框文本
 >
@@ -184,7 +186,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 通过`entry.get()`获取值。
 
-### return: entry
+### return: entry, uid
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI输入框.gif)
 
@@ -220,7 +222,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个单选框，竖式排列。
 
-### return: text, choices_text_list, choices_back, funcs
+### return: text, choices_text_list, choices_back, funcs, uid
 
 > text::文本提示画布对象
 >
@@ -251,7 +253,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个超链接文本。
 
-### return: link
+### return: link, uid
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/%E8%B6%85%E9%93%BE%E6%8E%A5.gif)
 
@@ -269,7 +271,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个扇形等待框。
 
-### return: waitbar1,ok
+### return: waitbar1, ok, uid
 
 > waitbar1::该画布对象
 >
@@ -288,7 +290,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个标题框，以包含所制定的所有画布对象。
 
-### return: label,frame
+### return: label, frame
 
 > label::标题文本
 >
@@ -308,7 +310,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个点状运动的等待框。
 
-### return: back,balls:list,stop
+### return: back, balls:list, stop, uid
 
 > back::背景矩形画布对象
 >
@@ -335,7 +337,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个组合框。
 
-### return: main, back, box_tagname, funcs
+### return: main, back, box_tagname, funcs, uid
 
 > main::显示框文字
 >
@@ -366,7 +368,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个进度条。
 
-### return: back,pro_tagname,text,goto
+### return: back, pro_tagname, text, goto, uid
 
 > back::背景矩形边框
 >
@@ -393,9 +395,9 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个表格。
 
-### return: None
+### return: uid
 
-> 表格组件绘制较复杂，涉及到列宽度、行最大高度等内容，目前没有返回内容
+> 表格组件绘制较复杂，涉及到列宽度、行最大高度等内容，目前只返回整体画布tag
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI表格.gif)
 
@@ -413,7 +415,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个开关。
 
-### return: state, back
+### return: state, back, uid
 
 > state::文本内容。“off”或“on”的画布对象
 
@@ -436,7 +438,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个选值框。
 
-### return: wentry, button1, button2
+### return: wentry, button1, button2, uid
 
 > wentry::输入框组件
 >
@@ -461,7 +463,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个滑动调节框。
 
-### return: name, back, button, funcs
+### return: name, back, button, funcs, uid
 
 > name::选值覆盖区域的tag名称
 >
@@ -494,7 +496,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个气泡提示框组件。
 
-### return: text, back, infotagname
+### return: text, back, infotagname, uid
 
 > text::标识符文本
 >
@@ -506,7 +508,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_menubar(self,cid='all',bind='\<Button-3\>',font='微软雅黑 12',fg='#ecf3e8',bg='#2b2a33',activefg='#ecf3e8',activebg='#616161',cont=(('command',print('')),'-'),tran='white')
+### add_menubar(self,cid='all',bind='\<Button-3\>',font='微软雅黑 12',fg='#ecf3e8',bg='#2b2a33',activefg='#ecf3e8',activebg='#616161',cont=(('command',print('')),'-'),tran='#01FF11')
 
 - cid::绑定的画布对象
 - bind::绑定事件的类型

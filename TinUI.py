@@ -10,7 +10,8 @@ class TinUINum:#数据载体，请忽略
 
 
 class TinUI(Canvas):
-    """基于tkinter的高级窗口绘制组件"""
+    """基于tkinter的高级窗口绘制组件
+    uid参数为每一个组件（除个别）的整体tag_name"""
 
     def __init__(self,master,update:bool=True,update_time:int=1000,**kw):
         self.frame = Frame(master)
@@ -94,9 +95,11 @@ class TinUI(Canvas):
             self.itemconfig(back,state='normal')
             out_button(None)
         button=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
+        uid='button'+str(button)
+        self.itemconfig(button,tags=uid)
         bbox=self.bbox(button)
         x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[2]+3,bbox[3]+3
-        back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=line,width=linew)
+        back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=line,width=linew,tags=uid)
         self.tag_bind(button,'<Button-1>',on_click)
         self.tag_bind(button,'<Enter>',in_button)
         self.tag_bind(button,'<Leave>',out_button)
@@ -105,15 +108,17 @@ class TinUI(Canvas):
         self.tag_bind(back,'<Leave>',out_button)
         self.tkraise(button)
         funcs=[change_command,disable,active]
-        return button,back,funcs
+        return button,back,funcs,uid
 
     def add_label(self,pos:tuple,text:str,fg='black',bg='#f0f0f0',outline='grey',font=('微软雅黑',12),anchor='nw'):#绘制标签
         label=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
+        uid='label'+str(label)
+        self.itemconfig(label,tags=uid)
         bbox=self.bbox(label)
         x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[2]+3,bbox[3]+3
-        back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=outline)
+        back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=outline,tags=uid)
         self.tkraise(label)
-        return label
+        return label,uid
 
     def add_checkbutton(self,pos:tuple,text:str,fontfg='black',fg='#868686',bg='#ededed',activefg='#868686',activebg='#e5e5e5',onfg='white',onbg='#334ac0',font=('微软雅黑',12),command=None,anchor='nw'):#绘制复选框
         def button_in(event):
@@ -147,15 +152,19 @@ class TinUI(Canvas):
         def disable():
             self.itemconfig(checkbutton,state='disable',fill='#7a7a7a')
             self.itemconfig(check,state='disable')
+            self.itemconfig(state,state='disable')
         def active():
             self.itemconfig(checkbutton,state='normal',fill=fontfg)
             self.itemconfig(check,state='normal')
+            self.itemconfig(state,state='normal')
         checkbutton=self.create_text(pos,text=text,fill=fontfg,font=font,anchor=anchor)
+        uid='checkbutton'+str(checkbutton)
+        self.itemconfig(checkbutton,tags=uid)
         bbox=self.bbox(checkbutton)
         dic=bbox[3]-bbox[1]#位移长度
         self.move(checkbutton,dic-7,0)
-        check=self.create_rectangle((pos[0]-2,pos[1]+4,pos[0]+dic-12,pos[1]+dic-4),outline=fg,fill=bg,width=2)
-        state=self.create_text((pos[0]-2,pos[1]),text='√',fill=onfg,font=font,anchor='nw',state='hidden')
+        check=self.create_rectangle((pos[0]-2,pos[1]+4,pos[0]+dic-12,pos[1]+dic-4),outline=fg,fill=bg,width=2,tags=uid)
+        state=self.create_text((pos[0]-2,pos[1]),text='√',fill=onfg,font=font,anchor='nw',state='hidden',tags=uid)
         self.tkraise(state)
         self.tag_bind(check,'<Enter>',button_in)
         self.tag_bind(check,'<Leave>',button_out)
@@ -165,7 +174,7 @@ class TinUI(Canvas):
         self.tag_bind(checkbutton,'<Button>',go_func)
         self.tag_bind(state,'<Button>',go_func)
         funcs=[flash,on,off,disable,active]
-        return checkbutton,check,funcs
+        return checkbutton,check,funcs,uid
 
     def add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='#cfd3d6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#63676b',onoutline='#4258cc',icon='>',anchor='nw'):#绘制单行输入框
         #这是一个半绘制组件
@@ -188,13 +197,15 @@ class TinUI(Canvas):
         entry.bind('<FocusIn>',lambda event:(self.itemconfig(back,outline=onoutline),entry.config(background=activebg,foreground=activefg)))
         entry.bind('<FocusOut>',lambda event:(self.itemconfig(back,outline=outline),entry.config(background=bg,foreground=fg)))
         funce=self.create_window(pos,window=entry,width=width,anchor=anchor)#输入框画布对象
-        funcw=self.create_text((pos[0]+width,pos[1]),text=icon,fill=fg,font=font,anchor='nw')
+        uid='entry'+str(funce)
+        self.itemconfig(funce,tags=uid)
+        funcw=self.create_text((pos[0]+width,pos[1]),text=icon,fill=fg,font=font,anchor='nw',tags=uid)
         w=self.bbox(funcw)[2]
         h=self.bbox(funce)[3]
-        back=self.create_rectangle((pos[0]-2,pos[1]-2,w+2,h+2),width=linew,outline=outline,fill=bg)
+        back=self.create_rectangle((pos[0]-2,pos[1]-2,w+2,h+2),width=linew,outline=outline,fill=bg,tags=uid)
         self.tkraise(funcw)
         if_empty(None)
-        return entry
+        return entry,uid
 
     def add_separate(self,pos:tuple,width:int,direction='x',fg='grey'):#绘制分割线
         bbox=list(pos)
@@ -235,15 +246,17 @@ class TinUI(Canvas):
                 self.itemconfig(f,state='normal',fill=fg)
                 self.itemconfig(b,state='normal')
         word=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor,width=width)
+        uid='radiobutton'+str(word)
+        self.itemconfig(word,tags=uid)
         start_x=pos[0]#起始x位置
         height=self.bbox(word)[3]+3#变量y位置
         choices_list=[]
         choices_back=[]
         for i in choices:
-            choice=self.create_text((start_x+2,height+2),text=i,fill=fg,font=font,anchor=anchor,width=width-4)
+            choice=self.create_text((start_x+2,height+2),text=i,fill=fg,font=font,anchor=anchor,width=width-4,tags=uid)
             bbox=self.bbox(choice)
             h=bbox[3]-bbox[1]+4
-            back=self.create_rectangle((start_x,height,start_x+width,height+h),outline=fg,fill=bg)
+            back=self.create_rectangle((start_x,height,start_x+width,height+h),outline=fg,fill=bg,tags=uid)
             self.tkraise(choice)
             height+=h+2
             choices_list.append(choice)
@@ -256,7 +269,7 @@ class TinUI(Canvas):
             self.tag_bind(back,'<Button>',lambda event,_text=i,back=back:go_func(back,_text))
         back_list=list(choices_back)
         funcs=[select,disable,active]
-        return word,choices_list,choices_back,funcs
+        return word,choices_list,choices_back,funcs,uid
 
     def add_link(self,pos:tuple,text,url,fg='#50B0F4',font:tuple=('微软雅黑',12),anchor='nw'):#绘制超链接
         def turn_red(event):
@@ -268,10 +281,12 @@ class TinUI(Canvas):
         def go_url(event):
             webopen(url)
         link=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
+        uid='link'+str(link)
+        self.itemconfig(link,tags=uid)
         font=self.itemcget(link,'font')+' underline'
         self.itemconfig(link,font=font)
         bbox=self.bbox(link)
-        back=self.create_rectangle(bbox,width=0)
+        back=self.create_rectangle(bbox,width=0,tags=uid)
         self.tkraise(link)
         self.tag_bind(link,'<Enter>',turn_red)
         self.tag_bind(link,'<Leave>',turn_back)
@@ -279,7 +294,7 @@ class TinUI(Canvas):
         self.tag_bind(back,'<Enter>',turn_red)
         self.tag_bind(back,'<Leave>',turn_back)
         self.tag_bind(back,'<Button-1>',go_url)
-        return link
+        return link,uid
 
     def add_waitbar1(self,pos:tuple,fg='#0078D7',bg='',okfg='lightgreen',okbg='',bd=2,r=20):#绘制圆形等待组件
         def __start(i):
@@ -303,9 +318,11 @@ class TinUI(Canvas):
         bbox=(pos[0],pos[1],pos[0]+2*r,pos[1]+2*r)
         back_bbox=(pos[0]+bd,pos[1]+bd,pos[0]+2*r-bd,pos[1]+2*r-bd)
         back=self.create_oval(back_bbox,width=0,fill=bg)
-        waitbar1=self.create_arc(bbox,outline=fg,extent=5,start=90,width=bd,style='arc')
+        uid='waitbar1'+str(back)
+        self.itemconfig(back,tags=uid)
+        waitbar1=self.create_arc(bbox,outline=fg,extent=5,start=90,width=bd,style='arc',tags=uid)
         start()
-        return waitbar1,ok
+        return waitbar1,ok,uid
 
     def add_labelframe(self,widgets:tuple=(),title='',fg='#A8A8A8',bg=''):#绘制标题框
         sx,sy,ex,ey=self.bbox(widgets[0])#获取直接的起始位置
@@ -359,13 +376,15 @@ class TinUI(Canvas):
         ifok.re=False
         bbox=(pos[0],pos[1],pos[0]+width+10,pos[1]+5)
         back=self.create_rectangle(bbox,fill=bg,outline=fg)
+        uid='waitbar2'+str(back)
+        self.itemconfig(back,tags=uid)
         balls=[]
         ball_bbox=(pos[0],pos[1],pos[0]+5,pos[1]+5)
         for b in range(1,6):
-            ball=self.create_oval(ball_bbox,fill=fg,outline=fg,state='hidden')
+            ball=self.create_oval(ball_bbox,fill=fg,outline=fg,state='hidden',tags=uid)
             balls.append(ball)
         start()
-        return back,balls,stop
+        return back,balls,stop,uid
 
     def add_combobox(self,pos:tuple,width:int=200,text='',content:tuple=(),fg='black',bg='#F2F2F2',activefg='',activebg='#7B8ADA',font=('微软雅黑',12),command=None):#绘制组合/下拉框
         def button_in(_tag):
@@ -396,20 +415,22 @@ class TinUI(Canvas):
         if activefg=='':
             activefg=self['background']
         main=self.create_text(pos,text=text,font=font,fill=fg,anchor='nw')
+        uid='combobox'+str(main)
+        self.itemconfig(main,tags=uid)
         bbox=self.bbox(main)
         x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[0]+width+3,bbox[3]+3
-        back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=fg)
+        back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=fg,tags=uid)
         self.tkraise(main)
-        button_text,button_back,button_funcs=self.add_button((x2+3,y1+3),'∨',fg,bg,'#CCCCCC',1,activefg,activebg,'#7a7a7a',font=font,command=open_box)
+        button_text,button_back,button_funcs,_=self.add_button((x2+3,y1+3),'∨',fg,bg,'#CCCCCC',1,activefg,activebg,'#7a7a7a',font=font,command=open_box)
         start_x=bbox[0]#起始x位置
         height=bbox[3]+3#变量y位置
         box_tagname='combobox>'+str(main)+'>'+str(back)#绑定独立的tag名称
         info=[]
         for i in content:
-            choice=self.create_text((start_x+2,height+2),text=i,fill=fg,font=(font[0],10),anchor='nw',width=width-4)
+            choice=self.create_text((start_x+2,height+2),text=i,fill=fg,font=(font[0],10),anchor='nw',width=width-4,tags=uid)
             pos=self.bbox(choice)
             h=pos[3]-pos[1]+4
-            cho_back=self.create_rectangle((start_x,height,start_x+width,height+h),outline=fg,fill=bg)
+            cho_back=self.create_rectangle((start_x,height,start_x+width,height+h),outline=fg,fill=bg,tags=uid)
             self.tkraise(choice)
             height+=h+2
             self.tag_bind(choice,'<Enter>',lambda event,back=cho_back:button_in(back))
@@ -423,31 +444,30 @@ class TinUI(Canvas):
             self.addtag_withtag(box_tagname,cho_back)
         self.itemconfig(box_tagname,state='hidden')
         funcs=[select,disable,active]
-        return main,back,box_tagname,funcs
+        return main,back,box_tagname,funcs,uid
 
     def add_progressbar(self,pos:tuple,width=250,fg='#1E1E27',bg='#0078D7',percentage=True,text=''):#绘制进度条
         def goto(num:int):
             if not 0<=num<=100:
                 return
             pw=width*num//100
-            self.delete(pro_tagname)
-            new_progressbar=self.create_rectangle((pos[0],pos[1],pos[0]+pw,pos[1]+15),fill=bg,outline=bg)
-            self.tkraise(text)
-            self.addtag_withtag(pro_tagname,new_progressbar)
+            self.coords(progressbar,pos[0],pos[1],pos[0]+pw,pos[1]+15)
             if percentage==True:
                 self.itemconfig(text,text=str(num)+'%')
             self.update()
         bbox=(pos[0],pos[1],pos[0]+width,pos[1]+15)
         back=self.create_rectangle((bbox),outline=fg,fill='#CCCCCC')
-        progressbar=self.create_rectangle((pos[0],pos[1],pos[0],pos[1]+15),outline=bg,fill=bg)
+        uid='progressbar'+str(back)
+        self.itemconfig(back,tags=uid)
+        progressbar=self.create_rectangle((pos[0],pos[1],pos[0],pos[1]+15),outline=bg,fill=bg,tags=uid)
         pro_tagname='progressbar>'+str(back)
         self.addtag_withtag(progressbar,pro_tagname)
         #是否显示默认文本
         if percentage==True:
-            text=self.create_text((pos[0]+width//2,pos[1]),anchor='n',text='0%',fill=fg,font='微软雅黑 10')
+            text=self.create_text((pos[0]+width//2,pos[1]),anchor='n',text='0%',fill=fg,font='微软雅黑 10',tags=uid)
         else:
-            text=self.create_text((pos[0]+width//2,pos[1]),anchor='n',text=text,fill=fg,font='微软雅黑 10')
-        return back,pro_tagname,text,goto
+            text=self.create_text((pos[0]+width//2,pos[1]),anchor='n',text=text,fill=fg,font='微软雅黑 10',tags=uid)
+        return back,pro_tagname,text,goto,uid
 
     def add_table(self,pos:tuple,outline='#E1E1E1',fg='black',bg='white',data=[['1','2','3'],['a','b','c']],minwidth=100,font=('微软雅黑',12),headbg='#d9ebf9'):#绘制表格
         def get_max_height(widths:dict):
@@ -456,10 +476,9 @@ class TinUI(Canvas):
                 height=i[1] if i[1]>height else height
             #重新绘制
             for back in widths.keys():
-                self.delete(widths[back][0])
                 x1,y1,x2=widths[back][2]
                 y2=y1+height
-                newback=self.create_rectangle((x1,y1,x2,y2),outline=outline,fill=bg)
+                self.coords(widths[back][0],x1,y1,x2,y2)
                 self.tkraise(widths[back][3])
             return height
         title_num=len(data[0])#获取表头个数
@@ -470,6 +489,9 @@ class TinUI(Canvas):
         ti_list=[]
         for i in data[0]:
             title=self.create_text((end_x,end_y),anchor='nw',text=i,fill=fg,font=font)
+            if count==1:#只去第一个背景作为tag id
+                uid='table'+str(title)
+            self.itemconfig(title,tags=uid)
             bbox=self.bbox(title)
             if bbox[2]-bbox[0]<=minwidth:
                 width=minwidth
@@ -478,7 +500,7 @@ class TinUI(Canvas):
             line_width[count]=width
             height=bbox[3]-bbox[1]
             relheight=height if height>relheight else relheight
-            ti_back=self.create_rectangle((end_x,end_y,end_x+width,end_y+height),outline=outline,fill=headbg)
+            ti_back=self.create_rectangle((end_x,end_y,end_x+width,end_y+height),outline=outline,fill=headbg,tag=uid)
             ti_list.append((ti_back,end_x,end_y,end_x+width))
             end_x=end_x+width+2
             count+=1
@@ -493,17 +515,17 @@ class TinUI(Canvas):
             height=0
             for a in line:
                 width=line_width[count]
-                cont=self.create_text((end_x,end_y),anchor='nw',text=a,fill=fg,width=width,font=font)
+                cont=self.create_text((end_x,end_y),anchor='nw',text=a,fill=fg,width=width,font=font,tags=uid)
                 bbox=self.bbox(cont)
                 height=bbox[3]-bbox[1]
-                back=self.create_rectangle((end_x,end_y,end_x+width,end_y+height),outline=outline,fill=bg)
+                back=self.create_rectangle((end_x,end_y,end_x+width,end_y+height),outline=outline,fill=bg,tags=uid)
                 self.tkraise(cont)
                 a_dict[count]=(back,height,(end_x,end_y,end_x+width),cont)#(end_x,end_y,width)为重新绘制确定位置范围
                 end_x=end_x+width+2
                 count+=1
             height=get_max_height(a_dict)
             end_y=end_y+height+2
-        return None
+        return uid
 
     def add_onoff(self,pos:tuple,fg='#333333',bg='#FFFFFF',onfg='#FFFFFF',onbg='#4258CC',font=('微软雅黑',12),command=None):#绘制开关控件
         def __on():
@@ -524,16 +546,18 @@ class TinUI(Canvas):
                 self.itemconfig(back,fill=bg,outline=fg)
                 __off()
         state=self.create_text(pos,anchor='nw',text='off',fill=fg,font=font)
+        uid='onoff'+str(state)
+        self.itemconfig(state,tags=uid)
         bbox=self.bbox(state)
         d=int(bbox[3]-bbox[1])#获得绘制半径
         width=bbox[2]-bbox[0]#获取绘制宽度
         self.move(state,d,0)
         back=self.create_polygon((pos[0]+d,pos[1],pos[0],pos[1]+d/2,pos[0]+d,pos[1]+d,pos[0]+d+width,pos[1]+d,pos[0]+d*2+width,pos[1]+d/2,
-        pos[0]+d+width,pos[1],pos[0]+d,pos[1]),fill=bg,outline=fg,width=2,joinstyle='miter')
+        pos[0]+d+width,pos[1],pos[0]+d,pos[1]),fill=bg,outline=fg,width=2,joinstyle='miter',tags=uid)
         self.tkraise(state)
         self.tag_bind(state,'<Button-1>',__on_click)
         self.tag_bind(back,'<Button-1>',__on_click)
-        return state,back
+        return state,back,uid
 
     def add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='black',bg='',activefg='black',activebg='#E5F1FB',font=('微软雅黑',12),command=None):#绘制选值框
         def updata(event):
@@ -573,15 +597,19 @@ class TinUI(Canvas):
             now=data[0]
         wentry.insert(0,now)
         entry=self.create_window(pos,window=wentry,width=width,anchor='nw')
+        uid='spinbox'+str(entry)
+        self.itemconfig(entry,tags=uid)
         bbox=self.bbox(entry)
         height=bbox[3]-bbox[1]
         font=(font[0],font[1]//3)
         button1=self.add_button((pos[0]+width+2,pos[1]+3),text='▲',linew=1,activefg=activefg,activebg=activebg,font=font,command=updata)
         button2=self.add_button((pos[0]+width+2,pos[1]-5+height),text='▼',linew=1,activefg=activefg,activebg=activebg,font=font,anchor='sw',command=downdata)
+        self.addtag_withtag(uid,button1[-1])
+        self.addtag_withtag(uid,button1[-1])
         datanum=TinUINum()
         datanum.num=data.index(now)#记录数据位置
         maxnum=len(data)-1#最大位置
-        return wentry,button1,button2
+        return wentry,button1,button2,uid
 
     def add_scalebar(self,pos:tuple,width=200,fg='#4258cc',activefg='#aeb5d7',bg='#99a3d5',data=(1,2,3,4,5),start=1,command=None):#绘制调节框
         def mousedown(event):
@@ -592,7 +620,7 @@ class TinUI(Canvas):
                 return
             self.move(button,move,0)
             self.delete(name)
-            active=self.create_line((pos[0],pos[1],move+scale.startx,pos[1]),fill=fg,width=3,tags=name)
+            active=self.create_line((pos[0],pos[1],move+scale.startx,pos[1]),fill=fg,width=3,tags=(uid,name))
             scale.startx=self.canvasx(event.x)
         def check(event):
             end=int(self.canvasx(event.x))
@@ -620,6 +648,8 @@ class TinUI(Canvas):
             self.itemconfig(name,state='normal',fill=fg)
         scale=TinUINum()#记录数据结构体
         back=self.create_line((pos[0],pos[1],pos[0]+width,pos[1]),fill=bg,width=3)
+        uid='scalebar'+str(back)
+        self.itemconfig(back,tags=uid)
         self.tag_bind(back,'<ButtonRelease-1>',checkval)
         dash_t=width//(len(data)-1)
         s=pos[0]#调节线段起点
@@ -628,18 +658,18 @@ class TinUI(Canvas):
             s+=dash_t
             dash.append(s)
         del s
-        active=self.create_line((pos[0],pos[1],dash[start],pos[1]),fill=fg,width=3)
+        active=self.create_line((pos[0],pos[1],dash[start],pos[1]),fill=fg,width=3,tags=uid)
         name='scaleactive'+str(active)
         self.tag_bind(name,'<ButtonRelease-1>',checkval)
         self.addtag_withtag(name,active)#为重绘绑定tag名称
-        button=self.create_rectangle((dash[start],pos[1]-15,dash[start]+10,pos[1]+17),width=0,fill=fg)
+        button=self.create_rectangle((dash[start],pos[1]-15,dash[start]+10,pos[1]+17),width=0,fill=fg,tags=uid)
         self.tag_bind(button,'<Enter>',lambda event:self.itemconfig(button,fill=activefg))
         self.tag_bind(button,'<Leave>',lambda event:self.itemconfig(button,fill=fg))
         self.tag_bind(button,'<Button-1>',mousedown)
         self.tag_bind(button,'<B1-Motion>',drag)
         self.tag_bind(button,'<ButtonRelease-1>',check)#矫正位置
         funcs=[select,disable,_active]
-        return name,back,button,funcs
+        return name,back,button,funcs,uid
 
     def add_info(self,pos:tuple,font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black'):#绘制提示框
         def showinfo(event):
@@ -647,24 +677,26 @@ class TinUI(Canvas):
         def hideinfo(event):
             self.itemconfig(infotagname,state='hidden')
         text=self.create_text(pos,anchor='nw',text='i',font=font,fill=fg)
+        uid='info'+str(text)
+        self.itemconfig(text,tags=uid)
         bbox=self.bbox(text)
-        back=self.create_rectangle((bbox[0]-2,bbox[1]-2,bbox[2]+2,bbox[3]+2),fill=bg,outline=fg,width=2)
+        back=self.create_rectangle((bbox[0]-2,bbox[1]-2,bbox[2]+2,bbox[3]+2),fill=bg,outline=fg,width=2,tags=uid)
         self.tkraise(text)
         self.tag_bind(back,'<Enter>',showinfo)
         self.tag_bind(back,'<Leave>',hideinfo)
         self.tag_bind(text,'<Enter>',showinfo)
         self.tag_bind(text,'<Leave>',hideinfo)
-        info=self.create_text((bbox[2]+10,(bbox[3]+bbox[1])//2),anchor='nw',text=info_text,font=info_font,fill=info_fg,width=info_width)
+        info=self.create_text((bbox[2]+10,(bbox[3]+bbox[1])//2),anchor='nw',text=info_text,font=info_font,fill=info_fg,width=info_width,tags=uid)
         ibbox=self.bbox(info)
-        info_back=self.create_rectangle((ibbox[0]-2,ibbox[1]-2,ibbox[2]+2,ibbox[3]+2),width=1,fill=bg,outline=fg)
+        info_back=self.create_rectangle((ibbox[0]-2,ibbox[1]-2,ibbox[2]+2,ibbox[3]+2),width=1,fill=bg,outline=fg,tags=uid)
         self.tkraise(info)
         infotagname='info'+str(info)+str(info_back)
         self.addtag_withtag(infotagname,info)
         self.addtag_withtag(infotagname,info_back)
         self.itemconfig(infotagname,state='hidden')
-        return text,back,infotagname
+        return text,back,infotagname,uid
 
-    def add_menubar(self,cid='all',bind='<Button-3>',font='微软雅黑 12',fg='#ecf3e8',bg='#2b2a33',activefg='#ecf3e8',activebg='#616161',cont=(('command',print),'-'),tran='white'):#绘制菜单
+    def add_menubar(self,cid='all',bind='<Button-3>',font='微软雅黑 12',fg='#ecf3e8',bg='#2b2a33',activefg='#ecf3e8',activebg='#616161',cont=(('command',print),'-'),tran='#01FF11'):#绘制菜单
         '''cont格式
         (('名称',绑定的函数（至少接受event参数）),#常规格式
         '-',#分割线
@@ -779,22 +811,22 @@ if __name__=='__main__':
     b.add_separate((20,200),600)
     b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
     b.add_link((400,500),'TinGroup知识库','http://tinhome.baklib-free.com/')
-    _,ok1=b.add_waitbar1((500,220),bg='#CCCCCC')
+    _,ok1,_=b.add_waitbar1((500,220),bg='#CCCCCC')
     b.add_button((500,270),'停止等待动画',activefg='cyan',activebg='black',command=test2)
     bu1=b.add_button((700,200),'停止点状滚动条',activefg='white',activebg='black',command=test3)[1]
     bu2=b.add_button((700,250),'nothing button 2')[1]
     bu3=b.add_button((700,300),'nothing button 3')[1]
     b.add_labelframe((bu1,bu2,bu3),'box buttons')
-    _,_,ok2=b.add_waitbar2((600,400))
+    _,_,ok2,_=b.add_waitbar2((600,400))
     b.add_combobox((600,550),text='你有多大可能去珠穆朗玛峰',content=('20%','40%','60%','80%','100%','1000%'))
     b.add_button((600,480),text='测试进度条（无事件版本）',command=test4)
-    _,_,_,progressgoto=b.add_progressbar((600,510))
+    _,_,_,progressgoto,_=b.add_progressbar((600,510))
     b.add_table((180,630),data=(('a','space fans over the\nworld','c'),('you\ncan','2','3'),('I','II','have a dream, then try your best to get it!')))
     b.add_paragraph((300,850),text='上面是一个表格')
     b.add_onoff((600,100))
     b.add_spinbox((680,100))
     b.add_scalebar((680,50),command=test5)
-    scale_text=b.add_label((890,50),text='当前选值：2')
+    scale_text,_=b.add_label((890,50),text='当前选值：2')
     b.add_info((680,140),info_text='this is info widget in TinUI')
     mtb=b.add_paragraph((0,720),'测试菜单（右键单击）')
     b.add_menubar(mtb,cont=(('command',print),('menu',test1),'-',('TinUI文本移动',test)))

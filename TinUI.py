@@ -849,7 +849,7 @@ if __name__=='__main__':
     _,_,ok2,_=b.add_waitbar2((600,400))
     b.add_combobox((600,550),text='你有多大可能去珠穆朗玛峰',content=('20%','40%','60%','80%','100%','1000%'))
     b.add_button((600,480),text='测试进度条（无事件版本）',command=test4)
-    _,_,_,progressgoto,_=b.add_progressbar((600,510))
+    _,_,_,progressgoto,_,_=b.add_progressbar((600,510))
     b.add_table((180,630),data=(('a','space fans over the\nworld','c'),('you\ncan','2','3'),('I','II','have a dream, then try your best to get it!')))
     b.add_paragraph((300,850),text='上面是一个表格')
     b.add_onoff((600,100))

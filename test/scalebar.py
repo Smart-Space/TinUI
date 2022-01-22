@@ -12,6 +12,6 @@ u=a.u
 u.add_button((2,5),'选定第三个选项',command=s)
 u.add_button((180,5),'禁用',command=di)
 u.add_button((250,5),'激活',command=ac)
-_,_,_,funcs=u.add_scalebar((5,50),width=200,data=('1','2','3','4','5','6'))
+_,_,_,funcs,_=u.add_scalebar((5,50),width=200,data=('1','2','3','4','5','6'))
 
 a.go()

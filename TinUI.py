@@ -1,7 +1,7 @@
 from tkinter import *
 from webbrowser import open as webopen
 import ctypes
-
+from typing import Union
 
 
 
@@ -9,59 +9,17 @@ class TinUINum:#数据载体，请忽略
     pass
 
 
-class TinUI(Canvas):
+class BasicTinUI(Canvas):
     """基于tkinter的高级窗口绘制组件
     uid参数为每一个组件（除个别）的整体tag_name"""
 
-    def __init__(self,master,update:bool=True,update_time:int=1000,**kw):
-        self.frame = Frame(master)
-        self.vbar = Scrollbar(self.frame)
-        self.vbar.pack(side=RIGHT, fill=Y)
-        ###
-        kw.update({'yscrollcommand': self.vbar.set})
-        Canvas.__init__(self, self.frame,selectborderwidth=0,highlightthickness=0,bd=0, **kw)
-        self.pack(fill=BOTH, expand=True)
-        self.vbar['command'] = self.yview
-        ###
-        self.hbar=Scrollbar(self.frame,orient='horizontal',command=self.xview)
-        self.hbar.pack(side=BOTTOM,fill=X)
-        self.config(xscrollcommand=self.hbar.set)
-        # Copy geometry methods
-        canvas_meths = vars(Canvas).keys()
-        methods = vars(Pack).keys() | vars(Grid).keys() | vars(Place).keys()
-        methods = methods.difference(canvas_meths)
-        for m in methods:
-            if m[0] != '_' and m != 'config' and m != 'configure':
-                setattr(self, m, getattr(self.frame, m))
-        self.bind('<MouseWheel>',self.set_y_view)
-        self.bind('<Configure>',lambda event:self.update__())
+    def __init__(self,master,**kw):
+        Canvas.__init__(self,master,selectborderwidth=0,highlightthickness=0,bd=0, **kw)
         self.bind('<Button-1>',lambda event:self.focus_set())
         self.init()
-        self.update_time=update_time
-        if update==False:
-            self.unbind("<Configure>")
 
     def init(self):
         self.title_size={0:20,1:18,2:16,3:14,4:12}
-    def set_y_view(self,event):
-        self.yview_scroll(int(-1*(event.delta/120)), "units")
-    def update__(self):#更新宽高
-        try:
-            bbox=self.bbox('all')
-            width,height=bbox[2:]
-            if height<=self.winfo_height():
-                self.vbar.pack_forget()
-            else:
-                self.vbar.pack(before=self,side=RIGHT,fill=Y)
-            if width<=self.winfo_width():
-                self.hbar.pack_forget()
-            else:
-                self.hbar.pack(side=BOTTOM,fill=X)
-            self.config(scrollregion=bbox)
-        except:
-            pass
-        finally:
-            self.after(self.update_time,self.update__)
 
     def add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,anchor='nw',**kw):#绘制标题
         kw['anchor']=anchor
@@ -446,7 +404,7 @@ class TinUI(Canvas):
         funcs=[select,disable,active]
         return main,back,box_tagname,funcs,uid
 
-    def add_progressbar(self,pos:tuple,width=250,fg='#1E1E27',bg='#0078D7',percentage=True,text=''):#绘制进度条
+    def add_progressbar(self,pos:tuple,width=250,fg='#868686',bg='#334ac0',back='#f3f3f3',fontc='#79b8f8',percentage=True,text=''):#绘制进度条
         def goto(num:int):
             if not 0<=num<=100:
                 return
@@ -455,8 +413,20 @@ class TinUI(Canvas):
             if percentage==True:
                 self.itemconfig(text,text=str(num)+'%')
             self.update()
+        def now_running():
+            self.itemconfig(text,fill=fontc)
+            self.itemconfig(back,outline=fg)
+            self.itemconfig(progressbar,outline=bg,fill=bg)
+        def now_paused(fg='#868686',bg='#9d5d00',fontc='#cdcdcd'):
+            self.itemconfig(text,fill=fontc)
+            self.itemconfig(back,outline=fg)
+            self.itemconfig(progressbar,outline=bg,fill=bg)
+        def now_error(fg='#868686',bg='#c42b1c',fontc='#cdcdcd'):
+            self.itemconfig(text,fill=fontc)
+            self.itemconfig(back,outline=fg)
+            self.itemconfig(progressbar,outline=bg,fill=bg)
         bbox=(pos[0],pos[1],pos[0]+width,pos[1]+15)
-        back=self.create_rectangle((bbox),outline=fg,fill='#CCCCCC')
+        back=self.create_rectangle((bbox),outline=fg,fill=back)
         uid='progressbar'+str(back)
         self.itemconfig(back,tags=uid)
         progressbar=self.create_rectangle((pos[0],pos[1],pos[0],pos[1]+15),outline=bg,fill=bg,tags=uid)
@@ -464,10 +434,11 @@ class TinUI(Canvas):
         self.addtag_withtag(progressbar,pro_tagname)
         #是否显示默认文本
         if percentage==True:
-            text=self.create_text((pos[0]+width//2,pos[1]),anchor='n',text='0%',fill=fg,font='微软雅黑 10',tags=uid)
+            text=self.create_text((pos[0]+width//2,pos[1]),anchor='n',text='0%',fill=fontc,font='微软雅黑 10',tags=uid)
         else:
-            text=self.create_text((pos[0]+width//2,pos[1]),anchor='n',text=text,fill=fg,font='微软雅黑 10',tags=uid)
-        return back,pro_tagname,text,goto,uid
+            text=self.create_text((pos[0]+width//2,pos[1]),anchor='n',text=text,fill=fontc,font='微软雅黑 10',tags=uid)
+        funcs=[now_running,now_paused,now_error]
+        return back,pro_tagname,text,goto,funcs,uid
 
     def add_table(self,pos:tuple,outline='#E1E1E1',fg='black',bg='white',data=[['1','2','3'],['a','b','c']],minwidth=100,font=('微软雅黑',12),headbg='#d9ebf9'):#绘制表格
         def get_max_height(widths:dict):
@@ -772,6 +743,64 @@ class TinUI(Canvas):
         menu.bind('<FocusOut>',lambda event:menu.withdraw())
         menu.attributes('-transparent',tran)
         return menu,bar,funcs
+
+
+class TinUI(BasicTinUI):
+    '''对BasicTinUI的封装，添加了滚动条自动刷新'''
+
+    def __init__(self,master,update:bool=True,update_time:int=1000,**kw):
+        self.frame = Frame(master)
+        self.vbar = Scrollbar(self.frame)
+        self.vbar.pack(side=RIGHT, fill=Y)
+        ###
+        kw.update({'yscrollcommand': self.vbar.set})
+        BasicTinUI.__init__(self,self.frame,**kw)
+        self.pack(fill=BOTH, expand=True)
+        self.vbar['command'] = self.yview
+        ###
+        self.hbar=Scrollbar(self.frame,orient='horizontal',command=self.xview)
+        self.hbar.pack(side=BOTTOM,fill=X)
+        self.config(xscrollcommand=self.hbar.set)
+        # Copy geometry methods
+        canvas_meths = vars(Canvas).keys()
+        methods = vars(Pack).keys() | vars(Grid).keys() | vars(Place).keys()
+        methods = methods.difference(canvas_meths)
+        for m in methods:
+            if m[0] != '_' and m != 'config' and m != 'configure':
+                setattr(self, m, getattr(self.frame, m))
+        self.bind('<MouseWheel>',self.set_y_view)
+        self.bind('<Configure>',lambda event:self.update__())
+        self.update_time=update_time
+        if update==False:
+            self.unbind("<Configure>")
+
+    def set_y_view(self,event):
+        self.yview_scroll(int(-1*(event.delta/120)), "units")
+    def update__(self):#更新宽高
+        try:
+            bbox=self.bbox('all')
+            width,height=bbox[2:]
+            if height<=self.winfo_height():
+                self.vbar.pack_forget()
+            else:
+                self.vbar.pack(before=self,side=RIGHT,fill=Y)
+            if width<=self.winfo_width():
+                self.hbar.pack_forget()
+            else:
+                self.hbar.pack(side=BOTTOM,fill=X)
+            self.config(scrollregion=bbox)
+        except:
+            pass
+        finally:
+            self.after(self.update_time,self.update__)
+
+
+class TinUIXml():#TinUI的xml渲染方式
+    '''为TinUI提供更加方便的平面方式，使用xml
+    开发中'''
+
+    def __init__(self,ui:Union[BasicTinUI,TinUI]):
+        pass
 
 
 

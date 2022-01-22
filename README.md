@@ -16,6 +16,10 @@ TinUI基于tkinter的画布（Canvas），可以作为整个窗口的唯一控�
 
 ---
 
+# Class: TinUI(BasicTinUI)
+
+TinUI模块的主类，基于`Class: BasicTinUI`。
+
 ## 创建TinUI
 
 ```python
@@ -26,10 +30,6 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 **kw::Canvas的参数
 '''
 ```
-
-
-
----
 
 ## 基础函数
 
@@ -357,18 +357,22 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_progressbar(self,pos:tuple,width=250,fg='#3B3B3B',bg='#63ADE5',percentage=True,text='')
+### add_progressbar(self,pos:tuple,width=250,fg='#868686',bg='#334ac0',back='#f3f3f3',fontc='#79b8f8',percentage=True,text='')
 
 - pos::位置
 - width::宽度
-- fg::文本以及边框颜色
+- fg::边框颜色
 - bg::填充颜色
+- back::未被填充的背景颜色
+- fontc::字体颜色
 - percentage::是否显示进度文本，如果为False，则显示参数text的内容
 - text::当不显示进度文本时，进度条上的文本内容
 
 绘制一个进度条。
 
-### return: back, pro_tagname, text, goto, uid
+不提供进度动画，动画效果需要自己实现，参考`TinUI.py`的`test4()`函数。
+
+### return: back, pro_tagname, text, goto, funcs, uid
 
 > back::背景矩形边框
 >
@@ -376,7 +380,15 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 >
 > text::进度条文本
 >
-> goto::进度改变函数：goto(num:int)，其中，num∈[0,100]。这将改变进度条的值
+> goto::改变进度：goto(num:int)，其中，num∈[0,100]。这将改变组件进度指示
+>
+> funcs
+>
+> > `funcs[0]()`::恢复常规样式
+> >
+> > `funcs[1](fg='#868686',bg='#9d5d00',fontc='#cdcdcd')`::改为暂停样式
+> >
+> > `funcs[2](fg='#868686',bg='#c42b1c',fontc='#cdcdcd')`::改为因错误暂停样式
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI进度条.gif)
 
@@ -540,3 +552,32 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 >funcs::所有菜单按钮的函数集，每一个元素为每一个TinUI按钮的函数集
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI菜单.gif)
+
+---
+
+# Class: BasicTinUI
+
+TinUI的基础类，仅提供组件绘制。
+
+`BasicTinUI`的用法与TinUI完全一致，虽然TinUI基于BasicTinUI，但是TinUI更适合作为窗口主组件，以下是二者区别：
+
+| 项目          | BasicTinUI | TinUI |
+| ------------- | ---------- | ----- |
+| TinUI绘制组件 | √          | √     |
+| 自动刷新      | ×          | √     |
+| 滚动条支持    | ×          | √     |
+| 窗口主组件    | ×          | √     |
+| 主窗口        | ×          | √     |
+| 区域渲染组件  | √          | ×     |
+
+---
+
+# Class: TinUINum
+
+TinUI中使用数据结构载体，不需要知道。
+
+---
+
+# Class: TinUIXml
+
+开发中……

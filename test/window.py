@@ -19,4 +19,5 @@ class win:
 
 
 if __name__=='__main__':
-    win()
+    root=win()
+    root.go()

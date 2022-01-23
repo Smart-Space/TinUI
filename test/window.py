@@ -1,6 +1,6 @@
 import sys
 sys.path.append('..')
-from TinUI import TinUI
+from TinUI import *
 
 from tkinter import Tk
 

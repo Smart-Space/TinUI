@@ -580,4 +580,83 @@ TinUI中使用数据结构载体，不需要知道。
 
 # Class: TinUIXml
 
-开发中……
+使用xml语言来绘制TinUI组件，当然，也包括BasicTinUI。
+
+## 基础类变量
+
+self.funcs::xml中涉及到的函数
+
+通常用与`command`参数。
+
+self.datas::xml中使用的特殊数据结构
+
+通常用于`data`等参数，但若数据结构不复杂，可以直接在xml中用字符表示。
+
+> 如 '200'，'(1,2,3,4)'等数据结构可以直接在字符串中表示。
+
+self.tags::内部组件tag集合
+
+用于有目标文本的xml-TinUI组件元素的回调。
+
+> 如`<button text='test'>bu</button>`可以使用`*.tags['bu']`获取原组件返回值。
+
+## 基本规则
+
+以下是使用`TinUIXml`中xml字符串的若干规定：
+
+1. 根元素必须是`<tinui>`
+
+2. 行元素必须是`<line>`
+
+3. 行元素不能嵌套
+
+    > **不能**有如下写法：
+    >
+    > ```xml
+    > <tinui>
+    >     <line>
+    >         <line>
+    >             <button text='one'></button>
+    >         </line>
+    >     </line>
+    > </tinui>
+    > ```
+    >
+    > 规范：
+    >
+    > ```xml
+    > <tinui>
+    >     <line>
+    >         <button text='one'></button>
+    >     </line>
+    >     <line>
+    >         <button text='two'></button>
+    >     </line>
+    > </tinui>
+    > ```
+
+4. 所有xml使用的函数需要使用字符串中表述为`self.funcs[...]`
+
+    > 即：
+    >
+    > ```xml
+    > <button text='one' command='self.funcs["funcstion"]'></button>
+    > ```
+
+5. 若需要，如【4】中类似地使用`self.datas[...]`
+
+6. 若需要使用数字定义宽度参数等，也如同`width='200'`使用
+
+## 基本语法
+
+## 基础函数
+
+### loadxml(xml:str)
+
+xml::xml语言
+
+通过一定规范的Xml字符串来对TinUI（BasicTinUI）进行渲染操作。
+
+### clean()
+
+清空绑定的TinUI或BasicTinUI。

@@ -804,46 +804,61 @@ class TinUIXml():#TinUI的xml渲染方式
         self.xendx,self.xendy=5,5#横向最宽原点
         self.yendx,self.yendy=5,5#纵向最低原点
         self.noload=('info','menubar','labelframe')#当前不解析的标签
+        self.intargs=('width','linew','bd','r','minwidth','start','info_width')#需要转为数字的参数
+        self.dataargs=('command','choices','widgets','content','percentage','data','cont')#需要转为数据结构的参数
         self.funcs={}#内部调用方法集合
         self.datas={}#内部数据结构集合
         self.tags={}#内部组件tag集合
+
+    def __attrib2kws(self,args:dict):#将部分特定参数转化为正确类型
+        keys=args.keys()
+        for ia in self.intargs:
+            if ia in keys:
+                args[ia]=int(args.get(ia))
+        for da in self.dataargs:
+            if da in keys:
+                args[da]=eval(args.get(da))
+        return args
+
+    def __load_line(self,line,x=5,y=5):#根据xml的<line>逐行渲染TinUI组件
+        lineatt=line.attrib
+        last_y=y
+        if 'x' in lineatt.keys():
+            self.xendx=int(line.get('x'))
+        else:
+            self.xendx=x
+        if 'y' in lineatt.keys():
+            self.xendy=int(line.get('y'))
+        else:
+            self.xendy=y
+        for i in line.iter():
+            if i.tag=='line':
+                continue
+            if i.tag in self.noload:
+                continue
+            #调整内部参数=====
+            i.attrib['pos']=(self.xendx,self.xendy)
+            attrib=self.__attrib2kws(i.attrib)
+            #==========
+            tagall=eval(f'self.ui.add_{i.tag}(**attrib)')
+            bboxtag=tagall[-1]
+            bbox=self.ui.bbox(bboxtag)
+            self.xendx=bbox[2]+10
+            if bbox[3]>last_y-10:#比较当前最低y坐标
+                last_y=bbox[3]+10#获取下一行最高y坐标
+            #为内部组件命名
+            if i.text!=None:
+                self.tags[i.text]=tagall
+        return last_y
 
     def loadxml(self,xml:str):#从xml字符串载入窗口组件
         root=ET.fromstring(xml)
         if root.tag!='tinui':#严格控制规范
             return
         for line in root.findall('line'):
-            lineatt=line.attrib
-            if 'x' in lineatt.keys():
-                self.xendx=int(line.get('x'))
-            else:
-                self.xendx=5
-            if 'y' in lineatt.keys():
-                self.xendy=int(line.get('y'))
-            else:
-                self.xendy=self.yendy
-            for i in line.iter():
-                if i.tag=='line':
-                    continue
-                if i.tag in self.noload:
-                    continue
-                #调整内部参数=====
-                i.attrib['pos']=(self.xendx,self.xendy)
-                for key in i.attrib.keys():#对所有参数进行内部化处理
-                    try:
-                        i.attrib[key]=eval(i.get(key))
-                    except:
-                        pass
-                #==========
-                tagall=eval(f'self.ui.add_{i.tag}(**i.attrib)')
-                bboxtag=tagall[-1]
-                bbox=self.ui.bbox(bboxtag)
-                self.xendx=bbox[2]+10
-                if bbox[3]>self.yendy-10:#比较当前最低y坐标
-                    self.yendy=bbox[3]+10#获取下一行最高y坐标
-                #为内部组件命名
-                if i.text!=None:
-                    self.tags[i.text]=tagall
+            y=self.__load_line(line,y=self.yendy)
+            if y>self.yendy-10:
+                self.yendy=y+10
 
     def clean(self):#清空TinUI
         self.ui.delete('all')

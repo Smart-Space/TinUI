@@ -22,9 +22,9 @@ xml='''
 '''
 
 a=Tk()
-u=BasicTinUI(a)
+u=TinUI(a)
 x=TinUIXml(u)
 x.funcs={'p':print,'get1':get1}
 x.loadxml(xml)
-u.pack()
+u.pack(fill='both',expand=True)
 a.mainloop()

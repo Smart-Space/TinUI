@@ -608,35 +608,30 @@ self.tags::内部组件tag集合
 
 2. 行元素必须是`<line>`
 
-2. 根元素的直接自己不能有除了行元素的其它元素
+2. 根元素的直接子集不能有除了行元素的其它元素
 
-3. 行元素不能嵌套
+3. 行元素可以嵌套
 
-    > **不能**有如下写法：
+    > 可以如下写法：
     >
     > ```xml
     > <tinui>
+    > <line>
+    >       <button text='one'></button>
+    > </line>
+    > <line>
+    >     <button text='two'></button>
     >     <line>
-    >         <line>
-    >             <button text='one'></button>
-    >         </line>
+    >         <button text='three'></button>
     >     </line>
+    >     <line>
+    >         <button text='four'></button>
+    >     </line>
+    >     <button text='five'></button>
+    > </line>
     > </tinui>
     > ```
-    >
-    > 规范：
-    >
-    > ```xml
-    > <tinui>
-    >     <line>
-    >         <button text='one'></button>
-    >     </line>
-    >     <line>
-    >         <button text='two'></button>
-    >     </line>
-    > </tinui>
-    > ```
-
+    
 4. 所有xml使用的函数需要使用字符串中表述为`self.funcs[...]`
 
     > 即：
@@ -652,6 +647,10 @@ self.tags::内部组件tag集合
 6. 字体使用如`font="微软雅黑 12"`的写法
 
 ## 基本语法
+
+使用`TinUIXml`，有特殊的语法和协定，详情见CSDN文章：
+
+CSDN文章。
 
 ## 基础函数
 

@@ -11,6 +11,14 @@ xml='''
 <line>
 <button text="获取输入值" font='宋体 16' command='self.funcs["get1"]'></button>
 <entry width='200'>en</entry>
+<line>
+<button text="获取输入值" font='宋体 16' command='self.funcs["get1"]'></button>
+<entry width='200'>en</entry>
+</line>
+<line>
+<button text="获取输入值" font='宋体 16' command='self.funcs["get1"]'></button>
+<entry width='200'>en</entry>
+</line>
 </line>
 <line>
 <button text="hi, this is a xml TinUI test" command='self.funcs["p"]'></button>

@@ -823,42 +823,53 @@ class TinUIXml():#TinUI的xml渲染方式
     def __load_line(self,line,x=5,y=5):#根据xml的<line>逐行渲染TinUI组件
         lineatt=line.attrib
         last_y=y
+        linex=None#纵块中的最大宽度
         if 'x' in lineatt.keys():
-            self.xendx=int(line.get('x'))
+            xendx=int(line.get('x'))
         else:
-            self.xendx=x
+            xendx=x
         if 'y' in lineatt.keys():
-            self.xendy=int(line.get('y'))
+            xendy=int(line.get('y'))
         else:
-            self.xendy=y
-        for i in line.iter():
+            xendy=y
+        for i in line.iterfind('*'):#只检索直接子元素
             if i.tag=='line':
+                linex=0
+                liney,newlinex=self.__load_line(i,xendx,xendy)
+                if liney>self.yendy-5:#在同一位置判断纵向大小
+                    last_y=xendy=liney
+                if newlinex>linex-10:
+                    linex=newlinex+10
                 continue
             if i.tag in self.noload:
                 continue
             #调整内部参数=====
-            i.attrib['pos']=(self.xendx,self.xendy)
+            xendy=y#从新获取本行其实纵坐标
+            if linex!=None:#存在纵块
+                xendx=linex
+                linex=None
+            i.attrib['pos']=(xendx,xendy)
             attrib=self.__attrib2kws(i.attrib)
             #==========
             tagall=eval(f'self.ui.add_{i.tag}(**attrib)')
             bboxtag=tagall[-1]
             bbox=self.ui.bbox(bboxtag)
-            self.xendx=bbox[2]+10
-            if bbox[3]>last_y-10:#比较当前最低y坐标
-                last_y=bbox[3]+10#获取下一行最高y坐标
+            xendx=bbox[2]+10
+            if bbox[3]>last_y-5:#比较当前最低y坐标
+                last_y=bbox[3]+5#获取下一行最高y坐标
             #为内部组件命名
             if i.text!=None:
                 self.tags[i.text]=tagall
-        return last_y
+        return last_y,xendx
 
     def loadxml(self,xml:str):#从xml字符串载入窗口组件
         root=ET.fromstring(xml)
         if root.tag!='tinui':#严格控制规范
             return
         for line in root.findall('line'):
-            y=self.__load_line(line,y=self.yendy)
-            if y>self.yendy-10:
-                self.yendy=y+10
+            y,_=self.__load_line(line,y=self.yendy)
+            if y>self.yendy-5:
+                self.yendy=y+5
 
     def clean(self):#清空TinUI
         self.ui.delete('all')

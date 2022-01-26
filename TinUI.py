@@ -157,10 +157,11 @@ class BasicTinUI(Canvas):
         funce=self.create_window(pos,window=entry,width=width,anchor=anchor)#输入框画布对象
         uid='entry'+str(funce)
         self.itemconfig(funce,tags=uid)
-        funcw=self.create_text((pos[0]+width,pos[1]),text=icon,fill=fg,font=font,anchor='nw',tags=uid)
+        bbox=self.bbox(funce)
+        funcw=self.create_text((bbox[0]+width,bbox[1]),text=icon,fill=fg,font=font,anchor='nw',tags=uid)
         w=self.bbox(funcw)[2]
         h=self.bbox(funce)[3]
-        back=self.create_rectangle((pos[0]-2,pos[1]-2,w+2,h+2),width=linew,outline=outline,fill=bg,tags=uid)
+        back=self.create_rectangle((bbox[0]-2,bbox[1]-2,w+2,h+2),width=linew,outline=outline,fill=bg,tags=uid)
         self.tkraise(funcw)
         if_empty(None)
         return entry,uid
@@ -379,16 +380,17 @@ class BasicTinUI(Canvas):
         x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[0]+width+3,bbox[3]+3
         back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=fg,tags=uid)
         self.tkraise(main)
-        button_text,button_back,button_funcs,_=self.add_button((x2+3,y1+3),'∨',fg,bg,'#CCCCCC',1,activefg,activebg,'#7a7a7a',font=font,command=open_box)
+        button_text,button_back,button_funcs,button_id=self.add_button((x2+3,y1+3),'∨',fg,bg,'#CCCCCC',1,activefg,activebg,'#7a7a7a',font=font,command=open_box)
+        self.addtag_withtag(uid,button_id)
         start_x=bbox[0]#起始x位置
         height=bbox[3]+3#变量y位置
         box_tagname='combobox>'+str(main)+'>'+str(back)#绑定独立的tag名称
         info=[]
         for i in content:
-            choice=self.create_text((start_x+2,height+2),text=i,fill=fg,font=(font[0],10),anchor='nw',width=width-4,tags=uid)
+            choice=self.create_text((start_x+2,height+2),text=i,fill=fg,font=(font[0],10),anchor='nw',width=width-4,tags=(uid,box_tagname))
             pos=self.bbox(choice)
             h=pos[3]-pos[1]+4
-            cho_back=self.create_rectangle((start_x,height,start_x+width,height+h),outline=fg,fill=bg,tags=uid)
+            cho_back=self.create_rectangle((start_x,height,start_x+width,height+h),outline=fg,fill=bg,tags=(uid,box_tagname))
             self.tkraise(choice)
             height+=h+2
             self.tag_bind(choice,'<Enter>',lambda event,back=cho_back:button_in(back))
@@ -398,8 +400,6 @@ class BasicTinUI(Canvas):
             self.tag_bind(choice,'<Button>',lambda event,_text=i,back=cho_back:choose_this(back,_text))
             self.tag_bind(cho_back,'<Button>',lambda event,_text=i,back=cho_back:choose_this(back,_text))
             info.append((back,i))
-            self.addtag_withtag(box_tagname,choice)
-            self.addtag_withtag(box_tagname,cho_back)
         self.itemconfig(box_tagname,state='hidden')
         funcs=[select,disable,active]
         return main,back,box_tagname,funcs,uid
@@ -471,7 +471,7 @@ class BasicTinUI(Canvas):
             line_width[count]=width
             height=bbox[3]-bbox[1]
             relheight=height if height>relheight else relheight
-            ti_back=self.create_rectangle((end_x,end_y,end_x+width,end_y+height),outline=outline,fill=headbg,tag=uid)
+            ti_back=self.create_rectangle((end_x,end_y,end_x+width,end_y+height),outline=outline,fill=headbg,tags=uid)
             ti_list.append((ti_back,end_x,end_y,end_x+width))
             end_x=end_x+width+2
             count+=1
@@ -744,6 +744,44 @@ class BasicTinUI(Canvas):
         menu.attributes('-transparent',tran)
         return menu,bar,funcs
 
+    def add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',font='微软雅黑 12',tran='#01FF11'):#绘制窗口提示框
+        def show_toti(event):
+            sx,sy=event.x_root,event.y_root
+            if sx+width>maxx:
+                x=sx-width
+            else:
+                x=sx
+            if sy+height>maxy:
+                y=sy-height
+            else:
+                y=sy
+            toti.geometry(f'{width+20}x{height+20}+{x}+{y}')
+            toti.deiconify()
+        def hide_toti(event):
+            toti.withdraw()
+        toti=Toplevel()
+        toti.overrideredirect(True)
+        toti.withdraw()
+        bar=TinUI(toti,bg=tran)
+        bar.pack(fill='both',expand=True)
+        info=bar.create_text((10,10),text=text,fill=fg,font=font,anchor='nw')
+        bbox=bar.bbox(info)
+        width=bbox[2]-bbox[0]+10
+        height=bbox[3]-bbox[1]+10
+        #绘制圆角边框
+        start=bbox[2]-bbox[0]
+        gomap=((start,bbox[1]),(bbox[2],bbox[1]),(bbox[2],bbox[3]),(bbox[0],bbox[3]),(bbox[0],bbox[1]),(start,bbox[1]))
+        tback=bar.create_polygon(gomap,fill=bg,outline=bg,width=15)
+        bar.lower(tback)
+        #屏幕尺寸
+        maxx=self.winfo_screenwidth()
+        maxy=self.winfo_screenheight()
+        self.tag_bind(uid,'<Enter>',show_toti)
+        self.tag_bind(uid,'<Leave>',hide_toti)
+        toti.attributes('-transparent',tran)
+        toti.attributes('-alpha',0.9)#透明度90%
+        return toti,bar
+
 
 class TinUI(BasicTinUI):
     '''对BasicTinUI的封装，添加了滚动条自动刷新'''
@@ -834,12 +872,14 @@ class TinUIXml():#TinUI的xml渲染方式
             xendy=y
         for i in line.iterfind('*'):#只检索直接子元素
             if i.tag=='line':
-                linex=0
+                #linex=0
                 liney,newlinex=self.__load_line(i,xendx,xendy)
                 if liney>self.yendy-5:#在同一位置判断纵向大小
                     last_y=xendy=liney
-                if newlinex>linex-10:
-                    linex=newlinex+10
+                if linex==None:#判断是否是该纵块的第一个<line>
+                    linex=0
+                if newlinex>linex-5:
+                    linex=newlinex+5
                 continue
             if i.tag in self.noload:
                 continue
@@ -852,7 +892,10 @@ class TinUIXml():#TinUI的xml渲染方式
             attrib=self.__attrib2kws(i.attrib)
             #==========
             tagall=eval(f'self.ui.add_{i.tag}(**attrib)')
-            bboxtag=tagall[-1]
+            if len(tagall)==1:
+                bboxtag=tagall
+            else:
+                bboxtag=tagall[-1]
             bbox=self.ui.bbox(bboxtag)
             xendx=bbox[2]+10
             if bbox[3]>last_y-5:#比较当前最低y坐标
@@ -931,5 +974,7 @@ if __name__=='__main__':
     b.add_info((680,140),info_text='this is info widget in TinUI')
     mtb=b.add_paragraph((0,720),'测试菜单（右键单击）')
     b.add_menubar(mtb,cont=(('command',print),('menu',test1),'-',('TinUI文本移动',test)))
+    ttb=b.add_paragraph((0,800),'TinUI能做些什么？')
+    b.add_tooltip(ttb,'很多很多')
 
     a.mainloop()

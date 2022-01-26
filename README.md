@@ -37,7 +37,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 >
 > 所有函数均会返回主要画布对象。`TinUI.add_...(...)`。
 >
-> - 除了`title`, `paragraph`, `separate`, `menu`, `labelframe`等组件，其余组件的最后一个返回值均为整个组件的画布`tag_name`。
+> - 除了`title`, `paragraph`, `separate`, `menu`, `labelframe`, `tooltip`等组件，其余组件的最后一个返回值均为整个组件的画布`tag_name`。
 
 ### add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,anchor='nw',**kw)
 
@@ -553,6 +553,30 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI菜单.gif)
 
+### add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',font='微软雅黑 12',tran='#01FF11')
+
+uid::画布对象
+
+text::提示文本
+
+fg::字体颜色
+
+bg::背景色
+
+font::字体
+
+tran::透明色
+
+绘制一个信息提示窗口。
+
+### return: toti, bar
+
+> toti::提示窗口（Toplevel）
+>
+> bar::提示窗口中的TinUI
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI窗口提示.gif)
+
 ---
 
 # Class: BasicTinUI
@@ -592,7 +616,7 @@ self.datas::xml中使用的特殊数据结构
 
 通常用于`data`等参数，但若数据结构不复杂，可以直接在xml中用字符表示。
 
-> 如 '200'，'(1,2,3,4)'等数据结构可以直接在字符串中表示。
+> 如 '200'，'("1","2","3","4")'等数据结构可以直接在字符串中表示。
 
 self.tags::内部组件tag集合
 

@@ -788,16 +788,24 @@ class BasicTinUI(Canvas):
 
     def add_back(self,pos:tuple,uids:tuple=(),fg='',bg='',linew=0):#绘制背景或间隔框
         if len(uids)==0:#优先考虑uids参数，没有则使用pos参数
-            back=self.create_rectangle((pos[0],pos[1],pos[0]+1,pos[1]+1))
-        else:
-            cpos=[0,0,0,0]
+            back=self.create_rectangle((pos[0],pos[1],pos[0]+1,pos[1]+1),fill=bg,outline=fg,width=linew)
+        else:#使用uids参数
+            cpos=[None,None,None,None]
             for i in uids:
                 bbox=self.bbox(i)
                 count=0
                 for p,old in zip(bbox,cpos):
-                    if p>old:
-                        cpos[count]=p
+                    if count<=1:
+                        if old==None or p<old:#起始位置
+                            cpos[count]=p
+                    else:
+                        if old==None or p>old:#最终位置
+                            cpos[count]=p
                     count+=1
+            cpos[0]-=2
+            cpos[1]-=2
+            cpos[2]+=2
+            cpos[3]+=2
             back=self.create_rectangle(cpos,fill=bg,outline=fg,width=linew)
         self.lower(back)
         return back
@@ -859,8 +867,6 @@ class TinUIXml():#TinUI的xml渲染方式
 
     def __init__(self,ui:Union[BasicTinUI,TinUI]):
         self.ui=ui
-        self.xendx,self.xendy=5,5#横向最宽原点
-        self.yendx,self.yendy=5,5#纵向最低原点
         self.noload=('info','menubar','labelframe','tooltip')#当前不解析的标签
         self.intargs=('width','linew','bd','r','minwidth','start','info_width')#需要转为数字的参数
         self.dataargs=('command','choices','widgets','content','percentage','data','cont')#需要转为数据结构的参数
@@ -877,6 +883,13 @@ class TinUIXml():#TinUI的xml渲染方式
             if da in keys:
                 args[da]=eval(args.get(da))
         return args
+    def __tags2uid(self,tag:str):#将self.tags中的内容转为画布uid
+        name=self.tags[tag]
+        if type(name)!=tuple or len(name)==1:
+            uid=name
+        else:
+            uid=name[-1]
+        return uid
 
     def __load_line(self,line,x=5,y=5):#根据xml的<line>逐行渲染TinUI组件
         lineatt=line.attrib
@@ -903,9 +916,15 @@ class TinUIXml():#TinUI的xml渲染方式
                 continue
             if i.tag in self.noload:#不渲染的组件
                 continue
-            #特殊渲染的组件
-            if i.tag=='back':
-                pass
+            #特殊渲染的组件，有些仅对参数处理，有些需要特殊处理
+            if i.tag=='back':#调整uids参数
+                if 'uids' in i.attrib:
+                    olds=eval(i.attrib['uids'])
+                    news=[]
+                    for tag in olds:
+                        uid=self.__tags2uid(tag)
+                        news.append(uid)
+                    i.attrib['uids']=tuple(news)
             #调整内部参数=====
             xendy=y#从新获取本行其实纵坐标
             if linex!=None:#存在纵块
@@ -915,7 +934,7 @@ class TinUIXml():#TinUI的xml渲染方式
             attrib=self.__attrib2kws(i.attrib)
             #==========
             tagall=eval(f'self.ui.add_{i.tag}(**attrib)')
-            if len(tagall)==1:
+            if type(tagall)!=tuple or len(tagall)==1:
                 bboxtag=tagall
             else:
                 bboxtag=tagall[-1]
@@ -929,6 +948,8 @@ class TinUIXml():#TinUI的xml渲染方式
         return last_y,xendx
 
     def loadxml(self,xml:str):#从xml字符串载入窗口组件
+        self.xendx,self.xendy=5,5#横向最宽原点
+        self.yendx,self.yendy=5,5#纵向最低原点
         root=ET.fromstring(xml)
         if root.tag!='tinui':#严格控制规范
             return

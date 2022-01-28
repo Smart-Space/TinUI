@@ -582,18 +582,22 @@ class BasicTinUI(Canvas):
         maxnum=len(data)-1#最大位置
         return wentry,button1,button2,uid
 
-    def add_scalebar(self,pos:tuple,width=200,fg='#4258cc',activefg='#aeb5d7',bg='#99a3d5',data=(1,2,3,4,5),start=1,command=None):#绘制调节框
+    def add_scalebar(self,pos:tuple,width=200,fg='#3b50ba',activefg='#aeb5d7',bg='#868686',data=(1,2,3,4,5),start=1,command=None):#绘制调节框
         def mousedown(event):
             scale.startx=self.canvasx(event.x)
+            bbox=self.bbox(button)
+            self.coords(button,bbox[0],pos[1]-3,bbox[0]+10,pos[1]+29)
         def drag(event):
             move=self.canvasx(event.x)-scale.startx
             if self.canvasx(event.x)<pos[0] or self.canvasx(event.x)>pos[0]+width:
                 return
             self.move(button,move,0)
             self.delete(name)
-            active=self.create_line((pos[0],pos[1],move+scale.startx,pos[1]),fill=fg,width=3,tags=(uid,name))
+            active=self.create_line((pos[0],pos[1]+12,move+scale.startx,pos[1]+12),fill=fg,width=3,tags=(uid,name))
             scale.startx=self.canvasx(event.x)
         def check(event):
+            bbox=self.bbox(button)
+            self.coords(button,bbox[0],pos[1],bbox[0]+10,pos[1]+26)
             end=int(self.canvasx(event.x))
             if end<pos[0]:end=pos[0]
             if end>pos[0]+width:end=pos[0]+width
@@ -603,12 +607,12 @@ class BasicTinUI(Canvas):
                 command(data[num])
         def checkval(event):
             move=self.canvasx(event.x)
-            self.coords(button,move,pos[1]-15,move+10,pos[1]+17)
-            self.coords(name,pos[0],pos[1],move,pos[1])
+            self.coords(button,move,pos[1]-3,move+10,pos[1]+29)
+            self.coords(name,pos[0],pos[1]+12,move,pos[1]+12)
             check(event)
         def select(num):
-            self.coords(button,dash[num],pos[1]-15,dash[num]+10,pos[1]+17)
-            self.coords(name,pos[0],pos[1],dash[num],pos[1])
+            self.coords(button,dash[num],pos[1]-3,dash[num]+10,pos[1]+29)
+            self.coords(name,pos[0],pos[1]+12,dash[num],pos[1]+12)
         def disable():
             self.itemconfig(button,state='disable',fill='#7a7a7a')
             self.itemconfig(back,state='disable')
@@ -618,7 +622,7 @@ class BasicTinUI(Canvas):
             self.itemconfig(back,state='normal')
             self.itemconfig(name,state='normal',fill=fg)
         scale=TinUINum()#记录数据结构体
-        back=self.create_line((pos[0],pos[1],pos[0]+width,pos[1]),fill=bg,width=3)
+        back=self.create_line((pos[0],pos[1]+12,pos[0]+width,pos[1]+12),fill=bg,width=3)
         uid='scalebar'+str(back)
         self.itemconfig(back,tags=uid)
         self.tag_bind(back,'<ButtonRelease-1>',checkval)
@@ -629,11 +633,11 @@ class BasicTinUI(Canvas):
             s+=dash_t
             dash.append(s)
         del s
-        active=self.create_line((pos[0],pos[1],dash[start],pos[1]),fill=fg,width=3,tags=uid)
+        active=self.create_line((pos[0],pos[1]+12,dash[start],pos[1]+12),fill=fg,width=3,tags=uid)
         name='scaleactive'+str(active)
         self.tag_bind(name,'<ButtonRelease-1>',checkval)
         self.addtag_withtag(name,active)#为重绘绑定tag名称
-        button=self.create_rectangle((dash[start],pos[1]-15,dash[start]+10,pos[1]+17),width=0,fill=fg,tags=uid)
+        button=self.create_rectangle((dash[start],pos[1],dash[start]+10,pos[1]+26),width=0,fill=fg,tags=uid)
         self.tag_bind(button,'<Enter>',lambda event:self.itemconfig(button,fill=activefg))
         self.tag_bind(button,'<Leave>',lambda event:self.itemconfig(button,fill=fg))
         self.tag_bind(button,'<Button-1>',mousedown)
@@ -782,6 +786,22 @@ class BasicTinUI(Canvas):
         toti.attributes('-alpha',0.9)#透明度90%
         return toti,bar
 
+    def add_back(self,pos:tuple,uids:tuple=(),fg='',bg='',linew=0):#绘制背景或间隔框
+        if len(uids)==0:#优先考虑uids参数，没有则使用pos参数
+            back=self.create_rectangle((pos[0],pos[1],pos[0]+1,pos[1]+1))
+        else:
+            cpos=[0,0,0,0]
+            for i in uids:
+                bbox=self.bbox(i)
+                count=0
+                for p,old in zip(bbox,cpos):
+                    if p>old:
+                        cpos[count]=p
+                    count+=1
+            back=self.create_rectangle(cpos,fill=bg,outline=fg,width=linew)
+        self.lower(back)
+        return back
+
 
 class TinUI(BasicTinUI):
     '''对BasicTinUI的封装，添加了滚动条自动刷新'''
@@ -841,7 +861,7 @@ class TinUIXml():#TinUI的xml渲染方式
         self.ui=ui
         self.xendx,self.xendy=5,5#横向最宽原点
         self.yendx,self.yendy=5,5#纵向最低原点
-        self.noload=('info','menubar','labelframe')#当前不解析的标签
+        self.noload=('info','menubar','labelframe','tooltip')#当前不解析的标签
         self.intargs=('width','linew','bd','r','minwidth','start','info_width')#需要转为数字的参数
         self.dataargs=('command','choices','widgets','content','percentage','data','cont')#需要转为数据结构的参数
         self.funcs={}#内部调用方法集合
@@ -881,8 +901,11 @@ class TinUIXml():#TinUI的xml渲染方式
                 if newlinex>linex-5:
                     linex=newlinex+5
                 continue
-            if i.tag in self.noload:
+            if i.tag in self.noload:#不渲染的组件
                 continue
+            #特殊渲染的组件
+            if i.tag=='back':
+                pass
             #调整内部参数=====
             xendy=y#从新获取本行其实纵坐标
             if linex!=None:#存在纵块
@@ -976,5 +999,6 @@ if __name__=='__main__':
     b.add_menubar(mtb,cont=(('command',print),('menu',test1),'-',('TinUI文本移动',test)))
     ttb=b.add_paragraph((0,800),'TinUI能做些什么？')
     b.add_tooltip(ttb,'很多很多')
+    b.add_back(pos=(0,0),uids=(ttb,),bg='cyan')
 
     a.mainloop()

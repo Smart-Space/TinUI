@@ -37,7 +37,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 >
 > 所有函数均会返回主要画布对象。`TinUI.add_...(...)`。
 >
-> - 除了`title`, `paragraph`, `separate`, `menu`, `labelframe`, `tooltip`等组件，其余组件的最后一个返回值均为整个组件的画布`tag_name`。
+> - 除了`title`, `paragraph`, `separate`, `menubar`, `labelframe`, `tooltip`, `back`等组件，其余组件的最后一个返回值均为整个组件的画布`tag_name`，返回值变量为`uid`。
 
 ### add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,anchor='nw',**kw)
 
@@ -577,6 +577,22 @@ tran::透明色
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI窗口提示.gif)
 
+### add_back(self,pos:tuple,uids:tuple=(),fg='',bg='',linew=0)
+
+pos::起始位置，可用(0,0)忽略
+
+uids::包含的所有画布对象，优先考虑该参数，若只有一个元素，使用`(id,)`表示
+
+fg::边框颜色
+
+bg::背景色
+
+linew::边框宽度
+
+绘制一个背景框或间隔框，优先考虑`uids`参数。
+
+### return: back
+
 ---
 
 # Class: BasicTinUI
@@ -605,6 +621,8 @@ TinUI中使用数据结构载体，不需要知道。
 # Class: TinUIXml
 
 使用xml语言来绘制TinUI组件，当然，也包括BasicTinUI。
+
+> 当前，`info`, `menubar`, `labelframe`, `tooltip`等组件不支持使用xml布局。
 
 ## 基础类变量
 
@@ -664,7 +682,7 @@ self.tags::内部组件tag集合
     > <button text='one' command='self.funcs["funcstion"]'></button>
     > ```
 
-5. 若需要，如【4】中类似地使用`self.datas[...]`
+5. 若需要，如【5】中类似地使用`self.datas[...]`
 
 7. 若需要使用**整数**定义宽度参数等，也如同`width='200'`使用
 
@@ -687,3 +705,13 @@ xml::xml语言
 ### clean()
 
 清空绑定的TinUI或BasicTinUI。
+
+## 特殊规则组件
+
+部分组件的xml写法有特殊规定。
+
+- back
+
+部分组件的特殊规定，详情见CSDN文章：
+
+CSDN文章。

@@ -14,10 +14,10 @@ root.geometry('1000x700+5+5')
 root.title('TinUIXml设计测试')
 
 text=ScrolledText(root,width=50,font='微软雅黑 13')
-text.pack(side='left',fill='y',expand=True)
+text.pack(side='left',fill='both',expand=True)
 Button(root,text='导入xml',command=inxml).pack()
 tinui=TinUI(root,bg='white',width=480,height=650)
-tinui.pack(side='right',expand=True)
+tinui.pack(side='right',fill='both',expand=True)
 x=TinUIXml(tinui)
 
 root.mainloop()

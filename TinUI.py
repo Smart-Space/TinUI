@@ -1,6 +1,7 @@
 from tkinter import *
 from webbrowser import open as webopen
 from typing import Union
+from types import FunctionType
 import xml.etree.ElementTree  as ET
 
 
@@ -121,7 +122,7 @@ class BasicTinUI(Canvas):
         bbox=self.bbox(checkbutton)
         dic=bbox[3]-bbox[1]#位移长度
         self.move(checkbutton,dic-7,0)
-        check=self.create_rectangle((pos[0]-2,pos[1]+4,pos[0]+dic-12,pos[1]+dic-4),outline=fg,fill=bg,width=2,tags=uid)
+        check=self.create_rectangle((pos[0]-2,pos[1]+4,pos[0]+dic-12,pos[1]+dic-4),outline=fg,fill=bg,width=1,tags=uid)
         state=self.create_text((pos[0]-2,pos[1]),text='√',fill=onfg,font=font,anchor='nw',state='hidden',tags=uid)
         self.tkraise(state)
         self.tag_bind(check,'<Enter>',button_in)
@@ -230,22 +231,34 @@ class BasicTinUI(Canvas):
         funcs=[select,disable,active]
         return word,choices_list,choices_back,funcs,uid
 
-    def add_link(self,pos:tuple,text,url,fg='#50B0F4',font:tuple=('微软雅黑',12),anchor='nw'):#绘制超链接
+    def add_link(self,pos:tuple,text,url:Union[str,FunctionType],fg='#4f62ca',activefg='red',activebg='#eaeaea',font:tuple=('微软雅黑',12),anchor='nw'):#绘制超链接
         def turn_red(event):
-            self.itemconfig(link,fill='red')
+            self.itemconfig(link,fill=activefg)
+            self.itemconfig(back,fill=activebg)
             self['cursor']='hand2'
         def turn_back(event):
             self.itemconfig(link,fill=fg)
+            self.itemconfig(back,fill='')
             self['cursor']='arrow'
         def go_url(event):
-            webopen(url)
+            #如果是字符串，则打开网页；是方法，则执行函数
+            if type(url)==str:
+                webopen(url)
+            else:
+                url(event)
+        def disable(fg='#b0b0b0'):
+            self.itemconfig(link,state='disable',fill=fg)
+            self.itemconfig(back,state='disable')
+        def active():
+            self.itemconfig(link,state='normal',fill=fg)
+            self.itemconfig(back,state='normal')
         link=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
         uid='link'+str(link)
         self.itemconfig(link,tags=uid)
         font=self.itemcget(link,'font')+' underline'
         self.itemconfig(link,font=font)
         bbox=self.bbox(link)
-        back=self.create_rectangle(bbox,width=0,tags=uid)
+        back=self.create_rectangle((bbox[0]-2,bbox[1]-2,bbox[2]+2,bbox[3]+2),width=0,tags=uid)
         self.tkraise(link)
         self.tag_bind(link,'<Enter>',turn_red)
         self.tag_bind(link,'<Leave>',turn_back)
@@ -253,7 +266,8 @@ class BasicTinUI(Canvas):
         self.tag_bind(back,'<Enter>',turn_red)
         self.tag_bind(back,'<Leave>',turn_back)
         self.tag_bind(back,'<Button-1>',go_url)
-        return link,uid
+        funcs=[disable,active]
+        return link,funcs,uid
 
     def add_waitbar1(self,pos:tuple,fg='#0078D7',bg='',okfg='lightgreen',okbg='',bd=2,r=20):#绘制圆形等待组件
         def __start(i):
@@ -999,6 +1013,7 @@ if __name__=='__main__':
     b.add_separate((20,200),600)
     b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
     b.add_link((400,500),'TinGroup知识库','http://tinhome.baklib-free.com/')
+    b.add_link((400,530),'执行print函数',print)
     _,ok1,_=b.add_waitbar1((500,220),bg='#CCCCCC')
     b.add_button((500,270),'停止等待动画',activefg='cyan',activebg='black',command=test2)
     bu1=b.add_button((700,200),'停止点状滚动条',activefg='white',activebg='black',command=test3)[1]

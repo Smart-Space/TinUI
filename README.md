@@ -242,20 +242,30 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_link(self,pos:tuple,text,url,fg='#50B0F4',font=('微软雅黑',12),anchor='nw')
+### add_link(self,pos:tuple,text,url:Union[str,FunctionType],fg='#4f62ca',activefg='red',activebg='#eaeaea',font:tuple=('微软雅黑',12),anchor='nw')
 
 - pos::位置
-- text::链接文本
+- text::网页链接 **或者** 要执行的函数，函数需要接受`event`参数
 - url::链接
 - fg::文本颜色
+- activefg::响应鼠标时文本颜色
+- activebg::响应鼠标时背景颜色
 - font::字体
 - anchor::对齐方向
 
-绘制一个超链接文本。
+绘制一个链接文本，指向网页或者执行函数。
 
-### return: link, uid
+### return: link, funcs, uid
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/%E8%B6%85%E9%93%BE%E6%8E%A5.gif)
+
+> link::链接文本
+>
+> funcs
+>
+> > `funcs[0](fg='#b0b0b0')`::禁用链接
+> >
+> > `funcs[1]()`::恢复链接
 
 ---
 
@@ -692,7 +702,7 @@ self.tags::内部组件tag集合
 
 使用`TinUIXml`，有特殊的语法和协定，详情见CSDN文章：
 
-CSDN文章。
+[tkinter-TinUI使用xml编写界面](https://blog.csdn.net/tinga_kilin/article/details/122740802)。
 
 ## 基础函数
 
@@ -714,4 +724,4 @@ xml::xml语言
 
 部分组件的特殊规定，详情见CSDN文章：
 
-CSDN文章。
+[tkinter-TinUI使用xml的特殊组件](https://blog.csdn.net/tinga_kilin/article/details/122740802#_481)。

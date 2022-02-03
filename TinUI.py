@@ -135,7 +135,7 @@ class BasicTinUI(Canvas):
         funcs=[flash,on,off,disable,active]
         return checkbutton,check,funcs,uid
 
-    def add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='#cfd3d6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#63676b',onoutline='#4258cc',icon='>',anchor='nw'):#绘制单行输入框
+    def add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='#cfd3d6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#63676b',onoutline='#3041d8',icon='>',anchor='nw'):#绘制单行输入框
         #这是一个半绘制组件
         def if_empty(event):
             ch=entry.get()
@@ -824,6 +824,36 @@ class BasicTinUI(Canvas):
         self.lower(back)
         return back
 
+    def add_waitbar3(self,pos:tuple,width:int=200,fg='#3041d8',bg='#f3f3f3',okcolor='lightgreen'):#绘制带状等待框
+        def move(startx,endx,nowwidth):
+            if nowwidth-maxwidth>width:#一轮动画完成
+                start()
+                return
+            self.coords(bar,(pos[0]+startx,pos[1],pos[0]+endx,pos[1]+4))
+            start(nowwidth+5)
+        def start(nowwidth=0):#开始动画
+            if ifok.ok==True:#已完成
+                self.itemconfig(bar,fill=okcolor,outline=okcolor)
+                self.coords(bar,(pos[0],pos[1],pos[0]+width,pos[1]+4))
+            if nowwidth<=maxwidth:#增长阶段
+                self.after(50,lambda : move(0,nowwidth,nowwidth))
+            elif nowwidth>=width:#缩小阶段
+                self.after(50,lambda : move(nowwidth-maxwidth,width,nowwidth))
+            else:#平滑阶段。因为我们去整数，所以平滑阶段无法使用断点判断
+                self.after(50,lambda : move(nowwidth-maxwidth,nowwidth,nowwidth))
+        def stop():#停止
+            ifok.ok=True
+        ifok=TinUINum()#记录是否暂停
+        ifok.ok=False
+        bbox=(pos[0],pos[1],pos[0]+width,pos[1]+4)
+        back=self.create_rectangle(bbox,fill=bg,outline=bg)
+        uid='waitbar3'+str(back)
+        self.itemconfig(back,tags=uid)
+        maxwidth=width//3
+        bar=self.create_rectangle((pos[0],pos[1],pos[0],pos[1]),fill=fg,outline=fg,tags=uid)
+        start()
+        return back,bar,stop,uid
+
 
 class TinUI(BasicTinUI):
     '''对BasicTinUI的封装，添加了滚动条自动刷新'''
@@ -1036,5 +1066,7 @@ if __name__=='__main__':
     ttb=b.add_paragraph((0,800),'TinUI能做些什么？')
     b.add_tooltip(ttb,'很多很多')
     b.add_back(pos=(0,0),uids=(ttb,),bg='cyan')
+    _,_,ok3,_=b.add_waitbar3((600,800),width=240)
+    b.add_button((600,750),text='停止带状等待框',command=lambda event:ok3())
 
     a.mainloop()

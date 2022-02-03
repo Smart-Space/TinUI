@@ -166,7 +166,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='#cfd3d6',activefg='black',activebg='white',font=('微软雅黑',12),linew=3,outline='#63676b',onoutline='#4258cc',icon='>',anchor='nw')
+### add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='#cfd3d6',activefg='black',activebg='white',font=('微软雅黑',12),linew=3,outline='#63676b',onoutline='#3041d8',icon='>',anchor='nw')
 
 - pos::位置
 - width::宽度
@@ -563,19 +563,22 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI菜单.gif)
 
+---
+
 ### add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',font='微软雅黑 12',tran='#01FF11')
 
-uid::画布对象
+- uid::画布对象
 
-text::提示文本
+- text::提示文本
 
-fg::字体颜色
+- fg::字体颜色
 
-bg::背景色
+- bg::背景色
 
-font::字体
+- font::字体
 
-tran::透明色
+- tran::透明色
+
 
 绘制一个信息提示窗口。
 
@@ -587,21 +590,48 @@ tran::透明色
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI窗口提示.gif)
 
+---
+
 ### add_back(self,pos:tuple,uids:tuple=(),fg='',bg='',linew=0)
 
-pos::起始位置，可用(0,0)忽略
+- pos::起始位置，可用(0,0)忽略
 
-uids::包含的所有画布对象，优先考虑该参数，若只有一个元素，使用`(id,)`表示
+- uids::包含的所有画布对象，优先考虑该参数，若只有一个元素，使用`(id,)`表示
 
-fg::边框颜色
+- fg::边框颜色
 
-bg::背景色
+- bg::背景色
 
-linew::边框宽度
+- linew::边框宽度
+
 
 绘制一个背景框或间隔框，优先考虑`uids`参数。
 
 ### return: back
+
+> 效果见tooltip控件中绑定的label控件背景。
+
+---
+
+### add_waitbar3(self,pos:tuple,width:int=200,fg='#3041d8',bg='#f3f3f3',okcolor='lightgreen')
+
+- pos::起始位置
+- width::宽度
+- fg::动画块颜色
+- bg::背景色
+- okcolor::完成时的颜色
+
+绘制一个带状等待框。
+
+### return: back, bar, stop, uid
+
+> back::背景框
+>
+> bar::动画块
+>
+> stop::停止等待动画的函数。当你完成你需要等待的任务后，你可以调用此函数，停止等待动画
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI等待3.gif)
 
 ---
 

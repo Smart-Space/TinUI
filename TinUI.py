@@ -3,7 +3,17 @@ from webbrowser import open as webopen
 from typing import Union
 from types import FunctionType
 import xml.etree.ElementTree  as ET
-
+'''全部组件都是绘制的~~~，除了输入型组件无法使用tkinter画布完成对应效果'''
+#==========
+'''开发信息
+开发者：Smart-Space（张**）
+开发者邮箱：smart-space@qq.com
+语言：Python
+技术基础：tkinter（tcl/tk）
+开源平台：pypi、GitHub、csdn
+贡献者：（暂无）
+免费使用条款：注明TinUI的开发者
+'''
 
 
 class TinUINum:#数据载体，请忽略
@@ -854,6 +864,119 @@ class BasicTinUI(Canvas):
         start()
         return back,bar,stop,uid
 
+    def add_textbox(self,pos:tuple,width:int=200,height:int=200,text:str='',anchor='nw',font='微软雅黑 12',fg='black',bg='white',linew=3,scrollbar=False,outline='#63676b',onoutline='#3041d8'):#绘制文本框
+        textbox=Text(self,font=font,fg=fg,bg=bg,highlightthickness=linew,highlightbackground=outline,highlightcolor=onoutline,relief='flat')
+        uid=self.create_window(pos,window=textbox,width=width,height=height,anchor=anchor)
+        textbox.insert(1.0,text)
+        if scrollbar==True:
+            bbox=self.bbox(uid)
+            cid=self.add_scrollbar((bbox[2]+5,bbox[1]),textbox,bbox[3]-bbox[1])[-1]
+            self.addtag_withtag(uid,cid)
+        return textbox,uid
+
+    def add_scrollbar(self,pos:tuple,widget,height:int=200,direction='y',bg='#f0f0f0',color='#999999',oncolor='#89898b'):#绘制滚动条
+        #滚动条宽度7px，未激活宽度3px；建议与widget相隔5xp
+        def enter(event):#鼠标进入
+            self.itemconfig(sc,outline=oncolor,width=7)
+        def leave(event):#鼠标离开
+            self.itemconfig(sc,outline=color,width=3)
+        def widget_move(sp,ep):#控件控制滚动条滚动
+            if mode=='y' and use_widget:
+                startp=start+canmove*float(sp)
+                endp=start+canmove*float(ep)
+                self.coords(sc,(pos[0]+5,startp+5,pos[0]+5,endp-5))
+        def mousedown(event):
+            nonlocal use_widget
+            use_widget=False
+            if mode=='y':
+                scroll.start=self.canvasy(event.y)#定义起始横坐标
+        def mouseup(event):
+            nonlocal use_widget
+            use_widget=True
+        def drag(event):
+            bbox=self.bbox(sc)
+            if mode=='y':#纵向
+                move=self.canvasy(event.y)-scroll.start#将窗口坐标转化为画布坐标
+                #防止被拖出范围
+                if bbox[1]+move<start-1 or bbox[3]+move>end+1:
+                    return
+                self.move(sc,0,move)
+                #重新定义画布中的起始拖动位置
+                scroll.start+=move
+                sc_move()
+        def topmove(event):#top
+            bbox=self.bbox(sc)
+            if mode=='y':
+                move=-(bbox[3]-bbox[1])/2
+                if bbox[1]+move<start:
+                    move=-(bbox[1]-start)
+                self.move(sc,0,move)
+                sc_move
+        def bottommove(event):#bottom
+            bbox=self.bbox(sc)
+            if mode=='y':
+                move=(bbox[3]-bbox[1])/2
+                if bbox[3]+move>end:
+                    move=(end-bbox[3])
+                self.move(sc,0,move)
+                sc_move()
+        def backmove(event):#bottom
+            bbox=self.bbox(sc)
+            if mode=='y':
+                posy=self.canvasy(event.y)
+                move=posy-bbox[1]
+                if move>0 and move+bbox[3]>end:
+                    move=end-bbox[3]
+                if move<0 and move+bbox[1]<start:
+                    move=start-bbox[1]
+                self.move(sc,0,move)
+                sc_move()
+        def sc_move():#滚动条控制控件滚动
+            if mode=='y':
+                bbox=self.bbox(sc)
+                startp=(bbox[1]-start)/canmove
+                widget.yview('moveto',startp)
+        if direction.upper()=='X':
+            mode='x'
+        elif direction.upper()=='Y':
+            mode='y'
+        else:
+            return None
+        #上标、下标 ▲▼
+        if mode=='y':
+            #back=self.create_rectangle((pos[0],pos[1],pos[0]+10,pos[1]+height),fill=bg,width=0)
+            back=self.create_polygon((pos[0]+5,pos[1]+5,pos[0]+5,pos[1]+height-5,pos[0]+5,pos[1]+5),
+            width=12,outline=bg)
+            uid='scrollbar'+str(back)
+            self.itemconfig(back,tags=uid)
+            top=self.create_text(pos,text='▲',font='微软雅黑 8',anchor='nw',fill=oncolor,tags=uid)
+            bottom=self.create_text((pos[0],pos[1]+height),text='▼',font='微软雅黑 8',anchor='sw',fill=oncolor,tags=uid)
+            #sc=self.create_rectangle((pos[0],pos[1]+15,pos[0]+10,pos[1]+height-15),fill=color,width=0,tags=uid)
+            sc=self.create_polygon((pos[0]+5,pos[1]+20,pos[0]+5,pos[1]+height-20,pos[0]+5,pos[1]+20,),
+            width=3,outline=color,tags=uid)
+            #起始和终止位置
+            start=pos[1]+15
+            end=pos[1]+height-15
+            canmove=end-start
+            #绑定组件
+            widget.config(yscrollcommand=widget_move)
+        scroll=TinUINum()
+        use_widget=True#是否允许控件控制滚动条
+        self.tag_bind(sc,'<Button-1>',mousedown)
+        self.tag_bind(sc,'<ButtonRelease-1>',mouseup)
+        self.tag_bind(sc,'<B1-Motion>',drag)
+        #绑定样式
+        self.tag_bind(sc,'<Enter>',enter)
+        self.tag_bind(sc,'<Leave>',leave)
+        #绑定点击滚动
+        self.tag_bind(top,'<Button-1>',topmove)
+        self.tag_bind(bottom,'<Button-1>',bottommove)
+        self.tag_bind(back,'<Button-1>',backmove)
+        return top,bottom,back,sc,uid
+
+    def add_listbox(self,pos:tuple,width:int=200,height:int=200,font='微软雅黑 12',data=('a','b','c'),command=None):#绘制列表框
+        ...
+
 
 class TinUI(BasicTinUI):
     '''对BasicTinUI的封装，添加了滚动条自动刷新'''
@@ -906,13 +1029,12 @@ class TinUI(BasicTinUI):
 
 
 class TinUIXml():#TinUI的xml渲染方式
-    '''为TinUI提供更加方便的平面方式，使用xml
-    开发中……'''
+    '''为TinUI提供更加方便的平面方式，使用xml'''
 
     def __init__(self,ui:Union[BasicTinUI,TinUI]):
         self.ui=ui
         self.noload=('info','menubar','labelframe','tooltip')#当前不解析的标签
-        self.intargs=('width','linew','bd','r','minwidth','start','info_width')#需要转为数字的参数
+        self.intargs=('width','linew','bd','r','minwidth','start','info_width','height')#需要转为数字的参数
         self.dataargs=('command','choices','widgets','content','percentage','data','cont')#需要转为数据结构的参数
         self.funcs={}#内部调用方法集合
         self.datas={}#内部数据结构集合
@@ -1031,7 +1153,7 @@ if __name__=='__main__':
 
     b=TinUI(a,bg='white')
     b.pack(fill='both',expand=True)
-    m=b.add_title((600,0),'TinUI is a test project for futher tin using')
+    m=b.add_title((600,0),'TinUI is a modern way to show tkinter widget in your application')
     m1=b.add_title((0,680),'test TinUI scrolled',size=2,angle=24)
     b.add_paragraph((20,290),'''     TinUI是基于tkinter画布开发的界面UI布局方案，作为tkinter拓展和TinEngine的拓展而存在。目前，TinUI已可应用于项目。''',
     angle=-18)
@@ -1068,5 +1190,7 @@ if __name__=='__main__':
     b.add_back(pos=(0,0),uids=(ttb,),bg='cyan')
     _,_,ok3,_=b.add_waitbar3((600,800),width=240)
     b.add_button((600,750),text='停止带状等待框',command=lambda event:ok3())
+    textbox=b.add_textbox((890,100),text='这是文本输入框'+'\n换行'*30)[0]
+    b.add_scrollbar((1095,100),textbox)
 
     a.mainloop()

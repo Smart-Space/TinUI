@@ -635,6 +635,57 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+###   add_textbox(self,pos:tuple,width:int=200,height:int=200,text:str='',anchor='nw',font='微软雅黑 12',fg='black',bg='white',linew=3,scrollbar=False,outline='#63676b',onoutline='#3041d8')
+
+- pos::起始位置
+- width::宽度
+- height::高度
+- text::预置文本
+- anchor::对齐方向
+- font::字体
+- fg::文本
+- bg::背景色
+- linew::边框宽度
+- scrollbar::是否添加纵向滚动条
+- outline::边框颜色
+- onoutline::响应鼠标边框颜色
+
+绘制一个文本编辑框。
+
+### return: textbox, uid
+
+> textbox::Text控件
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI文本框.gif)
+
+---
+
+### add_scrollbar(self,pos:tuple,widget,height:int=200,direction='y',bg='#f0f0f0',color='#999999',oncolor='#89898b')
+
+- pos::起始位置
+- widget::绑定滑动的组件，Text、Canvas、Treeview、Listbox等
+- height::长度
+- direction::方向，x或y，大小写无关
+- bg::背景色
+- color::滚动条闲置颜色
+- oncolor::滚动条激活颜色
+
+为显示区域可变的组件绘制一个滚动条。
+
+### return: top, bottom, back, sc, uid
+
+> top::上（左）标识
+>
+> bottom::下（右）标识
+>
+> back::背景
+>
+> sc::滚动块
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI滚动条.gif)
+
+---
+
 # Class: BasicTinUI
 
 TinUI的基础类，仅提供组件绘制。

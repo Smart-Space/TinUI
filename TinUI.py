@@ -868,7 +868,7 @@ class BasicTinUI(Canvas):
         textbox=Text(self,font=font,fg=fg,bg=bg,highlightthickness=linew,highlightbackground=outline,highlightcolor=onoutline,relief='flat')
         uid=self.create_window(pos,window=textbox,width=width,height=height,anchor=anchor)
         textbox.insert(1.0,text)
-        if scrollbar==True:
+        if scrollbar==True:#不支持横向滚动自动绑定
             bbox=self.bbox(uid)
             cid=self.add_scrollbar((bbox[2]+5,bbox[1]),textbox,bbox[3]-bbox[1])[-1]
             self.addtag_withtag(uid,cid)
@@ -885,11 +885,17 @@ class BasicTinUI(Canvas):
                 startp=start+canmove*float(sp)
                 endp=start+canmove*float(ep)
                 self.coords(sc,(pos[0]+5,startp+5,pos[0]+5,endp-5))
+            elif mode=='x' and use_widget:
+                startp=start+canmove*float(sp)
+                endp=start+canmove*float(ep)
+                self.coords(sc,(startp+5,pos[1]+5,endp+5,pos[1]+5))
         def mousedown(event):
-            nonlocal use_widget
+            nonlocal use_widget#当该值为真，才允许响应widget_move函数
             use_widget=False
             if mode=='y':
-                scroll.start=self.canvasy(event.y)#定义起始横坐标
+                scroll.start=self.canvasy(event.y)#定义起始纵坐标
+            elif mode=='x':
+                scroll.start=self.canvasx(event.x)#横坐标
         def mouseup(event):
             nonlocal use_widget
             use_widget=True
@@ -901,9 +907,14 @@ class BasicTinUI(Canvas):
                 if bbox[1]+move<start-1 or bbox[3]+move>end+1:
                     return
                 self.move(sc,0,move)
-                #重新定义画布中的起始拖动位置
-                scroll.start+=move
-                sc_move()
+            elif mode=='x':#横向
+                move=self.canvasx(event.x)-scroll.start
+                if bbox[0]+move<start-1 or bbox[2]+move>end+1:
+                    return
+                self.move(sc,move,0)
+            #重新定义画布中的起始拖动位置
+            scroll.start+=move
+            sc_move()
         def topmove(event):#top
             bbox=self.bbox(sc)
             if mode=='y':
@@ -911,7 +922,12 @@ class BasicTinUI(Canvas):
                 if bbox[1]+move<start:
                     move=-(bbox[1]-start)
                 self.move(sc,0,move)
-                sc_move
+            elif mode=='x':
+                move=-(bbox[2]-bbox[0])/2
+                if bbox[0]+move<start:
+                    move=-(bbox[0]-start)
+                self.move(sc,move,0)
+            sc_move()
         def bottommove(event):#bottom
             bbox=self.bbox(sc)
             if mode=='y':
@@ -919,8 +935,13 @@ class BasicTinUI(Canvas):
                 if bbox[3]+move>end:
                     move=(end-bbox[3])
                 self.move(sc,0,move)
-                sc_move()
-        def backmove(event):#bottom
+            elif mode=='x':
+                move=(bbox[2]-bbox[0])/2
+                if bbox[2]+move>end:
+                    move=(end-bbox[2])
+                self.move(sc,0,move)
+            sc_move()
+        def backmove(event):#back
             bbox=self.bbox(sc)
             if mode=='y':
                 posy=self.canvasy(event.y)
@@ -930,12 +951,23 @@ class BasicTinUI(Canvas):
                 if move<0 and move+bbox[1]<start:
                     move=start-bbox[1]
                 self.move(sc,0,move)
-                sc_move()
+            elif mode=='x':
+                posx=self.canvasx(event.x)
+                move=posx-bbox[0]
+                if move>0 and move+bbox[2]>end:
+                    move=end-bbox[2]
+                if move<0 and move+bbox[0]<start:
+                    move=start-bbox[0]
+                self.move(sc,move,0)
+            sc_move()
         def sc_move():#滚动条控制控件滚动
+            bbox=self.bbox(sc)
             if mode=='y':
-                bbox=self.bbox(sc)
                 startp=(bbox[1]-start)/canmove
                 widget.yview('moveto',startp)
+            elif mode=='x':
+                startp=(bbox[0]-start)/canmove
+                widget.xview('moveto',startp*1.2)
         if direction.upper()=='X':
             mode='x'
         elif direction.upper()=='Y':
@@ -960,6 +992,19 @@ class BasicTinUI(Canvas):
             canmove=end-start
             #绑定组件
             widget.config(yscrollcommand=widget_move)
+        elif mode=='x':
+            back=self.create_polygon((pos[0]+5,pos[1]+5,pos[0]+height-5,pos[1]+5,pos[0],pos[1]+5),
+            width=12,outline=bg)
+            uid='scrollbar'+str(back)
+            self.itemconfig(back,tags=uid)
+            top=self.create_text((pos[0]+2,pos[1]+11),text='▲',angle=90,font='微软雅黑 8',anchor='w',fill=oncolor,tags=uid)
+            bottom=self.create_text((pos[0]+height,pos[1]),text='▼',angle=90,font='微软雅黑 8',anchor='se',fill=oncolor,tags=uid)
+            sc=self.create_polygon((pos[0]+20,pos[1]+5,pos[0]+height-20,pos[1]+5,pos[0]+20,pos[1]+5),
+            width=3,outline=color,tags=uid)
+            start=pos[0]+8
+            end=pos[0]+height-13
+            canmove=(end-start)*0.95
+            widget.config(xscrollcommand=widget_move)
         scroll=TinUINum()
         use_widget=True#是否允许控件控制滚动条
         self.tag_bind(sc,'<Button-1>',mousedown)
@@ -1190,7 +1235,9 @@ if __name__=='__main__':
     b.add_back(pos=(0,0),uids=(ttb,),bg='cyan')
     _,_,ok3,_=b.add_waitbar3((600,800),width=240)
     b.add_button((600,750),text='停止带状等待框',command=lambda event:ok3())
-    textbox=b.add_textbox((890,100),text='这是文本输入框'+'\n换行'*30)[0]
+    textbox=b.add_textbox((890,100),text='这是文本输入框，当然，无法在textbox的参数中绑定横向滚动'+'\n换行'*30)[0]
+    textbox['wrap']='none'
     b.add_scrollbar((1095,100),textbox)
+    b.add_scrollbar((890,305),textbox,direction='x')
 
     a.mainloop()

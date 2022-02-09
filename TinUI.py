@@ -7,12 +7,14 @@ import xml.etree.ElementTree  as ET
 #==========
 '''开发信息
 开发者：Smart-Space（张**）
+版权：版权所有(C) 2019-2022 Smart-Space（张**）
 开发者邮箱：smart-space@qq.com
 语言：Python
 技术基础：tkinter（tcl/tk）
 开源平台：pypi、GitHub、csdn
+开源协议：GPLv3
 贡献者：（暂无）
-免费使用条款：注明TinUI的开发者
+免费条款：注明TinUI的开发者，修改后必须开源，且同样使用GPL协议。商业软件需要为TinUI提供开源许可，并声明开发者版权所有
 '''
 
 
@@ -1080,7 +1082,7 @@ class TinUIXml():#TinUI的xml渲染方式
         self.ui=ui
         self.noload=('info','menubar','labelframe','tooltip')#当前不解析的标签
         self.intargs=('width','linew','bd','r','minwidth','start','info_width','height')#需要转为数字的参数
-        self.dataargs=('command','choices','widgets','content','percentage','data','cont')#需要转为数据结构的参数
+        self.dataargs=('command','choices','widgets','content','percentage','data','cont','scrollbar')#需要转为数据结构的参数
         self.funcs={}#内部调用方法集合
         self.datas={}#内部数据结构集合
         self.tags={}#内部组件tag集合

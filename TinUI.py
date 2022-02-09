@@ -6,8 +6,8 @@ import xml.etree.ElementTree  as ET
 '''全部组件都是绘制的~~~，除了输入型组件无法使用tkinter画布完成对应效果'''
 #==========
 '''开发信息
-开发者：Smart-Space（张**）
-版权：版权所有(C) 2019-2022 Smart-Space（张**）
+开发者：Smart-Space（JunmingZhang）
+版权：版权所有(C) 2019-present Smart-Space（JunmingZhang）
 开发者邮箱：smart-space@qq.com
 语言：Python
 技术基础：tkinter（tcl/tk）

@@ -480,7 +480,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_scalebar(self,pos:tuple,width=200,fg='#4258cc',activefg='#aeb5d7',bg='#99a3d5',data=(1,2,3,4,5),start=1,command=None)
+### add_scalebar(self,pos:tuple,width=200,fg='#3b50ba',activefg='#aeb5d7',bg='#868686',data=(1,2,3,4,5),start=1,command=None)
 
 - pos::位置
 - width::长度（宽度）

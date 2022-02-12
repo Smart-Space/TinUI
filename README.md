@@ -4,7 +4,7 @@
 
 ---
 
-![](https://github.com/Smart-Space/TinUI/raw/main/theme/TinUI明亮模式.gif)![](https://github.com/Smart-Space/TinUI/raw/main/theme/TinUI黑暗模式.gif)
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI明亮样式.gif)![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI黑暗样式.gif)
 
 ---
 

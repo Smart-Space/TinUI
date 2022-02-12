@@ -2,6 +2,12 @@
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/LOGO.png)
 
+---
+
+![](https://github.com/Smart-Space/TinUI/raw/main/theme/TinUI明亮模式.gif)![](https://github.com/Smart-Space/TinUI/raw/main/theme/TinUI黑暗模式.gif)
+
+---
+
 ## 项目类型
 
 TinUI是一个基于tkinter（Python/tcl/tk）的拓展组件（Widget），可以绘制虚拟组件。
@@ -216,7 +222,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_radiobutton(self,pos:tuple,width,text='',choices=('choose me'),fg='black',bg='white',font=('微软雅黑',12),command=None,anchor='nw')
+### add_radiobutton(self,pos:tuple,width,text='',choices=('choose me'),fg='black',bg='white',font=('微软雅黑',12),activefg='white',activebg='#4453db',command=None,anchor='nw')
 
 - pos::位置
 - width::整体宽度
@@ -225,6 +231,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - fg::文本和边框颜色
 - bg::选项背景色
 - font::字体
+- activefg::选中字体和边框颜色
+- activebg::选中背景颜色
 - command::回调函数，有并且仅有一个参数，即该按钮所显示的文本
 - anchor::对齐方向
 

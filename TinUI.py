@@ -190,19 +190,25 @@ class BasicTinUI(Canvas):
         separate=self.create_line(bbox,fill=fg,width=3)
         return separate
 
-    def add_radiobutton(self,pos:tuple,width,text='',choices=('choose me'),fg='black',bg='white',font=('微软雅黑',12),command=None,anchor='nw'):#绘制单选框
-        def button_in(tag):
-            self.itemconfig(tag,fill='#E5F1FB',outline='#82BDEB')
-        def button_out(_tag):
+    def add_radiobutton(self,pos:tuple,width,text='',choices=('choose me'),fg='black',bg='white',font=('微软雅黑',12),activefg='white',activebg='#4453db',command=None,anchor='nw'):#绘制单选框
+        def button_in(tag,t):
+            self.itemconfig(tag,fill=activebg,outline=activefg)
+        def button_out(_tag,t):
             for tag in back_list:
                 self.itemconfig(tag,fill=bg,outline=fg)
-        def go_func(tag,_text):
+            for t in choices_list:
+                if t==None or t!=now_choice:
+                    self.itemconfig(t,fill=fg)
+        def go_func(tag,_text,t):
+            nonlocal now_choice
+            now_choice=t
             for i in choices_back:#判断是否为当前选中
                 if i not in back_list:
                     back_list.append(i)
-                    button_out(tag)
+                    button_out(tag,t)
             back_list.remove(tag)
-            self.itemconfig(tag,fill='#E5F1FB',outline='#82BDEB')
+            self.itemconfig(tag,fill=activebg,outline=activefg)
+            self.itemconfig(t,fill=activefg)
             if command!=None:
                 command(_text)
         def select(num):
@@ -218,6 +224,7 @@ class BasicTinUI(Canvas):
                 self.itemconfig(f,state='normal',fill=fg)
                 self.itemconfig(b,state='normal')
         word=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor,width=width)
+        now_choice=None#当前选中项
         uid='radiobutton'+str(word)
         self.itemconfig(word,tags=uid)
         start_x=pos[0]#起始x位置
@@ -233,12 +240,12 @@ class BasicTinUI(Canvas):
             height+=h+2
             choices_list.append(choice)
             choices_back.append(back)
-            self.tag_bind(choice,'<Enter>',lambda event,back=back:button_in(back))
-            self.tag_bind(choice,'<Leave>',lambda event,back=back:button_out(back))
-            self.tag_bind(back,'<Enter>',lambda event,back=back:button_in(back))
-            self.tag_bind(back,'<Leave>',lambda event,back=back:button_out(back))
-            self.tag_bind(choice,'<Button>',lambda event,_text=i,back=back:go_func(back,_text))
-            self.tag_bind(back,'<Button>',lambda event,_text=i,back=back:go_func(back,_text))
+            self.tag_bind(choice,'<Enter>',lambda event,back=back,c=choice:button_in(back,c))
+            self.tag_bind(choice,'<Leave>',lambda event,back=back,c=choice:button_out(back,c))
+            self.tag_bind(back,'<Enter>',lambda event,back=back,c=choice:button_in(back,c))
+            self.tag_bind(back,'<Leave>',lambda event,back=back,c=choice:button_out(back,c))
+            self.tag_bind(choice,'<Button>',lambda event,_text=i,back=back,c=choice:go_func(back,_text,c))
+            self.tag_bind(back,'<Button>',lambda event,_text=i,back=back,c=choice:go_func(back,_text,c))
         back_list=list(choices_back)
         funcs=[select,disable,active]
         return word,choices_list,choices_back,funcs,uid

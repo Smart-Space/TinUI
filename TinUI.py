@@ -147,7 +147,7 @@ class BasicTinUI(Canvas):
         funcs=[flash,on,off,disable,active]
         return checkbutton,check,funcs,uid
 
-    def add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='#cfd3d6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#63676b',onoutline='#3041d8',icon='>',anchor='nw'):#绘制单行输入框
+    def add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='#cfd3d6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#63676b',onoutline='#3041d8',icon='>',anchor='nw',call='→',command=None):#绘制单行输入框
         #这是一个半绘制组件
         def if_empty(event):
             ch=entry.get()
@@ -162,6 +162,9 @@ class BasicTinUI(Canvas):
                     self.tag_bind(funcw,'<Enter>',lambda event:self.itemconfig(funcw,fill=onoutline))
                     self.tag_bind(funcw,'<Leave>',lambda event:self.itemconfig(funcw,fill=fg))
                     self.tag_bind(funcw,'<Button-1>',lambda event:(entry.delete(0,'end'),if_empty(None)))
+        def call_command(event):
+            text=entry.get()
+            command(text)
         entry=Entry(self,fg=fg,bg=bg,font=font,relief='flat',bd=0,insertbackground=insert,insertborderwidth=2)
         entry.insert(0,text)
         entry.bind('<KeyRelease>',if_empty)
@@ -174,6 +177,11 @@ class BasicTinUI(Canvas):
         funcw=self.create_text((bbox[0]+width,bbox[1]),text=icon,fill=fg,font=font,anchor='nw',tags=uid)
         w=self.bbox(funcw)[2]
         h=self.bbox(funce)[3]
+        if command!=None:#调用函数的绑定仅当存在command时启动
+            print('yes')
+            button=self.add_button((w+8,pos[1]+1),text=call,font=font,command=call_command,fg=fg,bg=bg,line=outline)
+            self.addtag_withtag(uid,button[-1])
+            entry.bind('<Return>',call_command)
         back=self.create_rectangle((bbox[0]-2,bbox[1]-2,w+2,h+2),width=linew,outline=outline,fill=bg,tags=uid)
         self.tkraise(funcw)
         if_empty(None)
@@ -603,13 +611,11 @@ class BasicTinUI(Canvas):
         entry=self.create_window(pos,window=wentry,width=width,anchor='nw')
         uid='spinbox'+str(entry)
         self.itemconfig(entry,tags=uid)
-        bbox=self.bbox(entry)
-        height=bbox[3]-bbox[1]
-        font=(font[0],font[1]//3)
-        button1=self.add_button((pos[0]+width+2,pos[1]+3),text='▲',linew=1,activefg=activefg,activebg=activebg,font=font,command=updata)
-        button2=self.add_button((pos[0]+width+2,pos[1]-5+height),text='▼',linew=1,activefg=activefg,activebg=activebg,font=font,anchor='sw',command=downdata)
+        button1=self.add_button((pos[0]+width+2,pos[1]+2),text='∧',linew=1,fg=fg,bg=bg,activefg=activefg,activebg=activebg,font=font,command=updata)
+        bbox=self.bbox(button1[-1])
+        button2=self.add_button((bbox[2]+2,pos[1]+2),text='∨',linew=1,fg=fg,bg=bg,activefg=activefg,activebg=activebg,font=font,command=downdata)
         self.addtag_withtag(uid,button1[-1])
-        self.addtag_withtag(uid,button1[-1])
+        self.addtag_withtag(uid,button2[-1])
         datanum=TinUINum()
         datanum.num=data.index(now)#记录数据位置
         maxnum=len(data)-1#最大位置
@@ -1215,7 +1221,7 @@ if __name__=='__main__':
     b.add_button((250,450),'测试按钮',activefg='white',activebg='red',command=test,anchor='center')
     b.add_checkbutton((80,430),'允许TinUI测试',command=test1)
     b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
-    b.add_entry((250,330),350,'这里用来输入')
+    b.add_entry((250,330),350,'这里用来输入',command=print)
     b.add_separate((20,200),600)
     b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
     b.add_link((400,500),'TinGroup知识库','http://tinhome.baklib-free.com/')

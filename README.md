@@ -180,7 +180,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='#cfd3d6',activefg='black',activebg='white',font=('微软雅黑',12),linew=3,outline='#63676b',onoutline='#3041d8',icon='>',anchor='nw')
+### add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='#cfd3d6',activefg='black',activebg='white',font=('微软雅黑',12),linew=3,outline='#63676b',onoutline='#3041d8',icon='>',anchor='nw',call='→',command=None)
 
 - pos::位置
 - width::宽度
@@ -195,6 +195,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - onoutline::获取焦点时的边框颜色
 - icon::内容为空时，右侧显示的字符
 - anchor::对齐方向
+- call::回调按钮文本，仅command存在时可用
+- command::回调函数，可以通过按钮或回车键调用，函数需要接受text参数
 
 绘制一个单行输入框。这是一个半绘制组件，其实就是简化了Entry控件的导入。
 

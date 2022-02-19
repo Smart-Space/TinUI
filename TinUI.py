@@ -1037,6 +1037,9 @@ class BasicTinUI(Canvas):
     def add_listbox(self,pos:tuple,width:int=200,height:int=200,font='微软雅黑 12',data=('a','b','c'),command=None):#绘制列表框
         ...
 
+    def add_listview(self,pos:tuple)->FunctionType:#绘制列表视图,function:add_list
+        ...
+
 
 class TinUI(BasicTinUI):
     '''对BasicTinUI的封装，添加了滚动条自动刷新'''
@@ -1095,7 +1098,7 @@ class TinUIXml():#TinUI的xml渲染方式
         self.ui=ui
         self.noload=('info','menubar','labelframe','tooltip')#当前不解析的标签
         self.intargs=('width','linew','bd','r','minwidth','start','info_width','height')#需要转为数字的参数
-        self.dataargs=('command','choices','widgets','content','percentage','data','cont','scrollbar')#需要转为数据结构的参数
+        self.dataargs=('command','choices','widgets','content','percentage','data','cont','scrollbar','widget')#需要转为数据结构的参数
         self.funcs={}#内部调用方法集合
         self.datas={}#内部数据结构集合
         self.tags={}#内部组件tag集合

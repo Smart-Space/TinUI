@@ -704,6 +704,30 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+### add_listbox(self,pos:tuple,width:int=200,height:int=200,font='微软雅黑 12',data=('a','b','c'),bg='#f2f2f2',fg='black',activebg='#e9e9e9',sel='#b4bbea',anchor='nw',command=None)
+
+- pos::起始位置
+- width::列表框宽度而非框架宽度
+- height::列表框高度而非框架高度
+- font::字体
+- data::选项
+- bg::背景颜色
+- fg::文本颜色
+- activebg::响应鼠标背景色
+- sel::被选中颜色
+- anchor::对齐方式
+- command::回调函数，必须接受一个选项文本参数，这个参数是data中的一个值
+
+绘制一个列表框。
+
+### return: box, uid
+
+> box::绘制列表框功能区的BasicTinUI
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI列表框.gif)
+
+---
+
 # Class: BasicTinUI
 
 TinUI的基础类，仅提供组件绘制。

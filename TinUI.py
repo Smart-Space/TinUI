@@ -1034,8 +1034,63 @@ class BasicTinUI(Canvas):
         self.tag_bind(back,'<Button-1>',backmove)
         return top,bottom,back,sc,uid
 
-    def add_listbox(self,pos:tuple,width:int=200,height:int=200,font='微软雅黑 12',data=('a','b','c'),command=None):#绘制列表框
-        ...
+    def add_listbox(self,pos:tuple,width:int=200,height:int=200,font='微软雅黑 12',data=('a','b','c'),bg='#f2f2f2',fg='black',activebg='#e9e9e9',sel='#b4bbea',anchor='nw',command=None):#绘制列表框
+        def repaint_back():
+            for v in choices.values():
+                bbox=box.coords(v[1])
+                box.coords(v[1],3,bbox[1]-2,5+maxwidth+2,bbox[3]+2)
+        def in_mouse(t):
+            if choices[t][2]==True:#已被选中
+                return
+            box.itemconfig(choices[t][1],fill=activebg)
+        def out_mouse(t):
+            if choices[t][2]==True:#已被选中
+                box.itemconfig(choices[t][1],fill=sel)
+            else:
+                box.itemconfig(choices[t][1],fill=bg)
+        def sel_it(t):
+            box.itemconfig(choices[t][1],fill=sel)
+            choices[t][2]=True
+            for i in choices.keys():
+                if i==t:
+                    continue
+                choices[i][2]=False
+                out_mouse(i)
+            if command!=None:
+                command(t)
+        frame=BasicTinUI(self,bg=bg)#主显示框，显示滚动条
+        box=BasicTinUI(frame,bg=bg,width=width,height=height)#显示选择内容
+        box.place(x=12,y=12)
+        uid=self.create_window(pos,window=frame,width=width+24,height=height+24,anchor=anchor)
+        frame.add_scrollbar((width+12,12),widget=box,height=height,bg=bg,color=fg,oncolor=fg)#纵向
+        frame.add_scrollbar((12,height+12),widget=box,height=height,direction='x',bg=bg,color=fg,oncolor=fg)#横向
+        choices={}#'a':[a_text,a_back,is_sel:bool]
+        maxwidth=0#最大宽度
+        for i in data:
+            end=box.bbox('all')
+            end=5 if end==None else end[-1]
+            text=box.create_text((5,end+7),text=i,fill=fg,font=font,anchor='nw')
+            bbox=box.bbox(text)
+            twidth=bbox[2]-bbox[0]
+            maxwidth=twidth if twidth>maxwidth else maxwidth
+            back=box.create_rectangle((3,bbox[1]-2,bbox[2]+2,bbox[3]+2),width=0,fill=bg)
+            box.tkraise(text)
+            choices[i]=[text,back,False]
+            box.tag_bind(text,'<Enter>',lambda event,text=i : in_mouse(text))
+            box.tag_bind(text,'<Leave>',lambda event,text=i : out_mouse(text))
+            box.tag_bind(text,'<Button-1>',lambda event,text=i : sel_it(text))
+            box.tag_bind(back,'<Enter>',lambda event,text=i : in_mouse(text))
+            box.tag_bind(back,'<Leave>',lambda event,text=i : out_mouse(text))
+            box.tag_bind(back,'<Button-1>',lambda event,text=i : sel_it(text))
+        if maxwidth<width:
+            maxwidth=width
+        repaint_back()
+        bbox=box.bbox('all')
+        box.config(scrollregion=bbox)
+        def set_y_view(event):
+            box.yview_scroll(int(-1*(event.delta/120)), "units")
+        box.bind('<MouseWheel>',set_y_view)
+        return box,uid
 
     def add_listview(self,pos:tuple)->FunctionType:#绘制列表视图,function:add_list
         ...
@@ -1257,5 +1312,7 @@ if __name__=='__main__':
     textbox['wrap']='none'
     b.add_scrollbar((1095,100),textbox)
     b.add_scrollbar((890,305),textbox,direction='x')
+    b.add_listbox((890,430),data=('item1','item2','item3','item4\n item4.1\n item4.2\n item4.3\n itme4.4\n item4.5','item5 and item5.1 and item5.2 and item5.3'),
+    command=print)
 
     a.mainloop()

@@ -18,8 +18,25 @@ import xml.etree.ElementTree  as ET
 '''
 
 
-class TinUINum:#数据载体，请忽略
+class TinUINum:#数据载体，作者学习阶段的历史遗留产物
     pass
+
+
+class TinUITheme:
+    '''
+    专门为特有样式的TinUI或BasicTinUI提供的类
+    适用于重写样式配色的TinUI或BasicTinUI
+    该类允许重写样式的TinUI或BasicTinUI使用TinUIXml
+    '''
+
+    def __init__(self,name='tinui-theme'):
+        self.theme=name
+
+    def change_theme_name(self,name:str):
+        self.theme=name
+
+    def get_theme(self):
+        return self.theme
 
 
 class BasicTinUI(Canvas):
@@ -1147,9 +1164,11 @@ class TinUI(BasicTinUI):
 
 
 class TinUIXml():#TinUI的xml渲染方式
-    '''为TinUI提供更加方便的平面方式，使用xml'''
+    '''为TinUI提供更加方便的平面方式，使用xml
+    TinUITheme基类无法直接使用，只能够重写TinUI或BasicTinUI的样式后才能够使用，参考 /theme 中的样式重写范例
+    '''
 
-    def __init__(self,ui:Union[BasicTinUI,TinUI]):
+    def __init__(self,ui:Union[BasicTinUI,TinUITheme]):
         self.ui=ui
         self.noload=('info','menubar','labelframe','tooltip')#当前不解析的标签
         self.intargs=('width','linew','bd','r','minwidth','start','info_width','height')#需要转为数字的参数

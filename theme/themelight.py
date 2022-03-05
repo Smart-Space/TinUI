@@ -3,13 +3,14 @@ from window import *
 #winui3
 #部分组件无法展示
 
-class TinUILight:
+class TinUILight(TinUITheme):
     '''
     这是TinUI明亮模式的托管类，不是继承类
     调用时这需要注意文本和数据，样式类参数无需理会
     '''
 
     def __init__(self,ui:Union[TinUI,BasicTinUI]):
+        super().__init__('tinui-light-theme')
         self.ui=ui
         self.label='dark'
 

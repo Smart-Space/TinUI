@@ -61,7 +61,7 @@ class BasicTinUI(Canvas):
 
     def add_button(self,pos:tuple,text:str,fg='#000000',bg='#CCCCCC',line='#CCCCCC',linew='3',activefg='black',activebg='#999999',activeline='#7a7a7a',font=('微软雅黑',12),command=None,anchor='nw'):#绘制按钮
         def in_button(event):
-            self.itemconfig(back,fill=bg,outline=activeline)
+            self.itemconfig(back,fill=activebg,outline=activeline)
             self.itemconfig(button,fill=activefg)
         def out_button(event):
             self.itemconfig(back,fill=bg,outline=line)
@@ -195,7 +195,6 @@ class BasicTinUI(Canvas):
         w=self.bbox(funcw)[2]
         h=self.bbox(funce)[3]
         if command!=None:#调用函数的绑定仅当存在command时启动
-            print('yes')
             button=self.add_button((w+8,pos[1]+1),text=call,font=font,command=call_command,fg=fg,bg=bg,line=outline)
             self.addtag_withtag(uid,button[-1])
             entry.bind('<Return>',call_command)
@@ -1112,6 +1111,22 @@ class BasicTinUI(Canvas):
     def add_listview(self,pos:tuple)->FunctionType:#绘制列表视图,function:add_list
         ...
 
+    def add_canvas(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',linew=1,scrollbar=False,anchor='nw'):#绘制画布
+        def re_scrollregion():#更新滚动范围
+            canvas.config(scrollregion=canvas.bbox('all'))
+        canvas=Canvas(self,bg=bg,highlightthickness=linew,highlightbackground=outline,relief='flat')
+        uid=self.create_window(pos,window=canvas,width=width,height=height,anchor=anchor)
+        if scrollbar==True:
+            bbox=self.bbox(uid)
+            cid1=self.add_scrollbar((bbox[2]+5,bbox[1]),canvas,bbox[3]-bbox[1])[-1]
+            cid2=self.add_scrollbar((bbox[0],bbox[3]+5),canvas,bbox[2]-bbox[0],'x')[-1]
+            self.addtag_withtag(uid,cid1)
+            self.addtag_withtag(uid,cid2)
+        return canvas,re_scrollregion,uid
+
+    def add_ui(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',linew=1,scrollbar=False,anchor='nw'):#绘制BasicTinUI
+        ...
+
 
 class TinUI(BasicTinUI):
     '''对BasicTinUI的封装，添加了滚动条自动刷新'''
@@ -1333,5 +1348,9 @@ if __name__=='__main__':
     b.add_scrollbar((890,305),textbox,direction='x')
     b.add_listbox((890,430),data=('item1','item2','item3','item4\n item4.1\n item4.2\n item4.3\n itme4.4\n item4.5','item5 and item5.1 and item5.2 and item5.3'),
     command=print)
+    cav,cavf,_=b.add_canvas((890,670),scrollbar=True)
+    for i in range(1,15):
+        cav.create_text((5,i*40),text='画布对象：'+str(i)*i,font='微软雅黑 12',anchor='nw')
+    cavf()
 
     a.mainloop()

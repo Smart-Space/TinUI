@@ -128,6 +128,11 @@ class TinUILight(TinUITheme):
                 bg='#f9f9f9',color='#8d8d8d',
                  oncolor='#8a8a8a',*arg,**kw)
 
+    def add_listbox(self,pos,*arg,**kw):
+        return self.ui.add_listbox(pos,
+                bg='#f2f2f2',fg='black',activebg='#e9e9e9',sel='#b4bbea',
+                                   *arg,**kw)
+
 
 def end():
     bbox=u.bbox('all')
@@ -140,6 +145,7 @@ r=win()
 u=r.u
 du=TinUILight(u)
 u['background']='#f3f3f3'
+x=TinUIXml(du)
 
 #button
 du.add_button(end(),text='light theme')
@@ -195,6 +201,10 @@ textx,texty=end()
 text=du.add_textbox((textx,texty),linew=2)[0]
 #richtextbox
 du.add_scrollbar((textx+205,texty),text)
+#listbox
+du.add_listbox(end(),data=('first','second','third',
+'some thing between three and four called bleem','forth','fifth',
+'some thins behind five\nwhich we can not find it\nfor-\never'))
 
 u.add_back(end())
 r.r.title('TinUI light theme')

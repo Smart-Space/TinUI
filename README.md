@@ -728,6 +728,29 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+### add_canvas(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',linew=1,scrollbar=False,anchor='nw')
+
+- pos::位置
+- width::宽度
+- height::高度
+- bg::背景颜色
+- outline::边框颜色
+- linew::边框宽度
+- scrollbar::是否添加滚动条
+- anchor::对齐方位
+
+绘制一个画布。
+
+### return: canvas, re_scrollregion, uid
+
+> canvas::画布组件
+>
+> re_scrollregion::刷新滚动范围，标记为“all”
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI画布.gif)
+
+---
+
 # Class: BasicTinUI
 
 TinUI的基础类，仅提供组件绘制。

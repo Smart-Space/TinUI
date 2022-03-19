@@ -1124,8 +1124,30 @@ class BasicTinUI(Canvas):
             self.addtag_withtag(uid,cid2)
         return canvas,re_scrollregion,uid
 
-    def add_ui(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',linew=1,scrollbar=False,anchor='nw'):#绘制BasicTinUI
-        ...
+    def add_ui(self,pos:tuple,width:int=200,height:int=200,bg='white',scrollbar=False,region='man',anchor='nw'):#绘制BasicTinUI
+        def __update():#更新宽高
+            try:
+                re_scrollregion()
+            except:
+                pass
+            else:
+                ui.after(1000,__update)
+        def re_scrollregion():#更新滚动范围
+            ui.config(scrollregion=ui.bbox('all'))
+        ui=BasicTinUI(self,bg=bg)
+        uid=self.create_window(pos,window=ui,width=width,height=height,anchor=anchor)
+        if scrollbar==True:
+            bbox=self.bbox(uid)
+            cid1=self.add_scrollbar((bbox[2]+5,bbox[1]),ui,bbox[3]-bbox[1])[-1]
+            cid2=self.add_scrollbar((bbox[0],bbox[3]+5),ui,bbox[2]-bbox[0],'x')[-1]
+            self.addtag_withtag(uid,cid1)
+            self.addtag_withtag(uid,cid2)
+        if region=='man':#手动调节
+            pass
+        elif region=='auto':#自动调节
+            __update()
+        ui_xml=TinUIXml(ui)
+        return ui,re_scrollregion,ui_xml,uid
 
 
 class TinUI(BasicTinUI):
@@ -1175,6 +1197,7 @@ class TinUI(BasicTinUI):
         except:
             pass
         finally:
+        else:
             self.after(self.update_time,self.update__)
 
 
@@ -1305,7 +1328,7 @@ if __name__=='__main__':
 
     b=TinUI(a,bg='white')
     b.pack(fill='both',expand=True)
-    m=b.add_title((600,0),'TinUI is a modern way to show tkinter widget in your application')
+    m=b.add_title((600,0),'TinUI is a modern way to show tkinter widget in your application, as they are drawn by tkinter canvas')
     m1=b.add_title((0,680),'test TinUI scrolled',size=2,angle=24)
     b.add_paragraph((20,290),'''     TinUI是基于tkinter画布开发的界面UI布局方案，作为tkinter拓展和TinEngine的拓展而存在。目前，TinUI已可应用于项目。''',
     angle=-18)
@@ -1352,5 +1375,13 @@ if __name__=='__main__':
     for i in range(1,15):
         cav.create_text((5,i*40),text='画布对象：'+str(i)*i,font='微软雅黑 12',anchor='nw')
     cavf()
+    uixml=b.add_ui((150,890),scrollbar=True,region='auto')[-2]
+    uixml.loadxml('''<tinui><line>
+    <button text='button in child tinui'></button>
+    <label text='you can use BasicTinUI in a father TinUI&#x000A;by using&#x000A;tinui.add_uid(...)'></label>
+    </line><line>
+    <label text='you can use&#x000A;manual function re-region&#x000A;also can use&#x000A;auto function&#x000A;just one&#x000A;like&#x000A;this'>
+    </label>
+    </line></tinui>''')
 
     a.mainloop()

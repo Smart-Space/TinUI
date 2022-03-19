@@ -1196,7 +1196,6 @@ class TinUI(BasicTinUI):
             self.config(scrollregion=bbox)
         except:
             pass
-        finally:
         else:
             self.after(self.update_time,self.update__)
 

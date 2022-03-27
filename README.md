@@ -779,6 +779,30 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+### add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',buttonbg='#f8f8f8',num:int=2)
+
+- pos::位置
+- width::主视图宽度
+- height::主视图高度
+- bg::背景颜色
+- fg::按钮和导航栏前景色
+- buttonbg::按钮背景颜色
+- num::视图数量
+
+绘制一个横向翻页视图。
+
+### return: uilist, dotlist, move_to, uid
+
+> uilist::视图列表结构。`[(id-1,tinui-1,tinuixml-1),...]`
+>
+> dotlist::导航栏列表结构。`[dot_id-1,...]`
+>
+> move_to::需要一个数字参数num，转到第num个视图，第一个视图num为0
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI横向翻页视图.gif)
+
+---
+
 # Class: BasicTinUI
 
 TinUI的基础类，仅提供组件绘制。

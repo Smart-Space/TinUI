@@ -1149,6 +1149,73 @@ class BasicTinUI(Canvas):
         ui_xml=TinUIXml(ui)
         return ui,re_scrollregion,ui_xml,uid
 
+    def add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',buttonbg='#f8f8f8',num:int=2):#绘制翻页视图
+        def move_left(event):
+            nonlocal nowui
+            if nowui==0:
+                pass
+            else:
+                __dot_in(dotlist[nowui-1])
+                __dot_select(dotlist[nowui-1])
+        def move_right(event):
+            nonlocal nowui
+            if nowui==len(uilist)-1:
+                pass
+            else:
+                __dot_in(dotlist[nowui+1])
+                __dot_select(dotlist[nowui+1])
+        def move_to(number):
+            nonlocal nowui
+            self.itemconfig(uilist[nowui][0],state='hidden')
+            nowui=number
+            self.itemconfig(uilist[nowui][0],state='normal')
+        def __dot_in(dote):
+            bar.itemconfig(dote,width=3)
+        def __dot_out(dote):
+            if dotlist.index(dote)==nowui:
+                pass
+            else:
+                bar.itemconfig(dote,width=0)
+        def __dot_select(dote):
+            number=dotlist.index(dote)
+            if number==nowui:
+                pass
+            else:
+                move_to(number)
+                for i in dotlist:
+                    if i==dote:
+                        continue
+                    else:
+                        bar.itemconfig(i,width=0)
+        startx=pos[0]+20#按钮与主窗口间隔
+        uilist=list()#[(uiid-1,BasicTinUI-1,TinUIXml-1),(uiid-2,BasicTinUI-2,TinUIXml-2),...]
+        doty=pos[1]+height+5#控制点的起始纵坐标
+        dotlist=list()#[dot1,dot2,...]
+        nowui=0#当前显示界面序号
+        leftbutton=self.add_button((startx-2,pos[1]+width/2),'<',fg=fg,bg=buttonbg,linew=0,activefg=buttonbg,activebg=fg,command=move_left,anchor='e')[-1]
+        rightbutton=self.add_button((startx+width+2,pos[1]+width/2),'>',fg=fg,bg=buttonbg,linew=0,activefg=buttonbg,activebg=fg,command=move_right,anchor='w')[-1]
+        uid='pipspager'+str(leftbutton)+str(rightbutton)
+        self.addtag_withtag(uid,leftbutton)
+        self.addtag_withtag(uid,rightbutton)
+        bar=Canvas(self,bg=bg,highlightthickness=0,relief='flat')#导航栏
+        barid=self.create_window((startx,doty),window=bar,width=width,height=11,anchor='nw',tags=uid)
+        dotx=3
+        for i in range(0,num):
+            ui=BasicTinUI(self,bg=bg)
+            tinuixml=TinUIXml(ui)
+            uiid=self.create_window((startx,pos[1]),window=ui,width=width,height=height,state='hidden',anchor='nw',tags=uid)
+            uilist.append((uiid,ui,tinuixml))
+            dot=bar.create_oval((dotx,3,dotx+5,8),fill=fg,outline=fg,width=0)
+            dotlist.append(dot)
+            dotx+=13
+            bar.tag_bind(dot,'<Enter>',lambda event,dote=dot:__dot_in(dote))
+            bar.tag_bind(dot,'<Leave>',lambda event,dote=dot:__dot_out(dote))
+            bar.tag_bind(dot,'<Button-1>',lambda event,dote=dot:__dot_select(dote))
+        __dot_in(dotlist[nowui])
+        __dot_select(dotlist[nowui])
+        move_to(nowui)
+        return uilist,dotlist,move_to,uid
+
 
 class TinUI(BasicTinUI):
     '''对BasicTinUI的封装，添加了滚动条自动刷新'''
@@ -1208,7 +1275,7 @@ class TinUIXml():#TinUI的xml渲染方式
     def __init__(self,ui:Union[BasicTinUI,TinUITheme]):
         self.ui=ui
         self.noload=('info','menubar','labelframe','tooltip')#当前不解析的标签
-        self.intargs=('width','linew','bd','r','minwidth','start','info_width','height')#需要转为数字的参数
+        self.intargs=('width','linew','bd','r','minwidth','start','info_width','height','num')#需要转为数字的参数
         self.dataargs=('command','choices','widgets','content','percentage','data','cont','scrollbar','widget')#需要转为数据结构的参数
         self.funcs={}#内部调用方法集合
         self.datas={}#内部数据结构集合
@@ -1320,6 +1387,14 @@ def test4(event):
         progressgoto(i)
 def test5(result):
     b.itemconfig(scale_text,text='当前选值：'+str(result))
+def test6():
+    for i in range(0,5):
+        num=i
+        xml=f'''
+<tinui><line><label text='这是第{num}个BasicTinUI组件'></label></line>
+<line><button text='功能按钮' command='lambda event:print("第{i}个功能按钮")'></button>
+<combobox width='80' text='可选测试' content='("{i}","其它选项")'></combobox></line></tinui>'''
+        ppgl[i][2].loadxml(xml)
 
 if __name__=='__main__':
     a=Tk()
@@ -1382,5 +1457,7 @@ if __name__=='__main__':
     <label text='you can use&#x000A;manual function re-region&#x000A;also can use&#x000A;auto function&#x000A;just one&#x000A;like&#x000A;this'>
     </label>
     </line></tinui>''')
+    ppgl=b.add_pipspager((400,890),num=5)[0]
+    test6()
 
     a.mainloop()

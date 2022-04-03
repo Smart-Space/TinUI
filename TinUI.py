@@ -1164,11 +1164,15 @@ class BasicTinUI(Canvas):
             else:
                 __dot_in(dotlist[nowui+1])
                 __dot_select(dotlist[nowui+1])
-        def move_to(number):
+        def __move_to(number):
             nonlocal nowui
             self.itemconfig(uilist[nowui][0],state='hidden')
             nowui=number
             self.itemconfig(uilist[nowui][0],state='normal')
+        def move_to(number):
+            __dot_in(dotlist[nowui])
+            __dot_select(dotlist[nowui])
+            __move_to(nowui)
         def __dot_in(dote):
             bar.itemconfig(dote,width=3)
         def __dot_out(dote):
@@ -1181,7 +1185,7 @@ class BasicTinUI(Canvas):
             if number==nowui:
                 pass
             else:
-                move_to(number)
+                __move_to(number)
                 for i in dotlist:
                     if i==dote:
                         continue
@@ -1213,7 +1217,7 @@ class BasicTinUI(Canvas):
             bar.tag_bind(dot,'<Button-1>',lambda event,dote=dot:__dot_select(dote))
         __dot_in(dotlist[nowui])
         __dot_select(dotlist[nowui])
-        move_to(nowui)
+        __move_to(nowui)
         return uilist,dotlist,move_to,uid
 
 

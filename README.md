@@ -162,7 +162,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 > check_text::复选框文本
 > 
-> check_mark::复选框矩形标记部件
+> check_mark::复选框矩形标记部件，除边框
 > 
 > funcs
 > 

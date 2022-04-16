@@ -113,19 +113,23 @@ class BasicTinUI(Canvas):
             if self.itemcget(check,'fill')==onbg:
                 pass
             else:
-                self.itemconfig(check,outline=activefg,fill=activebg)
+                self.itemconfig(check,outline=activebg,fill=activebg)
+                self.itemconfig(outl,outline=activefg)
         def button_out(event):
             if self.itemcget(check,'fill')==onbg:
                 pass
             else:
-                self.itemconfig(check,outline=fg,fill=bg)
+                self.itemconfig(check,outline=bg,fill=bg)
+                self.itemconfig(outl,outline=fg)
         def go_func(event):
             if self.itemcget(check,'fill')!=onbg:
                 self.itemconfig(check,fill=onbg,outline=onbg)
+                self.itemconfig(outl,outline=onfg)
                 self.itemconfig(state,state='normal')
                 self.tkraise(state)
             else:
-                self.itemconfig(check,fill=bg,outline=fg)
+                self.itemconfig(check,fill=bg,outline=bg)
+                self.itemconfig(outl,outline=fg)
                 self.itemconfig(state,state='hidden')
             if command!=None:
                 command(event)
@@ -150,9 +154,14 @@ class BasicTinUI(Canvas):
         self.itemconfig(checkbutton,tags=uid)
         bbox=self.bbox(checkbutton)
         dic=bbox[3]-bbox[1]#位移长度
-        self.move(checkbutton,dic-7,0)
-        check=self.create_rectangle((pos[0]-2,pos[1]+4,pos[0]+dic-12,pos[1]+dic-4),outline=fg,fill=bg,width=1,tags=uid)
-        state=self.create_text((pos[0]-2,pos[1]),text='√',fill=onfg,font=font,anchor='nw',state='hidden',tags=uid)
+        self.move(checkbutton,dic+5,0)
+        outl=self.create_polygon((pos[0]+1,pos[1]+1,pos[0]+dic-1,pos[1]+1,
+        pos[0]+dic-1,pos[1]+dic-1,pos[0]+1,pos[1]+dic-1,pos[0]+1,pos[1]+1),
+        width=5,outline=fg,fill=fg,tags=uid)
+        check=self.create_polygon((pos[0]+2,pos[1]+2,pos[0]+dic-2,pos[1]+2,pos[0]+dic-2,pos[1]+dic-2,pos[0]+2,pos[1]+dic-2,pos[0]+2,pos[1]+2),
+        width=5,outline=bg,fill=bg,tags=uid)
+        state=self.create_line((pos[0]+2,pos[1]+2*dic/3-2,pos[0]+dic/3+2,pos[1]+dic-4,pos[0]+dic-2,pos[1]+dic/3-2),
+        width=3,fill=onfg,state='hidden',tags=uid)
         self.tkraise(state)
         self.tag_bind(check,'<Enter>',button_in)
         self.tag_bind(check,'<Leave>',button_out)
@@ -1412,7 +1421,7 @@ if __name__=='__main__':
     angle=-18)
     b.add_paragraph((20,100),'下面的段落是测试画布的非平行字体显示效果，也是TinUI的简单介绍')
     b.add_button((250,450),'测试按钮',activefg='white',activebg='red',command=test,anchor='center')
-    b.add_checkbutton((80,430),'允许TinUI测试',command=test1)
+    b.add_checkbutton((60,430),'允许TinUI测试',command=test1)
     b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
     b.add_entry((250,330),350,'这里用来输入',command=print)
     b.add_separate((20,200),600)

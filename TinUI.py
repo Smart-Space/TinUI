@@ -349,7 +349,7 @@ class BasicTinUI(Canvas):
         start()
         return waitbar1,ok,uid
 
-    def add_labelframe(self,widgets:tuple=(),title='',fg='#A8A8A8',bg=''):#绘制标题框
+    def add_labelframe(self,widgets:tuple=(),title='',fg='#A8A8A8',bg='',pos=None):#绘制标题框
         sx,sy,ex,ey=self.bbox(widgets[0])#获取直接的起始位置
         for i in widgets:
             nsx,nsy,nex,ney=self.bbox(i)
@@ -906,7 +906,9 @@ class BasicTinUI(Canvas):
 
     def add_textbox(self,pos:tuple,width:int=200,height:int=200,text:str='',anchor='nw',font='微软雅黑 12',fg='black',bg='white',linew=3,scrollbar=False,outline='#63676b',onoutline='#3041d8'):#绘制文本框
         textbox=Text(self,font=font,fg=fg,bg=bg,highlightthickness=linew,highlightbackground=outline,highlightcolor=onoutline,relief='flat')
-        uid=self.create_window(pos,window=textbox,width=width,height=height,anchor=anchor)
+        cavui=self.create_window(pos,window=textbox,width=width,height=height,anchor=anchor)
+        uid='textbox'+str(cavui)
+        self.addtag_withtag(uid,cavui)
         textbox.insert(1.0,text)
         if scrollbar==True:#不支持横向滚动自动绑定
             bbox=self.bbox(uid)
@@ -1086,7 +1088,9 @@ class BasicTinUI(Canvas):
         frame=BasicTinUI(self,bg=bg)#主显示框，显示滚动条
         box=BasicTinUI(frame,bg=bg,width=width,height=height)#显示选择内容
         box.place(x=12,y=12)
-        uid=self.create_window(pos,window=frame,width=width+24,height=height+24,anchor=anchor)
+        cavui=self.create_window(pos,window=frame,width=width+24,height=height+24,anchor=anchor)
+        uid='listbox'+str(cavui)
+        self.addtag_withtag(uid,cavui)
         frame.add_scrollbar((width+12,12),widget=box,height=height,bg=bg,color=fg,oncolor=fg)#纵向
         frame.add_scrollbar((12,height+12),widget=box,height=height,direction='x',bg=bg,color=fg,oncolor=fg)#横向
         choices={}#'a':[a_text,a_back,is_sel:bool]
@@ -1124,7 +1128,9 @@ class BasicTinUI(Canvas):
         def re_scrollregion():#更新滚动范围
             canvas.config(scrollregion=canvas.bbox('all'))
         canvas=Canvas(self,bg=bg,highlightthickness=linew,highlightbackground=outline,relief='flat')
-        uid=self.create_window(pos,window=canvas,width=width,height=height,anchor=anchor)
+        cavui=self.create_window(pos,window=canvas,width=width,height=height,anchor=anchor)
+        uid='canvas'+str(cavui)
+        self.addtag_withtag(uid,cavui)
         if scrollbar==True:
             bbox=self.bbox(uid)
             cid1=self.add_scrollbar((bbox[2]+5,bbox[1]),canvas,bbox[3]-bbox[1])[-1]
@@ -1144,13 +1150,16 @@ class BasicTinUI(Canvas):
         def re_scrollregion():#更新滚动范围
             ui.config(scrollregion=ui.bbox('all'))
         ui=BasicTinUI(self,bg=bg)
-        uid=self.create_window(pos,window=ui,width=width,height=height,anchor=anchor)
+        cavui=self.create_window(pos,window=ui,width=width,height=height,anchor=anchor)
+        uid='ui'+str(cavui)
+        self.addtag_withtag(uid,cavui)
         if scrollbar==True:
             bbox=self.bbox(uid)
             cid1=self.add_scrollbar((bbox[2]+5,bbox[1]),ui,bbox[3]-bbox[1])[-1]
             cid2=self.add_scrollbar((bbox[0],bbox[3]+5),ui,bbox[2]-bbox[0],'x')[-1]
             self.addtag_withtag(uid,cid1)
             self.addtag_withtag(uid,cid2)
+            print(cid1,cid2,uid)
         if region=='man':#手动调节
             pass
         elif region=='auto':#自动调节
@@ -1287,7 +1296,7 @@ class TinUIXml():#TinUI的xml渲染方式
 
     def __init__(self,ui:Union[BasicTinUI,TinUITheme]):
         self.ui=ui
-        self.noload=('info','menubar','labelframe','tooltip')#当前不解析的标签
+        self.noload=('info','menubar','tooltip')#当前不解析的标签
         self.intargs=('width','linew','bd','r','minwidth','start','info_width','height','num')#需要转为数字的参数
         self.dataargs=('command','choices','widgets','content','percentage','data','cont','scrollbar','widget')#需要转为数据结构的参数
         self.funcs={}#内部调用方法集合
@@ -1345,6 +1354,14 @@ class TinUIXml():#TinUI的xml渲染方式
                         uid=self.__tags2uid(tag)
                         news.append(uid)
                     i.attrib['uids']=tuple(news)
+            elif i.tag=='labelframe':#同back
+                if 'widgets' in i.attrib:
+                    olds=eval(i.attrib['widgets'])
+                    news=[]
+                    for tag in olds:
+                        uid=self.__tags2uid(tag)
+                        news.append(uid)
+                    i.attrib['widgets']=str(tuple(news))
             #调整内部参数=====
             xendy=y#从新获取本行其实纵坐标
             if linex!=None:#存在纵块
@@ -1462,7 +1479,7 @@ if __name__=='__main__':
     for i in range(1,15):
         cav.create_text((5,i*40),text='画布对象：'+str(i)*i,font='微软雅黑 12',anchor='nw')
     cavf()
-    uixml=b.add_ui((150,890),scrollbar=True,region='auto')[-2]
+    uixml,add_ui_id=b.add_ui((150,890),scrollbar=True,region='auto')[-2:]
     uixml.loadxml('''<tinui><line>
     <button text='button in child tinui'></button>
     <label text='you can use BasicTinUI in a father TinUI&#x000A;by using&#x000A;tinui.add_uid(...)'></label>

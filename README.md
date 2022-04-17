@@ -830,7 +830,7 @@ TinUI中使用数据结构载体，不需要知道。
 
 使用xml语言来绘制TinUI组件，当然，也包括BasicTinUI。
 
-> 当前，`info`, `menubar`, `labelframe`, `tooltip`等组件不支持使用xml布局。
+> 当前，`info`, `menubar`, `tooltip`等组件不支持使用xml布局。
 
 ## 基础类变量
 
@@ -919,6 +919,7 @@ xml::xml语言
 部分组件的xml写法有特殊规定。
 
 - back
+- labelframe
 
 部分组件的特殊规定，详情见CSDN文章：
 

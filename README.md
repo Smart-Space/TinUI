@@ -803,6 +803,67 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+### add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f9f9fc',fg='#1a1a1a',bg='#f3f3f3',activefg='#595959',activebg='#ededed',onfg='#191919',onbg='#eaeaea')
+
+- pos::位置
+- width::页面宽度
+- height::页面高度
+- color::视图背景色
+- fg::滚动条、文本颜色
+- bg::标签栏标签颜色
+- activefg::鼠标进入时提示色
+- activebg::鼠标进入时提示色
+- onfg::被点击时激活色
+- onbg::被点击时激活色
+
+绘制一个标签栏视图
+
+### return: tbu, scro, back, notebook, uid
+
+> tbu::标签栏BasicTinUI
+>
+> scro::滚动条TinUI返回值
+>
+> back::背景元素
+>
+> notebook::TinUINum函数结构体
+>
+> > notebook.addpage(title,flag=None,scrollbar=False)->flag
+> >
+> > `title`标签栏标签标题
+> >
+> > `flag`标识符，如果没有给定，会自动生成并返回
+> >
+> > `scrollbar`是否使用TinUI，默认BasicTinUI
+> >
+> > notebook.showpage(flag)
+> >
+> > `flag`需要显示的页面的标识符
+> >
+> > notebook.deletepage(flag)
+> >
+> > `flag`需要删除的页面的标识符
+> >
+> > notebook.getuis(flag)->(tinui,uixml,uiid)
+> >
+> > `flag`页面标识符。返回TinUI组件、TinUIXml绑定、组件的画布对象
+> >
+> > notebook.gettitles(flag)->(title,cb,bu)
+> >
+> > `flag`页面标识符。返回标题tbu对象、删除键tbu对象、标签tbu对象
+> >
+> > notebook.getvdic()->vdict
+> >
+> > 返回页面字典
+> >
+> > notebook.gettbdict()->tbdict
+> >
+> > 返回标签栏字典
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI标签栏视图.gif)
+
+---
+
 # Class: BasicTinUI
 
 TinUI的基础类，仅提供组件绘制。

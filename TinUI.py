@@ -1159,7 +1159,6 @@ class BasicTinUI(Canvas):
             cid2=self.add_scrollbar((bbox[0],bbox[3]+5),ui,bbox[2]-bbox[0],'x')[-1]
             self.addtag_withtag(uid,cid1)
             self.addtag_withtag(uid,cid2)
-            print(cid1,cid2,uid)
         if region=='man':#手动调节
             pass
         elif region=='auto':#自动调节
@@ -1237,6 +1236,140 @@ class BasicTinUI(Canvas):
         __dot_select(dotlist[nowui])
         __move_to(nowui)
         return uilist,dotlist,move_to,uid
+
+    def add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f9f9fc',fg='#1a1a1a',bg='#f3f3f3',activefg='#595959',activebg='#ededed',onfg='#191919',onbg='#eaeaea'):#绘制标签栏视图
+        def __onenter(flag):
+            if flag==nowpage:
+                return
+            t,c,b=tbdict[flag]
+            tbu.itemconfig(t,fill=activefg)
+            tbu.itemconfig(c,fill=activefg)
+            tbu.itemconfig(b,fill=activebg,outline=activebg)
+        def __onleave(flag):
+            if flag==nowpage:
+                return
+            t,c,b=tbdict[flag]
+            tbu.itemconfig(t,fill=fg)
+            tbu.itemconfig(c,fill=fg)
+            tbu.itemconfig(b,fill=bg,outline=bg)
+        def __onclick(flag):
+            if flag==nowpage:
+                return
+            t,c,b=tbdict[flag]
+            tbu.itemconfig(t,fill=onfg)
+            tbu.itemconfig(c,fill=onfg)
+            tbu.itemconfig(b,fill=onbg,outline=onbg)
+        def addpage(title:str,flag=None,scrollbar=False):#创建页面
+            if tbu.bbox('all')==None:
+                endx=3
+            else:
+                endx=tbu.bbox('all')[2]+3
+            titleu=tbu.create_text((endx,2),text=title,fill=fg,font=font,anchor='nw')
+            cbx=tbu.bbox(titleu)[2]+10
+            cb=tbu.create_text((cbx,2),text='×',font=font,fill=fg,anchor='nw')
+            tbbbox=tbu.bbox(titleu)
+            bux=(endx+2,tbbbox[1],cbx+15,tbbbox[1],cbx+15,tbbbox[3],endx+2,tbbbox[3],endx+2,tbbbox[1])
+            bu=tbu.create_polygon(bux,fill=bg,outline=bg,width=5)
+            tbu.lower(bu)
+            if flag==None:
+                flag='flag'+str(titleu)
+            if scrollbar:
+                page=TinUI(self,True,bg=self['background'])
+            elif scrollbar==False:
+                page=BasicTinUI(self,bg=self['background'])
+            uiid=self.create_window(viewpos,window=page,width=width,height=height,anchor='nw',state='hidden')
+            uixml=TinUIXml(page)
+            bbox=tbu.bbox('all')
+            tbu.config(scrollregion=bbox)
+            vdict[flag]=(page,uixml,uiid)
+            tbdict[flag]=(titleu,cb,bu)
+            flaglist.append(flag)
+            tbu.tag_bind(titleu,'<Enter>',lambda event:__onenter(flag))
+            tbu.tag_bind(cb,'<Enter>',lambda event:__onenter(flag))
+            tbu.tag_bind(bu,'<Enter>',lambda event:__onenter(flag))
+            tbu.tag_bind(titleu,'<Leave>',lambda event:__onleave(flag))
+            tbu.tag_bind(cb,'<Leave>',lambda event:__onleave(flag))
+            tbu.tag_bind(bu,'<Leave>',lambda event:__onleave(flag))
+            tbu.tag_bind(titleu,'<Button-1>',lambda event:showpage(flag))
+            tbu.tag_bind(bu,'<Button-1>',lambda event:showpage(flag))
+            tbu.tag_bind(cb,'<Button-1>',lambda event:deletepage(flag))
+        def showpage(flag):#显示页面
+            nonlocal nowpage
+            mp=nowpage#中间逻辑变量
+            if nowpage!='':
+                self.itemconfig(vdict[nowpage][2],state='hidden')
+                nowpage=flag
+                __onleave(mp)
+                nowpage=mp
+            self.itemconfig(vdict[flag][2],state='normal')
+            __onclick(flag)
+            nowpage=flag
+        def deletepage(flag):#删除页面
+            nonlocal nowpage
+            wbbox=tbu.bbox(tbdict[flag][2])
+            w=wbbox[2]-wbbox[0]
+            w+=1
+            for i in tbdict[flag]:
+                tbu.delete(i)
+            self.delete(vdict[flag][2])
+            vdict[flag][0].destroy()
+            index=flaglist.index(flag)
+            if index+1==len(tbdict):
+                pass
+            else:
+                for i in flaglist[index+1:]:
+                    for iid in tbdict[i]:
+                        tbu.move(iid,-w,0)
+            if flag==nowpage:
+                if len(tbdict)==1:
+                    pass
+                    nowpage=''
+                elif index+1<len(tbdict):
+                    showpage(flaglist[index+1])
+                    nowpage=flaglist[index+1]
+                elif index+1==len(tbdict):
+                    showpage(flaglist[index-1])
+                    nowpage=flaglist[index-1]
+            del tbdict[flag]
+            del vdict[flag]
+            del flaglist[index]
+            bbox=tbu.bbox('all')
+            tbu.config(scrollregion=bbox)
+        def getuis(flag):
+            return vdict[flag]
+        def gettitles(flag):
+            return tbdict[flag]
+        def getvdict():
+            return vdict
+        def gettbdict():
+            return tbdict
+        tbu=BasicTinUI(self,bg=color)
+        tbuid=self.create_window((pos[0]+2,pos[1]+2),window=tbu,width=width,height=30,anchor='nw')
+        uid='notebook'+str(tbuid)
+        self.addtag_withtag(uid,tbuid)
+        scro=self.add_scrollbar((pos[0]+5,pos[1]+32),tbu,height=width-5,direction='x',bg=bg,color=fg,oncolor=onfg)
+        self.addtag_withtag(uid,scro[-1])
+        barheight=self.bbox(scro[-1])[3]
+        backpos=(pos[0]+5,pos[1]+3,pos[0]+width+2,pos[1]+3,pos[0]+width+2,barheight+height-3,pos[0]+5,barheight+height-3,pos[0]+5,pos[1]+5)
+        back=self.create_polygon(backpos,outline=color,fill=color,width=10,tags=uid)
+        self.tkraise(tbuid)
+        self.tkraise(scro[-1])
+        viewpos=(pos[0]+2,barheight+2)
+        nowpage=''
+        vdict=dict()#ui,uixml,uiid
+        tbdict=dict()#title,cb,pyo
+        flaglist=list()
+        font='微软雅黑 12'
+        notebook=TinUINum
+        notebook.addpage=addpage
+        notebook.showpage=showpage
+        notebook.deletepage=deletepage
+        notebook.getuis=getuis
+        notebook.gettitles=gettitles
+        notebook.getvdict=getvdict
+        notebook.gettbdict=gettbdict
+        return tbu,scro,back,notebook,uid
+
 
 
 class TinUI(BasicTinUI):
@@ -1425,6 +1558,17 @@ def test6():
 <line><button text='功能按钮' command='lambda event:print("第{i}个功能按钮")'></button>
 <combobox width='80' text='可选测试' content='("{i}","其它选项")'></combobox></line></tinui>'''
         ppgl[i][2].loadxml(xml)
+def test7():
+    ntvdict=ntb.getvdict()
+    num=1
+    for i in ntvdict:
+        uxml=ntvdict[i][1]#tinuixml
+        xml=f'''
+<tinui><line><button text='这是第{num}个BasicTinUI组件' command='print'></button></line>
+<line><label text='TinUI的标签栏视图'></label><label text='每个都是单独页面'></label></line>
+</tinui>'''
+        uxml.loadxml(xml)
+        num+=1
 
 if __name__=='__main__':
     a=Tk()
@@ -1489,5 +1633,8 @@ if __name__=='__main__':
     </line></tinui>''')
     ppgl=b.add_pipspager((400,890),num=5)[0]
     test6()
-
+    ntb=b.add_notebook((800,900))[-2]
+    for i in range(1,11):
+        ntb.addpage('test'+str(i),'t'+str(i))
+    test7()
     a.mainloop()

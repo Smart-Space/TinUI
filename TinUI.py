@@ -1,5 +1,6 @@
 from tkinter import *
 from webbrowser import open as webopen
+import time
 from typing import Union
 from types import FunctionType
 import xml.etree.ElementTree  as ET
@@ -776,13 +777,22 @@ class BasicTinUI(Canvas):
             else:
                 y=sy
             menu.geometry(f'{winw+20}x{winh+20}+{x}+{y}')
+            bar.move('all',0,-height-7)
             menu.deiconify()
             menu.focus_set()
+            for i in range(0,height+5,5):#滚动动画
+                bar.move('all',0,5)
+                time.sleep(0.01)
+                bar.update()
+            bar.move('all',0,5)
+            bar.config(scrollregion=bar.bbox('all'))
+            bar.yview_moveto(0)
+            bar.update()
         self.tag_bind(cid,bind,show)
         menu=Toplevel(self)
         menu.overrideredirect(True)
         menu.withdraw()
-        bar=TinUI(menu,bg=tran)
+        bar=BasicTinUI(menu,bg=tran)
         bar.pack(fill='both',expand=True)
         wind=TinUINum()#记录数据
         backs=[]#按钮
@@ -791,10 +801,10 @@ class BasicTinUI(Canvas):
         widths=[]#寻找最宽位置
         for i in cont:#添加菜单内容
             if i=='-':
-                sep=bar.add_separate((5,endy()),100,fg=activebg)
+                sep=bar.add_separate((15,endy()),100,fg=activebg)
                 seps.append(sep)
             else:
-                button=bar.add_button((5,endy()),i[0],fg,bg,bg,3,activefg,activebg,activebg,font,command=lambda event,i=i:(i[1](event),menu.withdraw()))
+                button=bar.add_button((15,endy()),i[0],fg,bg,bg,3,activefg,activebg,activebg,font,command=lambda event,i=i:(i[1](event),menu.withdraw()))
                 backs.append(button[1])
                 funcs.append(button[2])
                 pos=bar.bbox(button[1])
@@ -804,10 +814,12 @@ class BasicTinUI(Canvas):
         readyshow()
         #绘制圆角边框
         bbox=bar.bbox('all')
+        height=bbox[3]-bbox[1]
         start=bbox[2]-bbox[0]
         gomap=((start,bbox[1]),(bbox[2],bbox[1]),(bbox[2],bbox[3]),(bbox[0],bbox[3]),(bbox[0],bbox[1]),(start,bbox[1]))
         mback=bar.create_polygon(gomap,fill=bg,outline=bg,width=15)
         bar.lower(mback)
+        bar.move('all',15,0)
         menu.bind('<FocusOut>',lambda event:menu.withdraw())
         menu.attributes('-transparent',tran)
         return menu,bar,funcs

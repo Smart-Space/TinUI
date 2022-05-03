@@ -174,7 +174,7 @@ class BasicTinUI(Canvas):
         funcs=[flash,on,off,disable,active]
         return checkbutton,check,funcs,uid
 
-    def add_entry(self,pos:tuple,width:int,text:str='',fg='black',bg='#cfd3d6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#63676b',onoutline='#3041d8',icon='>',anchor='nw',call='→',command=None):#绘制单行输入框
+    def add_entry(self,pos:tuple,width:int,text:str='',fg='#606060',bg='#f6f6f6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#868686',onoutline='#3041d8',icon='>',anchor='nw',call='→',command=None):#绘制单行输入框
         #这是一个半绘制组件
         def if_empty(event):
             ch=entry.get()
@@ -192,7 +192,7 @@ class BasicTinUI(Canvas):
         def call_command(event):
             text=entry.get()
             command(text)
-        entry=Entry(self,fg=fg,bg=bg,font=font,relief='flat',bd=0,insertbackground=insert,insertborderwidth=2)
+        entry=Entry(self,fg=fg,bg=bg,font=font,relief='flat',bd=0)
         entry.insert(0,text)
         entry.bind('<KeyRelease>',if_empty)
         entry.bind('<FocusIn>',lambda event:(self.itemconfig(back,outline=onoutline),entry.config(background=activebg,foreground=activefg)))
@@ -204,11 +204,18 @@ class BasicTinUI(Canvas):
         funcw=self.create_text((bbox[0]+width,bbox[1]),text=icon,fill=fg,font=font,anchor='nw',tags=uid)
         w=self.bbox(funcw)[2]
         h=self.bbox(funce)[3]
+        bubbox=self.bbox(funcw)
         if command!=None:#调用函数的绑定仅当存在command时启动
-            button=self.add_button((w+8,pos[1]+1),text=call,font=font,command=call_command,fg=fg,bg=bg,line=outline)
+            button=self.add_button((w+8,pos[1]+1),text=call,font=font,command=call_command,fg=fg,bg=bg,linew=0)
             self.addtag_withtag(uid,button[-1])
             entry.bind('<Return>',call_command)
-        back=self.create_rectangle((bbox[0]-2,bbox[1]-2,w+2,h+2),width=linew,outline=outline,fill=bg,tags=uid)
+            bubbox=self.bbox(button[-1])
+        backpos=(bbox[0],bbox[1],bubbox[2],bbox[1],bubbox[2],bbox[3],bbox[0],bbox[3],bbox[0],bbox[1])
+        outlinepos=(bbox[0]+linew,bbox[3]+4-linew,bubbox[2]-linew,bbox[3]+4-linew)
+        back=self.create_polygon(outlinepos,fill=outline,outline=outline,width=6+linew,tags=uid)#outline
+        back1=self.create_polygon(backpos,fill=bg,outline=bg,width=6,tags=uid)#back
+        if command!=None:
+            self.tkraise(button[-1])
         self.tkraise(funcw)
         if_empty(None)
         return entry,uid

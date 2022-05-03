@@ -1,6 +1,7 @@
 from tkinter import *
 from webbrowser import open as webopen
 import time
+import math
 from typing import Union
 from types import FunctionType
 import xml.etree.ElementTree  as ET
@@ -1389,6 +1390,90 @@ class BasicTinUI(Canvas):
         notebook.gettbdict=gettbdict
         return tbu,scro,back,notebook,uid
 
+    def add_notecard(self,pos:tuple):#绘制便笺
+        ...
+
+    def add_ratingbar(self,pos:tuple,fg='#585858',bg='#f3f3f3',onfg='#3041d8',onbg='#3041d8',r=10,num:int=5,linew:int=10,command=None):#绘制评星级控件
+        def __onnum(num):
+            for i in bars[:num+1]:
+                self.itemconfig(i,fill=onbg,outline=onfg)
+            if num!=len(bars):
+                for i in bars[num+1:]:
+                    self.itemconfig(i,fill=bg,outline=fg)
+        def click(barid):
+            nonlocal nowon
+            nowon=bars.index(barid)
+            if command!=None:
+                command(nowon+1)
+        def onin(barid):
+            index=bars.index(barid)
+            __onnum(index)
+        def onleave(barid):
+            pass
+        def leaveback(event):
+            if nowon==0:
+                for i in bars:
+                    self.itemconfig(i,fill=bg,outline=fg)
+                return
+            __onnum(nowon)
+        nowon=0
+        sin=math.sin
+        cos=math.cos
+        pi=math.pi
+        rm=r*sin(pi/10)/sin(7*pi/10)
+        bars=[]
+        item_num=1#总数量
+        line_num=1#行数量
+        center_x=pos[0]+r
+        center_y=pos[1]+r
+        uid='ratingbar'+str(id(bars))
+        for i in range(0,num):
+            points=(
+                #左上顶点
+                center_x - (r*sin(2*pi/5)),
+                center_y - (r*cos(2*pi/5)),
+                center_x + (rm*cos(7*pi/10)),
+                center_y - (rm*sin(7*pi/10)),
+                #上顶点
+                center_x,
+                center_y - r,
+                center_x + (rm*cos(3*pi/10)),
+                center_y - (rm*sin(3*pi/10)),
+                #右上顶点
+                center_x + (r*sin(2*pi/5)),
+                center_y - (r*cos(2*pi/5)),
+                center_x + (rm*cos(19*pi/10)),
+                center_y - (rm*sin(19*pi/10)),
+                #右下顶点
+                center_x + (r*sin(pi/5)),
+                center_y + (r*cos(pi/5)),
+                center_x + (rm*cos(3*pi/2)),
+                center_y - (rm*sin(3*pi/2)),
+                #左下顶点
+                center_x - int(r*sin(pi/5)),
+                center_y + int(r*cos(pi/5)),
+                center_x + (rm*cos(11*pi/10)),
+                center_y - (rm*sin(11*pi/10)),
+            )
+            bar=self.create_polygon(points,fill=bg,outline=fg,joinstyle='miter',tags=uid)
+            bars.append(bar)
+            self.tag_bind(bar,'<Enter>',lambda event,bar=bar:onin(bar))
+            self.tag_bind(bar,'<Leave>',lambda event,bar=bar:onleave(bar))
+            self.tag_bind(bar,'<Button-1>',lambda event,bar=bar:click(bar))
+            if item_num==num:
+                break
+            if line_num==linew:
+                center_x=pos[0]+r
+                center_y+=3*r
+                line_num=1
+                continue
+            item_num+=1
+            line_num+=1
+            center_x+=3*r
+        start=self.bbox(uid)
+        back=self.create_rectangle(start,fill='',outline=fg,width=1,tags=uid)
+        self.tag_bind(back,'<Leave>',leaveback)
+        return bars,uid
 
 
 class TinUI(BasicTinUI):
@@ -1656,4 +1741,5 @@ if __name__=='__main__':
     for i in range(1,11):
         ntb.addpage('test'+str(i),'t'+str(i))
     test7()
+    b.add_ratingbar((0,1150),num=28,command=print)
     a.mainloop()

@@ -816,7 +816,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - onfg::被点击时激活色
 - onbg::被点击时激活色
 
-绘制一个标签栏视图
+绘制一个标签栏视图。
 
 ### return: tbu, scro, back, notebook, uid
 
@@ -861,6 +861,28 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > > 返回标签栏字典
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI标签栏视图.gif)
+
+---
+
+### add_ratingbar(self,pos:tuple,fg='#585858',bg='#f3f3f3',onfg='#3041d8',onbg='#3041d8',r=10,num:int=5,linew:int=10,command=None)
+
+- pos::位置
+- fg::边框颜色
+- bg::星级色
+- onfg::激活时星级边框
+- onbg::激活时星级色
+- r::星级半径
+- num::总共的星级数量
+- linew::每一行有多少的星级
+- command::回调函数，必须接受一个参数，星级个数（1~...）
+
+绘制一个评星级控件。
+
+### return: bars, uid
+
+> bars::评星级元素列表
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI评星级控件.gif)
 
 ---
 

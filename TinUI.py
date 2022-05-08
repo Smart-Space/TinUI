@@ -772,6 +772,8 @@ class BasicTinUI(Canvas):
             maxx=self.winfo_screenwidth()
             maxy=self.winfo_screenheight()
             wind.data=(maxx,maxy,winw,winh)
+        def unshow(event):
+            menu.withdraw()
         def show(event):#显示的起始位置
             #初始位置
             maxx,maxy,winw,winh=wind.data
@@ -784,13 +786,14 @@ class BasicTinUI(Canvas):
                 y=sy-winh
             else:
                 y=sy
-            menu.geometry(f'{winw+20}x{winh+20}+{x}+{y}')
             bar.move('all',0,-height-7)
+            menu.geometry(f'{winw+20}x{winh+20}+{x}+{y}')
             menu.deiconify()
+            bar.update()
             menu.focus_set()
             for i in range(0,height+5,5):#滚动动画
                 bar.move('all',0,5)
-                time.sleep(0.01)
+                time.sleep(0.005)
                 bar.update()
             bar.move('all',0,5)
             bar.config(scrollregion=bar.bbox('all'))
@@ -798,6 +801,7 @@ class BasicTinUI(Canvas):
             bar.update()
         self.tag_bind(cid,bind,show)
         menu=Toplevel(self)
+        menu.attributes('-topmost',1)
         menu.overrideredirect(True)
         menu.withdraw()
         bar=BasicTinUI(menu,bg=tran)
@@ -828,7 +832,7 @@ class BasicTinUI(Canvas):
         mback=bar.create_polygon(gomap,fill=bg,outline=bg,width=15)
         bar.lower(mback)
         bar.move('all',15,0)
-        menu.bind('<FocusOut>',lambda event:menu.withdraw())
+        menu.bind('<FocusOut>',unshow)
         menu.attributes('-transparent',tran)
         return menu,bar,funcs
 

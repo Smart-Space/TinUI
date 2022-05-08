@@ -1151,7 +1151,7 @@ class BasicTinUI(Canvas):
     def add_canvas(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',linew=1,scrollbar=False,anchor='nw'):#绘制画布
         def re_scrollregion():#更新滚动范围
             canvas.config(scrollregion=canvas.bbox('all'))
-        canvas=Canvas(self,bg=bg,highlightthickness=linew,highlightbackground=outline,relief='flat')
+        canvas=Canvas(self,bg=bg,highlightthickness=linew,highlightbackground=outline,highlightcolor=outline,relief='flat')
         cavui=self.create_window(pos,window=canvas,width=width,height=height,anchor=anchor)
         uid='canvas'+str(cavui)
         self.addtag_withtag(uid,cavui)

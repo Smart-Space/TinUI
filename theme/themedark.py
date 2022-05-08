@@ -13,6 +13,7 @@ class TinUIDark(TinUITheme):
         super().__init__('tinui-dark-theme')
         self.ui=ui
         self.label='dark'
+        self.bbox=self.ui.bbox
 
     def add_button(self,pos,*arg,**kw):
         return self.ui.add_button(pos,fg='#ffffff',bg='#2d2d2d',
@@ -133,6 +134,23 @@ class TinUIDark(TinUITheme):
                 bg='#2b2b2b',fg='white',activebg='#b4bbea',sel='#465097',
                                    *arg,**kw)
 
+    def add_canvas(self,pos,*arg,**kw):
+        return self.ui.add_canvas(pos,
+                outline='#808080',linew=1,
+                                  *arg,**kw)
+
+    def add_pipspager(self,pos,*arg,**kw):
+        return self.ui.add_pipspager(pos,
+                bg='#202020',fg='#9a9a9a',buttonbg='#303030',
+                                     *arg,**kw)
+
+    def add_notebook(self,pos,*arg,**kw):
+        return self.ui.add_notebook(pos,
+                color='#202020',fg='#cccccc',bg='#202020',
+                activefg='#cfcfcf',activebg='#2d2d2d',
+                onfg='#ffffff',onbg='#282828',
+                                    *arg,**kw)
+
 
 def end():
     bbox=u.bbox('all')
@@ -208,6 +226,27 @@ du.add_scrollbar((textx+205,texty),text)
 du.add_listbox(end(),data=('first','second','third',
 'some thing between three and four called bleem','forth','fifth',
 'some thins behind five\nwhich we can not find it\nfor-\never'))
+#inkcanvas
+canvas=du.add_canvas(end())[0]
+canvas.create_text((100,20),text='TinUI canvas',font='微软雅黑 12')
+canvas.create_line((20,50,180,50),fill='#202020',width=5)
+#pipspager
+du.add_pipspager(end(),num=5)
+#tabview
+ntb=du.add_notebook(end())[-2]
+for i in range(1,4):
+    ntb.addpage('test'+str(i),'t'+str(i))
+ntvdict=ntb.getvdict()
+num=1
+for i in ntvdict:
+    ui=ntvdict[i][0]
+    uxml=TinUIXml(TinUIDark(ui))
+    xml=f'''
+<tinui><line><button text='这是第{num}个BasicTinUI组件' command='print'></button></line>
+<line><label text='TinUI的标签栏视图'></label><label text='每个都是单独页面'></label></line>
+</tinui>'''
+    uxml.loadxml(xml)
+    num+=1
 
 u.add_back(end())
 r.r.title('TinUI light theme')

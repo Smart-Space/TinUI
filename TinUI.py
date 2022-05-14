@@ -1473,8 +1473,8 @@ class BasicTinUI(Canvas):
                 center_x + (rm*cos(3*pi/2)),
                 center_y - (rm*sin(3*pi/2)),
                 #左下顶点
-                center_x - int(r*sin(pi/5)),
-                center_y + int(r*cos(pi/5)),
+                center_x - (r*sin(pi/5)),
+                center_y + (r*cos(pi/5)),
                 center_x + (rm*cos(11*pi/10)),
                 center_y - (rm*sin(11*pi/10)),
             )

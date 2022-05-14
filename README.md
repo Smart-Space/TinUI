@@ -909,11 +909,44 @@ TinUI中使用数据结构载体，不需要知道。
 
 ---
 
+# Class: TinUITheme
+
+TinUI自定义配色类。可实例化后直接应用于TinUIXml。
+
+```python
+class TinUITheme:
+    '''
+    专门为特有样式的TinUI或BasicTinUI提供的类
+    适用于重写样式配色的TinUI或BasicTinUI
+    该类允许重写样式的TinUI或BasicTinUI使用TinUIXml
+    '''
+
+    def __init__(self,ui,name='tinui-theme'):
+        #ui为TinUI框架
+```
+
+使用示例见开源TinUI代码库见`theme\themelight.py`等。
+
+---
+
 # Class: TinUIXml
 
 使用xml语言来绘制TinUI组件，当然，也包括BasicTinUI。
 
 > 当前，`info`, `menubar`, `tooltip`等组件不支持使用xml布局。
+
+```python
+class TinUIXml():#TinUI的xml渲染方式
+    '''为TinUI提供更加方便的平面方式，使用xml
+    TinUITheme基类无法直接使用，只能够重写TinUI或BasicTinUI的样式后才能够使用，参考 /theme 中的样式重写范例
+    '''
+
+    def __init__(self,ui:Union[BasicTinUI,TinUITheme]):
+        #BasicTinUI包括TinUI
+        #TinUITheme为样式基础类，继承类也可
+```
+
+
 
 ## 基础类变量
 

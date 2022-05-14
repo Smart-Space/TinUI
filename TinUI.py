@@ -31,8 +31,10 @@ class TinUITheme:
     该类允许重写样式的TinUI或BasicTinUI使用TinUIXml
     '''
 
-    def __init__(self,name='tinui-theme'):
+    def __init__(self,ui,name='tinui-theme'):
         self.theme=name
+        self.ui=ui
+        self.bbox=ui.bbox
 
     def change_theme_name(self,name:str):
         self.theme=name
@@ -222,14 +224,31 @@ class BasicTinUI(Canvas):
         return entry,uid
 
     def add_separate(self,pos:tuple,width:int,direction='x',fg='grey'):#绘制分割线
+        def action(x,y):
+            self.coords(separate,(*pos,x,y))
         bbox=list(pos)
+        separate=self.create_line((*pos,*pos),fill=fg,width=3,capstyle='round')
         if direction=='x':
+            maxl=pos[0]+width
+            nowl=pos[0]
+            count=1
+            for i in range(pos[0],maxl,5):
+                nowl+=5
+                self.after(count*5,lambda x=nowl,y=pos[1] :action(x,y))
+                count+=1
             bbox.append(pos[0]+width)
             bbox.append(pos[1])
         elif direction=='y':
+            maxl=pos[1]+width
+            nowl=pos[1]
+            count=1
+            for i in range(pos[1],maxl,5):
+                nowl+=5
+                self.after(count*5,lambda x=pos[0],y=nowl :action(x,y))
+                count+=1
             bbox.append(pos[0])
             bbox.append(pos[1]+width)
-        separate=self.create_line(bbox,fill=fg,width=3)
+        self.coords(separate,bbox)
         return separate
 
     def add_radiobutton(self,pos:tuple,width,text='',choices=('choose me'),fg='black',bg='white',font=('微软雅黑',12),activefg='white',activebg='#4453db',command=None,anchor='nw'):#绘制单选框
@@ -1693,7 +1712,7 @@ if __name__=='__main__':
     b.add_checkbutton((60,430),'允许TinUI测试',command=test1)
     b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
     b.add_entry((250,330),350,'这里用来输入',command=print)
-    b.add_separate((20,200),600)
+    b.add_button((20,170),'创建分割线',command=lambda event:b.add_separate((20,200),600))
     b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
     b.add_link((400,500),'TinGroup知识库','http://tinhome.baklib-free.com/')
     b.add_link((400,530),'执行print函数',print)

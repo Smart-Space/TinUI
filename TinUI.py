@@ -311,21 +311,25 @@ class BasicTinUI(Canvas):
         funcs=[select,disable,active]
         return word,choices_list,choices_back,funcs,uid
 
-    def add_link(self,pos:tuple,text,url:Union[str,FunctionType],fg='#4f62ca',activefg='red',activebg='#eaeaea',font:tuple=('微软雅黑',12),anchor='nw'):#绘制超链接
+    def add_link(self,pos:tuple,text,url:Union[str,FunctionType],fg='#4f62ca',activefg='red',activebg='#eaeaea',font:tuple=('微软雅黑',12),anchor='nw',command=None):#绘制超链接
         def turn_red(event):
             self.itemconfig(link,fill=activefg)
-            self.itemconfig(back,fill=activebg)
+            self.itemconfig(back,fill=activebg,outline=activebg)
             self['cursor']='hand2'
         def turn_back(event):
             self.itemconfig(link,fill=fg)
-            self.itemconfig(back,fill='')
+            self.itemconfig(back,fill='',outline='')
             self['cursor']='arrow'
         def go_url(event):
-            #如果是字符串，则打开网页；是方法，则执行函数
-            if type(url)==str:
-                webopen(url)
+            #先判断是否含有目标函数，有则只执行目标函数
+            if command!=None:
+                command(url)
             else:
-                url(event)
+                #url如果是字符串，则打开网页；是方法，则执行函数
+                if type(url)==str:
+                    webopen(url)
+                else:
+                    url(event)
         def disable(fg='#b0b0b0'):
             self.itemconfig(link,state='disable',fill=fg)
             self.itemconfig(back,state='disable')
@@ -338,7 +342,7 @@ class BasicTinUI(Canvas):
         font=self.itemcget(link,'font')+' underline'
         self.itemconfig(link,font=font)
         bbox=self.bbox(link)
-        back=self.create_rectangle((bbox[0]-2,bbox[1]-2,bbox[2]+2,bbox[3]+2),width=0,tags=uid)
+        back=self.create_polygon((bbox[0],bbox[1],bbox[2],bbox[1],bbox[2],bbox[3],bbox[0],bbox[3]),width=7,tags=uid,fill='',outline='')
         self.tkraise(link)
         self.tag_bind(link,'<Enter>',turn_red)
         self.tag_bind(link,'<Leave>',turn_back)
@@ -1716,6 +1720,7 @@ if __name__=='__main__':
     b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
     b.add_link((400,500),'TinGroup知识库','http://tinhome.baklib-free.com/')
     b.add_link((400,530),'执行print函数',print)
+    b.add_link((400,560),'执行print目标函数','https://smart-space.com.cn/',command=lambda url:print('open> '+url))
     _,ok1,_=b.add_waitbar1((500,220),bg='#CCCCCC')
     b.add_button((500,270),'停止等待动画',activefg='cyan',activebg='black',command=test2)
     bu1=b.add_button((700,200),'停止点状滚动条',activefg='white',activebg='black',command=test3)[1]

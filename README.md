@@ -264,7 +264,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 - pos::位置
 - text::网页链接 **或者** 要执行的函数，函数需要接受`event`参数
-- url::链接
+- url::链接或执行函数，当command为None时执行
 - fg::文本颜色
 - activefg::响应鼠标时文本颜色
 - activebg::响应鼠标时背景颜色

@@ -95,7 +95,8 @@ class TinUILight(TinUITheme):
 
     def add_scalebar(self,pos,*arg,**kw):
         return self.ui.add_scalebar(pos,
-            fg='#3b50ba',bg='#868686',activefg='#aeb5d7',
+            fg='#3b50ba',bg='#868686',activefg='#3b50ba',
+            buttonbg='#ffffff',buttonoutline='#cccccc',
                                     *arg,**kw)
 
     def add_info(self,pos,*arg,**kw):

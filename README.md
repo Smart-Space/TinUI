@@ -491,13 +491,15 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_scalebar(self,pos:tuple,width=200,fg='#3b50ba',activefg='#aeb5d7',bg='#868686',data=(1,2,3,4,5),start=1,command=None)
+### add_scalebar(self,pos:tuple,width=200,fg='#4554dc',activefg='#4554dc',bg='#868686',buttonbg='#ffffff',buttonoutline='#cccccc',data=(1,2,3,4,5),start=1,command=None)
 
 - pos::位置
 - width::长度（宽度）
 - fg::选值覆盖部分颜色
 - activefg::滑动按钮激活颜色
 - bg::选值未覆盖部分颜色
+- buttonbg::按钮背景色
+- buttonoutline::按钮边框色
 - data::选值范围
 - start::初始位置，第一个位置是0，第二个位置是1……
 - command::选值完成后调用该函数，必须接受一个参数，这个参数为data中的一个值

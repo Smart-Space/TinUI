@@ -43,6 +43,35 @@ class TinUITheme:
         return self.theme
 
 
+class TinUIEvent:
+    '''BasicTinUI与TinUI控件元素事件管理器testing...
+    可以综合管理每一个画布中所有元素绑定事件的函数
+    '''
+
+    def __init__(self,ui):
+        self.ui=ui
+        self.uiddict=dict()#{uid:{event:func,...},...}
+
+    def go_func(self,uid,eventname,*event):
+        #运行一个元素对应事件的所有函数
+        for func in self.uiddict[uid][eventname]:
+            func(event)
+
+    def bind(self,uid,*event_func):
+        #每一个新绑定的事件，首次绑定操作，可以同时绑定多个一一对应的事件和函数
+        #event_func: (event1,func1),(event2,func2)...
+        self.uiddict[uid]=dict()
+        for i in event_func:
+            self.uiddict[uid][i[0]]=[(i[1])]
+            self.ui.tag_bind(uid,i[0],lambda event,uid=uid,name=i[0]:self.go_func(uid,name,event))
+
+    def newbind(self,uid,event_name,func):#新增同事件函数
+        self.uiddict[uid][eventname].append(func)
+
+    def cancelbind(self,uid,eventname,func):#删除同事件函数
+        self.uiddict[uid][eventname].remove(func)
+
+
 class BasicTinUI(Canvas):
     """基于tkinter的高级窗口绘制组件
     uid参数为每一个组件（除个别）的整体tag_name"""
@@ -678,22 +707,28 @@ class BasicTinUI(Canvas):
         maxnum=len(data)-1#最大位置
         return wentry,button1,button2,uid
 
-    def add_scalebar(self,pos:tuple,width=200,fg='#3b50ba',activefg='#aeb5d7',bg='#868686',data=(1,2,3,4,5),start=1,command=None):#绘制调节框
+    def add_scalebar(self,pos:tuple,width=200,fg='#4554dc',activefg='#4554dc',bg='#868686',buttonbg='#ffffff',buttonoutline='#cccccc',data=(1,2,3,4,5),start=1,command=None):#绘制调节框
         def mousedown(event):
             scale.startx=self.canvasx(event.x)
-            bbox=self.bbox(button)
-            self.coords(button,bbox[0],pos[1]-3,bbox[0]+10,pos[1]+29)
+            bbox=self.bbox(button_back)
+            self.coords(button_fore,bbox[0]+4,pos[1]+3,bbox[0]+16,pos[1]+15)#放大
         def drag(event):
             move=self.canvasx(event.x)-scale.startx
             if self.canvasx(event.x)<pos[0] or self.canvasx(event.x)>pos[0]+width:
                 return
             self.move(button,move,0)
-            self.delete(name)
-            active=self.create_line((pos[0],pos[1]+12,move+scale.startx,pos[1]+12),fill=fg,width=3,tags=(uid,name))
+            self.coords(name,pos[0],pos[1]+8,move+scale.startx,pos[1]+8)
             scale.startx=self.canvasx(event.x)
         def check(event):
-            bbox=self.bbox(button)
-            self.coords(button,bbox[0],pos[1],bbox[0]+10,pos[1]+26)
+            bbox=self.bbox(button_back)
+            move=self.canvasx(event.x)-10
+            if move>pos[0]+width:
+                move=pos[0]+width-10.
+            if move<pos[0]:
+                move=pos[0]
+            self.move(button,move-bbox[0],0)
+            bbox=self.bbox(button_back)
+            self.coords(button_fore,bbox[0]+6,pos[1]+5,bbox[0]+14,pos[1]+13)#缩小
             end=int(self.canvasx(event.x))
             if end<pos[0]:end=pos[0]
             if end>pos[0]+width:end=pos[0]+width
@@ -703,22 +738,24 @@ class BasicTinUI(Canvas):
                 command(data[num])
         def checkval(event):
             move=self.canvasx(event.x)
-            self.coords(button,move,pos[1]-3,move+10,pos[1]+29)
-            self.coords(name,pos[0],pos[1]+12,move,pos[1]+12)
+            self.coords(name,pos[0],pos[1]+8,move,pos[1]+8)
             check(event)
         def select(num):
-            self.coords(button,dash[num],pos[1]-3,dash[num]+10,pos[1]+29)
-            self.coords(name,pos[0],pos[1]+12,dash[num],pos[1]+12)
+            move=dash[num]-self.bbox(button)[0]-10
+            self.move(button,move,0)
+            self.coords(name,pos[0],pos[1]+8,dash[num],pos[1]+8)
+            if command!=None:
+                command(data[num])
         def disable():
-            self.itemconfig(button,state='disable',fill='#7a7a7a')
+            self.itemconfig(button_fore,state='disable',fill='#7a7a7a')
             self.itemconfig(back,state='disable')
             self.itemconfig(name,state='disable',fill='#7a7a7a')
         def _active():
-            self.itemconfig(button,state='normal',fill=fg)
+            self.itemconfig(button_fore,state='normal',fill=fg)
             self.itemconfig(back,state='normal')
             self.itemconfig(name,state='normal',fill=fg)
         scale=TinUINum()#记录数据结构体
-        back=self.create_line((pos[0],pos[1]+12,pos[0]+width,pos[1]+12),fill=bg,width=3)
+        back=self.create_line((pos[0],pos[1]+8,pos[0]+width,pos[1]+8),fill=bg,width=3)
         uid='scalebar'+str(back)
         self.itemconfig(back,tags=uid)
         self.tag_bind(back,'<ButtonRelease-1>',checkval)
@@ -729,13 +766,15 @@ class BasicTinUI(Canvas):
             s+=dash_t
             dash.append(s)
         del s
-        active=self.create_line((pos[0],pos[1]+12,dash[start],pos[1]+12),fill=fg,width=3,tags=uid)
+        active=self.create_line((pos[0],pos[1]+8,dash[start],pos[1]+8),fill=fg,width=3,tags=uid)
         name='scaleactive'+str(active)
         self.tag_bind(name,'<ButtonRelease-1>',checkval)
         self.addtag_withtag(name,active)#为重绘绑定tag名称
-        button=self.create_rectangle((dash[start],pos[1],dash[start]+10,pos[1]+26),width=0,fill=fg,tags=uid)
-        self.tag_bind(button,'<Enter>',lambda event:self.itemconfig(button,fill=activefg))
-        self.tag_bind(button,'<Leave>',lambda event:self.itemconfig(button,fill=fg))
+        button='scalebutton'+str(back)
+        button_back=self.create_oval((dash[start],pos[1],dash[start]+18,pos[1]+18),width=1,fill=buttonbg,outline=buttonoutline,tags=(uid,button))
+        button_fore=self.create_oval((dash[start]+5,pos[1]+5,dash[start]+13,pos[1]+13),width=0,fill=fg,tags=(uid,button))
+        self.tag_bind(button,'<Enter>',lambda event:self.itemconfig(button_fore,fill=activefg))
+        self.tag_bind(button,'<Leave>',lambda event:self.itemconfig(button_fore,fill=fg))
         self.tag_bind(button,'<Button-1>',mousedown)
         self.tag_bind(button,'<B1-Motion>',drag)
         self.tag_bind(button,'<ButtonRelease-1>',check)#矫正位置
@@ -1770,4 +1809,7 @@ if __name__=='__main__':
         ntb.addpage('test'+str(i),'t'+str(i))
     test7()
     b.add_ratingbar((0,1150),num=28,command=print)
+
+    uevent=TinUIEvent(b)
+    #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))
     a.mainloop()

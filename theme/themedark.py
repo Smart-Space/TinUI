@@ -90,12 +90,13 @@ class TinUIDark(TinUITheme):
     def add_spinbox(self,pos,*arg,**kw):
         return self.ui.add_spinbox(pos,
               fg='#ffffff',bg='#2d2d2d',
-              activefg='#b8b8b8',activebg='#393939',
+              activefg='#b8b8b8',activebg='#303030',
                                    *arg,**kw)
 
     def add_scalebar(self,pos,*arg,**kw):
         return self.ui.add_scalebar(pos,
-                fg='#b2b8f2',bg='#9a9a9a',activefg='#c2d1fa',
+                fg='#b2b8f2',bg='#9a9a9a',activefg='#b2b8f2',
+                buttonbg='#454545',buttonoutline='#303030',
                                     *arg,**kw)
 
     def add_info(self,pos,*arg,**kw):

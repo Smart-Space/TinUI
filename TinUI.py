@@ -188,13 +188,13 @@ class BasicTinUI(Canvas):
         bbox=self.bbox(checkbutton)
         dic=bbox[3]-bbox[1]#位移长度
         self.move(checkbutton,dic+5,0)
-        outl=self.create_polygon((pos[0]+1,pos[1]+1,pos[0]+dic-1,pos[1]+1,
-        pos[0]+dic-1,pos[1]+dic-1,pos[0]+1,pos[1]+dic-1,pos[0]+1,pos[1]+1),
-        width=5,outline=fg,fill=fg,tags=uid)
-        check=self.create_polygon((pos[0]+2,pos[1]+2,pos[0]+dic-2,pos[1]+2,pos[0]+dic-2,pos[1]+dic-2,pos[0]+2,pos[1]+dic-2,pos[0]+2,pos[1]+2),
-        width=5,outline=bg,fill=bg,tags=uid)
-        state=self.create_line((pos[0]+2,pos[1]+2*dic/3-2,pos[0]+dic/3+2,pos[1]+dic-4,pos[0]+dic-2,pos[1]+dic/3-2),
-        width=3,fill=onfg,state='hidden',tags=uid)
+        outl=self.create_polygon((pos[0]+2,pos[1]+2,pos[0]+dic-2,pos[1]+2,
+        pos[0]+dic-2,pos[1]+dic-2,pos[0]+2,pos[1]+dic-2,pos[0]+2,pos[1]+2),
+        width=5,outline=fg,fill=fg,tags=uid)#外围边框
+        check=self.create_polygon((pos[0]+3,pos[1]+3,pos[0]+dic-3,pos[1]+3,pos[0]+dic-3,pos[1]+dic-3,pos[0]+3,pos[1]+dic-3,pos[0]+3,pos[1]+3),
+        width=5,outline=bg,fill=bg,tags=uid)#标识符内部元素
+        state=self.create_line((pos[0]+3,pos[1]+2*dic/3-3,pos[0]+dic/3+3,pos[1]+dic-5,pos[0]+dic-3,pos[1]+dic/3-3),
+        width=3,fill=onfg,state='hidden',tags=uid)#勾选标识符
         self.tkraise(state)
         self.tag_bind(check,'<Enter>',button_in)
         self.tag_bind(check,'<Leave>',button_out)

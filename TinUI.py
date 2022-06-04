@@ -820,11 +820,11 @@ class BasicTinUI(Canvas):
             maxwidth=max(widths)
             for back in backs:
                 pos=bar.bbox(back)
-                bar.coords(back,(5,pos[1],10+maxwidth,pos[3]))
+                bar.coords(back,(5,pos[1],maxwidth+5,pos[3]))
             for sep in seps:
                 pos=bar.bbox(sep)
                 bar.delete(sep)
-                bar.add_separate((5,pos[1]),maxwidth+5,fg=activebg)
+                bar.add_separate((17,pos[1]),maxwidth+5,fg=activebg)
         def readyshow():#计算显示位置
             allpos=bar.bbox('all')
             #菜单尺寸
@@ -836,6 +836,7 @@ class BasicTinUI(Canvas):
             wind.data=(maxx,maxy,winw,winh)
         def unshow(event):
             menu.withdraw()
+            menu.unbind('<FocusOut>')
         def show(event):#显示的起始位置
             #初始位置
             maxx,maxy,winw,winh=wind.data
@@ -849,18 +850,19 @@ class BasicTinUI(Canvas):
             else:
                 y=sy
             bar.move('all',0,-height-7)
-            menu.geometry(f'{winw+20}x{winh+20}+{x}+{y}')
+            menu.geometry(f'{winw+15}x{winh+15}+{x}+{y}')
             menu.deiconify()
             bar.update()
             menu.focus_set()
             for i in range(0,height+5,5):#滚动动画
                 bar.move('all',0,5)
-                time.sleep(0.005)
+                time.sleep(0.001)
                 bar.update()
             bar.move('all',0,5)
             bar.config(scrollregion=bar.bbox('all'))
             bar.yview_moveto(0)
             bar.update()
+            menu.bind('<FocusOut>',unshow)
         self.tag_bind(cid,bind,show)
         menu=Toplevel(self)
         menu.attributes('-topmost',1)
@@ -875,10 +877,10 @@ class BasicTinUI(Canvas):
         widths=[]#寻找最宽位置
         for i in cont:#添加菜单内容
             if i=='-':
-                sep=bar.add_separate((15,endy()),100,fg=activebg)
+                sep=bar.add_separate((15,endy()),10,fg=activebg)
                 seps.append(sep)
             else:
-                button=bar.add_button((15,endy()),i[0],fg,bg,bg,3,activefg,activebg,activebg,font,command=lambda event,i=i:(i[1](event),menu.withdraw()))
+                button=bar.add_button((15,endy()),i[0],fg,bg,bg,3,activefg,activebg,activebg,font,command=lambda event,i=i:(menu.withdraw(),i[1](event)))
                 backs.append(button[1])
                 funcs.append(button[2])
                 pos=bar.bbox(button[1])
@@ -889,8 +891,9 @@ class BasicTinUI(Canvas):
         #绘制圆角边框
         bbox=bar.bbox('all')
         height=bbox[3]-bbox[1]
-        start=bbox[2]-bbox[0]
-        gomap=((start,bbox[1]),(bbox[2],bbox[1]),(bbox[2],bbox[3]),(bbox[0],bbox[3]),(bbox[0],bbox[1]),(start,bbox[1]))
+        x1=bbox[0]
+        x2=bbox[0]+max(widths)+10
+        gomap=((x1,bbox[1]),(x2,bbox[1]),(x2,bbox[3]),(x1,bbox[3]),(x1,bbox[1]))
         mback=bar.create_polygon(gomap,fill=bg,outline=bg,width=15)
         bar.lower(mback)
         bar.move('all',15,0)
@@ -1541,6 +1544,70 @@ class BasicTinUI(Canvas):
         self.tag_bind(back,'<Leave>',leaveback)
         return bars,uid
 
+    def add_radiobox(self,pos:tuple,fontfg='black',font='微软雅黑 12',fg='#8b8b8b',bg='#ededed',activefg='#898989',activebg='#e5e5e5',onfg='#3041d8',onbg='#ffffff',content:tuple=('1','','2'),padx=10,pady=5,command=None):#绘制单选组控件
+        def button_in(area,sel,sign):
+            if sel==select:
+                return
+            self.itemconfig(sign,outline=activefg,fill=activebg)
+        def button_out(area,sel,sign):
+            if sel==select:
+                return
+            self.itemconfig(sign,outline=fg,fill=bg)
+        def sel_it(area,sel,sign):
+            nonlocal select
+            if sel==select:
+                return
+            old_select=select#原先选定项目序号
+            select=sel
+            if old_select>=0:#恢复原先的单选组
+                old_sign=boxes[old_select][0]
+                self.itemconfig(old_sign,width=1)
+                button_out(None,None,old_sign)
+                self.update()
+            self.itemconfig(sign,outline=onfg,fill=onbg,width=on_line)
+            if command!=None:
+                textid=boxes[sel][1]
+                text=self.itemcget(textid,'text')
+                command(text)
+        #标识符内部宽度width和边框宽度line
+        back_width=16
+        back_line=1#16+1*2=18
+        #active... = back...
+        on_width=8
+        on_line=4#8+5*2=18
+        boxes=[]#[(sign_id,text_id,back_id),...]，换行为(None,'\n',None)
+        nowx,nowy=pos#x坐标为左上角插入坐标，y坐标为底部坐标
+        uid='radiobox'+str(id(pos))
+        select=-1#当前选定
+        count=-1
+        t_bbox=None
+        for i in content:
+            count+=1#计数
+            if i=='':
+                if t_bbox==None:#没有底部坐标数据
+                    nowy+=pady
+                else:
+                    nowy=t_bbox[3]+pady
+                nowx=pos[0]
+                boxes.append((None,'\n',None))
+                continue
+            x1=nowx+back_line
+            y1=nowy+back_line
+            x2=nowx+back_line+back_width
+            y2=nowy+back_line+back_width
+            ar=(x1,y1,x2,y2)
+            sign=self.create_oval(ar,width=back_line,fill=bg,outline=fg,tags=uid)
+            text=self.create_text((x2+5,nowy),text=i,font=font,fill=fontfg,anchor='nw',tags=uid)
+            s_bbox=self.bbox(sign)
+            t_bbox=self.bbox(text)
+            back=self.create_rectangle((s_bbox[0],s_bbox[1],t_bbox[2],t_bbox[3]),width=0,fill='',tags=uid)
+            boxes.append((sign,text,back))
+            self.tag_bind(back,'<Enter>',lambda event,ar=ar,sel=count,sign=sign:button_in(ar,sel,sign))
+            self.tag_bind(back,'<Leave>',lambda event,ar=ar,sel=count,sign=sign:button_out(ar,sel,sign))
+            self.tag_bind(back,'<Button-1>',lambda event,ar=ar,sel=count,sign=sign:sel_it(ar,sel,sign))
+            nowx=t_bbox[2]+padx
+        return boxes,uid
+
 
 class TinUI(BasicTinUI):
     '''对BasicTinUI的封装，添加了滚动条自动刷新'''
@@ -1600,7 +1667,7 @@ class TinUIXml():#TinUI的xml渲染方式
     def __init__(self,ui:Union[BasicTinUI,TinUITheme]):
         self.ui=ui
         self.noload=('info','menubar','tooltip')#当前不解析的标签
-        self.intargs=('width','linew','bd','r','minwidth','start','info_width','height','num')#需要转为数字的参数
+        self.intargs=('width','linew','bd','r','minwidth','start','padx','pady','info_width','height','num')#需要转为数字的参数
         self.dataargs=('command','choices','widgets','content','percentage','data','cont','scrollbar','widget')#需要转为数据结构的参数
         self.funcs={}#内部调用方法集合
         self.datas={}#内部数据结构集合
@@ -1739,6 +1806,8 @@ def test7():
 </tinui>'''
         uxml.loadxml(xml)
         num+=1
+def test8(rbtext):
+    print(f'单选组控件选值=>{rbtext}')
 
 if __name__=='__main__':
     a=Tk()
@@ -1809,6 +1878,7 @@ if __name__=='__main__':
         ntb.addpage('test'+str(i),'t'+str(i))
     test7()
     b.add_ratingbar((0,1150),num=28,command=print)
+    b.add_radiobox((320,1150),content=('1','2','3','','新一行内容','','单选','组','控件'),command=test8)
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))

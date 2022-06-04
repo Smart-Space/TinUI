@@ -889,6 +889,29 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+### add_radiobox(self,pos:tuple,fontfg='black',font='微软雅黑 12',fg='#8b8b8b',bg='#ededed',activefg='#898989',activebg='#e5e5e5',onfg='#3041d8',onbg='#ffffff',content:tuple=('1','','2'),padx=10,pady=5,command=None)
+
+- pos::位置
+- fontfg::文本颜色
+- fg::标识符边框颜色
+- bg::标识符背景颜色
+- activefg::鼠标进入标识符边框颜色
+- activebg::鼠标进入标识符背景颜色
+- onfg::选定标识符边框颜色
+- onbg::选定标识符背景颜色
+- content::选择文本内容。如果为空字符串则代表换行
+- padx::水平间距
+- pady::行间距
+- command::回调函数，必须接受一个参数，所选选项的文本
+
+绘制一个单选组控件。
+
+### return: boxes, uid
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI单选组控件.gif)
+
+---
+
 # Class: BasicTinUI
 
 TinUI的基础类，仅提供组件绘制。

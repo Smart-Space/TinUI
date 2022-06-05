@@ -723,7 +723,7 @@ class BasicTinUI(Canvas):
             bbox=self.bbox(button_back)
             move=self.canvasx(event.x)-10
             if move>pos[0]+width:
-                move=pos[0]+width-10.
+                move=pos[0]+width-18.
             if move<pos[0]:
                 move=pos[0]
             self.move(button,move-bbox[0],0)
@@ -755,7 +755,7 @@ class BasicTinUI(Canvas):
             self.itemconfig(back,state='normal')
             self.itemconfig(name,state='normal',fill=fg)
         scale=TinUINum()#记录数据结构体
-        back=self.create_line((pos[0],pos[1]+8,pos[0]+width,pos[1]+8),fill=bg,width=3)
+        back=self.create_line((pos[0],pos[1]+8,pos[0]+width,pos[1]+8),fill=bg,width=3,capstyle='round')
         uid='scalebar'+str(back)
         self.itemconfig(back,tags=uid)
         self.tag_bind(back,'<ButtonRelease-1>',checkval)
@@ -766,7 +766,7 @@ class BasicTinUI(Canvas):
             s+=dash_t
             dash.append(s)
         del s
-        active=self.create_line((pos[0],pos[1]+8,dash[start],pos[1]+8),fill=fg,width=3,tags=uid)
+        active=self.create_line((pos[0],pos[1]+8,dash[start],pos[1]+8),fill=fg,width=3,tags=uid,capstyle='round')
         name='scaleactive'+str(active)
         self.tag_bind(name,'<ButtonRelease-1>',checkval)
         self.addtag_withtag(name,active)#为重绘绑定tag名称
@@ -1574,7 +1574,7 @@ class BasicTinUI(Canvas):
         back_line=1#16+1*2=18
         #active... = back...
         on_width=8
-        on_line=4#8+5*2=18
+        on_line=4#8+(4+1)*2=18
         boxes=[]#[(sign_id,text_id,back_id),...]，换行为(None,'\n',None)
         nowx,nowy=pos#x坐标为左上角插入坐标，y坐标为底部坐标
         uid='radiobox'+str(id(pos))

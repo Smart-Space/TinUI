@@ -150,6 +150,13 @@ class TinUIDark(TinUITheme):
                 onfg='#ffffff',onbg='#282828',
                                     *arg,**kw)
 
+    def add_radiobox(self,pos,*arg,**kw):
+        return self.ui.add_radiobox(pos,
+                fontfg='#ffffff',fg='#939393',bg='#2a2a2a',
+                activefg='#959595',activebg='#2a2a2a',
+                onfg='#a3a8dc',onbg='#000000',
+                                    *arg,**kw)
+
 
 def end():
     bbox=u.bbox('all')
@@ -246,6 +253,8 @@ for i in ntvdict:
 </tinui>'''
     uxml.loadxml(xml)
     num+=1
+#radiobutton
+du.add_radiobox(end(),command=print)
 
 u.add_back(end())
 r.r.title('TinUI light theme')

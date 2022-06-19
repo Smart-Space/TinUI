@@ -113,11 +113,11 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > 
 > funcs
 > 
-> > `funcs[0](new_func)`::为按钮绑定新函数
+> > `funcs[0]|funcs.change_command(new_func)`::为按钮绑定新函数
 > > 
-> > `funcs[1](fg='#7a7a7a',bg='#cccccc')`::禁用按钮
+> > `funcs[1]|funcs.disable(fg='#7a7a7a',bg='#cccccc')`::禁用按钮
 > > 
-> > `funcs[2]()`::激活按钮
+> > `funcs[2]|funcs.active()`::激活按钮
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E6%8C%89%E9%92%AE.gif)
 
@@ -166,15 +166,15 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > 
 > funcs
 > 
-> > `funcs[0]()`::切换复选框状态
+> > `funcs[0]|funcs.flash()`::切换复选框状态
 > > 
-> > `funcs[1]()`::选定
+> > `funcs[1]|funcs.on()`::选定
 > > 
-> > `funcs[2]()`::取消选定
+> > `funcs[2]|funcs.off()`::取消选定
 > > 
-> > `funcs[3]()`::禁用
+> > `funcs[3]|funcs.disable()`::禁用
 > > 
-> > `funcs[4]()`::激活
+> > `funcs[4]|funcs.active()`::激活
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI复选框.gif)
 
@@ -250,11 +250,11 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > 
 > funcs
 > 
-> > `funcs[0](num)`::选定一个选项
+> > `funcs[0]|funcs.select(num)`::选定一个选项
 > > 
-> > `funcs[1]()`::禁用
+> > `funcs[1]|funcs.disable()`::禁用
 > > 
-> > `funcs[2]()`::激活
+> > `funcs[2]|funcs.active()`::激活
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI单选框.gif)
 
@@ -282,9 +282,9 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > 
 > funcs
 > 
-> > `funcs[0](fg='#b0b0b0')`::禁用链接
+> > `funcs[0]|funcs.disable(fg='#b0b0b0')`::禁用链接
 > > 
-> > `funcs[1]()`::恢复链接
+> > `funcs[1]|funcs.active()`::恢复链接
 
 ---
 
@@ -376,11 +376,11 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > 
 > funcs
 > 
-> > `funcs[0](num)`::选定选值，第一个值是0
+> > `funcs[0]|funcs.select(num)`::选定选值，第一个值是0
 > > 
-> > `funcs[1]()`::禁用
+> > `funcs[1]|funcs.disable()`::禁用
 > > 
-> > `funcs[2]()`::激活
+> > `funcs[2]|fucns.active()`::激活
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E7%BB%84%E5%90%88%E6%A1%86.gif)
 
@@ -413,11 +413,11 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > 
 > funcs
 > 
-> > `funcs[0]()`::恢复常规样式
+> > `funcs[0]|funcs.now_running()`::恢复常规样式
 > > 
-> > `funcs[1](fg='#868686',bg='#9d5d00',fontc='#cdcdcd')`::改为暂停样式
+> > `funcs[1]|funcs.now_paused(fg='#868686',bg='#9d5d00',fontc='#cdcdcd')`::改为暂停样式
 > > 
-> > `funcs[2](fg='#868686',bg='#c42b1c',fontc='#cdcdcd')`::改为因错误暂停样式
+> > `funcs[2]|funcs.now_error(fg='#868686',bg='#c42b1c',fontc='#cdcdcd')`::改为因错误暂停样式
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI进度条.gif)
 
@@ -516,11 +516,11 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > 
 > funcs
 > 
-> > `funcs[0](num)`::选定选值，第一个值是0
+> > `funcs[0]|funcs.select(num)`::选定选值，第一个值是0
 > > 
-> > `funcs[1]()`::禁用
+> > `funcs[1]|funcs.disable()`::禁用
 > > 
-> > `funcs[2]()`::激活
+> > `funcs[2]|funcs._active()`::激活
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI调节框.gif)
 
@@ -797,16 +797,16 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 ### return: uilist, dotlist, move_to, uid
 
 > uilist::视图列表结构。`[(id-1,tinui-1,tinuixml-1),...]`
->
+> 
 > dotlist::导航栏列表结构。`[dot_id-1,...]`
->
+> 
 > move_to::需要一个数字参数num，转到第num个视图，第一个视图num为0
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI横向翻页视图.gif)
 
 ---
 
-### add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f9f9fc',fg='#1a1a1a',bg='#f3f3f3',activefg='#595959',activebg='#ededed',onfg='#191919',onbg='#eaeaea')
+### add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f3f3f3',fg='#5d5d5d',bg='#f3f3f3',activefg='#727272',activebg='#eaeaea',onfg='#1a1a1a',onbg='#f9f9f9')
 
 - pos::位置
 - width::页面宽度
@@ -824,43 +824,45 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 ### return: tbu, scro, back, notebook, uid
 
 > tbu::标签栏BasicTinUI
->
+> 
 > scro::滚动条TinUI返回值
->
+> 
 > back::背景元素
->
+> 
 > notebook::TinUINum函数结构体
->
-> > notebook.addpage(title,flag=None,scrollbar=False)->flag
-> >
+> 
+> > notebook.addpage(title,flag=None,scrollbar=False,cancancel=True)->flag
+> > 
 > > `title`标签栏标签标题
-> >
+> > 
 > > `flag`标识符，如果没有给定，会自动生成并返回
-> >
+> > 
 > > `scrollbar`是否使用TinUI，默认BasicTinUI
-> >
+> > 
+> > `cancancel`该页面是否能被删除
+> > 
 > > notebook.showpage(flag)
-> >
+> > 
 > > `flag`需要显示的页面的标识符
-> >
+> > 
 > > notebook.deletepage(flag)
-> >
+> > 
 > > `flag`需要删除的页面的标识符
-> >
+> > 
 > > notebook.getuis(flag)->(tinui,uixml,uiid)
-> >
+> > 
 > > `flag`页面标识符。返回TinUI组件、TinUIXml绑定、组件的画布对象
-> >
+> > 
 > > notebook.gettitles(flag)->(title,cb,bu)
-> >
+> > 
 > > `flag`页面标识符。返回标题tbu对象、删除键tbu对象、标签tbu对象
-> >
+> > 
 > > notebook.getvdic()->vdict
-> >
+> > 
 > > 返回页面字典
-> >
+> > 
 > > notebook.gettbdict()->tbdict
-> >
+> > 
 > > 返回标签栏字典
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI标签栏视图.gif)
@@ -935,6 +937,16 @@ TinUI中使用数据结构载体，不需要知道。
 
 ---
 
+# Class: FuncList
+
+TinUI控件使用的方法列表，既可以当做列表获取返回函数，也可以作为函数整体对象执行单个方法。以button为例：
+
+使用button的禁用方法（已获取`funcs`返回值）。既可以使用`funcs[1]()`，也可以使用`funcs.disable()`。方便使用。
+
+> 本文档中比较久之前的函数返回调用，沿用最初列表式结构说明，具体返回的`FuncList`类见源码。
+
+---
+
 # Class: TinUITheme
 
 TinUI自定义配色类。可实例化后直接应用于TinUIXml。
@@ -971,8 +983,6 @@ class TinUIXml():#TinUI的xml渲染方式
         #BasicTinUI包括TinUI
         #TinUITheme为样式基础类，继承类也可
 ```
-
-
 
 ## 基础类变量
 

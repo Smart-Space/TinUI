@@ -10,7 +10,7 @@ def test2(event):
     print('2')
 
 def disable(event):
-    func2[1]()
+    func2.disable()
 def active(event):
     func2[2]()
 

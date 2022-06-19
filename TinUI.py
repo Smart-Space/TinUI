@@ -24,6 +24,14 @@ class TinUINum:#数据载体，作者学习阶段的历史遗留产物
     pass
 
 
+class FuncList(list):#控件的函数列表类
+
+    def __init__(self,num:int=10):
+        list.__init__(self)
+        for i in range(0,num+1):
+            self.append(None)
+
+
 class TinUITheme:
     '''
     专门为特有样式的TinUI或BasicTinUI提供的类
@@ -128,7 +136,10 @@ class BasicTinUI(Canvas):
         self.tag_bind(back,'<Enter>',in_button)
         self.tag_bind(back,'<Leave>',out_button)
         self.tkraise(button)
-        funcs=[change_command,disable,active]
+        funcs=FuncList(3)
+        funcs.change_command=funcs[0]=change_command
+        funcs.disable=funcs[1]=disable
+        funcs.active=funcs[2]=active
         return button,back,funcs,uid
 
     def add_label(self,pos:tuple,text:str,fg='black',bg='#f0f0f0',outline='grey',font=('微软雅黑',12),anchor='nw'):#绘制标签
@@ -203,7 +214,12 @@ class BasicTinUI(Canvas):
         self.tag_bind(check,'<Button>',go_func)
         self.tag_bind(checkbutton,'<Button>',go_func)
         self.tag_bind(state,'<Button>',go_func)
-        funcs=[flash,on,off,disable,active]
+        funcs=FuncList(5)
+        funcs.flash=funcs[0]=flash
+        funcs.on=funcs[1]=on
+        funcs.off=funcs[2]=off
+        funcs.disable=funcs[3]=disable
+        funcs.active=funcs[4]=active
         return checkbutton,check,funcs,uid
 
     def add_entry(self,pos:tuple,width:int,text:str='',fg='#606060',bg='#f6f6f6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#868686',onoutline='#3041d8',icon='>',anchor='nw',call='→',command=None):#绘制单行输入框
@@ -337,7 +353,10 @@ class BasicTinUI(Canvas):
             self.tag_bind(choice,'<Button>',lambda event,_text=i,back=back,c=choice:go_func(back,_text,c))
             self.tag_bind(back,'<Button>',lambda event,_text=i,back=back,c=choice:go_func(back,_text,c))
         back_list=list(choices_back)
-        funcs=[select,disable,active]
+        funcs=FuncList(3)
+        funcs.select=funcs[0]=select
+        funcs.disable=funcs[1]=disable
+        funcs.active=funcs[2]=active
         return word,choices_list,choices_back,funcs,uid
 
     def add_link(self,pos:tuple,text,url:Union[str,FunctionType],fg='#4f62ca',activefg='red',activebg='#eaeaea',font:tuple=('微软雅黑',12),anchor='nw',command=None):#绘制超链接
@@ -379,7 +398,9 @@ class BasicTinUI(Canvas):
         self.tag_bind(back,'<Enter>',turn_red)
         self.tag_bind(back,'<Leave>',turn_back)
         self.tag_bind(back,'<Button-1>',go_url)
-        funcs=[disable,active]
+        funcs=FuncList(2)
+        funcs.disable=funcs[0]=disable
+        funcs.active=funcs[1]=active
         return link,funcs,uid
 
     def add_waitbar1(self,pos:tuple,fg='#0078D7',bg='',okfg='lightgreen',okbg='',bd=2,r=20):#绘制圆形等待组件
@@ -528,7 +549,10 @@ class BasicTinUI(Canvas):
             self.tag_bind(cho_back,'<Button>',lambda event,_text=i,back=cho_back:choose_this(back,_text))
             info.append((back,i))
         self.itemconfig(box_tagname,state='hidden')
-        funcs=[select,disable,active]
+        funcs=FuncList(3)
+        funcs.select=funcs[0]=select
+        funcs.disable=funcs[1]=disable
+        funcs.active=funcs[2]=active
         return main,back,box_tagname,funcs,uid
 
     def add_progressbar(self,pos:tuple,width=250,fg='#868686',bg='#334ac0',back='#f3f3f3',fontc='#79b8f8',percentage=True,text=''):#绘制进度条
@@ -564,10 +588,13 @@ class BasicTinUI(Canvas):
             text=self.create_text((pos[0]+width//2,pos[1]),anchor='n',text='0%',fill=fontc,font='微软雅黑 10',tags=uid)
         else:
             text=self.create_text((pos[0]+width//2,pos[1]),anchor='n',text=text,fill=fontc,font='微软雅黑 10',tags=uid)
-        funcs=[now_running,now_paused,now_error]
+        funcs=FuncList(3)
+        funcs.now_running=funcs[0]=now_running
+        funcs.now_paused=funcs[1]=now_paused
+        funcs.now_error=funcs[2]=now_error
         return back,pro_tagname,text,goto,funcs,uid
 
-    def add_table(self,pos:tuple,outline='#E1E1E1',fg='black',bg='white',data=[['1','2','3'],['a','b','c']],minwidth=100,font=('微软雅黑',12),headbg='#d9ebf9'):#绘制表格
+    def add_table(self,pos:tuple,outline='#E1E1E1',fg='black',bg='white',data=[['1','2','3'],['a','b','c']],minwidth=100,maxwidth=300,font=('微软雅黑',12),headbg='#d9ebf9'):#绘制表格
         def get_max_height(widths:dict):
             height=0
             for i in widths.values():
@@ -586,7 +613,7 @@ class BasicTinUI(Canvas):
         count=1
         ti_list=[]
         for i in data[0]:
-            title=self.create_text((end_x,end_y),anchor='nw',text=i,fill=fg,font=font)
+            title=self.create_text((end_x,end_y),anchor='nw',text=i,fill=fg,font=font,width=maxwidth)
             if count==1:#只去第一个背景作为tag id
                 uid='table'+str(title)
             self.itemconfig(title,tags=uid)
@@ -778,7 +805,10 @@ class BasicTinUI(Canvas):
         self.tag_bind(button,'<Button-1>',mousedown)
         self.tag_bind(button,'<B1-Motion>',drag)
         self.tag_bind(button,'<ButtonRelease-1>',check)#矫正位置
-        funcs=[select,disable,_active]
+        funcs=FuncList(3)
+        funcs.select=funcs[0]=select
+        funcs.disable=funcs[1]=disable
+        funcs._active=funcs[2]=_active
         return name,back,button,funcs,uid
 
     def add_info(self,pos:tuple,font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black'):#绘制提示框
@@ -1326,7 +1356,7 @@ class BasicTinUI(Canvas):
         __move_to(nowui)
         return uilist,dotlist,move_to,uid
 
-    def add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f9f9fc',fg='#1a1a1a',bg='#f3f3f3',activefg='#595959',activebg='#ededed',onfg='#191919',onbg='#eaeaea'):#绘制标签栏视图
+    def add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f3f3f3',fg='#5d5d5d',bg='#f3f3f3',activefg='#727272',activebg='#eaeaea',onfg='#1a1a1a',onbg='#f9f9f9'):#绘制标签栏视图
         def __onenter(flag):
             if flag==nowpage:
                 return
@@ -1348,7 +1378,7 @@ class BasicTinUI(Canvas):
             tbu.itemconfig(t,fill=onfg)
             tbu.itemconfig(c,fill=onfg)
             tbu.itemconfig(b,fill=onbg,outline=onbg)
-        def addpage(title:str,flag=None,scrollbar=False):#创建页面
+        def addpage(title:str,flag=None,scrollbar=False,cancancel:bool=True):#创建页面
             if tbu.bbox('all')==None:
                 endx=3
             else:
@@ -1357,6 +1387,8 @@ class BasicTinUI(Canvas):
             cbx=tbu.bbox(titleu)[2]+10
             cb=tbu.create_text((cbx,2),text='×',font=font,fill=fg,anchor='nw')
             tbbbox=tbu.bbox(titleu)
+            if cancancel==False:
+                tbu.itemconfig(cb,state='hidden')
             bux=(endx+2,tbbbox[1],cbx+15,tbbbox[1],cbx+15,tbbbox[3],endx+2,tbbbox[3],endx+2,tbbbox[1])
             bu=tbu.create_polygon(bux,fill=bg,outline=bg,width=5)
             tbu.lower(bu)
@@ -1366,7 +1398,7 @@ class BasicTinUI(Canvas):
                 page=TinUI(self,True,bg=self['background'])
             elif scrollbar==False:
                 page=BasicTinUI(self,bg=self['background'])
-            uiid=self.create_window(viewpos,window=page,width=width,height=height,anchor='nw',state='hidden')
+            uiid=self.create_window(viewpos,window=page,width=width,height=height-5,anchor='nw',state='hidden')
             uixml=TinUIXml(page)
             bbox=tbu.bbox('all')
             tbu.config(scrollregion=bbox)
@@ -1667,7 +1699,7 @@ class TinUIXml():#TinUI的xml渲染方式
     def __init__(self,ui:Union[BasicTinUI,TinUITheme]):
         self.ui=ui
         self.noload=('info','menubar','tooltip')#当前不解析的标签
-        self.intargs=('width','linew','bd','r','minwidth','start','padx','pady','info_width','height','num')#需要转为数字的参数
+        self.intargs=('width','linew','bd','r','minwidth','maxwidth','start','padx','pady','info_width','height','num')#需要转为数字的参数
         self.dataargs=('command','choices','widgets','content','percentage','data','cont','scrollbar','widget')#需要转为数据结构的参数
         self.funcs={}#内部调用方法集合
         self.datas={}#内部数据结构集合
@@ -1875,7 +1907,10 @@ if __name__=='__main__':
     test6()
     ntb=b.add_notebook((800,900))[-2]
     for i in range(1,11):
-        ntb.addpage('test'+str(i),'t'+str(i))
+        if i==5:#第五个不可删除:
+            ntb.addpage('test'+str(i),'t'+str(i),cancancel=False)
+        else:
+            ntb.addpage('test'+str(i),'t'+str(i))
     test7()
     b.add_ratingbar((0,1150),num=28,command=print)
     b.add_radiobox((320,1150),content=('1','2','3','','新一行内容','','单选','组','控件'),command=test8)

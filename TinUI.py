@@ -1493,8 +1493,51 @@ class BasicTinUI(Canvas):
         notebook.gettbdict=gettbdict
         return tbu,scro,back,notebook,uid
 
-    def add_notecard(self,pos:tuple):#绘制便笺
-        ...
+    def add_notecard(self,pos:tuple,title='note',text='note text\nmain content',tfg='black',tbg='#fbfbfb',fg='black',bg='#f4f4f4',sep='#e5e5e5',width=200,font='微软雅黑 12'):#绘制便笺
+        def mousedown(event):
+            nonlocal startx,starty
+            startx=self.canvasx(event.x)#定义起始横坐标
+            starty=self.canvasy(event.y)
+        def drag(event):
+            nonlocal startx,starty
+            nowx=self.canvasx(event.x)
+            nowy=self.canvasy(event.y)
+            movex=nowx-startx#将窗口坐标转化为画布坐标
+            movey=nowy-starty
+            self.move(uid,movex,movey)
+            #重新定义画布中的起始拖动位置
+            startx=nowx
+            starty=nowy
+        startx,starty=None,None#拖动记录点
+        toptext=self.create_text((pos[0]+10,pos[1]+10),text=title,font=font,fill=tfg,width=width,anchor='nw')#标题
+        uid='notecard'+str(toptext)
+        self.addtag_withtag(uid,toptext)
+        tx1,ty1,tx2,ty2=self.bbox(toptext)
+        if tx2-tx1<width:#判读当前文本宽度
+            tx2=tx1+width
+        topback=self.create_polygon((tx1,ty1,tx2,ty1,tx2,ty2,tx1,ty2),outline=tbg,fill=tbg,width=10,tags=uid)
+        content=self.create_text((tx1,ty2+12),text=text,font=font,fill=fg,width=width,anchor='nw',tags=uid)#便笺内容
+        cx1,cy1,cx2,cy2=self.bbox(content)
+        if cx2-cx1<width:
+            cx2=cx1+width
+        contentback=self.create_polygon((cx1,cy1,cx2,cy1,cx2,cy2,cx1,cy2),outline=bg,fill=bg,width=10,tags=uid)
+        ax1,ay1,ax2,ay2=self.bbox(uid)#大背景
+        ax1+=5
+        ay1+=5
+        ax2-=5
+        ay2-=5
+        allback=self.create_polygon((ax1,ay1,ax2,ay1,ax2,ay2,ax1,ay2),outline=sep,fill=sep,width=10,tags=uid)
+        #调整元素层级关系
+        self.tkraise(topback)
+        self.tkraise(toptext)
+        self.tkraise(contentback)
+        self.tkraise(content)
+        #绑定拖动事件
+        self.tag_bind(topback,'<Button-1>',mousedown)
+        self.tag_bind(topback,'<B1-Motion>',drag)
+        self.tag_bind(toptext,'<Button-1>',mousedown)
+        self.tag_bind(toptext,'<B1-Motion>',drag)
+        return toptext,content,uid
 
     def add_ratingbar(self,pos:tuple,fg='#585858',bg='#f3f3f3',onfg='#3041d8',onbg='#3041d8',r=10,num:int=5,linew:int=10,command=None):#绘制评星级控件
         def __onnum(num):
@@ -1851,6 +1894,7 @@ if __name__=='__main__':
     b.pack(fill='both',expand=True)
     m=b.add_title((600,0),'TinUI is a modern way to show tkinter widget in your application, as they are drawn by tkinter canvas')
     m1=b.add_title((0,680),'test TinUI scrolled',size=2,angle=24)
+    b.add_paragraph((2000,5),'location')
     b.add_paragraph((20,290),'''     TinUI是基于tkinter画布开发的界面UI布局方案，作为tkinter拓展和TinEngine的拓展而存在。目前，TinUI已可应用于项目。''',
     angle=-18)
     b.add_paragraph((20,100),'下面的段落是测试画布的非平行字体显示效果，也是TinUI的简单介绍')
@@ -1916,6 +1960,7 @@ if __name__=='__main__':
     test7()
     b.add_ratingbar((0,1150),num=28,command=print)
     b.add_radiobox((320,1150),content=('1','2','3','','新一行内容','','单选','组','控件'),command=test8)
+    b.add_notecard((1200,50))
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))

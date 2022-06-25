@@ -914,6 +914,31 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+### add_notecard(self,pos:tuple,title='note',text='note text\nmain content',tfg='black',tbg='#fbfbfb',fg='black',bg='#f4f4f4',sep='#e5e5e5',width=200,font='微软雅黑 12')
+
+- pos::位置
+- title::标题文本
+- text::内容文本
+- tfg::标题文本颜色
+- tbg::标题背景色
+- fg::内容文本颜色
+- bg::内容背景色
+- sep::边框、分割线颜色
+- width::文本宽度
+- font::字体
+
+绘制一个可拖动的便笺。
+
+### return: toptext, content, uid
+
+> toptext::标题文本
+>
+> content::内容文本
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI便笺.gif)
+
+---
+
 # Class: BasicTinUI
 
 TinUI的基础类，仅提供组件绘制。

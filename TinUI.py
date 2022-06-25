@@ -853,8 +853,9 @@ class BasicTinUI(Canvas):
                 bar.coords(back,(5,pos[1],maxwidth+5,pos[3]))
             for sep in seps:
                 pos=bar.bbox(sep)
-                bar.delete(sep)
-                bar.add_separate((17,pos[1]),maxwidth+5,fg=activebg)
+                bar.coords(sep,(5,pos[1],5+maxwidth,pos[1]))
+                #bar.delete(sep)
+                #bar.add_separate((17,pos[1]),maxwidth+5,fg=activebg)
         def readyshow():#计算显示位置
             allpos=bar.bbox('all')
             #菜单尺寸
@@ -907,10 +908,11 @@ class BasicTinUI(Canvas):
         widths=[]#寻找最宽位置
         for i in cont:#添加菜单内容
             if i=='-':
-                sep=bar.add_separate((15,endy()),10,fg=activebg)
+                sep=bar.create_line((5,endy(),20,endy()),fill=activebg,width=3)
+                #sep=bar.add_separate((15,endy()),10,fg=activebg)
                 seps.append(sep)
             else:
-                button=bar.add_button((15,endy()),i[0],fg,bg,bg,3,activefg,activebg,activebg,font,command=lambda event,i=i:(menu.withdraw(),i[1](event)))
+                button=bar.add_button((5,endy()),i[0],fg,bg,bg,3,activefg,activebg,activebg,font,command=lambda event,i=i:(menu.withdraw(),i[1](event)))
                 backs.append(button[1])
                 funcs.append(button[2])
                 pos=bar.bbox(button[1])

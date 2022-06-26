@@ -28,6 +28,37 @@ TinUI使用GPLv3（GPL）作为开源协议。
 
 商业软件，需要添加TinUI的gpl-3.0.md的开源许可，为自身使用TinUI最初声明，并且公开TinUI部分的代码。此外，需要注明开发者（JunmingZhang）对TinUI的版权所有，以及GitHub/TinUI的开源代码库：https://github.com/Smart-Space/TinUI/
 
+## 简单示例
+
+以下是一段简易TinUI代码示例：
+
+```python
+from tkinter import Tk
+from tinui.TinUI import TinUI #导入TinUI
+
+def dop(cont):#处理输入框返回事件
+    print(f'输入框内容为：{cont}')
+
+r=Tk()
+r.geometry('500x500+10+10')
+
+ui=TinUI(r)
+ui.pack(fill='both',expand=True)#填充窗口
+
+#绘制若干个按钮
+ui.add_button((5,5),text='one')
+ui.add_button((55,5),text='two1')
+ui.add_button((55,40),text='two2')
+ui.add_button((110,5),text='three')
+
+#绘制一个输入框，并绑定到处理函数：dop
+ui.add_entry((5,180),350,'这里用来输入',command=dop)
+
+r.mainloop()
+```
+
+
+
 ---
 
 # Class: TinUI(BasicTinUI)

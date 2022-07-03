@@ -454,7 +454,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_table(self,pos:tuple,outline='#E1E1E1',fg='black',bg='white',data=[['1','2','3'],['a','b','c']],minwidth=100,font=('微软雅黑',12),headbg='#d9ebf9')
+### add_table(self,pos:tuple,outline='#E1E1E1',fg='black',bg='white',data=[['1','2','3'],['a','b','c']],minwidth=100,maxwidth=300,font=('微软雅黑',12),headbg='#d9ebf9')
 
 - pos::位置
 - outline::边框颜色
@@ -462,6 +462,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - bg::文本背景颜色
 - data::表格数据。格式：((title,...,...),(content1,...,...),(content2,...,...),...)
 - minwidth::单元格最小宽度
+- maxwidth::单元格最大宽度
 - font::字体
 - headbg::表头背景色
 
@@ -855,46 +856,52 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 ### return: tbu, scro, back, notebook, uid
 
 > tbu::标签栏BasicTinUI
-> 
+>
 > scro::滚动条TinUI返回值
-> 
+>
 > back::背景元素
-> 
+>
 > notebook::TinUINum函数结构体
-> 
+>
 > > notebook.addpage(title,flag=None,scrollbar=False,cancancel=True)->flag
-> > 
+> >
 > > `title`标签栏标签标题
-> > 
+> >
 > > `flag`标识符，如果没有给定，会自动生成并返回
-> > 
+> >
 > > `scrollbar`是否使用TinUI，默认BasicTinUI
-> > 
+> >
 > > `cancancel`该页面是否能被删除
-> > 
+> >
 > > notebook.showpage(flag)
-> > 
+> >
 > > `flag`需要显示的页面的标识符
-> > 
+> >
 > > notebook.deletepage(flag)
-> > 
+> >
 > > `flag`需要删除的页面的标识符
-> > 
+> >
 > > notebook.getuis(flag)->(tinui,uixml,uiid)
-> > 
+> >
 > > `flag`页面标识符。返回TinUI组件、TinUIXml绑定、组件的画布对象
-> > 
+> >
 > > notebook.gettitles(flag)->(title,cb,bu)
-> > 
+> >
 > > `flag`页面标识符。返回标题tbu对象、删除键tbu对象、标签tbu对象
-> > 
+> >
 > > notebook.getvdic()->vdict
-> > 
+> >
 > > 返回页面字典
-> > 
+> >
 > > notebook.gettbdict()->tbdict
-> > 
+> >
 > > 返回标签栏字典
+> >
+> > notebook.cannew(can=False,newfunc=None)
+> >
+> > `can`是否响应&显示新界面按钮
+> >
+> > `newfunc`响应函数，如果为None则不执行
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI标签栏视图.gif)
 

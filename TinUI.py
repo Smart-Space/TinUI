@@ -1380,20 +1380,32 @@ class BasicTinUI(Canvas):
             tbu.itemconfig(t,fill=onfg)
             tbu.itemconfig(c,fill=onfg)
             tbu.itemconfig(b,fill=onbg,outline=onbg)
+        def __onnpin(e):
+            tbu.itemconfig(newpageback,fill=activebg,outline=activebg)
+        def __onnpleave(e):
+            tbu.itemconfig(newpageback,fill=bg,outline=bg)
+        def __onnpclick(e):
+            if newfunction!=None:
+                newfunction()
         def addpage(title:str,flag=None,scrollbar=False,cancancel:bool=True):#创建页面
-            if tbu.bbox('all')==None:
+            nonlocal npx
+            if tbu.bbox(labeluid)==None:
                 endx=3
             else:
-                endx=tbu.bbox('all')[2]+3
-            titleu=tbu.create_text((endx,2),text=title,fill=fg,font=font,anchor='nw')
+                endx=tbu.bbox(labeluid)[2]+3
+            titleu=tbu.create_text((endx,2),text=title,fill=fg,font=font,anchor='nw',tags=(labeluid))#标题
             cbx=tbu.bbox(titleu)[2]+10
-            cb=tbu.create_text((cbx,2),text='×',font=font,fill=fg,anchor='nw')
+            cb=tbu.create_text((cbx,2),text='×',font=font,fill=fg,anchor='nw',tags=(labeluid))#页面删除按钮文本
             tbbbox=tbu.bbox(titleu)
             if cancancel==False:
                 tbu.itemconfig(cb,state='hidden')
             bux=(endx+2,tbbbox[1],cbx+15,tbbbox[1],cbx+15,tbbbox[3],endx+2,tbbbox[3],endx+2,tbbbox[1])
-            bu=tbu.create_polygon(bux,fill=bg,outline=bg,width=5)
+            bu=tbu.create_polygon(bux,fill=bg,outline=bg,width=5,tags=(labeluid))
             tbu.lower(bu)
+            #移动newpageuid
+            npmovex=cbx+15+5.5-npx
+            tbu.move(newpageuid,npmovex,0)
+            npx=cbx+15+5.5
             if flag==None:
                 flag='flag'+str(titleu)
             if scrollbar:
@@ -1416,6 +1428,7 @@ class BasicTinUI(Canvas):
             tbu.tag_bind(titleu,'<Button-1>',lambda event:showpage(flag))
             tbu.tag_bind(bu,'<Button-1>',lambda event:showpage(flag))
             tbu.tag_bind(cb,'<Button-1>',lambda event:deletepage(flag))
+            return flag
         def showpage(flag):#显示页面
             nonlocal nowpage
             mp=nowpage#中间逻辑变量
@@ -1428,7 +1441,7 @@ class BasicTinUI(Canvas):
             __onclick(flag)
             nowpage=flag
         def deletepage(flag):#删除页面
-            nonlocal nowpage
+            nonlocal nowpage,npx
             wbbox=tbu.bbox(tbdict[flag][2])
             w=wbbox[2]-wbbox[0]
             w+=1
@@ -1443,6 +1456,10 @@ class BasicTinUI(Canvas):
                 for i in flaglist[index+1:]:
                     for iid in tbdict[i]:
                         tbu.move(iid,-w,0)
+            #移动newpageuid
+            tbu.move(newpageuid,-w,0)
+            npx-=w#调整当前位置
+            #---
             if flag==nowpage:
                 if len(tbdict)==1:
                     pass
@@ -1458,17 +1475,27 @@ class BasicTinUI(Canvas):
             del flaglist[index]
             bbox=tbu.bbox('all')
             tbu.config(scrollregion=bbox)
-        def getuis(flag):
+        def getuis(flag):#获取所有窗口
             return vdict[flag]
-        def gettitles(flag):
+        def gettitles(flag):#获取所有标题
             return tbdict[flag]
-        def getvdict():
+        def getvdict():#获取元素字典
             return vdict
-        def gettbdict():
+        def gettbdict():#获取标题元素字典
             return tbdict
+        def cannew(can=False,newfunc=None):#是否响应新界面函数
+            nonlocal newfunction
+            newfunction=newfunc
+            if can:
+                tbu.itemconfig(newpageuid,state='normal')
+            if not can:
+                tbu.itemconfig(newpageuid,state='hidden')
+            bbox=tbu.bbox('all')
+            tbu.config(scrollregion=bbox)
         tbu=BasicTinUI(self,bg=color)
         tbuid=self.create_window((pos[0]+2,pos[1]+2),window=tbu,width=width,height=30,anchor='nw')
         uid='notebook'+str(tbuid)
+        labeluid='notebooklabel'#标签元素名称
         self.addtag_withtag(uid,tbuid)
         scro=self.add_scrollbar((pos[0]+5,pos[1]+32),tbu,height=width-5,direction='x',bg=bg,color=fg,oncolor=onfg)
         self.addtag_withtag(uid,scro[-1])
@@ -1483,6 +1510,21 @@ class BasicTinUI(Canvas):
         tbdict=dict()#title,cb,pyo
         flaglist=list()
         font='微软雅黑 12'
+        #新页面按钮（默认不显示）
+        npx=3
+        newpageuid='notebooknew'+str(tbuid)
+        newpagetext=tbu.create_text((npx,2),text='+',font=font,fill=fg,anchor='nw',tags=newpageuid)
+        nptbbox=tbu.bbox(newpagetext)
+        #newpageback
+        npb=(nptbbox[0],nptbbox[1],nptbbox[2],nptbbox[1],nptbbox[2],nptbbox[3],nptbbox[0],nptbbox[3],nptbbox[0],nptbbox[1])
+        newpageback=tbu.create_polygon(npb,fill=bg,outline=bg,width=5,tags=newpageuid)
+        tbu.tkraise(newpagetext)
+        tbu.itemconfig(newpageuid,state='hidden')
+        newfunction=None#触发函数
+        tbu.tag_bind(newpagetext,'<Enter>',__onnpin)
+        tbu.tag_bind(newpagetext,'<Leave>',__onnpleave)
+        tbu.tag_bind(newpagetext,'<Button-1>',__onnpclick)
+        #新页面按钮完成创建
         notebook=TinUINum
         notebook.addpage=addpage
         notebook.showpage=showpage
@@ -1491,6 +1533,7 @@ class BasicTinUI(Canvas):
         notebook.gettitles=gettitles
         notebook.getvdict=getvdict
         notebook.gettbdict=gettbdict
+        notebook.cannew=cannew
         return tbu,scro,back,notebook,uid
 
     def add_notecard(self,pos:tuple,title='note',text='note text\nmain content',tfg='black',tbg='#fbfbfb',fg='black',bg='#f4f4f4',sep='#e5e5e5',width=200,font='微软雅黑 12'):#绘制便笺
@@ -1885,6 +1928,12 @@ def test7():
         num+=1
 def test8(rbtext):
     print(f'单选组控件选值=>{rbtext}')
+def test9():
+    newnotepage=ntb.addpage('newpage')
+    uxml=ntb.getvdict()[newnotepage][1]#tinuixml
+    uxml.loadxml('''<tinui><line><button text='这是一个新的标题栏窗口' command='print'></button></line>
+<line><label text='TinUI的标签栏视图'></label><label text='每个都是单独页面'></label></line>
+</tinui>''')
 
 if __name__=='__main__':
     a=Tk()
@@ -1957,6 +2006,7 @@ if __name__=='__main__':
             ntb.addpage('test'+str(i),'t'+str(i),cancancel=False)
         else:
             ntb.addpage('test'+str(i),'t'+str(i))
+    ntb.cannew(True,test9)
     test7()
     b.add_ratingbar((0,1150),num=28,command=print)
     b.add_radiobox((320,1150),content=('1','2','3','','新一行内容','','单选','组','控件'),command=test8)

@@ -319,7 +319,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_waitbar1(self,pos:tuple,fg='blue',bg='',okfg='lightgreen',okbg='',bd=2,r=20)
+### add_waitbar1(self,pos:tuple,fg='#0078D7',bg='',okfg='lightgreen',okbg='',bd=5,r=20)
 
 - pos::位置
 - fg::边框颜色

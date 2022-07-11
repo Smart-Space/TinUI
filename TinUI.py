@@ -403,11 +403,11 @@ class BasicTinUI(Canvas):
         funcs.active=funcs[1]=active
         return link,funcs,uid
 
-    def add_waitbar1(self,pos:tuple,fg='#0078D7',bg='',okfg='lightgreen',okbg='',bd=2,r=20):#绘制圆形等待组件
+    def add_waitbar1(self,pos:tuple,fg='#0078D7',bg='',okfg='lightgreen',okbg='',bd=5,r=20):#绘制圆形等待组件
         def __start(i):
             if ifok.re==True:
                     return
-            self.itemconfig(waitbar1,extent=i)
+            self.itemconfig(waitbar1,extent=i,start=90+i)
             self.update()
             if i==355:
                 start()
@@ -415,7 +415,7 @@ class BasicTinUI(Canvas):
             if ifok.re==True:
                 return
             for i in range(0,360,5):
-                self.after(i*10,lambda i=i:__start(i))
+                self.after(i*8,lambda i=i:__start(i))
         def ok():
             ifok.re=True
             self.itemconfig(waitbar1,outline=okfg,extent=359)

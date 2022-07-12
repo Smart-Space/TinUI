@@ -1003,24 +1003,33 @@ class BasicTinUI(Canvas):
             self.coords(bar,(pos[0]+startx,pos[1],pos[0]+endx,pos[1]+4))
             start(nowwidth+5)
         def start(nowwidth=0):#开始动画
+            nonlocal timesep,maxwidth
             if ifok.ok==True:#已完成
                 self.itemconfig(bar,fill=okcolor,outline=okcolor)
                 self.coords(bar,(pos[0],pos[1],pos[0]+width,pos[1]+4))
+            if nowwidth==0:#重新定义时间间隔与滑块长度
+                if timesep==10:
+                    timesep=40
+                    maxwidth/=2
+                else:
+                    timesep=10
+                    maxwidth*=2
             if nowwidth<=maxwidth:#增长阶段
-                self.after(50,lambda : move(0,nowwidth,nowwidth))
+                self.after(timesep,lambda : move(0,nowwidth,nowwidth))
             elif nowwidth>=width:#缩小阶段
-                self.after(50,lambda : move(nowwidth-maxwidth,width,nowwidth))
+                self.after(timesep,lambda : move(nowwidth-maxwidth,width,nowwidth))
             else:#平滑阶段。因为我们去整数，所以平滑阶段无法使用断点判断
-                self.after(50,lambda : move(nowwidth-maxwidth,nowwidth,nowwidth))
+                self.after(timesep,lambda : move(nowwidth-maxwidth,nowwidth,nowwidth))
         def stop():#停止
             ifok.ok=True
         ifok=TinUINum()#记录是否暂停
         ifok.ok=False
+        timesep=10#时间间隔，快20，慢40
         bbox=(pos[0],pos[1],pos[0]+width,pos[1]+4)
         back=self.create_rectangle(bbox,fill=bg,outline=bg)
         uid='waitbar3'+str(back)
         self.itemconfig(back,tags=uid)
-        maxwidth=width//3
+        maxwidth=width//3*2#原长为三分之一，快速模式为原长两倍
         bar=self.create_rectangle((pos[0],pos[1],pos[0],pos[1]),fill=fg,outline=fg,tags=uid)
         start()
         return back,bar,stop,uid

@@ -1501,10 +1501,36 @@ class BasicTinUI(Canvas):
                 tbu.itemconfig(newpageuid,state='hidden')
             bbox=tbu.bbox('all')
             tbu.config(scrollregion=bbox)
+        def newtitle(flag,title_text=''):#重设标题
+            nonlocal npx
+            newpustate=tbu.itemcget(newpageuid,'state')
+            tbu.itemconfig(newpageuid,state='normal')#此刻连着新界面按钮一起移动
+            title,cb,pyo=tbdict[flag]
+            title_bbox=tbu.bbox(title)
+            old_title_width=title_bbox[2]-title_bbox[1]#原文本宽度
+            pyo_bbox=tbu.bbox(pyo)
+            tbu.itemconfig(title,text=title_text)#修改标题
+            title_bbox=tbu.bbox(title)
+            tbu.itemconfig(title,text='')
+            new_title_width=title_bbox[2]-title_bbox[1]#现文本宽度
+            movex=new_title_width-old_title_width
+            all_bbox=tbu.bbox('all')
+            tbu.addtag(movename,'overlapping',pyo_bbox[2]+1,2,all_bbox[2],all_bbox[3])
+            tbu.move(movename,movex,0)#移动其它标题
+            tbu.dtag(movename)
+            pyo_t=(pyo_bbox[0]+5,pyo_bbox[1]+5,pyo_bbox[2]+movex-5,pyo_bbox[1]+5,pyo_bbox[2]+movex-5,pyo_bbox[3]-5,pyo_bbox[0]+5,pyo_bbox[3]-5)
+            tbu.coords(pyo,pyo_t)#调整背景
+            tbu.move(cb,movex,0)
+            tbu.itemconfig(title,text=title_text)#修改标题
+            tbu.itemconfig(newpageuid,state=newpustate)#恢复样式
+            npx+=movex
+            bbox=tbu.bbox('all')
+            tbu.config(scrollregion=bbox)
         tbu=BasicTinUI(self,bg=color)
         tbuid=self.create_window((pos[0]+2,pos[1]+2),window=tbu,width=width,height=30,anchor='nw')
         uid='notebook'+str(tbuid)
         labeluid='notebooklabel'#标签元素名称
+        movename='movetags'#更改标题时整体移动的临时名称
         self.addtag_withtag(uid,tbuid)
         scro=self.add_scrollbar((pos[0]+5,pos[1]+32),tbu,height=width-5,direction='x',bg=bg,color=fg,oncolor=onfg)
         self.addtag_withtag(uid,scro[-1])
@@ -1543,6 +1569,7 @@ class BasicTinUI(Canvas):
         notebook.getvdict=getvdict
         notebook.gettbdict=gettbdict
         notebook.cannew=cannew
+        notebook.newtitle=newtitle
         return tbu,scro,back,notebook,uid
 
     def add_notecard(self,pos:tuple,title='note',text='note text\nmain content',tfg='black',tbg='#fbfbfb',fg='black',bg='#f4f4f4',sep='#e5e5e5',width=200,font='微软雅黑 12'):#绘制便笺
@@ -1938,9 +1965,12 @@ def test7():
 def test8(rbtext):
     print(f'单选组控件选值=>{rbtext}')
 def test9():
+    def new_title(*e):
+        ntb.newtitle(newnotepage,'一个崭新的标题')
     newnotepage=ntb.addpage('newpage')
     uxml=ntb.getvdict()[newnotepage][1]#tinuixml
-    uxml.loadxml('''<tinui><line><button text='这是一个新的标题栏窗口' command='print'></button></line>
+    uxml.funcs['newtitle']=new_title
+    uxml.loadxml('''<tinui><line><button text='这是一个新的标题栏窗口' command='self.funcs["newtitle"]'></button></line>
 <line><label text='TinUI的标签栏视图'></label><label text='每个都是单独页面'></label></line>
 </tinui>''')
 
@@ -2007,7 +2037,7 @@ if __name__=='__main__':
     <label text='you can use&#x000A;manual function re-region&#x000A;also can use&#x000A;auto function&#x000A;just one&#x000A;like&#x000A;this'>
     </label>
     </line></tinui>''')
-    ppgl=b.add_pipspager((400,890),num=5)[0]
+    ppgl=b.add_pipspager((400,890),num=25)[0]
     test6()
     ntb=b.add_notebook((800,900))[-2]
     for i in range(1,11):

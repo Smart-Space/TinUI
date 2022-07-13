@@ -902,6 +902,12 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > > `can`是否响应&显示新界面按钮
 > >
 > > `newfunc`响应函数，如果为None则不执行
+> >
+> > notebook.newtitle(flag,title_text='')
+> >
+> > `flag`需要更换标题的页面的标识符
+> >
+> > `title_text`新标题文本
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI标签栏视图.gif)
 

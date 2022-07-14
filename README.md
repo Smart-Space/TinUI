@@ -983,6 +983,27 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+### add_pivot(self,pos:tuple,fg='#959595',bg='',activefg='#525252',activecolor='#5969e0',content=(('a-title','tag1'),('b-title','tag2'),'',('c-title','tag3')),font='微软雅黑 16',padx=10,pady=10,command=None)
+
+- pos::位置
+- fg::字体颜色
+- bg::保留参数，忽略
+- activefg::字体激活颜色
+- activecolor::提示色
+- content::内容，（文本，标签）
+- font::字体
+- padx::横方向间距
+- pady::纵方向间距
+- command::响应函数，必须接受一个参数，所选选项的标签
+
+绘制一个支点标题。
+
+### return: texts, uid
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI支点标题.gif)
+
+---
+
 # Class: BasicTinUI
 
 TinUI的基础类，仅提供组件绘制。

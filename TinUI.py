@@ -1764,6 +1764,52 @@ class BasicTinUI(Canvas):
             nowx=t_bbox[2]+padx
         return boxes,uid
 
+    def add_pivot(self,pos:tuple,fg='#959595',bg='',activefg='#525252',activecolor='#5969e0',content=(('a-title','tag1'),('b-title','tag2'),'',('c-title','tag3')),font='微软雅黑 16',padx=10,pady=10,command=None):#绘制支点标题
+        def button_in(num,text_uid):
+            if num!=select:
+                self.itemconfig(text_uid,fill=activefg)
+        def button_out(num,text_uid):
+            if num!=select:
+                self.itemconfig(text_uid,fill=fg)
+        def sel_it(num,text_uid,tag):
+            nonlocal select
+            if num==select:
+                return
+            self.itemconfig(texts[select][2],fill=fg)
+            select=num
+            self.itemconfig(text_uid,fill=activefg)
+            bbox=self.bbox(text_uid)
+            self.coords(line,(bbox[0],bbox[3]+2,bbox[2],bbox[3]+2))
+            if command!=None:
+                command(tag)
+        texts=[]#[(text,tag,text-uid),...]
+        count=-1
+        select=-1#当前选定
+        t_bbox=None
+        nowx,nowy=pos#x坐标为左上角插入坐标，y坐标为底部坐标
+        uid='pivot'+str(id(content))
+        line=self.create_line((pos[0],pos[1],pos[0]+5,pos[1]),fill=activecolor,width=3,capstyle='round',tags=(uid))
+        for i in content:
+            count+=1#计数
+            if i=='':
+                if t_bbox==None:#没有底部坐标数据
+                    nowy+=pady
+                else:
+                    nowy=t_bbox[3]+pady
+                nowx=pos[0]
+                texts.append(('\n','\n',None))
+                continue
+            text=self.create_text((nowx,nowy),font=font,text=i[0],fill=fg,anchor='nw',tags=(uid))
+            t_bbox=self.bbox(text)
+            width=t_bbox[2]-t_bbox[0]
+            nowx=nowx+width+padx
+            texts.append((i[0],i[1],text))
+            self.tag_bind(text,'<Enter>',lambda event,num=count,tag=text:button_in(num,tag))
+            self.tag_bind(text,'<Leave>',lambda event,num=count,tag=text:button_out(num,tag))
+            self.tag_bind(text,'<Button-1>',lambda event,num=count,tag=text,tagname=i[1]:sel_it(num,tag,tagname))
+        sel_it(0,texts[0][2],texts[0][1])
+        return texts,uid
+
 
 class TinUI(BasicTinUI):
     '''对BasicTinUI的封装，添加了滚动条自动刷新'''
@@ -1973,6 +2019,8 @@ def test9():
     uxml.loadxml('''<tinui><line><button text='这是一个新的标题栏窗口' command='self.funcs["newtitle"]'></button></line>
 <line><label text='TinUI的标签栏视图'></label><label text='每个都是单独页面'></label></line>
 </tinui>''')
+def test10(tag):
+    b.itemconfig(pivott,text='pivot text: '+tag)
 
 if __name__=='__main__':
     a=Tk()
@@ -2050,6 +2098,8 @@ if __name__=='__main__':
     b.add_ratingbar((0,1150),num=28,command=print)
     b.add_radiobox((320,1150),content=('1','2','3','','新一行内容','','单选','组','控件'),command=test8)
     b.add_notecard((1200,50))
+    pivott=b.create_text((1200,400),text='pivot text',anchor='nw',font='微软雅黑 12')
+    b.add_pivot((1200,300),command=test10)
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))

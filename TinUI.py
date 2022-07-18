@@ -425,7 +425,7 @@ class BasicTinUI(Canvas):
         bbox=(pos[0],pos[1],pos[0]+2*r,pos[1]+2*r)
         back_bbox=(pos[0]+bd,pos[1]+bd,pos[0]+2*r-bd,pos[1]+2*r-bd)
         back=self.create_oval(back_bbox,width=0,fill=bg)
-        uid='waitbar1'+str(back)
+        uid='waitbar1-'+str(back)
         self.itemconfig(back,tags=uid)
         waitbar1=self.create_arc(bbox,outline=fg,extent=5,start=90,width=bd,style='arc',tags=uid)
         start()
@@ -483,7 +483,7 @@ class BasicTinUI(Canvas):
         ifok.re=False
         bbox=(pos[0],pos[1],pos[0]+width+10,pos[1]+5)
         back=self.create_rectangle(bbox,fill=bg,outline=fg)
-        uid='waitbar2'+str(back)
+        uid='waitbar2-'+str(back)
         self.itemconfig(back,tags=uid)
         balls=[]
         ball_bbox=(pos[0],pos[1],pos[0]+5,pos[1]+5)
@@ -1027,7 +1027,7 @@ class BasicTinUI(Canvas):
         timesep=10#时间间隔，快20，慢40
         bbox=(pos[0],pos[1],pos[0]+width,pos[1]+4)
         back=self.create_rectangle(bbox,fill=bg,outline=bg)
-        uid='waitbar3'+str(back)
+        uid='waitbar3-'+str(back)
         self.itemconfig(back,tags=uid)
         maxwidth=width//3*2#原长为三分之一，快速模式为原长两倍
         bar=self.create_rectangle((pos[0],pos[1],pos[0],pos[1]),fill=fg,outline=fg,tags=uid)
@@ -1810,6 +1810,51 @@ class BasicTinUI(Canvas):
         sel_it(0,texts[0][2],texts[0][1])
         return texts,uid
 
+    def add_button2(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),command=None,anchor='nw'):#绘制圆角按钮
+        def in_button(event):
+            self.itemconfig(outline,outline=activeline,fill=activeline)
+            self.itemconfig(button,fill=activefg)
+        def out_button(event):
+            self.itemconfig(back,fill=bg,outline=bg)
+            self.itemconfig(outline,outline=line,fill=line)
+            self.itemconfig(button,fill=fg)
+        def on_click(event):
+            self.itemconfig(back,fill=activebg,outline=activebg)
+            self.itemconfig(button,fill=activefg)
+            self.after(500,lambda : out_button(None))
+            if command!=None:
+                command(event)
+        def change_command(new_func):
+            nonlocal command
+            command=new_func
+        def disable(fg='#9d9d9d',bg='#f5f5f5'):
+            self.itemconfig(button,state='disable',fill=fg)
+            self.itemconfig(back,state='disable',disabledfill=bg)
+        def active():
+            self.itemconfig(button,state='normal')
+            self.itemconfig(back,state='normal')
+            out_button(None)
+        button=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
+        uid='button2-'+str(button)
+        self.itemconfig(button,tags=uid)
+        x1,y1,x2,y2=self.bbox(button)
+        outline_t=(x1-linew,y1-linew,x2+linew,y1-linew,x2+linew,y2+linew,x1-linew,y2+linew)
+        outline=self.create_polygon(outline_t,width=7,tags=uid,fill=line,outline=line)
+        back_t=(x1,y1,x2,y1,x2,y2,x1,y2)
+        back=self.create_polygon(back_t,width=7,tags=uid,fill=bg,outline=bg)
+        self.tag_bind(button,'<Button-1>',on_click)
+        self.tag_bind(button,'<Enter>',in_button)
+        self.tag_bind(button,'<Leave>',out_button)
+        self.tag_bind(back,'<Button-1>',on_click)
+        self.tag_bind(back,'<Enter>',in_button)
+        self.tag_bind(back,'<Leave>',out_button)
+        self.tkraise(button)
+        funcs=FuncList(3)
+        funcs.change_command=change_command
+        funcs.disable=disable
+        funcs.active=active
+        return button,back,line,funcs,uid
+
 
 class TinUI(BasicTinUI):
     '''对BasicTinUI的封装，添加了滚动条自动刷新'''
@@ -2100,6 +2145,7 @@ if __name__=='__main__':
     b.add_notecard((1200,50))
     pivott=b.create_text((1200,400),text='pivot text',anchor='nw',font='微软雅黑 12')
     b.add_pivot((1200,300),command=test10)
+    b.add_button2((1200,180),text='圆角按钮')
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))

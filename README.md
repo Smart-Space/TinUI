@@ -1004,6 +1004,49 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+### add_button2(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),command=None,anchor='nw')
+
+- pos::位置
+- text::标题文字
+- fg::文字颜色
+- bg::按钮颜色
+- line::边框颜色
+- linew::边框宽度
+- activefg::响应鼠标的文本颜色
+- activebg::响应鼠标的按钮颜色
+- activeline::响应鼠标的边框颜色
+- font::字体名称+大小
+- command::绑定的函数。该函数**必须要有event参数**，因为TinUI的按钮会传递点击事件的event
+- anchor::对齐方向
+
+绘制一个圆角按钮。
+
+### return: button, back, line, funcs, uid
+
+> button::按钮文本
+>
+> back::背景元素
+>
+> line::边框元素
+>
+> funcs
+>
+> > funcs.change_command(new_func)
+> >
+> > `new_func`切换的新函数
+> >
+> > funcs.disable(fg='#9d9d9d',bg='#f5f5f5')
+> >
+> > 禁用按钮
+> >
+> > funcs.active()
+> >
+> > 激活按钮
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI按钮2.gif)
+
+---
+
 # Class: BasicTinUI
 
 TinUI的基础类，仅提供组件绘制。

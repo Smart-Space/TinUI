@@ -1838,8 +1838,9 @@ class BasicTinUI(Canvas):
         uid='button2-'+str(button)
         self.itemconfig(button,tags=uid)
         x1,y1,x2,y2=self.bbox(button)
+        linew-=1
         outline_t=(x1-linew,y1-linew,x2+linew,y1-linew,x2+linew,y2+linew,x1-linew,y2+linew)
-        outline=self.create_polygon(outline_t,width=7,tags=uid,fill=line,outline=line)
+        outline=self.create_polygon(outline_t,width=9,tags=uid,fill=line,outline=line)
         back_t=(x1,y1,x2,y1,x2,y2,x1,y2)
         back=self.create_polygon(back_t,width=7,tags=uid,fill=bg,outline=bg)
         self.tag_bind(button,'<Button-1>',on_click)

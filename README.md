@@ -558,7 +558,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_info(self,pos:tuple,font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black')
+### add_info(self,pos:tuple,info='i',font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black')
 
 - pos::位置
 - font::标识符字体
@@ -571,13 +571,12 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个气泡提示框组件。
 
-### return: text, back, infotagname, uid
+### return: text, back, uid
 
 > text::标识符文本
 > 
 > back::标识符背景边框
 > 
-> infotagname::提示文本以及文本边框背景
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI气泡提示.gif)
 
@@ -618,18 +617,14 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',font='微软雅黑 12',tran='#01FF11')
+### add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',outline='#3b3b3b',font='微软雅黑 12',tran='#01FF11')
 
 - uid::画布对象
-
 - text::提示文本
-
 - fg::字体颜色
-
 - bg::背景色
-
+- outline::边框颜色
 - font::字体
-
 - tran::透明色
 
 绘制一个信息提示窗口。
@@ -1104,7 +1099,7 @@ class TinUITheme:
 
 使用xml语言来绘制TinUI组件，当然，也包括BasicTinUI。
 
-> 当前，`info`, `menubar`, `tooltip`等组件不支持使用xml布局。
+> 当前，`menubar`,`tooltip`等组件不支持使用xml布局。
 
 ```python
 class TinUIXml():#TinUI的xml渲染方式

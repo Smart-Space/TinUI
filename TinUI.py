@@ -811,30 +811,15 @@ class BasicTinUI(Canvas):
         funcs._active=funcs[2]=_active
         return name,back,button,funcs,uid
 
-    def add_info(self,pos:tuple,font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black'):#绘制提示框
-        def showinfo(event):
-            self.itemconfig(infotagname,state='normal')
-        def hideinfo(event):
-            self.itemconfig(infotagname,state='hidden')
-        text=self.create_text(pos,anchor='nw',text='i',font=font,fill=fg)
+    def add_info(self,pos:tuple,info='i',font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black'):#绘制提示框
+        text=self.create_text(pos,anchor='nw',text=info,font=font,fill=fg)
         uid='info'+str(text)
         self.itemconfig(text,tags=uid)
         bbox=self.bbox(text)
         back=self.create_rectangle((bbox[0]-2,bbox[1]-2,bbox[2]+2,bbox[3]+2),fill=bg,outline=fg,width=2,tags=uid)
         self.tkraise(text)
-        self.tag_bind(back,'<Enter>',showinfo)
-        self.tag_bind(back,'<Leave>',hideinfo)
-        self.tag_bind(text,'<Enter>',showinfo)
-        self.tag_bind(text,'<Leave>',hideinfo)
-        info=self.create_text((bbox[2]+10,(bbox[3]+bbox[1])//2),anchor='nw',text=info_text,font=info_font,fill=info_fg,width=info_width,tags=uid)
-        ibbox=self.bbox(info)
-        info_back=self.create_rectangle((ibbox[0]-2,ibbox[1]-2,ibbox[2]+2,ibbox[3]+2),width=1,fill=bg,outline=fg,tags=uid)
-        self.tkraise(info)
-        infotagname='info'+str(info)+str(info_back)
-        self.addtag_withtag(infotagname,info)
-        self.addtag_withtag(infotagname,info_back)
-        self.itemconfig(infotagname,state='hidden')
-        return text,back,infotagname,uid
+        self.add_tooltip(uid,text=info_text,fg=info_fg,bg=bg,outline=fg,font=info_font)
+        return text,back,uid
 
     def add_menubar(self,cid='all',bind='<Button-3>',font='微软雅黑 12',fg='#ecf3e8',bg='#2b2a33',activefg='#ecf3e8',activebg='#616161',cont=(('command',print),'-'),tran='#01FF11'):#绘制菜单
         '''cont格式
@@ -933,7 +918,7 @@ class BasicTinUI(Canvas):
         menu.attributes('-transparent',tran)
         return menu,bar,funcs
 
-    def add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',font='微软雅黑 12',tran='#01FF11'):#绘制窗口提示框
+    def add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',outline='#3b3b3b',font='微软雅黑 12',tran='#01FF11'):#绘制窗口提示框
         def show_toti(event):
             sx,sy=event.x_root,event.y_root
             if sx+width>maxx:
@@ -954,14 +939,20 @@ class BasicTinUI(Canvas):
         bar=TinUI(toti,bg=tran)
         bar.pack(fill='both',expand=True)
         info=bar.create_text((10,10),text=text,fill=fg,font=font,anchor='nw')
-        bbox=bar.bbox(info)
+        bbox=list(bar.bbox(info))
         width=bbox[2]-bbox[0]+10
         height=bbox[3]-bbox[1]+10
+        bbox[0]+=5
+        bbox[1]+=5
+        bbox[2]-=5
+        bbox[3]-=5
         #绘制圆角边框
+        tlinemap=((bbox[0]-1,bbox[1]-1),(bbox[2]+1,bbox[1]-1),(bbox[2]+1,bbox[3]+1),(bbox[0]-1,bbox[3]+1))
+        tline=bar.create_polygon(tlinemap,fill=outline,outline=outline,width=15)
         start=bbox[2]-bbox[0]
-        gomap=((start,bbox[1]),(bbox[2],bbox[1]),(bbox[2],bbox[3]),(bbox[0],bbox[3]),(bbox[0],bbox[1]),(start,bbox[1]))
+        gomap=((bbox[0],bbox[1]),(bbox[2],bbox[1]),(bbox[2],bbox[3]),(bbox[0],bbox[3]))
         tback=bar.create_polygon(gomap,fill=bg,outline=bg,width=15)
-        bar.lower(tback)
+        bar.tkraise(info)
         #屏幕尺寸
         maxx=self.winfo_screenwidth()
         maxy=self.winfo_screenheight()
@@ -1914,7 +1905,7 @@ class TinUIXml():#TinUI的xml渲染方式
 
     def __init__(self,ui:Union[BasicTinUI,TinUITheme]):
         self.ui=ui
-        self.noload=('info','menubar','tooltip')#当前不解析的标签
+        self.noload=('','menubar','tooltip')#当前不解析的标签
         self.intargs=('width','linew','bd','r','minwidth','maxwidth','start','padx','pady','info_width','height','num')#需要转为数字的参数
         self.dataargs=('command','choices','widgets','content','percentage','data','cont','scrollbar','widget')#需要转为数据结构的参数
         self.funcs={}#内部调用方法集合
@@ -2105,7 +2096,7 @@ if __name__=='__main__':
     b.add_spinbox((680,100))
     b.add_scalebar((680,50),command=test5)
     scale_text,_=b.add_label((890,50),text='当前选值：2')
-    b.add_info((680,140),info_text='this is info widget in TinUI')
+    b.add_info((710,140),info_text='this is info widget in TinUI')
     mtb=b.add_paragraph((0,720),'测试菜单（右键单击）')
     b.add_menubar(mtb,cont=(('command',print),('menu',test1),'-',('TinUI文本移动',test)))
     ttb=b.add_paragraph((0,800),'TinUI能做些什么？')

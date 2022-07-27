@@ -1,3 +1,7 @@
+'''
+<TinUI, a modern frame to render various widgets element for tkinter in one control.>
+    Copyright (C) <2021-present>  <张峻铭>
+'''
 from tkinter import *
 from webbrowser import open as webopen
 import time
@@ -8,15 +12,15 @@ import xml.etree.ElementTree  as ET
 '''全部组件都是绘制的~~~，除了输入型组件无法使用tkinter画布完成对应效果'''
 #==========
 '''开发信息
-开发者：Smart-Space（JunmingZhang）
-版权：版权所有(C) 2019-present Smart-Space（JunmingZhang）
+开发者：Smart-Space（Junming Zhang）
+版权：版权所有(C) 2019（原型框架，TinGroup子项目）|2021（正式命名TinUI）- present Smart-Space（Junming Zhang）
 开发者邮箱：smart-space@qq.com
 语言：Python
 技术基础：tkinter（tcl/tk）
 开源平台：pypi、GitHub、csdn
 开源协议：GPLv3
 贡献者：（暂无）
-免费条款：注明TinUI的开发者，修改后必须开源，且同样使用GPL协议。商业软件需要为TinUI提供开源许可，并声明开发者版权所有
+免费条款：注明TinUI的开发者，修改后必须开源本文件，且同样使用GPL协议。商业软件需要为TinUI提供开源许可，并声明开发者版权所有
 '''
 
 
@@ -86,7 +90,7 @@ class BasicTinUI(Canvas):
 
     def __init__(self,master,**kw):
         Canvas.__init__(self,master,selectborderwidth=0,highlightthickness=0,bd=0, **kw)
-        self.bind('<Button-1>',lambda event:self.focus_set())
+        #self.bind('<Button-1>',lambda event:self.focus_set())
         self.init()
 
     def init(self):
@@ -936,7 +940,7 @@ class BasicTinUI(Canvas):
         toti=Toplevel()
         toti.overrideredirect(True)
         toti.withdraw()
-        bar=TinUI(toti,bg=tran)
+        bar=BasicTinUI(toti,bg=tran)
         bar.pack(fill='both',expand=True)
         info=bar.create_text((10,10),text=text,fill=fg,font=font,anchor='nw')
         bbox=list(bar.bbox(info))
@@ -1475,9 +1479,9 @@ class BasicTinUI(Canvas):
             del flaglist[index]
             bbox=tbu.bbox('all')
             tbu.config(scrollregion=bbox)
-        def getuis(flag):#获取所有窗口
+        def getuis(flag):#获取对应窗口
             return vdict[flag]
-        def gettitles(flag):#获取所有标题
+        def gettitles(flag):#获取对应标题
             return tbdict[flag]
         def getvdict():#获取元素字典
             return vdict
@@ -1550,6 +1554,8 @@ class BasicTinUI(Canvas):
         tbu.tag_bind(newpagetext,'<Enter>',__onnpin)
         tbu.tag_bind(newpagetext,'<Leave>',__onnpleave)
         tbu.tag_bind(newpagetext,'<Button-1>',__onnpclick)
+        bbox=tbu.bbox('all')
+        tbu.config(scrollregion=bbox)
         #新页面按钮完成创建
         notebook=TinUINum
         notebook.addpage=addpage

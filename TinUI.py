@@ -876,7 +876,7 @@ class BasicTinUI(Canvas):
             menu.focus_set()
             for i in range(0,height+5,5):#滚动动画
                 bar.move('all',0,5)
-                time.sleep(0.001)
+                time.sleep(0.0005)
                 bar.update()
             bar.move('all',0,5)
             bar.config(scrollregion=bar.bbox('all'))
@@ -917,7 +917,7 @@ class BasicTinUI(Canvas):
         gomap=((x1,bbox[1]),(x2,bbox[1]),(x2,bbox[3]),(x1,bbox[3]),(x1,bbox[1]))
         mback=bar.create_polygon(gomap,fill=bg,outline=bg,width=15)
         bar.lower(mback)
-        bar.move('all',15,0)
+        bar.move('all',7,0)
         menu.bind('<FocusOut>',unshow)
         menu.attributes('-transparent',tran)
         return menu,bar,funcs

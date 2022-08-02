@@ -1042,6 +1042,33 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+### add_expander(self,pos:tuple,title='expand content',tfg='black',tbg='#fbfbfb',bg='#f4f4f4',sep='#e5e5e5',width=200,height=200,scrollbar=False,font='微软雅黑 12')
+
+- pos::位置
+- title::标题
+- tfg::标题颜色
+- tbg::标题背景色
+- bg::UI颜色
+- sep::大背景色、分割线颜色
+- width::控件宽度，文本宽度为`width-30`
+- height::UI高度
+- scrollbar::是否添加滚动条（是否使用TinUI）
+- font::标题字体
+
+绘制一个可折叠UI。
+
+### return: toptext, ui, ux, uid
+
+> toptext::标题文本
+>
+> ui::BasicTinUI或TinUI
+>
+> ux::绑定到UI的TinUIXml
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI可折叠UI.gif)
+
+---
+
 # Class: BasicTinUI
 
 TinUI的基础类，仅提供组件绘制。

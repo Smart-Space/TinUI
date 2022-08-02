@@ -1853,6 +1853,61 @@ class BasicTinUI(Canvas):
         funcs.active=active
         return button,back,line,funcs,uid
 
+    def add_expander(self,pos:tuple,title='expand content',tfg='black',tbg='#fbfbfb',bg='#f4f4f4',sep='#e5e5e5',width=200,height=200,scrollbar=False,font='微软雅黑 12'):#绘制一个可拓展UI
+        def do_expand(*e):
+            nonlocal expand
+            if expand==False:
+                expand=True
+                #back_bbox=self.bbox(allback)
+                #all_bbox=self.bbox('all')
+                #self.addtag(movename,'overlapping',back_bbox[0],back_bbox[3],back_bbox[2],all_bbox[3])
+                #self.move(movename,0,height)
+                self.itemconfig(content,state='normal')
+                self.itemconfig(button[0],text='🔺')
+            elif expand==True:
+                expand=False
+                #self.move(movename,0,-height)
+                #self.dtag(movename)
+                self.itemconfig(content,state='hidden')
+                self.itemconfig(button[0],text='🔻')
+            __size_back()
+        def __size_back():#调整背景
+            bx1,by1,bx2,by2=self.bbox(contentid)#大背景
+            bx1+=5
+            by1+=5
+            bx2-=5
+            self.coords(allback,bx1,by1,bx2,by1,bx2,by2,bx1,by2)
+        toptext=self.create_text((pos[0]+10,pos[1]+10),text=title,font=font,fill=tfg,width=width-30,anchor='nw')#标题
+        uid='expander'+str(toptext)
+        contentid='expander-content'+str(toptext)
+        #movename='expander-move'+str(toptext)
+        self.addtag_withtag(uid,toptext)
+        self.addtag_withtag(contentid,toptext)
+        tx1,ty1,tx2,ty2=self.bbox(toptext)
+        if tx2-tx1<width:#判读当前文本宽度
+            tx2=tx1+width
+        topback=self.create_polygon((tx1,ty1,tx2,ty1,tx2,ty2,tx1,ty2),outline=tbg,fill=tbg,width=10,tags=(uid,contentid))#标题背景
+        button=self.add_button2((tx2-2,ty1-0.5),anchor='ne',text='🔻',font=font,fg=tfg,bg=tbg,activebg=bg,command=do_expand)
+        self.addtag_withtag(uid,button[-1])
+        self.addtag_withtag(contentid,button[-1])
+        if not scrollbar:#不使用滚动条，BasicTinUI
+            ui=BasicTinUI(self,bg=bg)
+        elif scrollbar:#使用TinUI
+            ui=TinUI(self,bg=bg)
+        ux=TinUIXml(ui)
+        content=self.create_window((tx1,ty2+10),window=ui,anchor='nw',width=width,height=height,tags=(uid,contentid),state='hidden')#便笺内容
+        ax1,ay1,ax2,ay2=self.bbox(uid)#大背景
+        ax1+=5
+        ay1+=5
+        ax2-=5
+        allback=self.create_polygon((ax1,ay1,ax2,ay1,ax2,ay2,ax1,ay2),outline=sep,fill=sep,width=10,tags=uid)
+        expand=False#当前还没有扩展
+        #调整元素层级关系
+        self.tkraise(topback)
+        self.tkraise(toptext)
+        self.tkraise(button[-1])
+        return toptext,ui,ux,uid
+
 
 class TinUI(BasicTinUI):
     '''对BasicTinUI的封装，添加了滚动条自动刷新'''
@@ -2144,6 +2199,15 @@ if __name__=='__main__':
     pivott=b.create_text((1200,400),text='pivot text',anchor='nw',font='微软雅黑 12')
     b.add_pivot((1200,300),command=test10)
     b.add_button2((1200,180),text='圆角按钮')
+    exux=b.add_expander((1200,500))[2]
+    exux.loadxml('''<tinui><line>
+    <button2 text='拓展UI框架的按钮'></button2></line>
+    <line>
+    <paragraph text='拓展UI框架可以节省布局位置，能够使用TinUIXml为可拓展UI框架编写界面布局。' width='190'></paragraph>
+    </line>
+    <line><paragraph text='感觉如何？' width='190'></paragraph></line><line><ratingbar></ratingbar>
+    </line></tinui>
+    ''')
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))

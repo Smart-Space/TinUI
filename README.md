@@ -233,7 +233,19 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 通过`entry.get()`获取值。
 
-### return: entry, uid
+### return: entry, funcs, uid
+
+> entry::输入框类（控件）
+>
+> funcs
+>
+> > `funcs.get()`::获取输入内容
+> >
+> > `funcs.error(errorline='#c42b1c')`::显示错误样式
+> >
+> > `funcs.normal()`::回复正常样式
+> >
+> > `funcs.disable()`::禁用输入框
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI输入框.gif)
 

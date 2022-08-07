@@ -244,6 +244,18 @@ class BasicTinUI(Canvas):
         def call_command(event):
             text=entry.get()
             command(text)
+        #---
+        def get_entry():#获取文本
+            return entry.get()
+        def __error(errorline='#c42b1c'):#错误样式
+            self.itemconfig(back,outline=errorline,fill=errorline)
+        def __normal():#正常样式
+            entry['state']='normal'
+            entry.focus_set()
+            self.itemconfig(back,outline=onoutline,fill=onoutline)
+        def __disable():#禁用
+            entry['state']='disable'
+            self.itemconfig(back,outline=outline,fill=outline)
         entry=Entry(self,fg=fg,bg=bg,font=font,relief='flat',bd=0)
         entry.insert(0,text)
         entry.bind('<KeyRelease>',if_empty)
@@ -270,7 +282,12 @@ class BasicTinUI(Canvas):
             self.tkraise(button[-1])
         self.tkraise(funcw)
         if_empty(None)
-        return entry,uid
+        funcs=FuncList(4)
+        funcs.get=get_entry
+        funcs.error=__error
+        funcs.normal=__normal
+        funcs.disable=__disable
+        return entry,funcs,uid
 
     def add_separate(self,pos:tuple,width:int,direction='x',fg='grey'):#绘制分割线
         def action(x,y):

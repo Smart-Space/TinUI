@@ -1350,6 +1350,18 @@ class BasicTinUI(Canvas):
                         continue
                     else:
                         bar.itemconfig(i,width=0)
+                #修正视图
+                bbox=bar.bbox(dote)
+                allbbox=bar.bbox('all')#全部元素
+                rsrate=(bbox[2]+10)/allbbox[2]#需要展示的右边位置
+                lsrate=(bbox[0]-10)/allbbox[2]#左边
+                if rsrate>1:rsrate=1
+                if lsrate<0:lsrate=0
+                nowrate=bar.xview()
+                if rsrate>nowrate[1]:
+                    bar.xview_moveto(rsrate)
+                elif lsrate<nowrate[0]:
+                    bar.xview_moveto(lsrate)
         startx=pos[0]+20#按钮与主窗口间隔
         uilist=list()#[(uiid-1,BasicTinUI-1,TinUIXml-1),(uiid-2,BasicTinUI-2,TinUIXml-2),...]
         doty=pos[1]+height+5#控制点的起始纵坐标
@@ -1368,15 +1380,16 @@ class BasicTinUI(Canvas):
             tinuixml=TinUIXml(ui)
             uiid=self.create_window((startx,pos[1]),window=ui,width=width,height=height,state='hidden',anchor='nw',tags=uid)
             uilist.append((uiid,ui,tinuixml))
-            dot=bar.create_oval((dotx,3,dotx+5,8),fill=fg,outline=fg,width=0)
+            dot=bar.create_oval((dotx,3,dotx+4,8),fill=fg,outline=fg,width=0)
             dotlist.append(dot)
-            dotx+=13
+            dotx+=15
             bar.tag_bind(dot,'<Enter>',lambda event,dote=dot:__dot_in(dote))
             bar.tag_bind(dot,'<Leave>',lambda event,dote=dot:__dot_out(dote))
             bar.tag_bind(dot,'<Button-1>',lambda event,dote=dot:__dot_select(dote))
         __dot_in(dotlist[nowui])
         __dot_select(dotlist[nowui])
         __move_to(nowui)
+        bar.config(scrollregion=bar.bbox('all'))
         return uilist,dotlist,move_to,uid
 
     def add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f3f3f3',fg='#5d5d5d',bg='#f3f3f3',activefg='#727272',activebg='#eaeaea',onfg='#1a1a1a',onbg='#f9f9f9'):#绘制标签栏视图
@@ -1640,22 +1653,32 @@ class BasicTinUI(Canvas):
                 for i in bars[num+1:]:
                     self.itemconfig(i,fill=bg,outline=fg)
         def click(barid):
-            nonlocal nowon
+            nonlocal nowon,tempon
             nowon=bars.index(barid)
+            tempon=nowon
             if command!=None:
                 command(nowon+1)
         def onin(barid):
+            nonlocal tempon
             index=bars.index(barid)
+            tempon=index
             __onnum(index)
         def onleave(barid):
             pass
         def leaveback(event):
-            if nowon==0:
+            nonlocal tempon
+            if nowon==-1:
                 for i in bars:
                     self.itemconfig(i,fill=bg,outline=fg)
                 return
             __onnum(nowon)
-        nowon=0
+            tempon=nowon
+        def __ontemp(event):#鼠标没有正好点在图标上时
+            print(tempon)
+            click(bars[tempon])
+            __onnum(tempon)
+        nowon=-1#已选定
+        tempon=-1#待选定
         sin=math.sin
         cos=math.cos
         pi=math.pi
@@ -1710,8 +1733,11 @@ class BasicTinUI(Canvas):
             line_num+=1
             center_x+=3*r
         start=self.bbox(uid)
-        back=self.create_rectangle(start,fill='',outline=fg,width=1,tags=uid)
+        bg=self['background']
+        back=self.create_rectangle(start,fill=bg,outline=fg,width=1,tags=uid)
+        self.lower(back)
         self.tag_bind(back,'<Leave>',leaveback)
+        self.tag_bind(back,'<Button>',__ontemp)
         return bars,uid
 
     def add_radiobox(self,pos:tuple,fontfg='black',font='微软雅黑 12',fg='#8b8b8b',bg='#ededed',activefg='#898989',activebg='#e5e5e5',onfg='#3041d8',onbg='#ffffff',content:tuple=('1','','2'),padx=10,pady=5,command=None):#绘制单选组控件

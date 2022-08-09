@@ -1733,7 +1733,6 @@ class BasicTinUI(Canvas):
             line_num+=1
             center_x+=3*r
         start=self.bbox(uid)
-        bg=self['background']
         back=self.create_rectangle(start,fill=bg,outline=fg,width=1,tags=uid)
         self.lower(back)
         self.tag_bind(back,'<Leave>',leaveback)

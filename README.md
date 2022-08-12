@@ -629,7 +629,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',outline='#3b3b3b',font='微软雅黑 12',tran='#01FF11')
+### add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',outline='#3b3b3b',font='微软雅黑 12',tran='#01FF11',width=400)
 
 - uid::画布对象
 - text::提示文本
@@ -638,6 +638,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - outline::边框颜色
 - font::字体
 - tran::透明色
+- width::文本宽度
 
 绘制一个信息提示窗口。
 

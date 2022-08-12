@@ -419,6 +419,8 @@ class BasicTinUI(Canvas):
         self.tag_bind(back,'<Enter>',turn_red)
         self.tag_bind(back,'<Leave>',turn_back)
         self.tag_bind(back,'<Button-1>',go_url)
+        if type(url)==str:#为网址，显示提示框
+            self.add_tooltip(uid,text=url,fg=fg,bg=self['background'],font=font,outline=activebg)
         funcs=FuncList(2)
         funcs.disable=funcs[0]=disable
         funcs.active=funcs[1]=active
@@ -939,7 +941,7 @@ class BasicTinUI(Canvas):
         menu.attributes('-transparent',tran)
         return menu,bar,funcs
 
-    def add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',outline='#3b3b3b',font='微软雅黑 12',tran='#01FF11'):#绘制窗口提示框
+    def add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',outline='#3b3b3b',font='微软雅黑 12',tran='#01FF11',width=400):#绘制窗口提示框
         def show_toti(event):
             sx,sy=event.x_root,event.y_root
             if sx+width>maxx:
@@ -959,7 +961,7 @@ class BasicTinUI(Canvas):
         toti.withdraw()
         bar=BasicTinUI(toti,bg=tran)
         bar.pack(fill='both',expand=True)
-        info=bar.create_text((10,10),text=text,fill=fg,font=font,anchor='nw')
+        info=bar.create_text((10,10),text=text,fill=fg,width=width,font=font,anchor='nw')
         bbox=list(bar.bbox(info))
         width=bbox[2]-bbox[0]+10
         height=bbox[3]-bbox[1]+10
@@ -2199,7 +2201,7 @@ if __name__=='__main__':
     b.add_spinbox((680,100))
     b.add_scalebar((680,50),command=test5)
     scale_text,_=b.add_label((890,50),text='当前选值：2')
-    b.add_info((710,140),info_text='this is info widget in TinUI')
+    b.add_info((710,140),info_text='this is info widget in TinUI, using TinUI\'s tooltip widget with its own style.')
     mtb=b.add_paragraph((0,720),'测试菜单（右键单击）')
     b.add_menubar(mtb,cont=(('command',print),('menu',test1),'-',('TinUI文本移动',test)))
     ttb=b.add_paragraph((0,800),'TinUI能做些什么？')

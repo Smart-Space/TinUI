@@ -570,7 +570,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_info(self,pos:tuple,info='i',font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black')
+### add_info(self,pos:tuple,info='i',font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black',width=400)
 
 - pos::位置
 - font::标识符字体
@@ -580,6 +580,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - info_font::提示文本字体
 - info_width::提示文本每一行的宽度
 - info_fg::提示文本颜色
+- width::文本宽度
 
 绘制一个气泡提示框组件。
 

@@ -834,14 +834,14 @@ class BasicTinUI(Canvas):
         funcs._active=funcs[2]=_active
         return name,back,button,funcs,uid
 
-    def add_info(self,pos:tuple,info='i',font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black'):#绘制提示框
+    def add_info(self,pos:tuple,info='i',font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black',width=400):#绘制提示框
         text=self.create_text(pos,anchor='nw',text=info,font=font,fill=fg)
         uid='info'+str(text)
         self.itemconfig(text,tags=uid)
         bbox=self.bbox(text)
         back=self.create_rectangle((bbox[0]-2,bbox[1]-2,bbox[2]+2,bbox[3]+2),fill=bg,outline=fg,width=2,tags=uid)
         self.tkraise(text)
-        self.add_tooltip(uid,text=info_text,fg=info_fg,bg=bg,outline=fg,font=info_font)
+        self.add_tooltip(uid,text=info_text,fg=info_fg,bg=bg,outline=fg,font=info_font,width=width)
         return text,back,uid
 
     def add_menubar(self,cid='all',bind='<Button-3>',font='微软雅黑 12',fg='#ecf3e8',bg='#2b2a33',activefg='#ecf3e8',activebg='#616161',cont=(('command',print),'-'),tran='#01FF11'):#绘制菜单

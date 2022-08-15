@@ -1125,7 +1125,7 @@ class BasicTinUI(Canvas):
                 move=(bbox[2]-bbox[0])/2
                 if bbox[2]+move>end:
                     move=(end-bbox[2])
-                self.move(sc,0,move)
+                self.move(sc,move,0)
             sc_move()
         def backmove(event):#back
             bbox=self.bbox(sc)
@@ -1153,7 +1153,7 @@ class BasicTinUI(Canvas):
                 widget.yview('moveto',startp)
             elif mode=='x':
                 startp=(bbox[0]-start)/canmove
-                widget.xview('moveto',startp*1.2)
+                widget.xview('moveto',startp)
         if direction.upper()=='X':
             mode='x'
         elif direction.upper()=='Y':

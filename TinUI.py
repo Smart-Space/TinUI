@@ -1335,12 +1335,12 @@ class BasicTinUI(Canvas):
             __dot_select(dotlist[nowui])
             __move_to(nowui)
         def __dot_in(dote):
-            bar.itemconfig(dote,width=3)
+            bar.itemconfig(dote,text='●')
         def __dot_out(dote):
             if dotlist.index(dote)==nowui:
                 pass
             else:
-                bar.itemconfig(dote,width=0)
+                bar.itemconfig(dote,text='•')
         def __dot_select(dote):
             number=dotlist.index(dote)
             if number==nowui:
@@ -1351,7 +1351,7 @@ class BasicTinUI(Canvas):
                     if i==dote:
                         continue
                     else:
-                        bar.itemconfig(i,width=0)
+                        bar.itemconfig(i,text='•')
                 #修正视图
                 bbox=bar.bbox(dote)
                 allbbox=bar.bbox('all')#全部元素
@@ -1364,13 +1364,14 @@ class BasicTinUI(Canvas):
                     bar.xview_moveto(rsrate)
                 elif lsrate<nowrate[0]:
                     bar.xview_moveto(lsrate)
+                    bar.xview_scroll(-3,'unit')
         startx=pos[0]+20#按钮与主窗口间隔
         uilist=list()#[(uiid-1,BasicTinUI-1,TinUIXml-1),(uiid-2,BasicTinUI-2,TinUIXml-2),...]
         doty=pos[1]+height+5#控制点的起始纵坐标
         dotlist=list()#[dot1,dot2,...]
         nowui=0#当前显示界面序号
-        leftbutton=self.add_button((startx-2,pos[1]+width/2),'<',fg=fg,bg=buttonbg,linew=0,activefg=buttonbg,activebg=fg,command=move_left,anchor='e')[-1]
-        rightbutton=self.add_button((startx+width+2,pos[1]+width/2),'>',fg=fg,bg=buttonbg,linew=0,activefg=buttonbg,activebg=fg,command=move_right,anchor='w')[-1]
+        leftbutton=self.add_button((startx-2,pos[1]+width/2),'◀',fg=fg,bg=buttonbg,linew=0,activefg=buttonbg,activebg=fg,command=move_left,anchor='e')[-1]
+        rightbutton=self.add_button((startx+width+2,pos[1]+width/2),'▶',fg=fg,bg=buttonbg,linew=0,activefg=buttonbg,activebg=fg,command=move_right,anchor='w')[-1]
         uid='pipspager'+str(leftbutton)+str(rightbutton)
         self.addtag_withtag(uid,leftbutton)
         self.addtag_withtag(uid,rightbutton)
@@ -1382,7 +1383,7 @@ class BasicTinUI(Canvas):
             tinuixml=TinUIXml(ui)
             uiid=self.create_window((startx,pos[1]),window=ui,width=width,height=height,state='hidden',anchor='nw',tags=uid)
             uilist.append((uiid,ui,tinuixml))
-            dot=bar.create_oval((dotx,3,dotx+4,8),fill=fg,outline=fg,width=0)
+            dot=bar.create_text((dotx+2,5.5),text='•',fill=fg,font=('微软雅黑',8),anchor='center')
             dotlist.append(dot)
             dotx+=15
             bar.tag_bind(dot,'<Enter>',lambda event,dote=dot:__dot_in(dote))

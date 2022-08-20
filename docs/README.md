@@ -24,9 +24,9 @@ TinUI基于tkinter的画布（Canvas），可以作为整个窗口的唯一控�
 
 TinUI使用GPLv3（GPL）作为开源协议。
 
-非商业软件，TinUI部分代码必须开源，即使源码被修改。开源的TinUI部分代码必须采用同样的开源协议——GPL，并且注明开发者 Smart-Space（JunmingZhang），以及GitHub/TinUI的开源代码库：https://github.com/Smart-Space/TinUI/
+非商业软件，TinUI部分代码必须开源，即使源码被修改。开源的TinUI部分代码必须采用同样的开源协议——GPL，并且注明开发者 Smart-Space（JunmingZhang|张峻铭），以及GitHub/TinUI的开源代码库：https://github.com/Smart-Space/TinUI/
 
-商业软件，需要添加TinUI的gpl-3.0.md的开源许可，为自身使用TinUI最初声明，并且公开TinUI部分的代码。此外，需要注明开发者（JunmingZhang）对TinUI的版权所有，以及GitHub/TinUI的开源代码库：https://github.com/Smart-Space/TinUI/
+商业软件，需要添加TinUI的gpl-3.0.md的开源许可，为自身使用TinUI最初声明，并且公开TinUI部分的代码。此外，需要注明开发者（JunmingZhang|张峻铭）对TinUI的版权所有，以及GitHub/TinUI的开源代码库：https://github.com/Smart-Space/TinUI/
 
 ## 简单示例
 
@@ -233,7 +233,19 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 通过`entry.get()`获取值。
 
-### return: entry, uid
+### return: entry, funcs, uid
+
+> entry::输入框类（控件）
+>
+> funcs
+>
+> > `funcs.get()`::获取输入内容
+> >
+> > `funcs.error(errorline='#c42b1c')`::显示错误样式
+> >
+> > `funcs.normal()`::回复正常样式
+> >
+> > `funcs.disable()`::禁用输入框
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI输入框.gif)
 
@@ -558,7 +570,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_info(self,pos:tuple,info='i',font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black')
+### add_info(self,pos:tuple,info='i',font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black',width=400)
 
 - pos::位置
 - font::标识符字体
@@ -568,6 +580,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - info_font::提示文本字体
 - info_width::提示文本每一行的宽度
 - info_fg::提示文本颜色
+- width::文本宽度
 
 绘制一个气泡提示框组件。
 
@@ -617,7 +630,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',outline='#3b3b3b',font='微软雅黑 12',tran='#01FF11')
+### add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',outline='#3b3b3b',font='微软雅黑 12',tran='#01FF11',width=400)
 
 - uid::画布对象
 - text::提示文本
@@ -626,6 +639,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - outline::边框颜色
 - font::字体
 - tran::透明色
+- width::文本宽度
 
 绘制一个信息提示窗口。
 
@@ -1039,6 +1053,33 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > > 激活按钮
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI按钮2.gif)
+
+---
+
+### add_expander(self,pos:tuple,title='expand content',tfg='black',tbg='#fbfbfb',bg='#f4f4f4',sep='#e5e5e5',width=200,height=200,scrollbar=False,font='微软雅黑 12')
+
+- pos::位置
+- title::标题
+- tfg::标题颜色
+- tbg::标题背景色
+- bg::UI颜色
+- sep::大背景色、分割线颜色
+- width::控件宽度，文本宽度为`width-30`
+- height::UI高度
+- scrollbar::是否添加滚动条（是否使用TinUI）
+- font::标题字体
+
+绘制一个可折叠UI。
+
+### return: toptext, ui, ux, uid
+
+> toptext::标题文本
+>
+> ui::BasicTinUI或TinUI
+>
+> ux::绑定到UI的TinUIXml
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI可折叠UI.gif)
 
 ---
 

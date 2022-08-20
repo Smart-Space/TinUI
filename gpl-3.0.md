@@ -2,7 +2,7 @@
 
 基于tkinter.Canvas绘制现代化组件的框架控件
 
-Copyright (C) 2019-present Smart-Space|JunmingZhang
+Copyright (C) 2019-present Smart-Space|Junming Zhang|张峻铭
 
 ### GNU GENERAL PUBLIC LICENSE
 

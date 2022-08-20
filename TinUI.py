@@ -13,7 +13,7 @@ import xml.etree.ElementTree  as ET
 #==========
 '''开发信息
 开发者：Smart-Space（Junming Zhang）
-版权：版权所有(C) 2019（原型框架，TinGroup子项目）|2021（正式命名TinUI）- present Smart-Space（Junming Zhang）
+版权：版权所有(C) 2019（原型框架，TinGroup子项目）|2021（正式命名TinUI）- present Smart-Space（Junming Zhang|张峻铭）
 开发者邮箱：smart-space@qq.com
 语言：Python
 技术基础：tkinter（tcl/tk）

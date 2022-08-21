@@ -57,7 +57,9 @@ ui.add_entry((5,180),350,'这里用来输入',command=dop)
 r.mainloop()
 ```
 
+## 更新日志
 
+[TinUI更新日志](https://tinui.smart-space.com.cn/changelog)。
 
 ---
 
@@ -630,7 +632,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',outline='#3b3b3b',font='微软雅黑 12',tran='#01FF11',width=400)
+### add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',outline='#3b3b3b',font='微软雅黑 12',tran='#01FF11',delay=0,width=400)
 
 - uid::画布对象
 - text::提示文本
@@ -639,6 +641,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - outline::边框颜色
 - font::字体
 - tran::透明色
+- delay::延时显示时间，以秒为单位
 - width::文本宽度
 
 绘制一个信息提示窗口。
@@ -712,9 +715,17 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个文本编辑框。
 
-### return: textbox, uid
+### return: textbox, funcs, uid
 
 > textbox::Text控件
+>
+> funcs
+>
+> > `funcs.get(start='1.0',end='end')`::获取输入
+> >
+> > `funcs.delete(start='1.0',end='end')`::删除内容
+> >
+> > `funcs.config(**kw)`::设置Text属性
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI文本框.gif)
 

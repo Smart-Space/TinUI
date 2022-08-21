@@ -6,6 +6,7 @@ from tkinter import *
 from webbrowser import open as webopen
 import time
 import math
+import threading
 from typing import Union
 from types import FunctionType
 import xml.etree.ElementTree  as ET
@@ -941,8 +942,18 @@ class BasicTinUI(Canvas):
         menu.attributes('-transparent',tran)
         return menu,bar,funcs
 
-    def add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',outline='#3b3b3b',font='微软雅黑 12',tran='#01FF11',width=400):#绘制窗口提示框
-        def show_toti(event):
+    def add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',outline='#3b3b3b',font='微软雅黑 12',tran='#01FF11',delay=0,width=400):#绘制窗口提示框
+        def show_toti(event,flag=True):
+            nonlocal timethread
+            if delay!=0 and flag:
+                if timethread==None:#重复利用计时器，避免占用资源
+                    timethread=threading.Timer(delay,show_toti,[event,None])
+                    timethread.start()
+                else:
+                    timethread.finished.clear()#恢复上一次计时标记
+                    timethread.args=[event,None]
+                    timethread.run()
+                return
             sx,sy=event.x_root,event.y_root
             if sx+width>maxx:
                 x=sx-width
@@ -955,6 +966,8 @@ class BasicTinUI(Canvas):
             toti.geometry(f'{width+20}x{height+20}+{x}+{y}')
             toti.deiconify()
         def hide_toti(event):
+            if delay!=0:
+                timethread.cancel()
             toti.withdraw()
         toti=Toplevel()
         toti.overrideredirect(True)
@@ -983,6 +996,7 @@ class BasicTinUI(Canvas):
         self.tag_bind(uid,'<Leave>',hide_toti)
         toti.attributes('-transparent',tran)
         toti.attributes('-alpha',0.9)#透明度90%
+        timethread=None#延时计时器
         return toti,bar
 
     def add_back(self,pos:tuple,uids:tuple=(),fg='',bg='',linew=0):#绘制背景或间隔框
@@ -1049,6 +1063,12 @@ class BasicTinUI(Canvas):
         return back,bar,stop,uid
 
     def add_textbox(self,pos:tuple,width:int=200,height:int=200,text:str='',anchor='nw',font='微软雅黑 12',fg='black',bg='white',linew=3,scrollbar=False,outline='#63676b',onoutline='#3041d8'):#绘制文本框
+        def get(start='1.0',end='end'):#获取输入
+            return textbox.get(start,end)
+        def delete(start='1.0',end='end'):#删除
+            textbox.delete(start,end)
+        def config(**kw):#设置样式
+            textbox.config(**kw)
         textbox=Text(self,font=font,fg=fg,bg=bg,highlightthickness=linew,highlightbackground=outline,highlightcolor=onoutline,relief='flat')
         cavui=self.create_window(pos,window=textbox,width=width,height=height,anchor=anchor)
         uid='textbox'+str(cavui)
@@ -1058,7 +1078,11 @@ class BasicTinUI(Canvas):
             bbox=self.bbox(uid)
             cid=self.add_scrollbar((bbox[2]+5,bbox[1]),textbox,bbox[3]-bbox[1])[-1]
             self.addtag_withtag(uid,cid)
-        return textbox,uid
+        funcs=FuncList(3)
+        funcs.get=get
+        funcs.delete=delete
+        funcs.config=config
+        return textbox,funcs,uid
 
     def add_scrollbar(self,pos:tuple,widget,height:int=200,direction='y',bg='#f0f0f0',color='#999999',oncolor='#89898b'):#绘制滚动条
         #滚动条宽度7px，未激活宽度3px；建议与widget相隔5xp
@@ -2012,7 +2036,7 @@ class TinUIXml():#TinUI的xml渲染方式
     def __init__(self,ui:Union[BasicTinUI,TinUITheme]):
         self.ui=ui
         self.noload=('','menubar','tooltip')#当前不解析的标签
-        self.intargs=('width','linew','bd','r','minwidth','maxwidth','start','padx','pady','info_width','height','num')#需要转为数字的参数
+        self.intargs=('width','linew','bd','r','minwidth','maxwidth','start','padx','pady','info_width','height','num','delay')#需要转为数字的参数
         self.dataargs=('command','choices','widgets','content','percentage','data','cont','scrollbar','widget')#需要转为数据结构的参数
         self.funcs={}#内部调用方法集合
         self.datas={}#内部数据结构集合
@@ -2206,7 +2230,7 @@ if __name__=='__main__':
     mtb=b.add_paragraph((0,720),'测试菜单（右键单击）')
     b.add_menubar(mtb,cont=(('command',print),('menu',test1),'-',('TinUI文本移动',test)))
     ttb=b.add_paragraph((0,800),'TinUI能做些什么？')
-    b.add_tooltip(ttb,'很多很多')
+    b.add_tooltip(ttb,'很多很多',delay=1)
     b.add_back(pos=(0,0),uids=(ttb,),bg='cyan')
     _,_,ok3,_=b.add_waitbar3((600,800),width=240)
     b.add_button((600,750),text='停止带状等待框',command=lambda event:ok3())

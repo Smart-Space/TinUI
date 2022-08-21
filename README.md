@@ -59,7 +59,7 @@ r.mainloop()
 
 ## 更新日志
 
-[TinUI更新日志](https://tinui.smart-space.com.cn/changelog)。
+[TinUI更新日志](https://tinui.smart-space.com.cn/changelog/ChangeLog.txt)。
 
 ---
 

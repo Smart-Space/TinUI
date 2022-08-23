@@ -1186,14 +1186,12 @@ class BasicTinUI(Canvas):
             return None
         #上标、下标 ▲▼
         if mode=='y':
-            #back=self.create_rectangle((pos[0],pos[1],pos[0]+10,pos[1]+height),fill=bg,width=0)
             back=self.create_polygon((pos[0]+5,pos[1]+5,pos[0]+5,pos[1]+height-5,pos[0]+5,pos[1]+5),
             width=12,outline=bg)
             uid='scrollbar'+str(back)
             self.itemconfig(back,tags=uid)
             top=self.create_text(pos,text='▲',font='微软雅黑 8',anchor='nw',fill=oncolor,tags=uid)
             bottom=self.create_text((pos[0],pos[1]+height),text='▼',font='微软雅黑 8',anchor='sw',fill=oncolor,tags=uid)
-            #sc=self.create_rectangle((pos[0],pos[1]+15,pos[0]+10,pos[1]+height-15),fill=color,width=0,tags=uid)
             sc=self.create_polygon((pos[0]+5,pos[1]+20,pos[0]+5,pos[1]+height-20,pos[0]+5,pos[1]+20,),
             width=3,outline=color,tags=uid)
             #起始和终止位置
@@ -2133,6 +2131,10 @@ class TinUIXml():#TinUI的xml渲染方式
             y,_=self.__load_line(line,y=self.yendy)
             if y>self.yendy-5:
                 self.yendy=y+5
+
+    def environment(self,dict_item:dict):#在funcs和datas中加入默认标识内容，一般为globals()或locals()
+        self.funcs=self.funcs|dict_item
+        self.datas=self.datas|dict_item
 
     def clean(self):#清空TinUI
         self.ui.delete('all')

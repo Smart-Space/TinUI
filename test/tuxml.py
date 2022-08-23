@@ -4,6 +4,7 @@ from tkinter import Tk
 def get1(event):
     lb1=x.tags['lb1'][0]
     entry=x.tags['en'][0]
+    print(lb1,entry.get())
     u.itemconfig(lb1,text=entry.get())
 
 xml='''
@@ -21,7 +22,7 @@ xml='''
 </line>
 </line>
 <line>
-<button text="hi, this is a xml TinUI test" command='self.funcs["p"]'></button>
+<button text="hi, this is a xml TinUI test" command='print'></button>
 </line>
 <line x='100'>
 <label text='&lt;输入内容显示]' outline=''>lb1</label>
@@ -32,7 +33,7 @@ xml='''
 a=Tk()
 u=TinUI(a)
 x=TinUIXml(u)
-x.funcs={'p':print,'get1':get1}
+x.environment(globals())
 x.loadxml(xml)
 u.pack(fill='both',expand=True)
 a.mainloop()

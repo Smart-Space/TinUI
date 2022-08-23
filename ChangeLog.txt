@@ -10,6 +10,7 @@
 1. tooltip新增delay参数，允许延时显示
 2. textbox添加相关方法
 3. 网站同步changelog
+4. TinUIXml添加environment方法，用以快速导入funcs和datas
 
 ==========3.24==========
 2022-8-20

@@ -1242,6 +1242,12 @@ xml::xml语言
 
 通过一定规范的Xml字符串来对TinUI（BasicTinUI）进行渲染操作。
 
+### environment(dict_item:dict)
+
+dict_item::一个字典，建议是`globals()`或`locals()`
+
+根据本地变量，快速导入`funcs`和`datas`。但这样会缺少规范性。
+
 ### clean()
 
 清空绑定的TinUI或BasicTinUI。

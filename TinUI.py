@@ -676,37 +676,72 @@ class BasicTinUI(Canvas):
             end_y=end_y+height+2
         return uid
 
-    def add_onoff(self,pos:tuple,fg='#333333',bg='#FFFFFF',onfg='#FFFFFF',onbg='#4258CC',font=('微软雅黑',12),command=None):#绘制开关控件
+    def add_onoff(self,pos:tuple,fg='#575757',bg='#e5e5e5',onfg='#FFFFFF',onbg='#3041d8',command=None):#绘制开关控件
         def __on():
+            nonlocal nowstate
+            nowstate='on'
             if command!=None:
                 command(True)
         def __off():
+            nonlocal nowstate
+            nowstate='off'
             if command!=None:
                 command(False)
         def __on_click(event):
-            if self.itemcget(state,'fill')==fg:
-                self.itemconfig(state,fill=onfg,text='on')
-                self.move(state,width//10,0)
-                self.itemconfig(back,fill=onbg,outline=onbg)
+            if nowstate=='off':
+                self.itemconfig(state,fill=onfg)
+                self.move(state,30,0)
+                self.itemconfig(back,fill=onbg)
+                self.itemconfig(outline,fill=onbg)
                 __on()
             else:
-                self.itemconfig(state,fill=fg,text='off')
-                self.move(state,0-width//10,0)
-                self.itemconfig(back,fill=bg,outline=fg)
+                self.itemconfig(state,fill=fg)
+                self.move(state,-30,0)
+                self.itemconfig(back,fill=bg)
+                self.itemconfig(outline,fill=fg)
                 __off()
-        state=self.create_text(pos,anchor='nw',text='off',fill=fg,font=font)
-        uid='onoff'+str(state)
-        self.itemconfig(state,tags=uid)
-        bbox=self.bbox(state)
-        d=int(bbox[3]-bbox[1])#获得绘制半径
-        width=bbox[2]-bbox[0]#获取绘制宽度
-        self.move(state,d,0)
-        back=self.create_polygon((pos[0]+d,pos[1],pos[0],pos[1]+d/2,pos[0]+d,pos[1]+d,pos[0]+d+width,pos[1]+d,pos[0]+d*2+width,pos[1]+d/2,
-        pos[0]+d+width,pos[1],pos[0]+d,pos[1]),fill=bg,outline=fg,width=2,joinstyle='miter',tags=uid)
-        self.tkraise(state)
-        self.tag_bind(state,'<Button-1>',__on_click)
-        self.tag_bind(back,'<Button-1>',__on_click)
-        return state,back,uid
+        def on():#开启
+            if nowstate=='off':
+                self.itemconfig(state,fill=onfg)
+                self.move(state,30,0)
+                self.itemconfig(back,fill=onbg)
+                self.itemconfig(outline,fill=onbg)
+            __on()
+        def off():#关闭
+            if nowstate=='on':
+                self.itemconfig(state,fill=fg)
+                self.move(state,-30,0)
+                self.itemconfig(back,fill=bg)
+                self.itemconfig(outline,fill=fg)
+            __off()
+        def disable(dfg='#f0f0f0',dbg='#bfbfbf'):#禁用
+            self.itemconfig(uid,state='disable')
+            self.itemconfig(state,fill=dfg)
+            self.itemconfig(outline,fill=dbg)
+            self.itemconfig(back,fill=dbg)
+        def active():#启用
+            self.itemconfig(uid,state='normal')
+            if nowstate=='on':
+                self.itemconfig(state,fill=onfg)
+                self.itemconfig(back,fill=onbg)
+                self.itemconfig(outline,fill=onbg)
+            else:
+                self.itemconfig(state,fill=fg)
+                self.itemconfig(back,fill=bg)
+                self.itemconfig(outline,fill=fg)
+        nowstate='off'
+        outline=self.create_line((pos[0]+12,pos[1]+12,pos[0]+12+30,pos[1]+12),width=25,fill=fg,capstyle='round')
+        uid='onoff'+str(outline)
+        self.itemconfig(outline,tags=uid)
+        back=self.create_line((pos[0]+13,pos[1]+12,pos[0]+13+28,pos[1]+12),width=23,fill=bg,capstyle='round',tags=uid)
+        state=self.create_oval((pos[0]+5,pos[1]+5,pos[0]+5+15,pos[1]+5+15),fill=fg,width=0,tags=uid)
+        self.tag_bind(uid,'<Button-1>',__on_click)
+        funcs=FuncList(4)
+        funcs.on=on
+        funcs.off=off
+        funcs.disable=disable
+        funcs.active=active
+        return state,back,outline,funcs,uid
 
     def add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='black',bg='',activefg='black',activebg='#E5F1FB',font=('微软雅黑',12),command=None):#绘制选值框
         def updata(event):

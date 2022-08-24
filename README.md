@@ -490,21 +490,34 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_onoff(self,pos:tuple,fg='#333333',bg='#FFFFFF',onfg='#FFFFFF',onbg='#4258CC',font=('微软雅黑',12),command=None)
+### add_onoff(self,pos:tuple,fg='#575757',bg='#e5e5e5',onfg='#FFFFFF',onbg='#3041d8',command=None)
 
 - pos::位置
 - fg::关闭状态下的文本、边框颜色
 - bg::关闭状态下的背景颜色
 - onfg::开启状态下的文本颜色
 - onbg::开启状态下的边框、背景颜色
-- font::字体
 - command::当被点击时调用的函数，函数只有一个参数：布尔值。调用参数True表示开启，False表示关闭
 
 绘制一个开关。
 
-### return: state, back, uid
+### return: state, back, outline, funcs, uid
 
-> state::文本内容。“off”或“on”的画布对象
+> state::开关标识符
+>
+> back::背景
+>
+> outline::边框，与背景为同一个类型，比背景尺寸稍大
+>
+> funcs
+>
+> > `funcs.on`::开启
+> >
+> > `funcs.off`::关闭
+> >
+> > `funcs.active`::启用
+> >
+> > `fucns.disable(dfg='#f0f0f0',dbg='#bfbfbf')`::禁用
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI开关.gif)
 

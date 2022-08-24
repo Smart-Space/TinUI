@@ -11,6 +11,7 @@
 2. textbox添加相关方法
 3. 网站同步changelog
 4. TinUIXml添加environment方法，用以快速导入funcs和datas
+5. onoff重写，采用新样式，增加相关方法
 
 ==========3.24==========
 2022-8-20

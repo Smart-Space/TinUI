@@ -1123,8 +1123,16 @@ class BasicTinUI(Canvas):
         #滚动条宽度7px，未激活宽度3px；建议与widget相隔5xp
         def enter(event):#鼠标进入
             self.itemconfig(sc,outline=oncolor,width=7)
+        def all_enter(event):
+            self.itemconfig(top,fill=oncolor)
+            self.itemconfig(bottom,fill=oncolor)
+            self.itemconfig(back,outline=bg)
         def leave(event):#鼠标离开
             self.itemconfig(sc,outline=color,width=3)
+        def all_leave(event):
+            self.itemconfig(top,fill='')
+            self.itemconfig(bottom,fill='')
+            self.itemconfig(back,outline='')
         def widget_move(sp,ep):#控件控制滚动条滚动
             if mode=='y' and use_widget:
                 startp=start+canmove*float(sp)
@@ -1222,12 +1230,12 @@ class BasicTinUI(Canvas):
         #上标、下标 ▲▼
         if mode=='y':
             back=self.create_polygon((pos[0]+5,pos[1]+5,pos[0]+5,pos[1]+height-5,pos[0]+5,pos[1]+5),
-            width=12,outline=bg)
+            width=13,outline=bg)
             uid='scrollbar'+str(back)
             self.itemconfig(back,tags=uid)
             top=self.create_text(pos,text='▲',font='微软雅黑 8',anchor='nw',fill=oncolor,tags=uid)
             bottom=self.create_text((pos[0],pos[1]+height),text='▼',font='微软雅黑 8',anchor='sw',fill=oncolor,tags=uid)
-            sc=self.create_polygon((pos[0]+5,pos[1]+20,pos[0]+5,pos[1]+height-20,pos[0]+5,pos[1]+20,),
+            sc=self.create_polygon((pos[0]+5,pos[1]+20,pos[0]+5,pos[1]+height-20,pos[0]+5,pos[1]+20),
             width=3,outline=color,tags=uid)
             #起始和终止位置
             start=pos[1]+15
@@ -1237,7 +1245,7 @@ class BasicTinUI(Canvas):
             widget.config(yscrollcommand=widget_move)
         elif mode=='x':
             back=self.create_polygon((pos[0]+5,pos[1]+5,pos[0]+height-5,pos[1]+5,pos[0],pos[1]+5),
-            width=12,outline=bg)
+            width=13,outline=bg)
             uid='scrollbar'+str(back)
             self.itemconfig(back,tags=uid)
             top=self.create_text((pos[0]+2,pos[1]+11),text='▲',angle=90,font='微软雅黑 8',anchor='w',fill=oncolor,tags=uid)
@@ -1249,6 +1257,9 @@ class BasicTinUI(Canvas):
             canmove=(end-start)*0.95
             widget.config(xscrollcommand=widget_move)
         scroll=TinUINum()
+        self.tag_bind(uid,'<Enter>',all_enter)
+        self.tag_bind(uid,'<Leave>',all_leave)
+        all_leave(None)
         use_widget=True#是否允许控件控制滚动条
         self.tag_bind(sc,'<Button-1>',mousedown)
         self.tag_bind(sc,'<ButtonRelease-1>',mouseup)

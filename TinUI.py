@@ -687,30 +687,38 @@ class BasicTinUI(Canvas):
             nowstate='off'
             if command!=None:
                 command(False)
+        def __left30():
+            f=lambda:self.move(state,-1,0)
+            for i in range(0,31):
+                self.after(i*5,f)
+        def __right30():
+            f=lambda:self.move(state,1,0)
+            for i in range(0,31):
+                self.after(i*5,f)
         def __on_click(event):
             if nowstate=='off':
                 self.itemconfig(state,fill=onfg)
-                self.move(state,30,0)
+                __right30()
                 self.itemconfig(back,fill=onbg)
                 self.itemconfig(outline,fill=onbg)
                 __on()
             else:
                 self.itemconfig(state,fill=fg)
-                self.move(state,-30,0)
+                __left30()
                 self.itemconfig(back,fill=bg)
                 self.itemconfig(outline,fill=fg)
                 __off()
         def on():#开启
             if nowstate=='off':
                 self.itemconfig(state,fill=onfg)
-                self.move(state,30,0)
+                __right30()
                 self.itemconfig(back,fill=onbg)
                 self.itemconfig(outline,fill=onbg)
             __on()
         def off():#关闭
             if nowstate=='on':
                 self.itemconfig(state,fill=fg)
-                self.move(state,-30,0)
+                __left30()
                 self.itemconfig(back,fill=bg)
                 self.itemconfig(outline,fill=fg)
             __off()
@@ -2072,6 +2080,41 @@ class TinUI(BasicTinUI):
             self.after(self.update_time,self.update__)
 
 
+class TinUIWidget(BasicTinUI):
+    '''提供含单个元素控件的TinUI控件，用来在普通tkinter组件中使用'''
+
+    def __init__(self,master,widget_name='ui',**kw):
+        BasicTinUI.__init__(self,master,**kw)
+        self.func=eval('self.add_'+widget_name)
+        self.width=None
+        self.height=None
+
+    def get_size(self):#获取尺寸大小
+        return self.width,self.height
+
+    def load(self,*args,**kw):#载入控件
+        self.uids=self.func(*args,**kw)
+        self.reupdate()
+        return self.uids
+
+    def reupdate(self):#调整滚动范围
+        state_l=list()
+        ids=self.find_withtag(self.uids[-1])
+        for i in ids:
+            state_l.append(self.itemcget(i,'state'))
+            self.itemconfig(i,state='normal')
+        for i,s in zip(ids,state_l):
+            self.itemconfig(i,state=s)
+        bbox=list(self.bbox('all'))
+        bbox[0]-=1
+        bbox[1]-=1
+        bbox[2]+=1
+        bbox[3]+=1
+        self['width']=self.width=bbox[2]-bbox[0]
+        self['height']=self.height=bbox[3]-bbox[1]
+        self.config(scrollregion=bbox)
+
+
 class TinUIXml():#TinUI的xml渲染方式
     '''为TinUI提供更加方便的平面方式，使用xml
     TinUITheme基类无法直接使用，只能够重写TinUI或BasicTinUI的样式后才能够使用，参考 /theme 中的样式重写范例
@@ -2328,4 +2371,7 @@ if __name__=='__main__':
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))
+    bw=TinUIWidget(a,'button2',bg='black')
+    bw.load((5,5),text='tinui widget')
+    bw.pack()
     a.mainloop()

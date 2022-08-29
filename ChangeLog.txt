@@ -9,6 +9,8 @@
 2022-9
 1. onoff移动动画
 2. 创建TinUIWidget类，用来显示单个元素控件
+3. 修改expander, notebook, notecard的圆角
+4. back边框圆角
 
 ==========3.30==========
 2022-8-27

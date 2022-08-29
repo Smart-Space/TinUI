@@ -1013,8 +1013,8 @@ class BasicTinUI(Canvas):
                 timethread.cancel()
             toti.withdraw()
         toti=Toplevel()
-        toti.overrideredirect(True)
         toti.withdraw()
+        toti.overrideredirect(True)
         bar=BasicTinUI(toti,bg=tran)
         bar.pack(fill='both',expand=True)
         info=bar.create_text((10,10),text=text,fill=fg,width=width,font=font,anchor='nw')
@@ -1062,7 +1062,8 @@ class BasicTinUI(Canvas):
             cpos[1]-=2
             cpos[2]+=2
             cpos[3]+=2
-            back=self.create_rectangle(cpos,fill=bg,outline=fg,width=linew)
+            bbox=(cpos[0]+4,cpos[1]+4,cpos[2]-4,cpos[1]+4,cpos[2]-4,cpos[3]-4,cpos[0]+4,cpos[3]-4)
+            back=self.create_polygon(bbox,fill=bg,outline=fg,width=9+linew)
         self.lower(back)
         return back
 
@@ -1640,7 +1641,7 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(uid,scro[-1])
         barheight=self.bbox(scro[-1])[3]
         backpos=(pos[0]+5,pos[1]+3,pos[0]+width+2,pos[1]+3,pos[0]+width+2,barheight+height-3,pos[0]+5,barheight+height-3,pos[0]+5,pos[1]+5)
-        back=self.create_polygon(backpos,outline=color,fill=color,width=10,tags=uid)
+        back=self.create_polygon(backpos,outline=color,fill=color,width=11,tags=uid)
         self.tkraise(tbuid)
         self.tkraise(scro[-1])
         viewpos=(pos[0]+2,barheight+2)
@@ -1700,18 +1701,18 @@ class BasicTinUI(Canvas):
         tx1,ty1,tx2,ty2=self.bbox(toptext)
         if tx2-tx1<width:#判读当前文本宽度
             tx2=tx1+width
-        topback=self.create_polygon((tx1,ty1,tx2,ty1,tx2,ty2,tx1,ty2),outline=tbg,fill=tbg,width=10,tags=uid)
+        topback=self.create_polygon((tx1,ty1,tx2,ty1,tx2,ty2,tx1,ty2),outline=tbg,fill=tbg,width=11,tags=uid)
         content=self.create_text((tx1,ty2+12),text=text,font=font,fill=fg,width=width,anchor='nw',tags=uid)#便笺内容
         cx1,cy1,cx2,cy2=self.bbox(content)
         if cx2-cx1<width:
             cx2=cx1+width
-        contentback=self.create_polygon((cx1,cy1,cx2,cy1,cx2,cy2,cx1,cy2),outline=bg,fill=bg,width=10,tags=uid)
+        contentback=self.create_polygon((cx1,cy1,cx2,cy1,cx2,cy2,cx1,cy2),outline=bg,fill=bg,width=11,tags=uid)
         ax1,ay1,ax2,ay2=self.bbox(uid)#大背景
         ax1+=5
         ay1+=5
         ax2-=5
         ay2-=5
-        allback=self.create_polygon((ax1,ay1,ax2,ay1,ax2,ay2,ax1,ay2),outline=sep,fill=sep,width=10,tags=uid)
+        allback=self.create_polygon((ax1,ay1,ax2,ay1,ax2,ay2,ax1,ay2),outline=sep,fill=sep,width=11,tags=uid)
         #调整元素层级关系
         self.tkraise(topback)
         self.tkraise(toptext)
@@ -1796,7 +1797,7 @@ class BasicTinUI(Canvas):
                 center_x + (rm*cos(11*pi/10)),
                 center_y - (rm*sin(11*pi/10)),
             )
-            bar=self.create_polygon(points,fill=bg,outline=fg,joinstyle='miter',tags=uid)
+            bar=self.create_polygon(points,fill=bg,outline=fg,tags=uid)
             bars.append(bar)
             self.tag_bind(bar,'<Enter>',lambda event,bar=bar:onin(bar))
             self.tag_bind(bar,'<Leave>',lambda event,bar=bar:onleave(bar))
@@ -2007,7 +2008,7 @@ class BasicTinUI(Canvas):
         tx1,ty1,tx2,ty2=self.bbox(toptext)
         if tx2-tx1<width:#判读当前文本宽度
             tx2=tx1+width
-        topback=self.create_polygon((tx1,ty1,tx2,ty1,tx2,ty2,tx1,ty2),outline=tbg,fill=tbg,width=10,tags=(uid,contentid))#标题背景
+        topback=self.create_polygon((tx1,ty1,tx2,ty1,tx2,ty2,tx1,ty2),outline=tbg,fill=tbg,width=11,tags=(uid,contentid))#标题背景
         button=self.add_button2((tx2-2,ty1-0.5),anchor='ne',text='🔻',font=font,fg=tfg,bg=tbg,activebg=bg,command=do_expand)
         self.addtag_withtag(uid,button[-1])
         self.addtag_withtag(contentid,button[-1])
@@ -2021,7 +2022,7 @@ class BasicTinUI(Canvas):
         ax1+=5
         ay1+=5
         ax2-=5
-        allback=self.create_polygon((ax1,ay1,ax2,ay1,ax2,ay2,ax1,ay2),outline=sep,fill=sep,width=10,tags=uid)
+        allback=self.create_polygon((ax1,ay1,ax2,ay1,ax2,ay2,ax1,ay2),outline=sep,fill=sep,width=11,tags=uid)
         expand=False#当前还没有扩展
         #调整元素层级关系
         self.tkraise(topback)
@@ -2320,9 +2321,9 @@ if __name__=='__main__':
     b.add_info((710,140),info_text='this is info widget in TinUI, using TinUI\'s tooltip widget with its own style.')
     mtb=b.add_paragraph((0,720),'测试菜单（右键单击）')
     b.add_menubar(mtb,cont=(('command',print),('menu',test1),'-',('TinUI文本移动',test)))
-    ttb=b.add_paragraph((0,800),'TinUI能做些什么？')
+    ttb=b.add_paragraph((10,800),'TinUI能做些什么？')
     b.add_tooltip(ttb,'很多很多',delay=1)
-    b.add_back(pos=(0,0),uids=(ttb,),bg='cyan')
+    b.add_back(pos=(0,0),uids=(ttb,),bg='cyan',fg='cyan')
     _,_,ok3,_=b.add_waitbar3((600,800),width=240)
     b.add_button((600,750),text='停止带状等待框',command=lambda event:ok3())
     textbox=b.add_textbox((890,100),text='这是文本输入框，当然，无法在textbox的参数中绑定横向滚动'+'\n换行'*30)[0]

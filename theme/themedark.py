@@ -150,11 +150,41 @@ class TinUIDark(TinUITheme):
                 onfg='#ffffff',onbg='#282828',
                                     *arg,**kw)
 
+    def add_ratingbar(self,pos,*arg,**kw):
+        return self.ui.add_ratingbar(pos,
+                fg='#cccccc',bg='#202020',
+                onfg='#b2b8f2',onbg='#b2b8f2',
+                                     *arg,**kw)
+
     def add_radiobox(self,pos,*arg,**kw):
         return self.ui.add_radiobox(pos,
                 fontfg='#ffffff',fg='#939393',bg='#2a2a2a',
                 activefg='#959595',activebg='#2a2a2a',
                 onfg='#a3a8dc',onbg='#000000',
+                                    *arg,**kw)
+
+    def add_notecard(self,pos,*arg,**kw):
+        return self.ui.add_notecard(pos,
+                tfg='#ffffff',tbg='#2b2b2b',fg='#ffffff',
+                bg='#272727',sep='#1d1d1d',
+                                    *arg,**kw)
+
+    def add_pivot(self,pos,*arg,**kw):
+        return self.ui.add_pivot(pos,
+                fg='#a6a6a6',bg='',
+                activefg='#ffffff',activecolor='#5969e0',
+                                 *arg,**kw)
+
+    def add_button2(self,pos,*arg,**kw):
+        return self.ui.add_button2(pos,fg='#ffffff',bg='#2d2d2d',
+             activefg='#e8e8e8',activebg='#323232',
+             line='#303030',linew=1,activeline='#303030',
+                           *arg,**kw)
+
+    def add_expander(self,pos,*arg,**kw):
+        return self.ui.add_expander(pos,
+                tfg='#ffffff',tbg='#2b2b2b',
+                bg='#272727',sep='#1d1d1d',
                                     *arg,**kw)
 
 
@@ -253,9 +283,19 @@ for i in ntvdict:
 </tinui>'''
     uxml.loadxml(xml)
     num+=1
+#ratingcontrol
+du.add_ratingbar(end())
 #radiobutton
 du.add_radiobox(end(),command=print)
+#expander
+du.add_notecard(end())
+#pivot
+du.add_pivot(end())
+#button
+du.add_button2(end(),'button2')
+#expander
+du.add_expander(end())
 
 u.add_back(end())
-r.r.title('TinUI light theme')
+r.r.title('TinUI dark theme')
 r.go()

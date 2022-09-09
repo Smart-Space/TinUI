@@ -1,0 +1,17 @@
+# TinUI项目贡献者
+
+以github名称及相关开源平台昵称为名。
+
+## Smart-Space
+
+[Smart-Space](https://github.com/Smart-Space)，
+
+TinUI发起人以及版权所有者，主要贡献者、维护者。
+
+全权参与TinUI的维护和开发。
+
+## TotoWang-hhh
+
+[TotoWang-hhh](https://github.com/TotoWang-hhh)，
+
+为TinUI提供了在windows上自动识别深浅色模式样式。

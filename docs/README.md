@@ -61,6 +61,10 @@ r.mainloop()
 
 [TinUI更新日志](https://tinui.smart-space.com.cn/changelog/ChangeLog.txt)。
 
+## 贡献者
+
+[TinUI贡献者列表](https://tinui.smart-space.com.cn/contributors)。
+
 ---
 
 # Class: TinUI(BasicTinUI)

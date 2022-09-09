@@ -6,7 +6,12 @@
 
 
 ==========3.3x==========
-2022-9
+2022-9-
+1. 感谢TotoWang-hhh（github）提交的自动识别windows系统深浅色模式样式
+2.
+
+==========3.31==========
+2022-9-9
 1. onoff移动动画
 2. 创建TinUIWidget类，用来显示单个元素控件
 3. 修改expander, notebook, notecard的圆角

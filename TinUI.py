@@ -2030,6 +2030,53 @@ class BasicTinUI(Canvas):
         self.tkraise(button[-1])
         return toptext,ui,ux,uid
 
+    def add_waitframe(self,pos:tuple,width=300,height=300,fg='#e0e0e0',bg='#ececee'):#元素等待框
+        def __start():
+            nonlocal nowx,nowmove
+            if wait==True:
+                if nowx>=width:#移动到位
+                    nowx=0
+                    #切换移动元素，重新调整层级
+                    if nowmove==itemfg:
+                        frame.lower(itemfg)
+                        frame.move(itembg,-width,-height)
+                        nowmove=itembg
+                    else:
+                        frame.lower(itembg)
+                        frame.move(itemfg,-width,-height)
+                        nowmove=itemfg
+                frame.move(nowmove,mx,my)
+                nowx+=mx
+                frame.after(25,__start)
+            else:
+                self.itemconfig(uid,state='hidden')
+        def start():
+            nonlocal wait
+            wait=True
+            self.itemconfig(uid,state='normal')
+            __start()
+        def end():
+            nonlocal wait
+            wait=False
+        frame=BasicTinUI(self,width=width,height=height,bg=bg)
+        frameid=self.create_window(pos,window=frame,width=width,height=height,anchor='nw')
+        uid='waitframe'+str(frameid)
+        self.addtag_withtag(uid,frameid)
+        itemfg=frame.create_polygon((0,0,width,0,width,height,0,height),outline=fg,fill=fg,width=21)
+        itembg=frame.create_polygon((0,0,width,0,width,height,0,height),outline=bg,fill=bg,width=21)
+        frame.move(itemfg,-width,-height)
+        mx=width/40
+        my=height/40
+        nowmove=itemfg#当前移动元素
+        nowx=0#当前移动元素的横向移动量
+        wait=False
+        funcs=FuncList(2)
+        funcs.start=start
+        funcs.end=end
+        self.itemconfig(uid,state='hidden')
+        #start()
+        return frame,itemfg,itembg,funcs,uid
+
 
 class TinUI(BasicTinUI):
     '''对BasicTinUI的封装，添加了滚动条自动刷新'''
@@ -2280,6 +2327,10 @@ def test9():
 </tinui>''')
 def test10(tag):
     b.itemconfig(pivott,text='pivot text: '+tag)
+def test11_1(e):
+    wffunc.start()
+def test11_2(e):
+    wffunc.end()
 
 if __name__=='__main__':
     a=Tk()
@@ -2369,6 +2420,10 @@ if __name__=='__main__':
     <line><paragraph text='感觉如何？' width='190'></paragraph></line><line><ratingbar></ratingbar>
     </line></tinui>
     ''')
+    b.add_button((1220,650),text='获取TinUI相关信息',command=test11_1)
+    wf,_,_,wffunc,_=b.add_waitframe((1220,700),height=250)
+    wf.add_paragraph((150,100),text='Loading . . .',anchor='n')
+    wf.add_button2((150,150),text='取消等待❌',anchor='n',command=test11_2)
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))

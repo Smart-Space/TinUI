@@ -1111,6 +1111,34 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+### add_waitframe(self,pos:tuple,width=300,height=300,fg='#e0e0e0',bg='#ececee')
+
+- pos::位置
+- width::宽度
+- height::盖度
+- fg::前景色
+- bg::背景色
+
+绘制一个元素等待框。
+
+### return: frame, itemfg, itembg, funcs, uid
+
+> frame::元素框控件（BasicTinUI）
+>
+> itemfg::标识元素1
+>
+> itembg::标识元素2
+>
+> funcs
+>
+> > `funcs.start()`::开启等待覆盖
+> >
+> > `fucns.end()`::结束等待覆盖
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI元素等待框.gif)
+
+---
+
 # Class: BasicTinUI
 
 TinUI的基础类，仅提供组件绘制。

@@ -1342,8 +1342,44 @@ class BasicTinUI(Canvas):
         box.bind('<MouseWheel>',set_y_view)
         return box,uid
 
-    def add_listview(self,pos:tuple)->FunctionType:#绘制列表视图,function:add_list
-        ...
+    def add_listview(self,pos:tuple,width=300,height=300,linew=80,bg='#f3f3f3',activebg='#eaeaea',oncolor='#3041d8',scrobg='#f8f8f8',scroc='#999999',scrooc='#89898b',num=5):#绘制列表视图,function:add_list
+        def buttonin(itui):
+            itui[0]['background']=activebg
+        def buttonout(itui):
+            if items.index(itui)!=nowon:
+                itui[0]['background']=bg
+        def click(itui):
+            nonlocal nowon
+            index=items.index(itui)
+            items[nowon][0]['background']=bg
+            nowon=index
+            items[nowon][0]['background']=activebg
+            ui.coords(line,1,index*(linew+2)+lineheight,1,index*(linew+2)+lineheight*2)
+        def bindyview(event):
+            ui.yview_scroll(int(-1*(event.delta/120)), "units")
+        nowon=-1
+        ui=BasicTinUI(self,bg=bg)
+        view=self.create_window(pos,window=ui,height=height,width=width,anchor='nw')
+        uid='listview'+str(view)
+        self.addtag_withtag(uid,view)
+        scro=self.add_scrollbar((pos[0]+width+2,pos[1]),ui,height=height,bg=scrobg,color=scroc,oncolor=scrooc)
+        self.addtag_withtag(uid,scro[-1])
+        items=[]#使用列表作为存储类型，以后可能动态修改列表视图元素
+        endy=0
+        for i in range(0,num):
+            item=ui.add_ui((3,endy),width=width-3,height=linew,bg=bg)
+            items.append(item)
+            endy+=linew+2
+            item[0].bind('<Enter>',lambda event,item=item:buttonin(item))
+            item[0].bind('<Button-1>',lambda event,item=item:click(item))
+            item[0].bind('<Leave>',lambda event,item=item:buttonout(item))
+            item[0].bind('<MouseWheel>',bindyview)
+        lineheight=linew/3
+        line=ui.create_line((1,linew/3,1,linew*2/3),fill=oncolor,width=3,capstyle='round')
+        ui.config(scrollregion=ui.bbox('all'))
+        ui.move(line,0,-linew-height)
+        self.add_back((),(view,scro[-1]),fg=bg,bg=bg,linew=3)
+        return ui,scro,items,uid
 
     def add_canvas(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',linew=1,scrollbar=False,anchor='nw'):#绘制画布
         def re_scrollregion():#更新滚动范围
@@ -2077,6 +2113,23 @@ class BasicTinUI(Canvas):
         #start()
         return frame,itemfg,itembg,funcs,uid
 
+    def add_treeview(self,pos:tuple,width=200,height=300,content=(('one',('1','2','3')),'two',('three',('a','b','c')),'four'),):#树状图
+        '''
+        content=(
+        a,
+        (b,(b1,b2,b3)),
+        (c,(c1,(c2-1,c2-2),c3)),
+        d,
+        )
+        '''
+        def buttonin():
+            ...
+        def buttonout():
+            ...
+        def click():
+            ...
+        ...
+
 
 class TinUI(BasicTinUI):
     '''对BasicTinUI的封装，添加了滚动条自动刷新'''
@@ -2390,7 +2443,7 @@ if __name__=='__main__':
     uixml,add_ui_id=b.add_ui((150,890),scrollbar=True,region='auto')[-2:]
     uixml.loadxml('''<tinui><line>
     <button text='button in child tinui'></button>
-    <label text='you can use BasicTinUI in a father TinUI&#x000A;by using&#x000A;tinui.add_uid(...)'></label>
+    <label text='you can use BasicTinUI in a father TinUI&#x000A;by using&#x000A;tinui.add_ui(...)'></label>
     </line><line>
     <label text='you can use&#x000A;manual function re-region&#x000A;also can use&#x000A;auto function&#x000A;just one&#x000A;like&#x000A;this'>
     </label>
@@ -2424,6 +2477,27 @@ if __name__=='__main__':
     wf,_,_,wffunc,_=b.add_waitframe((1220,700),height=250)
     wf.add_paragraph((150,100),text='Loading . . .',anchor='n')
     wf.add_button2((150,150),text='取消等待❌',anchor='n',command=test11_2)
+    lvitems=b.add_listview((1220,980))[2]
+    lvcontent=(
+    ('BasicTinUI','TinUI框架渲染核心','https://tinui.smart-space.com.cn'),
+    ('TinUI','基于tkinter的现代元素控件框架','https://smart-space.com.cn/project/TinUI/index.html'),
+    ('CSDN','中文IT技术交流平台','https://www.csdn.net/'),
+    ('百度','全球领先的中文搜索引擎','https://www.baidu.com/'),
+    ('Smart-Space','一个平凡的中国人','https://smart-space.com.cn')
+    )
+    for i in range(0,5):
+        print(lvitems[i][2])
+        lvitems[i][2].loadxml(f'''<tinui>
+        <line>
+        <line>
+        <title text='{lvcontent[i][0]}'></title>
+        <link text='相关链接' url='{lvcontent[i][2]}'></link>
+        </line>
+        <line>
+        <label text='{lvcontent[i][1]}'></label>
+        </line>
+        </line>
+        </tinui>''')
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))

@@ -1139,6 +1139,34 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+### add_listview(self,pos:tuple,width=300,height=300,linew=80,bg='#f3f3f3',activebg='#eaeaea',oncolor='#3041d8',scrobg='#f8f8f8',scroc='#999999',scrooc='#89898b',num=5)
+
+- pos::位置
+- width::宽度
+- height::高度
+- linew::单元素高度
+- bg::背景色
+- activebg::响应鼠标提示色
+- oncolor::选中提示色
+- scrobg::滚动条背景色
+- scroc::滚动条颜色
+- scrooc::滚动条提示色
+- num::元素数量
+
+绘制一个列表视图。
+
+### return: ui, scro, items, uid
+
+> ui::列表框架BasicTinUI
+>
+> scro::滚动条返回值，`add_scrollbar`
+>
+> items::元素列表，每个元素为ui返回值，`add_ui`
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI列表视图.gif)
+
+---
+
 # Class: BasicTinUI
 
 TinUI的基础类，仅提供组件绘制。

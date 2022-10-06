@@ -1139,7 +1139,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_listview(self,pos:tuple,width=300,height=300,linew=80,bg='#f3f3f3',activebg='#eaeaea',oncolor='#3041d8',scrobg='#f8f8f8',scroc='#999999',scrooc='#89898b',num=5)
+### add_listview(self,pos:tuple,width=300,height=300,linew=80,bg='#f3f3f3',activebg='#eaeaea',oncolor='#3041d8',scrobg='#f8f8f8',scroc='#999999',scrooc='#89898b',num=5,command=None)
 
 - pos::位置
 - width::宽度
@@ -1152,6 +1152,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - scroc::滚动条颜色
 - scrooc::滚动条提示色
 - num::元素数量
+- command::选定时响应函数，需要一个参数：选中项的位次，从0开始
 
 绘制一个列表视图。
 

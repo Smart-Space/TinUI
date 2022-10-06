@@ -1342,7 +1342,7 @@ class BasicTinUI(Canvas):
         box.bind('<MouseWheel>',set_y_view)
         return box,uid
 
-    def add_listview(self,pos:tuple,width=300,height=300,linew=80,bg='#f3f3f3',activebg='#eaeaea',oncolor='#3041d8',scrobg='#f8f8f8',scroc='#999999',scrooc='#89898b',num=5):#绘制列表视图,function:add_list
+    def add_listview(self,pos:tuple,width=300,height=300,linew=80,bg='#f3f3f3',activebg='#eaeaea',oncolor='#3041d8',scrobg='#f8f8f8',scroc='#999999',scrooc='#89898b',num=5,command=None):#绘制列表视图,function:add_list
         def buttonin(itui):
             itui[0]['background']=activebg
         def buttonout(itui):
@@ -1355,6 +1355,8 @@ class BasicTinUI(Canvas):
             nowon=index
             items[nowon][0]['background']=activebg
             ui.coords(line,1,index*(linew+2)+lineheight,1,index*(linew+2)+lineheight*2)
+            if command!=None:
+                command(nowon)
         def bindyview(event):
             ui.yview_scroll(int(-1*(event.delta/120)), "units")
         nowon=-1
@@ -1379,6 +1381,7 @@ class BasicTinUI(Canvas):
         ui.config(scrollregion=ui.bbox('all'))
         ui.move(line,0,-linew-height)
         self.add_back((),(view,scro[-1]),fg=bg,bg=bg,linew=3)
+        ui.bind('<MouseWheel>',bindyview)
         return ui,scro,items,uid
 
     def add_canvas(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',linew=1,scrollbar=False,anchor='nw'):#绘制画布
@@ -2486,7 +2489,6 @@ if __name__=='__main__':
     ('Smart-Space','一个平凡的中国人','https://smart-space.com.cn')
     )
     for i in range(0,5):
-        print(lvitems[i][2])
         lvitems[i][2].loadxml(f'''<tinui>
         <line>
         <line>

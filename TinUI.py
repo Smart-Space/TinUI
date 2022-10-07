@@ -2133,6 +2133,13 @@ class BasicTinUI(Canvas):
             ...
         ...
 
+    def add_togglebutton(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='',activebg='',activeline='',font=('微软雅黑',12),command=None,anchor='nw'):#绘制开关按钮
+        ...
+
+    def add_passwordbox(self,pos:tuple,width:int,text:str='',fg='#606060',bg='#f6f6f6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#868686',onoutline='#3041d8',anchor='nw',command=None):#绘制密码输入框
+        #👁️眼睛
+        ...
+
 
 class TinUI(BasicTinUI):
     '''对BasicTinUI的封装，添加了滚动条自动刷新'''

@@ -187,6 +187,17 @@ class TinUIDark(TinUITheme):
                 bg='#272727',sep='#1d1d1d',
                                     *arg,**kw)
 
+    def add_waitframe(self,pos,*arg,**kw):
+        return self.ui.add_waitframe(pos,
+                fg='#2d2d2d',bg='#323232',
+                                     *arg,**kw)
+
+    def add_listview(self,pos,*arg,**kw):
+        return self.ui.add_listview(pos,
+                bg='#202020',activebg='#2d2d2d',oncolor='#b2b8f2',
+                scrobg='#2e2e2e',scroc='#9a9a9a',scrooc='#9f9f9f',
+                                    *arg,**kw)
+
 
 def end():
     bbox=u.bbox('all')
@@ -295,6 +306,11 @@ du.add_pivot(end())
 du.add_button2(end(),'button2')
 #expander
 du.add_expander(end())
+#animation interop
+wffunc=du.add_waitframe((end()[0],end()[1]+200))[3]
+wffunc.start()
+#listview
+du.add_listview(end(),num=10)
 
 u.add_back(end())
 r.r.title('TinUI dark theme')

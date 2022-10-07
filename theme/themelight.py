@@ -187,6 +187,17 @@ class TinUILight(TinUITheme):
                 bg='#f4f4f4',sep='#e5e5e5',
                                     *arg,**kw)
 
+    def add_waitframe(self,pos,*arg,**kw):
+        return self.ui.add_waitframe(pos,
+                fg='#fbfbfb',bg='#f6f6f6',
+                                     *arg,**kw)
+
+    def add_listview(self,pos,*arg,**kw):
+        return self.ui.add_listview(pos,
+                bg='#f3f3f3',activebg='#eaeaea',oncolor='#3041d8',
+                scrobg='#f8f8f8',scroc='#868686',scrooc='#898989',
+                                    *arg,**kw)
+
 
 def end():
     bbox=u.bbox('all')
@@ -292,6 +303,11 @@ du.add_pivot(end())
 du.add_button2(end(),'button2')
 #expander
 du.add_expander(end())
+#animation interop
+wffunc=du.add_waitframe((end()[0],end()[1]+200))[3]
+wffunc.start()
+#listview
+du.add_listview(end(),num=10)
 
 u.add_back(end())
 r.r.title('TinUI light theme')

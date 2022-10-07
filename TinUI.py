@@ -2171,7 +2171,11 @@ class TinUI(BasicTinUI):
             self.unbind("<Configure>")
 
     def set_y_view(self,event):
-        self.yview_scroll(int(-1*(event.delta/120)), "units")
+        print(event.state)
+        if event.state==0:#纵向滚动
+            self.yview_scroll(int(-1*(event.delta/120)), "units")
+        elif event.state==1:#横向滚动
+            self.xview_scroll(int(-1*(event.delta/120)), "units")
     def update__(self):#更新宽高
         try:
             bbox=self.bbox('all')

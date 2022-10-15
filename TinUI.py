@@ -991,7 +991,6 @@ class BasicTinUI(Canvas):
             if first:
                 first=False
                 first_create()
-                print('ok')
             if delay!=0 and flag:
                 if timethread==None:#重复利用计时器，避免占用资源
                     timethread=threading.Timer(delay,show_toti,[event,None])

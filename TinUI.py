@@ -987,7 +987,11 @@ class BasicTinUI(Canvas):
 
     def add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',outline='#3b3b3b',font='微软雅黑 12',tran='#01FF11',delay=0,width=400):#绘制窗口提示框
         def show_toti(event,flag=True):
-            nonlocal timethread
+            nonlocal timethread,first
+            if first:
+                first=False
+                first_create()
+                print('ok')
             if delay!=0 and flag:
                 if timethread==None:#重复利用计时器，避免占用资源
                     timethread=threading.Timer(delay,show_toti,[event,None])
@@ -1012,35 +1016,46 @@ class BasicTinUI(Canvas):
             if delay!=0:
                 timethread.cancel()
             toti.withdraw()
-        toti=Toplevel()
-        toti.withdraw()
-        toti.overrideredirect(True)
-        bar=BasicTinUI(toti,bg=tran)
-        bar.pack(fill='both',expand=True)
-        info=bar.create_text((10,10),text=text,fill=fg,width=width,font=font,anchor='nw')
-        bbox=list(bar.bbox(info))
-        width=bbox[2]-bbox[0]+10
-        height=bbox[3]-bbox[1]+10
-        bbox[0]+=5
-        bbox[1]+=5
-        bbox[2]-=5
-        bbox[3]-=5
-        #绘制圆角边框
-        tlinemap=((bbox[0]-1,bbox[1]-1),(bbox[2]+1,bbox[1]-1),(bbox[2]+1,bbox[3]+1),(bbox[0]-1,bbox[3]+1))
-        tline=bar.create_polygon(tlinemap,fill=outline,outline=outline,width=15)
-        start=bbox[2]-bbox[0]
-        gomap=((bbox[0],bbox[1]),(bbox[2],bbox[1]),(bbox[2],bbox[3]),(bbox[0],bbox[3]))
-        tback=bar.create_polygon(gomap,fill=bg,outline=bg,width=15)
-        bar.tkraise(info)
+        def first_create():#首次使用时创建
+            nonlocal toti, bar, bbox, width, height
+            toti=Toplevel()
+            toti.withdraw()
+            toti.overrideredirect(True)
+            bar=BasicTinUI(toti,bg=tran)
+            bar.pack(fill='both',expand=True)
+            info=bar.create_text((10,10),text=text,fill=fg,width=width,font=font,anchor='nw')
+            bbox=list(bar.bbox(info))
+            width=bbox[2]-bbox[0]+10
+            height=bbox[3]-bbox[1]+10
+            bbox[0]+=5
+            bbox[1]+=5
+            bbox[2]-=5
+            bbox[3]-=5
+            #绘制圆角边框
+            tlinemap=((bbox[0]-1,bbox[1]-1),(bbox[2]+1,bbox[1]-1),(bbox[2]+1,bbox[3]+1),(bbox[0]-1,bbox[3]+1))
+            tline=bar.create_polygon(tlinemap,fill=outline,outline=outline,width=15)
+            start=bbox[2]-bbox[0]
+            gomap=((bbox[0],bbox[1]),(bbox[2],bbox[1]),(bbox[2],bbox[3]),(bbox[0],bbox[3]))
+            tback=bar.create_polygon(gomap,fill=bg,outline=bg,width=15)
+            bar.tkraise(info)
+            toti.attributes('-transparent',tran)
+            toti.attributes('-alpha',0.9)#透明度90%
+        def get_return():
+            return toti,bar
+        toti=None
+        bar=None
+        bbox=None
+        width=None
+        height=None
         #屏幕尺寸
         maxx=self.winfo_screenwidth()
         maxy=self.winfo_screenheight()
+        #绑定事件
+        first=True
         self.tag_bind(uid,'<Enter>',show_toti)
         self.tag_bind(uid,'<Leave>',hide_toti)
-        toti.attributes('-transparent',tran)
-        toti.attributes('-alpha',0.9)#透明度90%
         timethread=None#延时计时器
-        return toti,bar
+        return get_return
 
     def add_back(self,pos:tuple,uids:tuple=(),fg='',bg='',linew=0):#绘制背景或间隔框
         if len(uids)==0:#优先考虑uids参数，没有则使用pos参数
@@ -2136,7 +2151,7 @@ class BasicTinUI(Canvas):
     def add_togglebutton(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='',activebg='',activeline='',font=('微软雅黑',12),command=None,anchor='nw'):#绘制开关按钮
         ...
 
-    def add_passwordbox(self,pos:tuple,width:int,text:str='',fg='#606060',bg='#f6f6f6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#868686',onoutline='#3041d8',anchor='nw',command=None):#绘制密码输入框
+    def add_passwordbox(self,pos:tuple,width:int,fg='#606060',bg='#f6f6f6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#868686',onoutline='#3041d8',anchor='nw',command=None):#绘制密码输入框
         #👁️眼睛
         ...
 
@@ -2171,7 +2186,6 @@ class TinUI(BasicTinUI):
             self.unbind("<Configure>")
 
     def set_y_view(self,event):
-        print(event.state)
         if event.state==0:#纵向滚动
             self.yview_scroll(int(-1*(event.delta/120)), "units")
         elif event.state==1:#横向滚动

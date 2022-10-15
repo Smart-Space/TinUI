@@ -663,11 +663,9 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个信息提示窗口。
 
-### return: toti, bar
+### return: get_return
 
-> toti::提示窗口（Toplevel）
-> 
-> bar::提示窗口中的TinUI
+> get_return::函数，获取toti（提示窗口）和bar（其中的TinUI）
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI窗口提示.gif)
 

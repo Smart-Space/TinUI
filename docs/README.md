@@ -663,11 +663,9 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个信息提示窗口。
 
-### return: toti, bar
+### return: get_return
 
-> toti::提示窗口（Toplevel）
-> 
-> bar::提示窗口中的TinUI
+> get_return::函数，获取toti（提示窗口）和bar（其中的TinUI）
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI窗口提示.gif)
 
@@ -1136,6 +1134,35 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > > `fucns.end()`::结束等待覆盖
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI元素等待框.gif)
+
+---
+
+### add_listview(self,pos:tuple,width=300,height=300,linew=80,bg='#f3f3f3',activebg='#eaeaea',oncolor='#3041d8',scrobg='#f8f8f8',scroc='#999999',scrooc='#89898b',num=5,command=None)
+
+- pos::位置
+- width::宽度
+- height::高度
+- linew::单元素高度
+- bg::背景色
+- activebg::响应鼠标提示色
+- oncolor::选中提示色
+- scrobg::滚动条背景色
+- scroc::滚动条颜色
+- scrooc::滚动条提示色
+- num::元素数量
+- command::选定时响应函数，需要一个参数：选中项的位次，从0开始
+
+绘制一个列表视图。
+
+### return: ui, scro, items, uid
+
+> ui::列表框架BasicTinUI
+>
+> scro::滚动条返回值，`add_scrollbar`
+>
+> items::元素列表，每个元素为ui返回值，`add_ui`
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI列表视图.gif)
 
 ---
 

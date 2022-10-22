@@ -1889,7 +1889,7 @@ class BasicTinUI(Canvas):
             select=sel
             if old_select>=0:#恢复原先的单选组
                 old_sign=boxes[old_select][0]
-                self.itemconfig(old_sign,width=1)
+                self.itemconfig(old_sign,width=2)
                 button_out(None,None,old_sign)
                 self.update()
             self.itemconfig(sign,outline=onfg,fill=onbg,width=on_line)
@@ -1898,11 +1898,11 @@ class BasicTinUI(Canvas):
                 text=self.itemcget(textid,'text')
                 command(text)
         #标识符内部宽度width和边框宽度line
-        back_width=16
-        back_line=1#16+1*2=18
+        back_width=18
+        back_line=2#16+2*2=20
         #active... = back...
-        on_width=8
-        on_line=4#8+(4+1)*2=18
+        on_width=6
+        on_line=4#6+(4+2)*2=18
         boxes=[]#[(sign_id,text_id,back_id),...]，换行为(None,'\n',None)
         nowx,nowy=pos#x坐标为左上角插入坐标，y坐标为底部坐标
         uid='radiobox'+str(id(pos))

@@ -1156,7 +1156,11 @@ class BasicTinUI(Canvas):
             self.itemconfig(top,fill='')
             self.itemconfig(bottom,fill='')
             self.itemconfig(back,outline='')
+        def __move(event):#可能用来实现平滑滚动
+            #print(event)
+            ...
         def widget_move(sp,ep):#控件控制滚动条滚动
+            #print(sp,ep)
             if mode=='y' and use_widget:
                 startp=start+canmove*float(sp)
                 endp=start+canmove*float(ep)
@@ -1266,6 +1270,7 @@ class BasicTinUI(Canvas):
             canmove=end-start
             #绑定组件
             widget.config(yscrollcommand=widget_move)
+            #widget.bind('<MouseWheel>',__move)
         elif mode=='x':
             back=self.create_polygon((pos[0]+5,pos[1]+5,pos[0]+height-5,pos[1]+5,pos[0],pos[1]+5),
             width=13,outline=bg)
@@ -1394,7 +1399,8 @@ class BasicTinUI(Canvas):
         line=ui.create_line((1,linew/3,1,linew*2/3),fill=oncolor,width=3,capstyle='round')
         ui.config(scrollregion=ui.bbox('all'))
         ui.move(line,0,-linew-height)
-        self.add_back((),(view,scro[-1]),fg=bg,bg=bg,linew=3)
+        allback=self.add_back((),(view,scro[-1]),fg=bg,bg=bg,linew=3)
+        self.addtag_withtag(uid,allback)
         ui.bind('<MouseWheel>',bindyview)
         return ui,scro,items,uid
 
@@ -2130,7 +2136,7 @@ class BasicTinUI(Canvas):
         #start()
         return frame,itemfg,itembg,funcs,uid
 
-    def add_treeview(self,pos:tuple,width=200,height=300,content=(('one',('1','2','3')),'two',('three',('a','b','c')),'four'),):#树状图
+    def add_treeview(self,pos:tuple,fg='#1a1a1a',bg='#f3f3f3',onfg='#1a1a1a',onbg='#eaeaea',oncolor='#3041d8',signcolor='#3c3c3c',width=200,height=300,font='微软雅黑 12',content=(('one',('1','2','3')),'two',('three',('a',('b',('b1','b2','b3')),'c')),'four'),command=None):#树状图
         '''
         content=(
         a,
@@ -2139,13 +2145,139 @@ class BasicTinUI(Canvas):
         d,
         )
         '''
-        def buttonin():
+        def buttonin(cid):
+            if cid!=nowid:
+                box.itemconfig(cid,fill=onbg,outline=onbg)
+        def buttonout(cid):
+            if cid!=nowid:
+                box.itemconfig(cid,fill=bg,outline=bg)
+        def click(cid):
+            nonlocal nowid
+            if cid!=nowid:
+                box.itemconfig(cid,fill=onbg,outline=onbg)
+                box.itemconfig(nowid,fill=bg,outline=bg)
+                nowid=cid
+                posi=box.bbox(nowid)[1]
+                box.moveto(line,1,posi+linew/5)
+            if command!=None:
+                fln.father_link=[cid]#父级关系
+                find_father_link(fln,cid)
+                command(fln.father_link[::-1])#[父级, 子1级, 子2级...]
+        def find_father_link(fln,cid):#获取元素父级关系
+            for i in items_dict:
+                if cid in items_dict[i]:
+                    fln.father_link.append(i)
+                    find_father_link(fln,i)
+        def endy():
+            return box.bbox('all')[-1]
+        def add_item(padx=5,texts:tuple=(),father_id=None):#添加元素
+            child_id=[]
+            for text in texts:
+                y=endy()+3
+                if type(text)==str:
+                    te=box.create_text((padx+15,y),text=text,font=font,fill=fg,anchor='nw')
+                    back=box.add_back((),tuple([te]),fg=bg,bg=bg,linew=3)
+                    items[back]=(te,back)
+                else:
+                    sign=box.create_text((padx,y),text='▽',font='Consolas 13',fill=signcolor,anchor='nw')#▷
+                    te=box.create_text((padx+15,y),text=text[0],font=font,fill=fg,anchor='nw')
+                    back=box.add_back((),tuple((sign,te)),fg=bg,bg=bg,linew=3)
+                    items[back]=(te,back,sign)
+                    add_item(padx+15,text[1],back)
+                    box.tag_bind(sign,'<Button-1>',lambda event,s=sign,cid=back:close_view(s,cid))
+                box.tag_bind(back,'<Enter>',lambda event,_id=back:buttonin(_id))
+                box.tag_bind(back,'<Leave>',lambda event,_id=back:buttonout(_id))
+                box.tag_bind(back,'<Button-1>',lambda event,_id=back:click(_id))
+                box.tag_bind(te,'<Enter>',lambda event,_id=back:buttonin(_id))
+                box.tag_bind(te,'<Leave>',lambda event,_id=back:buttonout(_id))
+                box.tag_bind(te,'<Button-1>',lambda event,_id=back:click(_id))
+                child_id.append(back)
+            if father_id!=None:#存在父级
+                items_dict[father_id]=tuple(child_id)
+        def get_cids(cid):
+            cids=[]
+            if cid in items_dict:
+                for i in items_dict[cid]:
+                    cids.append(i)
+                    ccids=get_cids(i)
+                    cids+=ccids
+            return cids
+        def open_view(sign,cid):#展开
+            box.tag_bind(sign,'<Button-1>',lambda event:close_view(sign,cid))
+            box.itemconfig(sign,text='▽')
+            cids=get_cids(cid)
+            for i in cids:
+                #print(box.itemcget(items[i][0],'text'))
+                for uid in items[i]:
+                    box.addtag_withtag('move',uid)
+            box.itemconfig('move',state='normal')
+            bbox=box.bbox('move')
+            index=tuple(items.keys()).index(cids[-1])+1
+            if index!=len(items.keys()):
+                height=bbox[3]-bbox[1]#获取移动模块高度
+                for i in tuple(items.keys())[index:]:
+                    for uid in items[i]:
+                        box.move(uid,0,height)
+            box.dtag('move')
+            box.config(scrollregion=box.bbox('all'))
             ...
-        def buttonout():
+        def close_view(sign,cid):#闭合
+            box.tag_bind(sign,'<Button-1>',lambda event:open_view(sign,cid))
+            box.itemconfig(sign,text='▷')
+            cids=get_cids(cid)
+            for i in cids:
+                #print(box.itemcget(items[i][0],'text'))
+                for uid in items[i]:
+                    box.addtag_withtag('move',uid)
+            bbox=box.bbox('move')
+            box.itemconfig('move',state='hidden')
+            index=tuple(items.keys()).index(cids[-1])+1
+            if index!=len(items.keys()):
+                height=bbox[3]-bbox[1]#获取移动模块高度
+                for i in tuple(items.keys())[index:]:
+                    for uid in items[i]:
+                        box.move(uid,0,-height)
+            box.dtag('move')
+            box.config(scrollregion=box.bbox('all'))
             ...
-        def click():
-            ...
-        ...
+        def bindview(event):
+            if event.state==0:
+                box.yview_scroll(int(-1*(event.delta/120)), "units")
+            elif event.state==1:
+                box.xview_scroll(int(-1*(event.delta/120)), "units")
+        nowid=None
+        fln=TinUINum()#用于寻找父级关系，目前效率比较低，之后考虑优化
+        frame=BasicTinUI(self,bg=bg)#主显示框，显示滚动条
+        box=BasicTinUI(frame,bg=bg,width=width,height=height)#显示选择内容
+        box.place(x=12,y=12)
+        cavui=self.create_window(pos,window=frame,width=width+24,height=height+24,anchor='nw')
+        uid='treeview'+str(cavui)
+        self.addtag_withtag(uid,cavui)
+        yscro=frame.add_scrollbar((width+12,12),widget=box,height=height,bg=bg,color=signcolor,oncolor=signcolor)#纵向
+        xscro=frame.add_scrollbar((12,height+12),widget=box,height=width,direction='x',bg=bg,color=signcolor,oncolor=signcolor)#横向
+        #id为back的uid
+        items=dict()#元素对象{id:(text,back,[sign]),...}
+        items_dict=dict()#链接关系（下一级）{id:(id1,id2,id3,...),id2:(id2-1,id2-2,...),id-new:(...)...}
+        box.add_back((0,0,0,0),linew=0)
+        add_item(5,content)
+        #重绘宽度
+        bbox=box.bbox(tuple(items.keys())[0])#第一个元素高度-4
+        linew=bbox[3]-bbox[1]
+        line=box.create_line((1,linew/3,1,linew*2/3),fill=oncolor,width=3,capstyle='round')
+        #重绘宽度
+        maxwidth=bbox[2]
+        if maxwidth<width-14:maxwidth=width-14
+        for i in items.keys():
+            old_coords=box.coords(i)
+            old_coords[0]=old_coords[6]=6.0
+            old_coords[2]=old_coords[4]=6+maxwidth
+            box.coords(i,old_coords)
+        allback=self.add_back((),tuple([cavui]),fg=bg,bg=bg,linew=3)
+        self.addtag_withtag(uid,allback)
+        box.config(scrollregion=box.bbox('all'))
+        box.move(line,0,-linew-height)
+        box.bind('<MouseWheel>',bindview)
+        return items,items_dict,box,uid
 
     def add_togglebutton(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='',activebg='',activeline='',font=('微软雅黑',12),command=None,anchor='nw'):#绘制开关按钮
         ...
@@ -2524,6 +2656,7 @@ if __name__=='__main__':
         </line>
         </line>
         </tinui>''')
+    b.add_treeview((1220,1300),command=print)
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))

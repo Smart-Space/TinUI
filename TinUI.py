@@ -2136,12 +2136,12 @@ class BasicTinUI(Canvas):
         #start()
         return frame,itemfg,itembg,funcs,uid
 
-    def add_treeview(self,pos:tuple,fg='#1a1a1a',bg='#f3f3f3',onfg='#1a1a1a',onbg='#eaeaea',oncolor='#3041d8',signcolor='#3c3c3c',width=200,height=300,font='微软雅黑 12',content=(('one',('1','2','3')),'two',('three',('a',('b',('b1','b2','b3')),'c')),'four'),command=None):#树状图
+    def add_treeview(self,pos:tuple,fg='#1a1a1a',bg='#f3f3f3',onfg='#1a1a1a',onbg='#eaeaea',oncolor='#3041d8',signcolor='#8a8a8a',width=200,height=300,font='微软雅黑 12',content=(('one',('1','2','3')),'two',('three',('a',('b',('b1','b2','b3')),'c')),'four'),command=None):#树状图
         '''
         content=(
         a,
         (b,(b1,b2,b3)),
-        (c,(c1,(c2-1,c2-2),c3)),
+        (c,(c1,(c2,(c2-1,c2-2)),c3)),
         d,
         )
         '''
@@ -2153,12 +2153,12 @@ class BasicTinUI(Canvas):
                 box.itemconfig(cid,fill=bg,outline=bg)
         def click(cid):
             nonlocal nowid
-            if cid!=nowid:
-                box.itemconfig(cid,fill=onbg,outline=onbg)
-                box.itemconfig(nowid,fill=bg,outline=bg)
-                nowid=cid
-                posi=box.bbox(nowid)[1]
-                box.moveto(line,1,posi+linew/5)
+            box.itemconfig(line,state='normal')
+            box.itemconfig(nowid,fill=bg,outline=bg)#原来的
+            box.itemconfig(cid,fill=onbg,outline=onbg)#现在的
+            nowid=cid#互换次序
+            posi=box.bbox(nowid)[1]
+            box.moveto(line,1,posi+linew/5)
             if command!=None:
                 fln.father_link=[cid]#父级关系
                 find_father_link(fln,cid)
@@ -2174,11 +2174,11 @@ class BasicTinUI(Canvas):
             child_id=[]
             for text in texts:
                 y=endy()+3
-                if type(text)==str:
+                if type(text)==str:#单极
                     te=box.create_text((padx+15,y),text=text,font=font,fill=fg,anchor='nw')
                     back=box.add_back((),tuple([te]),fg=bg,bg=bg,linew=3)
                     items[back]=(te,back)
-                else:
+                else:#存在子级
                     sign=box.create_text((padx,y),text='▽',font='Consolas 13',fill=signcolor,anchor='nw')#▷
                     te=box.create_text((padx+15,y),text=text[0],font=font,fill=fg,anchor='nw')
                     back=box.add_back((),tuple((sign,te)),fg=bg,bg=bg,linew=3)
@@ -2203,43 +2203,55 @@ class BasicTinUI(Canvas):
                     cids+=ccids
             return cids
         def open_view(sign,cid):#展开
+            if box.itemcget(sign,'text')=='▽':
+                return
             box.tag_bind(sign,'<Button-1>',lambda event:close_view(sign,cid))
             box.itemconfig(sign,text='▽')
-            cids=get_cids(cid)
-            for i in cids:
-                #print(box.itemcget(items[i][0],'text'))
+            cids=items_dict[cid]
+            move='move'+str(cid)#单层管理命名元素
+            for i in cids:#只展开一层
                 for uid in items[i]:
-                    box.addtag_withtag('move',uid)
-            box.itemconfig('move',state='normal')
-            bbox=box.bbox('move')
+                    box.addtag_withtag(move,uid)
+            box.itemconfig(move,state='normal')
+            bbox=box.bbox(move)
+            if bbox==None:return
             index=tuple(items.keys()).index(cids[-1])+1
             if index!=len(items.keys()):
                 height=bbox[3]-bbox[1]#获取移动模块高度
                 for i in tuple(items.keys())[index:]:
                     for uid in items[i]:
                         box.move(uid,0,height)
-            box.dtag('move')
+            box.dtag(move)
+            if nowid in cids:#重新显示标识元素
+                click(nowid)
             box.config(scrollregion=box.bbox('all'))
-            ...
         def close_view(sign,cid):#闭合
+            if box.itemcget(sign,'text')=='▷':
+                return
             box.tag_bind(sign,'<Button-1>',lambda event:open_view(sign,cid))
             box.itemconfig(sign,text='▷')
             cids=get_cids(cid)
+            move='move'+str(cid)#单层管理命名元素
             for i in cids:
                 #print(box.itemcget(items[i][0],'text'))
                 for uid in items[i]:
-                    box.addtag_withtag('move',uid)
-            bbox=box.bbox('move')
-            box.itemconfig('move',state='hidden')
+                    box.addtag_withtag(move,uid)
+                if i in items_dict:
+                    close_view(items[i][-1],i)
+            bbox=box.bbox(move)
+            box.itemconfig(move,state='hidden')
             index=tuple(items.keys()).index(cids[-1])+1
             if index!=len(items.keys()):
                 height=bbox[3]-bbox[1]#获取移动模块高度
                 for i in tuple(items.keys())[index:]:
                     for uid in items[i]:
                         box.move(uid,0,-height)
-            box.dtag('move')
+            box.dtag(move)
+            if nowid in cids:#标识元素控制
+                box.itemconfig(line,state='hidden')
+            else:
+                click(nowid)#重新绘制位置
             box.config(scrollregion=box.bbox('all'))
-            ...
         def bindview(event):
             if event.state==0:
                 box.yview_scroll(int(-1*(event.delta/120)), "units")
@@ -2276,6 +2288,7 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(uid,allback)
         box.config(scrollregion=box.bbox('all'))
         box.move(line,0,-linew-height)
+        box.itemconfig(line,state='hidden')
         box.bind('<MouseWheel>',bindview)
         return items,items_dict,box,uid
 
@@ -2543,6 +2556,10 @@ def test11_1(e):
     wffunc.start()
 def test11_2(e):
     wffunc.end()
+def test12(cid):
+    for i in cid:
+        print(trvbox.itemcget(trvl[i][0],'text')+'/',end='')
+    print('')
 
 if __name__=='__main__':
     a=Tk()
@@ -2656,7 +2673,7 @@ if __name__=='__main__':
         </line>
         </line>
         </tinui>''')
-    b.add_treeview((1220,1300),command=print)
+    trvl,_,trvbox,_=b.add_treeview((1220,1300),command=test12)
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))

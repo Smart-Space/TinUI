@@ -1166,6 +1166,35 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+### add_treeview(self,pos:tuple,fg='#1a1a1a',bg='#f3f3f3',onfg='#1a1a1a',onbg='#eaeaea',oncolor='#3041d8',signcolor='#8a8a8a',width=200,height=300,font='微软雅黑 12',content=(('one',('1','2','3')),'two',('three',('a',('b',('b1','b2','b3')),'c')),'four'),command=None)
+
+- pos::位置
+- fg::文本颜色
+- bg::背景色
+- onfg::选中时文本颜色
+- onbg::选中时元素背景色
+- oncolor::标识符颜色
+- signcolor::滚动条提示色
+- width::宽度
+- height::高度
+- font::字体
+- content::内容数据。`(一级,一级,(一级,(二级)),一级)`可嵌套
+- command::回调函数，需要一个参数：选中项id的级次从属列表
+
+绘制一个树状图。
+
+### return: items, items_dict, box, uid
+
+> items::所有元素id对应的文本id、背景id，以及可能的伸缩提示文本id的字典
+>
+> items_dict::所有含子级元素id对应下一级id的字典
+>
+> box::作为树状图父组件的BasicTinUI
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI树状图.gif)
+
+---
+
 # Class: BasicTinUI
 
 TinUI的基础类，仅提供组件绘制。

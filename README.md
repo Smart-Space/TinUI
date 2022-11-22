@@ -24,9 +24,9 @@ TinUI基于tkinter的画布（Canvas），可以作为整个窗口的唯一控�
 
 TinUI使用GPLv3（GPL）作为开源协议。
 
-非商业软件，TinUI部分代码必须开源，即使源码被修改。开源的TinUI部分代码必须采用同样的开源协议——GPL，并且注明开发者 Smart-Space（JunmingZhang|张峻铭），以及GitHub/TinUI的开源代码库：https://github.com/Smart-Space/TinUI/
+非商业软件，TinUI部分代码必须开源，即使源码被修改。开源的TinUI部分代码必须采用同样的开源协议——GPL，并且注明开发者 Smart-Space（Junming Zhang），以及GitHub/TinUI的开源代码库：https://github.com/Smart-Space/TinUI/
 
-商业软件，需要添加TinUI的gpl-3.0.md的开源许可，为自身使用TinUI最初声明，并且公开TinUI部分的代码。此外，需要注明开发者（JunmingZhang|张峻铭）对TinUI的版权所有，以及GitHub/TinUI的开源代码库：https://github.com/Smart-Space/TinUI/
+商业软件，需要添加TinUI的gpl-3.0.md的开源许可，为自身使用TinUI最初声明，并且公开TinUI部分的代码。此外，需要注明开发者Smart-Space（Junming Zhang）对TinUI的版权所有，以及GitHub/TinUI的开源代码库：https://github.com/Smart-Space/TinUI/
 
 ## 简单示例
 

@@ -2298,6 +2298,16 @@ class BasicTinUI(Canvas):
     def add_passwordbox(self,pos:tuple,width:int,fg='#606060',bg='#f6f6f6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#868686',onoutline='#3041d8',anchor='nw',command=None):#绘制密码输入框
         #👁️眼睛
         ...
+    
+    def add_image(self,pos:tuple,width=None,height=None,imgfile=None,):#绘制静态图片
+        #这个控件是静态gif或者是png图片
+        ...
+    
+    #def add_image2(self):#绘制来自PIL的图片信息？？？绘制拓展格式图片
+    #    ...
+
+    #def add_gif(self):#绘制动图
+    #    ...
 
 
 class TinUI(BasicTinUI):

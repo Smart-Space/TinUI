@@ -2574,6 +2574,8 @@ def test12(cid):
 if __name__=='__main__':
     a=Tk()
     a.geometry('700x700+5+5')
+    a.iconbitmap('LOGO.ico')
+    a.title('TinUI控件展示')
 
     b=TinUI(a,bg='white')
     b.pack(fill='both',expand=True)

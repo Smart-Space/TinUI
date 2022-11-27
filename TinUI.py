@@ -95,6 +95,7 @@ class BasicTinUI(Canvas):
         self.init()
 
     def init(self):
+        self.images=[]
         self.title_size={0:20,1:18,2:16,3:14,4:12}
 
     def add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,anchor='nw',**kw):#绘制标题
@@ -1156,9 +1157,6 @@ class BasicTinUI(Canvas):
             self.itemconfig(top,fill='')
             self.itemconfig(bottom,fill='')
             self.itemconfig(back,outline='')
-        def __move(event):#可能用来实现平滑滚动
-            #print(event)
-            ...
         def widget_move(sp,ep):#控件控制滚动条滚动
             #print(sp,ep)
             if mode=='y' and use_widget:
@@ -1270,7 +1268,6 @@ class BasicTinUI(Canvas):
             canmove=end-start
             #绑定组件
             widget.config(yscrollcommand=widget_move)
-            #widget.bind('<MouseWheel>',__move)
         elif mode=='x':
             back=self.create_polygon((pos[0]+5,pos[1]+5,pos[0]+height-5,pos[1]+5,pos[0],pos[1]+5),
             width=13,outline=bg)
@@ -1285,6 +1282,7 @@ class BasicTinUI(Canvas):
             canmove=(end-start)*0.95
             widget.config(xscrollcommand=widget_move)
         scroll=TinUINum()
+        scroll.__move=False
         self.tag_bind(uid,'<Enter>',all_enter)
         self.tag_bind(uid,'<Leave>',all_leave)
         all_leave(None)
@@ -2299,9 +2297,36 @@ class BasicTinUI(Canvas):
         #👁️眼睛
         ...
     
-    def add_image(self,pos:tuple,width=None,height=None,imgfile=None,):#绘制静态图片
+    def add_image(self,pos:tuple,width=None,height=None,state='fill',imgfile=None):#绘制静态图片
         #这个控件是静态gif或者是png图片
-        ...
+        #state::none裁剪操作，fill填充，uniform等比缩放
+        state=state.lower()
+        if state=='none' and (width!=None or height!=None):#直接左上角裁剪
+            image=PhotoImage(file=imgfile,width=width,height=height)
+            width,height=None,None
+        else:
+            image=PhotoImage(file=imgfile)
+        self.images.append(image)#存储图片，防止被python垃圾回收
+        img=self.create_image(pos,anchor='nw',image=self.images[-1])
+        bbox=self.bbox(img)
+        rwidth,rheight=bbox[2]-bbox[0],bbox[3]-bbox[1]
+        if width!=None or height!=None:#缩放
+            #缩放系数
+            xrate=width/rwidth if width!=None else 1
+            yrate=height/rheight if height!=None else 1
+            if state=='uniform':#等比缩放
+                #取最小值
+                if yrate<xrate:
+                    xrate=yrate
+                else:#yrate>=xrate
+                    yrate=xrate
+            #else:state=='fill'
+            key=round(2)
+            image=PhotoImage.zoom(image,key,key)
+            image=image.subsample(round(key/xrate),round(key/yrate))
+            self.images[-1]=image
+            self.itemconfig(img,image=self.images[-1])
+        return img
     
     #def add_image2(self):#绘制来自PIL的图片信息？？？绘制拓展格式图片
     #    ...
@@ -2686,6 +2711,10 @@ if __name__=='__main__':
         </line>
         </tinui>''')
     trvl,_,trvbox,_=b.add_treeview((1220,1300),command=test12)
+    try:
+        b.add_image((10,1300),200,250,imgfile=__file__[:-8]+'image/LOGO.png')#仅测试
+    except Exception as err:
+        print(err)
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))

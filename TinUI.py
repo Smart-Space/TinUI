@@ -97,6 +97,14 @@ class BasicTinUI(Canvas):
     def init(self):
         self.images=[]
         self.title_size={0:20,1:18,2:16,3:14,4:12}
+    
+    def __get_text_size(self,text):
+        #获取文本元素字体大小
+        font=self.itemcget(text,'font').split(' ')
+        if len(font)==1:
+            return ''
+        else:
+            return ' '+font[1]
 
     def add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,anchor='nw',**kw):#绘制标题
         kw['anchor']=anchor
@@ -210,8 +218,7 @@ class BasicTinUI(Canvas):
         width=5,outline=fg,fill=fg,tags=uid)#外围边框
         check=self.create_polygon((pos[0]+3,pos[1]+3,pos[0]+dic-3,pos[1]+3,pos[0]+dic-3,pos[1]+dic-3,pos[0]+3,pos[1]+dic-3,pos[0]+3,pos[1]+3),
         width=5,outline=bg,fill=bg,tags=uid)#标识符内部元素
-        state=self.create_line((pos[0]+3,pos[1]+2*dic/3-3,pos[0]+dic/3+3,pos[1]+dic-5,pos[0]+dic-3,pos[1]+dic/3-3),
-        width=3,fill=onfg,state='hidden',tags=uid)#勾选标识符
+        state=self.create_text((pos[0],pos[1]),text='✔️',anchor='nw',font='{Segoe UI Emoji}'+self.__get_text_size(checkbutton),fill=onfg,state='hidden',tags=uid)#勾选标识符
         self.tkraise(state)
         self.tag_bind(check,'<Enter>',button_in)
         self.tag_bind(check,'<Leave>',button_out)
@@ -1506,6 +1513,8 @@ class BasicTinUI(Canvas):
         nowui=0#当前显示界面序号
         leftbutton=self.add_button((startx-2,pos[1]+width/2),'◀',fg=fg,bg=buttonbg,linew=0,activefg=buttonbg,activebg=fg,command=move_left,anchor='e')[-1]
         rightbutton=self.add_button((startx+width+2,pos[1]+width/2),'▶',fg=fg,bg=buttonbg,linew=0,activefg=buttonbg,activebg=fg,command=move_right,anchor='w')[-1]
+        #leftbutton=self.add_button((startx-2,pos[1]+width/2),'◁',font='{Segoe UI Emoji}',fg=fg,bg=buttonbg,linew=0,activefg=buttonbg,activebg=fg,command=move_left,anchor='e')[-1]
+        #rightbutton=self.add_button((startx+width+2,pos[1]+width/2),'▷',font='{Segoe UI Emoji}',fg=fg,bg=buttonbg,linew=0,activefg=buttonbg,activebg=fg,command=move_right,anchor='w')[-1]
         uid='pipspager'+str(leftbutton)+str(rightbutton)
         self.addtag_withtag(uid,leftbutton)
         self.addtag_withtag(uid,rightbutton)

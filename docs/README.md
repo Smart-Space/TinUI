@@ -1195,6 +1195,24 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+### add_image(self,pos:tuple,width=None,height=None,state='fill',imgfile=None)
+
+- pos::位置
+- width::宽度（默认为图片宽度）
+- height::高度（默认为图片高度）
+- state::尺寸状态（none左上角裁剪，fill填充，uniform等比缩放）
+- imgfile::图片文件，支持静态gif和png
+
+绘制一个静态图片。
+
+### return: img
+
+> img::图片画布对象，相当于大多数的`uid`
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI图片1.gif)
+
+---
+
 # Class: BasicTinUI
 
 TinUI的基础类，仅提供组件绘制。

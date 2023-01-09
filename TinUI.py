@@ -1466,11 +1466,34 @@ class BasicTinUI(Canvas):
             else:
                 __dot_in(dotlist[nowui+1])
                 __dot_select(dotlist[nowui+1])
-        def __move_to(number):
+        def __move_to(number,first=False):#显示视图
             nonlocal nowui
-            self.itemconfig(uilist[nowui][0],state='hidden')
-            nowui=number
-            self.itemconfig(uilist[nowui][0],state='normal')
+            oldone=nowui
+            def animate(startwidth,times):#展开动画
+                self.itemconfig(newui,width=startwidth+inchx)
+                if times<19:
+                    self.after(10,lambda:animate(startwidth+inchx,times+1))
+                else:
+                    if not first:
+                        self.itemconfig(uilist[oldone][0],state='hidden')
+            inchx=width/20#翻页动画参数
+            newui=uilist[number][0]
+            if number>nowui:#向右翻页
+                if self.itemcget(newui,'anchor')!='ne':#重新对齐
+                    self.move(newui,width,0)
+                self.itemconfig(newui,anchor='ne')
+            else:#向左翻页
+                self.itemconfig(uilist[oldone][0],state='hidden')
+                if self.itemcget(newui,'anchor')!='nw':#重新对齐
+                    self.move(newui,-width,0)
+                self.itemconfig(newui,anchor='nw')
+            #startwidth=0#动画起始宽度
+            self.itemconfig(newui,width=0)
+            self.itemconfig(newui,state='normal')
+            self.lift(newui)
+            animate(0,0)
+            self.itemconfig(newui,width=width)
+            nowui=number#新标志
         def move_to(number):
             __dot_in(dotlist[nowui])
             __dot_select(dotlist[nowui])
@@ -1534,7 +1557,7 @@ class BasicTinUI(Canvas):
             bar.tag_bind(dot,'<Button-1>',lambda event,dote=dot:__dot_select(dote))
         __dot_in(dotlist[nowui])
         __dot_select(dotlist[nowui])
-        __move_to(nowui)
+        __move_to(nowui,True)#first参数代表初始化
         bar.config(scrollregion=bar.bbox('all'))
         return uilist,dotlist,move_to,uid
 

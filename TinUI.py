@@ -2181,7 +2181,7 @@ class BasicTinUI(Canvas):
         def buttonout(cid):
             if cid!=nowid:
                 box.itemconfig(cid,fill=bg,outline=bg)
-        def click(cid):
+        def click(cid,send=False):
             nonlocal nowid
             box.itemconfig(line,state='normal')
             box.itemconfig(nowid,fill=bg,outline=bg)#原来的
@@ -2189,7 +2189,7 @@ class BasicTinUI(Canvas):
             nowid=cid#互换次序
             posi=box.bbox(nowid)[1]
             box.moveto(line,1,posi+linew/5)
-            if command!=None:
+            if command!=None and send:
                 fln.father_link=[cid]#父级关系
                 find_father_link(fln,cid)
                 command(fln.father_link[::-1])#[父级, 子1级, 子2级...]
@@ -2217,10 +2217,10 @@ class BasicTinUI(Canvas):
                     box.tag_bind(sign,'<Button-1>',lambda event,s=sign,cid=back:close_view(s,cid))
                 box.tag_bind(back,'<Enter>',lambda event,_id=back:buttonin(_id))
                 box.tag_bind(back,'<Leave>',lambda event,_id=back:buttonout(_id))
-                box.tag_bind(back,'<Button-1>',lambda event,_id=back:click(_id))
+                box.tag_bind(back,'<Button-1>',lambda event,_id=back:click(_id,True))
                 box.tag_bind(te,'<Enter>',lambda event,_id=back:buttonin(_id))
                 box.tag_bind(te,'<Leave>',lambda event,_id=back:buttonout(_id))
-                box.tag_bind(te,'<Button-1>',lambda event,_id=back:click(_id))
+                box.tag_bind(te,'<Button-1>',lambda event,_id=back:click(_id,True))
                 child_id.append(back)
             if father_id!=None:#存在父级
                 items_dict[father_id]=tuple(child_id)

@@ -429,7 +429,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > > 
 > > `funcs[1]|funcs.disable()`::禁用
 > > 
-> > `funcs[2]|fucns.active()`::激活
+> > `funcs[2]|funcs.active()`::激活
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E7%BB%84%E5%90%88%E6%A1%86.gif)
 
@@ -788,9 +788,15 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个列表框。
 
-### return: box, uid
+### return: box, funcs, uid
 
 > box::绘制列表框功能区的BasicTinUI
+>
+> funcs
+>
+> > `funcs.add(text:str)`::在尾部添加新选项
+> >
+> > `funcs.delete(index:int)`::删除指定序数的元素，第一个元素序号为0
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI列表框.gif)
 

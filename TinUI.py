@@ -6,6 +6,7 @@ from tkinter import *
 from webbrowser import open as webopen
 import time
 import math
+import asyncio
 import threading
 from typing import Union
 from types import FunctionType
@@ -1309,27 +1310,79 @@ class BasicTinUI(Canvas):
     def add_listbox(self,pos:tuple,width:int=200,height:int=200,font='微软雅黑 12',data=('a','b','c'),bg='#f2f2f2',fg='black',activebg='#e9e9e9',sel='#b4bbea',anchor='nw',command=None):#绘制列表框
         def repaint_back():
             for v in choices.values():
-                bbox=box.coords(v[1])
-                box.coords(v[1],3,bbox[1]-2,5+maxwidth+2,bbox[3]+2)
+                bbox=box.coords(v[2])
+                #box.coords(v[2],3,bbox[1]-2,5+maxwidth+2,bbox[3]+2)
+                box.coords(v[2],3,bbox[1],5+maxwidth+2,bbox[3])
         def in_mouse(t):
-            if choices[t][2]==True:#已被选中
+            if choices[t][-1]==True:#已被选中
                 return
-            box.itemconfig(choices[t][1],fill=activebg)
+            box.itemconfig(choices[t][2],fill=activebg)
         def out_mouse(t):
-            if choices[t][2]==True:#已被选中
-                box.itemconfig(choices[t][1],fill=sel)
+            if choices[t][-1]==True:#已被选中
+                box.itemconfig(choices[t][2],fill=sel)
             else:
-                box.itemconfig(choices[t][1],fill=bg)
+                box.itemconfig(choices[t][2],fill=bg)
         def sel_it(t):
-            box.itemconfig(choices[t][1],fill=sel)
-            choices[t][2]=True
+            box.itemconfig(choices[t][2],fill=sel)
+            choices[t][-1]=True
             for i in choices.keys():
                 if i==t:
                     continue
-                choices[i][2]=False
+                choices[i][-1]=False
                 out_mouse(i)
             if command!=None:
-                command(t)
+                command(choices[t][0])
+        def _add(item:str='new item'):#添加元素
+            load_data({item})
+            #return choices
+        def _delete(index:int=0):#删除元素，默认第一个
+            nonlocal maxwidth
+            total=len(all_keys)
+            if index+1>total:#序数超出总数
+                return
+            key=all_keys[index]
+            bbox=box.bbox(choices[key][2])#获取背景尺寸
+            height=bbox[3]-bbox[1]#高度 元素之间差7 "end+7"
+            for cid in choices[key][1:3]:#[1],[2]
+                box.delete(cid)
+            if index+1!=total:#往下所有元素上移
+                for keyid in all_keys[index+1:]:
+                    box.move(choices[keyid][1],0,-height-2)
+                    box.move(choices[keyid][2],0,-height-2)
+            del choices[key]
+            del all_keys[index]
+            tbbox=box.bbox('textcid')
+            maxwidth=tbbox[2]-tbbox[0]
+            if maxwidth<width:
+                maxwidth=width
+            repaint_back()
+            bbox=box.bbox('all')
+            box.config(scrollregion=bbox)
+        def load_data(datas):#导入元素
+            nonlocal maxwidth
+            for i in datas:
+                end=box.bbox('all')
+                end=5 if end==None else end[-1]
+                text=box.create_text((5,end+7),text=i,fill=fg,font=font,anchor='nw',tags=('textcid'))
+                bbox=box.bbox(text)#获取文本宽度
+                back=box.create_rectangle((3,bbox[1]-4,bbox[2]+2,bbox[3]+4),width=0,fill=bg)
+                box.tkraise(text)
+                choices[text]=[i,text,back,False]#用文本id代表键，避免选项文本重复带来的逻辑错误
+                all_keys.append(text)
+                box.tag_bind(text,'<Enter>',lambda event,text=text : in_mouse(text))
+                box.tag_bind(text,'<Leave>',lambda event,text=text : out_mouse(text))
+                box.tag_bind(text,'<Button-1>',lambda event,text=text : sel_it(text))
+                box.tag_bind(back,'<Enter>',lambda event,text=text : in_mouse(text))
+                box.tag_bind(back,'<Leave>',lambda event,text=text : out_mouse(text))
+                box.tag_bind(back,'<Button-1>',lambda event,text=text : sel_it(text))
+            tbbox=box.bbox('textcid')
+            twidth=tbbox[2]-tbbox[0]
+            maxwidth=twidth if twidth>maxwidth else maxwidth
+            if maxwidth<width:
+                maxwidth=width
+            repaint_back()
+            bbox=box.bbox('all')
+            box.config(scrollregion=bbox)
         frame=BasicTinUI(self,bg=bg)#主显示框，显示滚动条
         box=BasicTinUI(frame,bg=bg,width=width,height=height)#显示选择内容
         box.place(x=12,y=12)
@@ -1338,33 +1391,18 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(uid,cavui)
         frame.add_scrollbar((width+12,12),widget=box,height=height,bg=bg,color=fg,oncolor=fg)#纵向
         frame.add_scrollbar((12,height+12),widget=box,height=height,direction='x',bg=bg,color=fg,oncolor=fg)#横向
-        choices={}#'a':[a_text,a_back,is_sel:bool]
+        #choices不返回，避免编写者直接操作选项
+        all_keys=[]#[a-id,b-id,...]
+        choices={}#'a-id':[a,a_text,a_back,is_sel:bool]
         maxwidth=0#最大宽度
-        for i in data:
-            end=box.bbox('all')
-            end=5 if end==None else end[-1]
-            text=box.create_text((5,end+7),text=i,fill=fg,font=font,anchor='nw')
-            bbox=box.bbox(text)
-            twidth=bbox[2]-bbox[0]
-            maxwidth=twidth if twidth>maxwidth else maxwidth
-            back=box.create_rectangle((3,bbox[1]-2,bbox[2]+2,bbox[3]+2),width=0,fill=bg)
-            box.tkraise(text)
-            choices[i]=[text,back,False]
-            box.tag_bind(text,'<Enter>',lambda event,text=i : in_mouse(text))
-            box.tag_bind(text,'<Leave>',lambda event,text=i : out_mouse(text))
-            box.tag_bind(text,'<Button-1>',lambda event,text=i : sel_it(text))
-            box.tag_bind(back,'<Enter>',lambda event,text=i : in_mouse(text))
-            box.tag_bind(back,'<Leave>',lambda event,text=i : out_mouse(text))
-            box.tag_bind(back,'<Button-1>',lambda event,text=i : sel_it(text))
-        if maxwidth<width:
-            maxwidth=width
-        repaint_back()
-        bbox=box.bbox('all')
-        box.config(scrollregion=bbox)
+        load_data(data)#重复使用元素添加
         def set_y_view(event):
             box.yview_scroll(int(-1*(event.delta/120)), "units")
         box.bind('<MouseWheel>',set_y_view)
-        return box,uid
+        funcs=FuncList(2)
+        funcs.add=_add
+        funcs.delete=_delete
+        return box,funcs,uid
 
     def add_listview(self,pos:tuple,width=300,height=300,linew=80,bg='#f3f3f3',activebg='#eaeaea',oncolor='#3041d8',scrobg='#f8f8f8',scroc='#999999',scrooc='#89898b',num=5,command=None):#绘制列表视图,function:add_list
         def buttonin(itui):
@@ -2353,7 +2391,7 @@ class BasicTinUI(Canvas):
                 else:#yrate>=xrate
                     yrate=xrate
             #else:state=='fill'
-            key=round(2)
+            key=round(10)#计算精度
             image=PhotoImage.zoom(image,key,key)
             image=image.subsample(round(key/xrate),round(key/yrate))
             self.images[-1]=image

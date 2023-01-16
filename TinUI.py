@@ -1861,8 +1861,13 @@ class BasicTinUI(Canvas):
                     self.itemconfig(i,fill=bg,outline=fg)
         def click(barid):
             nonlocal nowon,tempon
+            oldone=nowon
             nowon=bars.index(barid)
-            tempon=nowon
+            if oldone==nowon==0:#只选定一个时，点击取消选择
+                tempon=nowon=-1
+                leaveback(None)
+            else:
+                tempon=nowon
             if command!=None:
                 command(nowon+1)
         def onin(barid):
@@ -1881,7 +1886,6 @@ class BasicTinUI(Canvas):
             __onnum(nowon)
             tempon=nowon
         def __ontemp(event):#鼠标没有正好点在图标上时
-            print(tempon)
             click(bars[tempon])
             __onnum(tempon)
         nowon=-1#已选定

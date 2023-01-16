@@ -971,6 +971,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 ### return: bars, uid
 
 > bars::评星级元素列表
+>
+> 当只选定一个星级，再次选择第一个星级时，取消选择，command个数为0
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI评星级控件.gif)
 

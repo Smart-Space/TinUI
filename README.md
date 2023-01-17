@@ -1064,13 +1064,13 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个圆角按钮。
 
-### return: button, back, line, funcs, uid
+### return: button, back, outline, funcs, uid
 
 > button::按钮文本
 >
 > back::背景元素
 >
-> line::边框元素
+> outline::边框元素
 >
 > funcs
 >

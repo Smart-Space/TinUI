@@ -351,7 +351,7 @@ class BasicTinUI(Canvas):
         def select(num):
             back=choices_back[num]
             _text='select command'
-            go_func(back,_text)
+            go_func(back,_text,choices_list[num])
         def disable():
             for f,b in zip(choices_list,choices_back):
                 self.itemconfig(f,state='disable',fill='#7a7a7a')
@@ -2104,7 +2104,7 @@ class BasicTinUI(Canvas):
         funcs.change_command=change_command
         funcs.disable=disable
         funcs.active=active
-        return button,back,line,funcs,uid
+        return button,back,outline,funcs,uid
 
     def add_expander(self,pos:tuple,title='expand content',tfg='black',tbg='#fbfbfb',bg='#f4f4f4',sep='#e5e5e5',width=200,height=200,scrollbar=False,font='微软雅黑 12'):#绘制一个可拓展UI
         def do_expand(*e):
@@ -2364,9 +2364,6 @@ class BasicTinUI(Canvas):
         box.bind('<MouseWheel>',bindview)
         return items,items_dict,box,uid
 
-    def add_togglebutton(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='',activebg='',activeline='',font=('微软雅黑',12),command=None,anchor='nw'):#绘制开关按钮
-        ...
-
     def add_passwordbox(self,pos:tuple,width:int,fg='#606060',bg='#f6f6f6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#868686',onoutline='#3041d8',anchor='nw',command=None):#绘制密码输入框
         #👁️眼睛
         ...
@@ -2407,6 +2404,99 @@ class BasicTinUI(Canvas):
 
     #def add_gif(self):#绘制动图
     #    ...
+
+    def add_togglebutton(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#f3f4fd',activebg='#3041d8',activeline='#5360de',font=('微软雅黑',12),command=None,anchor='nw'):#绘制状态开关按钮
+        def in_button(event):
+            pass
+        #状态开关按钮当前不再对鼠标进入和离开进行响应
+        def out_button(event):
+            pass
+        def on_click(event):
+            nonlocal state
+            if state==False:
+                state=True
+                self.itemconfig(outline,fill=activeline,outline=activeline)
+                change_color(0,2)
+            else:
+                state=False
+                self.itemconfig(outline,fill=line,outline=line)
+                change_color(0,1)
+            if command!=None:
+                command(state)
+        def change_color(t,change:int):#变化颜色
+            #change:: 1=>colors, 2=>re_colors
+            nonlocal nowcolors
+            if t<=25:
+                self.itemconfig(back,fill=nowcolors[1][t],outline=nowcolors[1][t])
+                self.itemconfig(button,fill=nowcolors[0][t])
+                self.after(5,lambda : change_color(t+1,change))
+            else:
+                if change==1:
+                    nowcolors=colors
+                elif change==2:
+                    nowcolors=re_colors
+        def change_command(new_func):
+            nonlocal command
+            command=new_func
+        def disable(fg='#9d9d9d',bg='#f5f5f5'):
+            if state==False:#区分当前状态进行禁用配色
+                self.itemconfig(button,state='disable',fill=fg)
+                self.itemconfig(back,state='disable',disabledfill=bg)
+            else:
+                self.itemconfig(button,state='disable',fill=bg)
+                self.itemconfig(back,state='disable',disabledfill=fg)
+        def active():
+            self.itemconfig(button,state='normal')
+            self.itemconfig(back,state='normal')
+            out_button(None)
+        def __rgb2num(rgb):#tkinter颜色类型转十进制rgb
+            return int(rgb[1:3],16),int(rgb[3:5],16),int(rgb[5:],16)
+        def __num2rgb(hexs:tuple):#十进制rgb转tkinter颜色类型
+            co='#'
+            for i in hexs:
+                co+=str(hex(i))[2:]
+            return co
+        def get_color_change(st,ed):
+            colors_list=[]
+            #起始和终止颜色，十进制rgb
+            a1,a2,a3=__rgb2num(st)
+            b1,b2,b3=__rgb2num(ed)
+            #两颜色差值
+            r,g,b=(b1-a1),(b2-a2),(b3-a3)
+            for i in range(26):
+                t=i/25
+                rgb=(int(a1 + r * t), int(a2 + g * t), int(a3 + b * t))
+                colors_list.append(__num2rgb(rgb))
+            return colors_list
+        state=False#off:False on:True
+        colors=[]#渐变色颜色列表，25个，off->on，[[文本颜色,...],[背景色,...]]
+        button=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
+        uid='togglebutton'+str(button)
+        self.itemconfig(button,tags=uid)
+        x1,y1,x2,y2=self.bbox(button)
+        linew-=1
+        outline_t=(x1-linew,y1-linew,x2+linew,y1-linew,x2+linew,y2+linew,x1-linew,y2+linew)
+        outline=self.create_polygon(outline_t,width=9,tags=uid,fill=line,outline=line)
+        back_t=(x1,y1,x2,y1,x2,y2,x1,y2)
+        back=self.create_polygon(back_t,width=7,tags=uid,fill=bg,outline=bg)
+        self.tag_bind(button,'<Button-1>',on_click)
+        #self.tag_bind(button,'<Enter>',in_button)
+        #self.tag_bind(button,'<Leave>',out_button)
+        self.tag_bind(back,'<Button-1>',on_click)
+        #self.tag_bind(back,'<Enter>',in_button)
+        #self.tag_bind(back,'<Leave>',out_button)
+        self.tkraise(button)
+        funcs=FuncList(3)
+        funcs.change_command=change_command
+        funcs.disable=disable
+        funcs.active=active
+        #处理渐变色
+        colors.append(get_color_change(fg,activefg))#文本颜色
+        colors.append(get_color_change(bg,activebg))#背景颜色
+        #re_colors 反向颜色列表
+        re_colors=[colors[0][::-1],colors[1][::-1]]
+        nowcolors=colors
+        return button,back,outline,funcs,uid
 
 
 class TinUI(BasicTinUI):
@@ -2669,6 +2759,12 @@ def test12(cid):
     for i in cid:
         print(trvbox.itemcget(trvl[i][0],'text')+'/',end='')
     print('')
+def test13(state):
+    if state:
+        b.itemconfig(tgbutton,text='状态开关按钮：开启')
+    else:
+        b.itemconfig(tgbutton,text='状态开关按钮：关闭')
+
 
 if __name__=='__main__':
     a=Tk()
@@ -2789,6 +2885,7 @@ if __name__=='__main__':
         b.add_image((10,1300),200,250,imgfile=__file__[:-8]+'image/LOGO.png')#仅测试
     except Exception as err:
         print(err)
+    tgbutton=b.add_togglebutton((1200,230),text='状态开关按钮：关闭',command=test13)[0]
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))

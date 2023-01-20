@@ -971,6 +971,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 ### return: bars, uid
 
 > bars::评星级元素列表
+>
+> 当只选定一个星级，再次选择第一个星级时，取消选择，command个数为0
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI评星级控件.gif)
 
@@ -1062,13 +1064,13 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个圆角按钮。
 
-### return: button, back, line, funcs, uid
+### return: button, back, outline, funcs, uid
 
 > button::按钮文本
 >
 > back::背景元素
 >
-> line::边框元素
+> outline::边框元素
 >
 > funcs
 >
@@ -1216,6 +1218,43 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > img::图片画布对象，相当于大多数的`uid`
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI图片1.gif)
+
+---
+
+### add_togglebutton(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#f3f4fd',activebg='#3041d8',activeline='#5360de',font=('微软雅黑',12),command=None,anchor='nw')
+
+- pos::位置
+- text::文本
+- fg::文本颜色
+- bg::背景色
+- line::边框颜色
+- linew::边框宽度
+- activefg::开启状态文本颜色
+- activebg::开启状态背景色
+- activeline::开启状态边框颜色
+- font::字体
+- command::响应函数，接受一个参数：`True`开启，`False`关闭
+- anchor::对齐方向
+
+绘制一个状态开关按钮。
+
+### return: button, back, outline, funcs, uid
+
+> button::文本元素
+>
+> back::背景元素
+>
+> outline::边框元素
+>
+> funcs
+>
+> > `funcs.change_command()`::更换响应函数
+> >
+> > `funcs.disable(fg='#9d9d9d',bg='#f5f5f5')`::禁用
+> >
+> > `funcs.active()`::启用
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI状态开关按钮.gif)
 
 ---
 

@@ -2229,6 +2229,7 @@ class BasicTinUI(Canvas):
             box.itemconfig(nowid,fill=bg,outline=bg)#原来的
             box.itemconfig(cid,fill=onbg,outline=onbg)#现在的
             nowid=cid#互换次序
+            print(nowid)
             posi=box.bbox(nowid)[1]
             box.moveto(line,1,posi+linew/5)
             if command!=None and send:
@@ -2294,8 +2295,9 @@ class BasicTinUI(Canvas):
                     for uid in items[i]:
                         box.move(uid,0,height)
             box.dtag(move)
-            if nowid in cids:#重新显示标识元素
-                click(nowid)
+            click(nowid)
+            #if nowid in cids:#重新显示标识元素
+            #    click(nowid)
             box.config(scrollregion=box.bbox('all'))
         def close_view(sign,cid):#闭合
             if box.itemcget(sign,'text')=='▷':
@@ -2322,7 +2324,7 @@ class BasicTinUI(Canvas):
             if nowid in cids:#标识元素控制
                 box.itemconfig(line,state='hidden')
             else:
-                click(nowid)#重新绘制位置
+                click(cid)#重新绘制位置
             box.config(scrollregion=box.bbox('all'))
         def bindview(event):
             if event.state==0:

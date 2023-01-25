@@ -57,6 +57,21 @@ class TinUITheme:
         return self.theme
 
 
+class TinUIPen:
+    '''自绘引擎（试用）目前仅作为记录'''
+
+    def __init__(self,canvas):
+        self.canvas=canvas
+
+    def oval(self,x,y,w,h,resolution=32,**kw):
+        points = [x, y,
+              x+w, y,
+              x+w, y+h,
+              x, y+h,
+              x, y]
+        return self.canvas.create_polygon(points, **kw, smooth=True, splinesteps=resolution)
+
+
 class TinUIEvent:
     '''BasicTinUI与TinUI控件元素事件管理器testing...
     可以综合管理每一个画布中所有元素绑定事件的函数
@@ -98,6 +113,7 @@ class BasicTinUI(Canvas):
     def init(self):
         self.images=[]
         self.title_size={0:20,1:18,2:16,3:14,4:12}
+        self.pen=TinUIPen(self)
     
     def __get_text_size(self,text):
         #获取文本元素字体大小
@@ -747,10 +763,10 @@ class BasicTinUI(Canvas):
                 self.itemconfig(back,fill=bg)
                 self.itemconfig(outline,fill=fg)
         nowstate='off'
-        outline=self.create_line((pos[0]+12,pos[1]+12,pos[0]+12+30,pos[1]+12),width=25,fill=fg,capstyle='round')
+        outline=self.create_line((pos[0]+12,pos[1]+12,pos[0]+12+30,pos[1]+12),width=25,fill=fg,capstyle='round',smooth=True,splinesteps=32)
         uid='onoff'+str(outline)
         self.itemconfig(outline,tags=uid)
-        back=self.create_line((pos[0]+13,pos[1]+12,pos[0]+13+28,pos[1]+12),width=23,fill=bg,capstyle='round',tags=uid)
+        back=self.create_line((pos[0]+13,pos[1]+12,pos[0]+13+28,pos[1]+12),width=23,fill=bg,capstyle='round',tags=uid,smooth=True,splinesteps=32)
         state=self.create_oval((pos[0]+5,pos[1]+5,pos[0]+5+15,pos[1]+5+15),fill=fg,width=0,tags=uid)
         self.tag_bind(uid,'<Button-1>',__on_click)
         funcs=FuncList(4)
@@ -1041,10 +1057,10 @@ class BasicTinUI(Canvas):
             bbox[3]-=5
             #绘制圆角边框
             tlinemap=((bbox[0]-1,bbox[1]-1),(bbox[2]+1,bbox[1]-1),(bbox[2]+1,bbox[3]+1),(bbox[0]-1,bbox[3]+1))
-            tline=bar.create_polygon(tlinemap,fill=outline,outline=outline,width=15)
+            tline=bar.create_polygon(tlinemap,fill=outline,outline=outline,width=15,splinesteps=32)
             start=bbox[2]-bbox[0]
             gomap=((bbox[0],bbox[1]),(bbox[2],bbox[1]),(bbox[2],bbox[3]),(bbox[0],bbox[3]))
-            tback=bar.create_polygon(gomap,fill=bg,outline=bg,width=15)
+            tback=bar.create_polygon(gomap,fill=bg,outline=bg,width=15,splinesteps=32)
             bar.tkraise(info)
             toti.attributes('-transparent',tran)
             toti.attributes('-alpha',0.9)#透明度90%
@@ -1086,7 +1102,7 @@ class BasicTinUI(Canvas):
             cpos[2]+=2
             cpos[3]+=2
             bbox=(cpos[0]+4,cpos[1]+4,cpos[2]-4,cpos[1]+4,cpos[2]-4,cpos[3]-4,cpos[0]+4,cpos[3]-4)
-            back=self.create_polygon(bbox,fill=bg,outline=fg,width=9+linew)
+            back=self.create_polygon(bbox,fill=bg,outline=fg,width=9+linew,splinesteps=32)
         self.lower(back)
         return back
 
@@ -1928,7 +1944,7 @@ class BasicTinUI(Canvas):
                 center_x + (rm*cos(11*pi/10)),
                 center_y - (rm*sin(11*pi/10)),
             )
-            bar=self.create_polygon(points,fill=bg,outline=fg,tags=uid)
+            bar=self.create_polygon(points,fill=bg,outline=fg,tags=uid,smooth=True,splinesteps=32)
             bars.append(bar)
             self.tag_bind(bar,'<Enter>',lambda event,bar=bar:onin(bar))
             self.tag_bind(bar,'<Leave>',lambda event,bar=bar:onleave(bar))
@@ -2003,6 +2019,7 @@ class BasicTinUI(Canvas):
             y2=nowy+back_line+back_width
             ar=(x1,y1,x2,y2)
             sign=self.create_oval(ar,width=back_line,fill=bg,outline=fg,tags=uid)
+            #sign=self.pen.oval(x1,y1,x2-x1,y2-y1,width=back_line,fill=bg,outline=fg,tags=uid)
             text=self.create_text((x2+5,nowy),text=i,font=font,fill=fontfg,anchor='nw',tags=uid)
             s_bbox=self.bbox(sign)
             t_bbox=self.bbox(text)

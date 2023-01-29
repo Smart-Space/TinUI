@@ -89,7 +89,7 @@ class TinUILight(TinUITheme):
 
     def add_spinbox(self,pos,*arg,**kw):
         return self.ui.add_spinbox(pos,
-              fg='#1a1a1a',bg='#fbfbfb',
+              fg='#1b1b1b',bg='#ffffff',line='#e5e5e5',
               activefg='#818181',activebg='#f2f2f2',
                                    *arg,**kw)
 
@@ -197,6 +197,19 @@ class TinUILight(TinUITheme):
                 bg='#f3f3f3',activebg='#eaeaea',oncolor='#3041d8',
                 scrobg='#f8f8f8',scroc='#868686',scrooc='#898989',
                                     *arg,**kw)
+
+    def add_treeview(self,pos,*arg,**kw):
+        return self.ui.add_treeview(pos,
+                fg='#1a1a1a',bg='#f3f3f3',
+                onfg='#1a1a1a',onbg='#eaeaea',
+                oncolor='#3041d8',signcolor='#8a8a8a',
+                *arg,**kw)
+
+    def add_togglebutton(self,pos,*arg,**kw):
+        return self.ui.add_togglebutton(pos,
+                fg='#1b1b1b',bg='#fbfbfb',line='#cccccc',
+                activefg='#f3f4fd',activebg='#3041d8',activeline='#5360de',
+                *arg,**kw)
 
 
 def end():
@@ -308,6 +321,10 @@ wffunc=du.add_waitframe((end()[0],end()[1]+200))[3]
 wffunc.start()
 #listview
 du.add_listview(end(),num=10)
+#treeview
+du.add_treeview(end())
+#togglebutton
+du.add_togglebutton(end(),text='状态开关按钮')
 
 u.add_back(end())
 r.r.title('TinUI light theme')

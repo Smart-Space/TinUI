@@ -767,7 +767,7 @@ class BasicTinUI(Canvas):
         uid='onoff'+str(outline)
         self.itemconfig(outline,tags=uid)
         back=self.create_line((pos[0]+13,pos[1]+12,pos[0]+13+28,pos[1]+12),width=23,fill=bg,capstyle='round',tags=uid,smooth=True,splinesteps=32)
-        state=self.create_oval((pos[0]+5,pos[1]+5,pos[0]+5+15,pos[1]+5+15),fill=fg,width=0,tags=uid)
+        state=self.pen.oval(pos[0]+5,pos[1]+5,15,15,fill=fg,width=0,tags=uid)
         self.tag_bind(uid,'<Button-1>',__on_click)
         funcs=FuncList(4)
         funcs.on=on
@@ -776,7 +776,7 @@ class BasicTinUI(Canvas):
         funcs.active=active
         return state,back,outline,funcs,uid
 
-    def add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='black',bg='',activefg='black',activebg='#E5F1FB',font=('微软雅黑',12),command=None):#绘制选值框
+    def add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='#1b1b1b',bg='#ffffff',line='#e5e5e5',activefg='#818181',activebg='#f2f2f2',font=('微软雅黑',12),command=None):#绘制选值框
         def updata(event):
             val=check_in_data()
             if val[0]==True:
@@ -809,22 +809,30 @@ class BasicTinUI(Canvas):
                 return False,val
         if bg=='':
             bg=self['background']
-        wentry=Entry(self,font=font,fg=fg,bd=2,bg=bg,relief='groove')
+        wentry=Entry(self,font=font,fg=fg,highlightthickness=0,insertwidth=1,bd=1,bg=bg,relief='flat')
         if now=='' or now not in data:
             now=data[0]
         wentry.insert(0,now)
         entry=self.create_window(pos,window=wentry,width=width,anchor='nw')
         uid='spinbox'+str(entry)
         self.itemconfig(entry,tags=uid)
-        button1=self.add_button((pos[0]+width+2,pos[1]+2),text='∧',linew=1,fg=fg,bg=bg,activefg=activefg,activebg=activebg,font=font,command=updata)
+        button1=self.add_button2((pos[0]+width+5,pos[1]+2),text='∧',linew=1,line=line,activeline=line,fg=fg,bg=bg,activefg=activefg,activebg=activebg,font=font,command=updata)
         bbox=self.bbox(button1[-1])
-        button2=self.add_button((bbox[2]+2,pos[1]+2),text='∨',linew=1,fg=fg,bg=bg,activefg=activefg,activebg=activebg,font=font,command=downdata)
+        button2=self.add_button2((bbox[2]+3,pos[1]+2),text='∨',linew=1,line=line,activeline=line,fg=fg,bg=bg,activefg=activefg,activebg=activebg,font=font,command=downdata)
         self.addtag_withtag(uid,button1[-1])
         self.addtag_withtag(uid,button2[-1])
+        backbbox=self.bbox(uid)
+        backpos=(backbbox[0]+4,backbbox[1]+6,backbbox[2]-6,backbbox[1]+6,backbbox[2]-6,backbbox[3]-6,backbbox[0]+4,backbbox[3]-6)
+        back=self.create_polygon(backpos,fill=bg,outline=bg,width=10,tags=uid)
+        outline=self.create_polygon(backpos,fil=line,outline=line,width=12,tags=uid)
+        self.tkraise(back)
+        self.tkraise(entry)
+        self.tkraise(button1[-1])
+        self.tkraise(button2[-1])
         datanum=TinUINum()
         datanum.num=data.index(now)#记录数据位置
         maxnum=len(data)-1#最大位置
-        return wentry,button1,button2,uid
+        return wentry,button1,button2,back,outline,uid
 
     def add_scalebar(self,pos:tuple,width=200,fg='#4554dc',activefg='#4554dc',bg='#868686',buttonbg='#ffffff',buttonoutline='#cccccc',data=(1,2,3,4,5),start=1,command=None):#绘制调节框
         def mousedown(event):

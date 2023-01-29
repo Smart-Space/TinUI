@@ -527,7 +527,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='black',bg='',activefg='black',activebg='#E5F1FB',font=('微软雅黑',12),command=None)
+### add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='#1b1b1b',bg='#ffffff',line='#e5e5e5',activefg='#818181',activebg='#f2f2f2',font=('微软雅黑',12),command=None)
 
 - pos::位置
 - width::宽度
@@ -542,13 +542,17 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个选值框。
 
-### return: wentry, button1, button2, uid
+### return: wentry, button1, button2, back, outline, uid
 
 > wentry::输入框组件
-> 
+>
 > button1::上调按钮
-> 
+>
 > button2::下调按钮
+>
+> back::背景元素
+>
+> outline::边框元素
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI选值框.gif)
 

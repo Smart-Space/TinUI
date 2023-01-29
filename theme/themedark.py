@@ -89,8 +89,8 @@ class TinUIDark(TinUITheme):
 
     def add_spinbox(self,pos,*arg,**kw):
         return self.ui.add_spinbox(pos,
-              fg='#ffffff',bg='#2d2d2d',
-              activefg='#b8b8b8',activebg='#303030',
+              fg='#ffffff',bg='#1f1f1f',line='#303030',
+              activefg='#c0c0c0',activebg='#2c2c2c',
                                    *arg,**kw)
 
     def add_scalebar(self,pos,*arg,**kw):
@@ -197,6 +197,19 @@ class TinUIDark(TinUITheme):
                 bg='#202020',activebg='#2d2d2d',oncolor='#b2b8f2',
                 scrobg='#2e2e2e',scroc='#9a9a9a',scrooc='#9f9f9f',
                                     *arg,**kw)
+
+    def add_treeview(self,pos,*arg,**kw):
+        return self.ui.add_treeview(pos,
+                fg='#ffffff',bg='#202020',
+                onfg='#ffffff',onbg='#2d2d2d',
+                oncolor='#b2b8f2',signcolor='#9f9f9f',
+                *arg,**kw)
+
+    def add_togglebutton(self,pos,*arg,**kw):
+        return self.ui.add_togglebutton(pos,
+                fg='#ffffff',bg='#2d2d2d',line='#303030',
+                activefg='#000000',activebg='#b2b8f2',activeline='#b8bef3',
+                *arg,**kw)
 
 
 def end():
@@ -311,6 +324,10 @@ wffunc=du.add_waitframe((end()[0],end()[1]+200))[3]
 wffunc.start()
 #listview
 du.add_listview(end(),num=10)
+#treeview
+du.add_treeview(end())
+#togglebutton
+du.add_togglebutton(end(),text='状态开关按钮')
 
 u.add_back(end())
 r.r.title('TinUI dark theme')

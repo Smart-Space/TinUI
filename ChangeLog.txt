@@ -10,6 +10,8 @@
 1. 优化帮助手册
 2. 优化ratingbar, onoff外观
 3. 优化spinbox外观，更新spinbox示例
+4. 修复treeview的一个展开错误
+5. 新增滑动控件 swipecontrol
 
 ==========4.2==========
 2023-1-21

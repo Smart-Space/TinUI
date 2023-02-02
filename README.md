@@ -1262,6 +1262,61 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+### add_swipecontrol(self,pos:tuple,text:str='',height=50,width=400,fg='#1a1a1a',bg='#f3f3f3',line='#fbfbfb',data:dict={'left':({'text':'✔️\nok','fg':'#202020','bg':'#bcbcbc','command':print},),'right':({'text':'❌\nclose'},)},font=('微软雅黑',12))
+
+- pos-位置
+
+- text-文本
+
+- height-高度
+
+- width-宽度
+
+- fg-文本颜色
+
+- bg-背景色
+
+- line-边框颜色
+
+- data-滑动操作元素参数
+
+    > data结构：
+    >
+    > ```json
+    > {
+    >     'left':({
+    >         'text':'文本',
+    >         'fg':'文本颜色',
+    >         'bg':'背景颜色',
+    >     },
+    >             ...,
+    >            ),
+    >     'right':({
+    >         'text':'文本',
+    >     },
+    >              ...,
+    >     )
+    > }
+    > ```
+    >
+    > 其中，字典键值`left`表示往右滑动显示的左边元素，`right`表示往左滑动显示的右边元素。两者皆可选。
+    >
+    > 一侧元素以一个数组表示，一个及以上，不超过六个。每个元素以字典表示，文本必选，颜色有默认值。
+
+- font-字体
+
+绘制一个滑动控件。
+
+### return: back, backitem
+
+> back::容器BasicTinUI
+>
+> backitem::控件的画布元素
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI滑动控件.gif)
+
+---
+
 # Class: BasicTinUI
 
 TinUI的基础类，仅提供组件绘制。

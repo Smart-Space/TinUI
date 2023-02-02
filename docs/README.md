@@ -527,7 +527,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='black',bg='',activefg='black',activebg='#E5F1FB',font=('微软雅黑',12),command=None)
+### add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='#1b1b1b',bg='#ffffff',line='#e5e5e5',activefg='#818181',activebg='#f2f2f2',font=('微软雅黑',12),command=None)
 
 - pos::位置
 - width::宽度
@@ -542,13 +542,17 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个选值框。
 
-### return: wentry, button1, button2, uid
+### return: wentry, button1, button2, back, outline, uid
 
 > wentry::输入框组件
-> 
+>
 > button1::上调按钮
-> 
+>
 > button2::下调按钮
+>
+> back::背景元素
+>
+> outline::边框元素
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI选值框.gif)
 
@@ -1255,6 +1259,61 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > > `funcs.active()`::启用
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI状态开关按钮.gif)
+
+---
+
+### add_swipecontrol(self,pos:tuple,text:str='',height=50,width=400,fg='#1a1a1a',bg='#f3f3f3',line='#fbfbfb',data:dict={'left':({'text':'✔️\nok','fg':'#202020','bg':'#bcbcbc','command':print},),'right':({'text':'❌\nclose'},)},font=('微软雅黑',12))
+
+- pos-位置
+
+- text-文本
+
+- height-高度
+
+- width-宽度
+
+- fg-文本颜色
+
+- bg-背景色
+
+- line-边框颜色
+
+- data-滑动操作元素参数
+
+    > data结构：
+    >
+    > ```json
+    > {
+    >     'left':({
+    >         'text':'文本',
+    >         'fg':'文本颜色',
+    >         'bg':'背景颜色',
+    >     },
+    >             ...,
+    >            ),
+    >     'right':({
+    >         'text':'文本',
+    >     },
+    >              ...,
+    >     )
+    > }
+    > ```
+    >
+    > 其中，字典键值`left`表示往右滑动显示的左边元素，`right`表示往左滑动显示的右边元素。两者皆可选。
+    >
+    > 一侧元素以一个数组表示，一个及以上，不超过六个。每个元素以字典表示，文本必选，颜色有默认值。
+
+- font-字体
+
+绘制一个滑动控件。
+
+### return: back, backitem
+
+> back::容器BasicTinUI
+>
+> backitem::控件的画布元素
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI滑动控件.gif)
 
 ---
 

@@ -2393,7 +2393,63 @@ class BasicTinUI(Canvas):
 
     def add_passwordbox(self,pos:tuple,width:int,fg='#606060',bg='#f6f6f6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#868686',onoutline='#3041d8',anchor='nw',command=None):#绘制密码输入框
         #👁️眼睛
-        ...
+        #参考entry控件
+        def if_empty(event):
+            if nowstate=='hidden':
+                self.tag_bind(funcw,'<Enter>',lambda event:self.itemconfig(funcw,fill=onoutline))
+                self.tag_bind(funcw,'<Leave>',lambda event:self.itemconfig(funcw,fill=fg))
+                self.tag_bind(funcw,'<Button-1>',showkey)
+            elif nowstate=='shown':
+                self.tag_bind(funcw,'<Leave>',lambda event:self.itemconfig(funcw,fill=onoutline))
+                self.tag_bind(funcw,'<Enter>',lambda event:self.itemconfig(funcw,fill=fg))
+                self.tag_bind(funcw,'<Button-1>',hidekey)
+        def showkey(e):
+            nonlocal nowstate
+            nowstate='shown'
+            self.itemconfig(funcw,fill=activefg)
+            entry.config(show='')
+            if_empty(None)
+        def hidekey(e):
+            nonlocal nowstate
+            nowstate='hidden'
+            self.itemconfig(funcw,fill=fg)
+            entry.config(show='●')
+            if_empty(None)
+        #---
+        def get_entry():#获取文本
+            return entry.get()
+        def __error(errorline='#c42b1c'):#错误样式
+            self.itemconfig(back,outline=errorline,fill=errorline)
+        def __normal():#正常样式
+            entry['state']='normal'
+            entry.focus_set()
+            self.itemconfig(back,outline=onoutline,fill=onoutline)
+        def __disable():#禁用
+            entry['state']='disable'
+            self.itemconfig(back,outline=outline,fill=outline)
+        nowstate='hidden'#'shown'
+        entry=Entry(self,fg=fg,bg=bg,font=font,relief='flat',bd=0,show='●')
+        entry.bind('<KeyRelease>',if_empty)
+        entry.bind('<FocusIn>',lambda event:(self.itemconfig(back,outline=onoutline),entry.config(background=activebg,foreground=activefg)))
+        entry.bind('<FocusOut>',lambda event:(self.itemconfig(back,outline=outline),entry.config(background=bg,foreground=fg)))
+        funce=self.create_window(pos,window=entry,width=width,anchor=anchor)#输入框画布对象
+        uid='entry'+str(funce)
+        self.itemconfig(funce,tags=uid)
+        bbox=self.bbox(funce)
+        funcw=self.create_text((bbox[0]+width,bbox[1]),text='👁️',fill=fg,font=font,anchor='nw',tags=uid)
+        bubbox=self.bbox(funcw)
+        backpos=(bbox[0],bbox[1],bubbox[2]-20,bbox[1],bubbox[2]-20,bbox[3],bbox[0],bbox[3],bbox[0],bbox[1])
+        outlinepos=(bbox[0]+linew,bbox[3]+4-linew,bubbox[2]-20-linew,bbox[3]+4-linew)
+        back=self.create_polygon(outlinepos,fill=outline,outline=outline,width=6+linew,tags=uid)#outline
+        back1=self.create_polygon(backpos,fill=bg,outline=bg,width=6,tags=uid)#back
+        self.tkraise(funcw)
+        if_empty(None)
+        funcs=FuncList(4)
+        funcs.get=get_entry
+        funcs.error=__error
+        funcs.normal=__normal
+        funcs.disable=__disable
+        return entry,funcs,uid
     
     def add_image(self,pos:tuple,width=None,height=None,state='fill',imgfile=None):#绘制静态图片
         #这个控件是静态gif或者是png图片
@@ -3016,6 +3072,7 @@ if __name__=='__main__':
         print(err)
     tgbutton=b.add_togglebutton((1200,230),text='状态开关按钮：关闭',command=test13)[0]
     b.add_swipecontrol((320,1300),'swipe control')
+    b.add_passwordbox((250,1400),350)
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))

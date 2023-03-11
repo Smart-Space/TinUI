@@ -1317,6 +1317,29 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+### add_passwordbox(self,pos:tuple,width:int,fg='#606060',bg='#f6f6f6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#868686',onoutline='#3041d8',anchor='nw')
+
+- pos-位置
+- width-宽度
+- fg-文本颜色
+- bg-背景色
+- activefg-响应时文本颜色
+- activebg-响应时背景颜色
+- insert-光标颜色
+- font-字体
+- linew-边框宽度
+- outline-边框颜色
+- onoutline-响应时边框颜色
+- anchor-对齐方向
+
+绘制一个密码输入框。
+
+### return: entry, funcs, uid
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI密码输入框.gif)
+
+---
+
 # Class: BasicTinUI
 
 TinUI的基础类，仅提供组件绘制。

@@ -1,6 +1,6 @@
 '''
 <TinUI, a modern frame to render various widgets element for tkinter in one control.>
-    Copyright (C) <2021-present>  <张峻铭>
+    Copyright (C) <2021-present>  <smart-space>
 '''
 from tkinter import *
 from webbrowser import open as webopen

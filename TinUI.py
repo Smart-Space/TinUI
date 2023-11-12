@@ -15,7 +15,7 @@ import xml.etree.ElementTree  as ET
 #==========
 '''开发信息
 开发者：Smart-Space（Junming Zhang）
-版权：版权所有(C) 2019（原型框架，TinGroup子项目）|2021（正式命名TinUI）- present Smart-Space（Junming Zhang|张峻铭）
+版权：版权所有(C) 2019（原型框架，TinGroup子项目）|2021（正式命名TinUI）- present Smart-Space（Junming Zhang）
 开发者邮箱：smart-space@qq.com
 语言：Python
 技术基础：tkinter（tcl/tk）
@@ -122,6 +122,31 @@ class BasicTinUI(Canvas):
             return ''
         else:
             return ' '+font[1]
+    
+    def __auto_anchor(self,uid,anchor='nw'):#统一对齐
+        #在4.5之前已有anchor参数的忽略
+        #working test
+        bbox=self.bbox(uid)
+        xcenter=(bbox[2]-bbox[0])/2
+        ycenter=(bbox[3]-bbox[1])/2
+        if anchor=='nw':
+            pass
+        elif anchor=='n':
+            self.move(uid,-xcenter,0)
+        elif anchor=='ne':
+            self.move(uid,-2*xcenter,0)
+        elif anchor=='e':
+            self.move(uid,-2*xcenter,-ycenter)
+        elif anchor=='se':
+            self.move(uid,-2*xcenter,-2*ycenter)
+        elif anchor=='s':
+            self.move(uid,-xcenter,-2*ycenter)
+        elif anchor=='sw':
+            self.move(uid,0,-2*ycenter)
+        elif anchor=='w':
+            self.move(uid,0,-ycenter)
+        elif anchor=='center':
+            self.move(uid,-xcenter,-ycenter)
 
     def add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,anchor='nw',**kw):#绘制标题
         kw['anchor']=anchor
@@ -2320,9 +2345,9 @@ class BasicTinUI(Canvas):
                     for uid in items[i]:
                         box.move(uid,0,height)
             box.dtag(move)
-            click(nowid)
-            #if nowid in cids:#重新显示标识元素
-            #    click(nowid)
+            #click(nowid)#单极输出
+            if nowid in cids:#重新显示标识元素
+                click(nowid)
             box.config(scrollregion=box.bbox('all'))
         def close_view(sign,cid):#闭合
             if box.itemcget(sign,'text')=='▷':

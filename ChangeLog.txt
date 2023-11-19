@@ -1,9 +1,13 @@
 <TinUI, a modern frame to render various widgets element for tkinter in one control.>
-    Copyright (C) <2021-present>  <Smart-Space | Junming Zhang> <tsan-zane@outlook.com>
+    Copyright (C) <2021-present>  <Smart-Space | Junming Zhang> <tsan-zane@outlook.com|smart-space@qq.com>
     2019（原型框架）2021（正式命名TinUI发布）
 
 ==========更新日志==========
 
+
+==========4.6==========
+202
+1. spinbox返回值
 
 ==========4.5==========
 2023-11-12

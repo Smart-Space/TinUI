@@ -38,6 +38,13 @@ class FuncList(list):#控件的函数列表类
             self.append(None)
 
 
+class TinUIString(str):#TinUI字符串类
+
+    def __init__(self,string:str=''):
+        str.__init__(self)
+        self.text=string
+
+
 class TinUITheme:
     '''
     专门为特有样式的TinUI或BasicTinUI提供的类
@@ -125,7 +132,7 @@ class BasicTinUI(Canvas):
     
     def __auto_anchor(self,uid,anchor='nw'):#统一对齐
         #在4.5之前已有anchor参数的忽略
-        #working test
+        #working test...
         bbox=self.bbox(uid)
         xcenter=(bbox[2]-bbox[0])/2
         ycenter=(bbox[3]-bbox[1])/2
@@ -813,7 +820,9 @@ class BasicTinUI(Canvas):
             wentry.delete(0,'end')
             wentry.insert(0,data[index])
             if command!=None:
-                command(data[index])
+                result=TinUIString(data[index])
+                result.num=index
+                command(result)
         def downdata(event):
             val=check_in_data()
             if val[0]==True:
@@ -825,7 +834,9 @@ class BasicTinUI(Canvas):
             wentry.delete(0,'end')
             wentry.insert(0,data[index])
             if command!=None:
-                command(data[index])
+                result=TinUIString(data[index])
+                result.num=index
+                command(result)
         def check_in_data():
             val=wentry.get()
             if val in data:
@@ -2345,7 +2356,7 @@ class BasicTinUI(Canvas):
                     for uid in items[i]:
                         box.move(uid,0,height)
             box.dtag(move)
-            #click(nowid)#单极输出
+            #click(nowid)#单级输出
             if nowid in cids:#重新显示标识元素
                 click(nowid)
             box.config(scrollregion=box.bbox('all'))
@@ -2708,6 +2719,9 @@ class BasicTinUI(Canvas):
         back.tag_bind(cont,'<Button-1>',_recenter)
         return back,backitem
 
+    def add_picker(self,pos:tuple,text:str=''):#绘制滚动选值框
+        ...
+
 
 class TinUI(BasicTinUI):
     '''对BasicTinUI的封装，添加了滚动条自动刷新'''
@@ -2996,7 +3010,7 @@ if __name__=='__main__':
     b.add_entry((250,330),350,'这里用来输入',command=print)
     b.add_button((20,170),'创建分割线',command=lambda event:b.add_separate((20,200),600))
     b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
-    b.add_link((400,500),'TinGroup知识库','http://tinhome.baklib-free.com/')
+    b.add_link((400,500),'TinGroup知识库','https://tinhome.bk-free02.com')
     b.add_link((400,530),'执行print函数',print)
     b.add_link((400,560),'执行print目标函数','https://smart-space.com.cn/',command=lambda url:print('open> '+url))
     _,ok1,_=b.add_waitbar1((500,220),bg='#CCCCCC')
@@ -3012,7 +3026,7 @@ if __name__=='__main__':
     b.add_table((180,630),data=(('a','space fans over the\nworld','c'),('you\ncan','2','3'),('I','II','have a dream, then try your best to get it!')))
     b.add_paragraph((300,850),text='上面是一个表格')
     b.add_onoff((600,100))
-    b.add_spinbox((680,100))
+    b.add_spinbox((680,100),command=lambda string:print(f'{string.num}: {string}'))
     b.add_scalebar((680,50),command=test5)
     scale_text,_=b.add_label((890,50),text='当前选值：2')
     b.add_info((710,140),info_text='this is info widget in TinUI, using TinUI\'s tooltip widget with its own style.')

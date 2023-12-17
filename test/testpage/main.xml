@@ -1,0 +1,9 @@
+<tinui>
+    <line>
+        <image width='200' height='200' imgfile='test\LOGO.png'></image>
+    </line>
+    <line>
+        <listbox height='300'>
+        </listbox>
+    </line>
+</tinui>

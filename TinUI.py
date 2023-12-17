@@ -133,6 +133,8 @@ class BasicTinUI(Canvas):
     def __auto_anchor(self,uid,anchor='nw'):#统一对齐
         #在4.5之前已有anchor参数的忽略
         #working test...
+        #更改下方三行代码，获取控件当前位置，比对中心
+        #参数添加期望位置
         bbox=self.bbox(uid)
         xcenter=(bbox[2]-bbox[0])/2
         ycenter=(bbox[3]-bbox[1])/2
@@ -1450,7 +1452,7 @@ class BasicTinUI(Canvas):
         uid='listbox'+str(cavui)
         self.addtag_withtag(uid,cavui)
         frame.add_scrollbar((width+12,12),widget=box,height=height,bg=bg,color=fg,oncolor=fg)#纵向
-        frame.add_scrollbar((12,height+12),widget=box,height=height,direction='x',bg=bg,color=fg,oncolor=fg)#横向
+        frame.add_scrollbar((12,height+12),widget=box,height=width,direction='x',bg=bg,color=fg,oncolor=fg)#横向
         #choices不返回，避免编写者直接操作选项
         all_keys=[]#[a-id,b-id,...]
         choices={}#'a-id':[a,a_text,a_back,is_sel:bool]

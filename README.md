@@ -1529,3 +1529,11 @@ dict_item::一个字典，建议是 `globals()`或 `locals()`
 部分组件的特殊规定，详情见CSDN文章：
 
 [tkinter-TinUI使用xml的特殊组件](https://blog.csdn.net/tinga_kilin/article/details/122740802#_481)。
+
+# 新想法
+
+- 发送issue至GitHub-TinUI储存库
+
+- 发送邮件至tsan-zane@outlook.com或smart-space@qq.com
+
+

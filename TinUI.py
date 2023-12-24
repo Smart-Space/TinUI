@@ -134,7 +134,7 @@ class BasicTinUI(Canvas):
         #在4.5之前已有anchor参数的忽略
         #working test...
         #更改下方三行代码，获取控件当前位置，比对中心
-        #参数添加期望位置
+        #参数添加期望位置(uid,pos,anchor)
         bbox=self.bbox(uid)
         xcenter=(bbox[2]-bbox[0])/2
         ycenter=(bbox[3]-bbox[1])/2
@@ -2013,28 +2013,33 @@ class BasicTinUI(Canvas):
         return bars,uid
 
     def add_radiobox(self,pos:tuple,fontfg='black',font='微软雅黑 12',fg='#8b8b8b',bg='#ededed',activefg='#898989',activebg='#e5e5e5',onfg='#3041d8',onbg='#ffffff',content:tuple=('1','','2'),padx=10,pady=5,command=None):#绘制单选组控件
-        def button_in(area,sel,sign):
+        def button_in(sel,sign,sback):
             if sel==select:
                 return
-            self.itemconfig(sign,outline=activefg,fill=activebg)
-        def button_out(area,sel,sign):
+            self.itemconfig(sign,fill=activebg)
+            self.itemconfig(sback,fill=activefg)
+        def button_out(sel,sign,sback):
             if sel==select:
                 return
-            self.itemconfig(sign,outline=fg,fill=bg)
-        def sel_it(area,sel,sign):
+            self.itemconfig(sign,fill=bg)
+            self.itemconfig(sback,fill=fg)
+        def sel_it(sel,sign,sback):
             nonlocal select
             if sel==select:
                 return
             old_select=select#原先选定项目序号
             select=sel
             if old_select>=0:#恢复原先的单选组
-                old_sign=boxes[old_select][0]
-                self.itemconfig(old_sign,width=2)
-                button_out(None,None,old_sign)
+                old_sign_back,old_sign=boxes[old_select][0:2]
+                #self.itemconfig(old_sign,width=2)
+                self.coords(old_sign,boxes[old_select][-2])
+                button_out(None,old_sign,old_sign_back)
                 self.update()
-            self.itemconfig(sign,outline=onfg,fill=onbg,width=on_line)
+            self.coords(sign,boxes[sel][-1])
+            self.itemconfig(sign,fill=onbg)
+            self.itemconfig(sback,fill=onfg)
             if command!=None:
-                textid=boxes[sel][1]
+                textid=boxes[sel][2]
                 text=self.itemcget(textid,'text')
                 command(text)
         #标识符内部宽度width和边框宽度line
@@ -2063,17 +2068,20 @@ class BasicTinUI(Canvas):
             y1=nowy+back_line
             x2=nowx+back_line+back_width
             y2=nowy+back_line+back_width
-            ar=(x1,y1,x2,y2)
-            sign=self.create_oval(ar,width=back_line,fill=bg,outline=fg,tags=uid)
+            ar=(x1+1,y1+1,x2-1,y2-1)
+            ar2=(x1+2,y1+2,x2-2,y2-2)
+            #sign=self.create_oval(ar,width=back_line,fill=bg,outline=fg,tags=uid)
+            sign_back=self.create_oval((x1-1,y1-1,x2+1,y2+1),width=0,fill=fg,tags=uid)
+            sign=self.create_oval(ar,width=0,fill=bg,tags=uid)
             #sign=self.pen.oval(x1,y1,x2-x1,y2-y1,width=back_line,fill=bg,outline=fg,tags=uid)
             text=self.create_text((x2+5,nowy),text=i,font=font,fill=fontfg,anchor='nw',tags=uid)
             s_bbox=self.bbox(sign)
             t_bbox=self.bbox(text)
             back=self.create_rectangle((s_bbox[0],s_bbox[1],t_bbox[2],t_bbox[3]),width=0,fill='',tags=uid)
-            boxes.append((sign,text,back))
-            self.tag_bind(back,'<Enter>',lambda event,ar=ar,sel=count,sign=sign:button_in(ar,sel,sign))
-            self.tag_bind(back,'<Leave>',lambda event,ar=ar,sel=count,sign=sign:button_out(ar,sel,sign))
-            self.tag_bind(back,'<Button-1>',lambda event,ar=ar,sel=count,sign=sign:sel_it(ar,sel,sign))
+            boxes.append((sign_back,sign,text,back,ar,ar2))
+            self.tag_bind(back,'<Enter>',lambda event,sel=count,sign=sign,sback=sign_back:button_in(sel,sign,sback))
+            self.tag_bind(back,'<Leave>',lambda event,sel=count,sign=sign,sback=sign_back:button_out(sel,sign,sback))
+            self.tag_bind(back,'<Button-1>',lambda event,sel=count,sign=sign,sback=sign_back:sel_it(sel,sign,sback))
             nowx=t_bbox[2]+padx
         return boxes,uid
 

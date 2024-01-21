@@ -3309,7 +3309,7 @@ if __name__=='__main__':
     tgbutton=b.add_togglebutton((1200,230),text='状态开关按钮：关闭',command=test13)[0]
     b.add_swipecontrol((320,1300),'swipe control')
     b.add_passwordbox((250,1400),350)
-    b.add_picker((1400,230))
+    b.add_picker((1400,230),command=print)
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))

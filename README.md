@@ -1332,6 +1332,42 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+### add_picker(self,pos:tuple,height=250,fg='#1b1b1b',bg='#fbfbfb',outline='#ececec',activefg='#1b1b1b',activebg='#f6f6f6',onfg='#eaecfb',onbg='#3748d9',font=('微软雅黑',10),text=(('year',60),('season',100),),data=(('2022','2023','2024'),('spring','summer','autumn','winter')),tran='#01FF11',command=None)
+
+- pos-位置
+
+- height-选择框高度
+
+- fg-文本颜色
+
+- bg-背景色
+
+- outline-边框色
+
+- activefg-选择时文本颜色
+
+- activebg-选择时背景颜色
+
+- onfg-选定时文本颜色
+
+- onbg-选定时背景颜色
+
+- font-字体
+
+- text-文本内容，需要与`data`对应。`((选值文本,元素宽度),...)`
+
+- data-选值内容，需要与`text`对应
+
+- tran-透明处理规避颜色
+
+- command-响应接受函数。需要接受一个参数：所有选值列表，全被选定时触发
+
+绘制一个滚动选值框。
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI滚动选择框.gif)
+
+---
+
 # Class: BasicTinUI
 
 TinUI的基础类，仅提供组件绘制。
@@ -1535,5 +1571,3 @@ dict_item::一个字典，建议是 `globals()`或 `locals()`
 - 发送issue至GitHub-TinUI储存库
 
 - 发送邮件至tsan-zane@outlook.com或smart-space@qq.com
-
-

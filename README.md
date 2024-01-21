@@ -1364,6 +1364,16 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 绘制一个滚动选值框。
 
+### return: picker, bar, texts, pickerbars, uid
+
+> picker::选择器所在的窗口
+> 
+> bar::选择器所在的BasicTinUI
+> 
+> texts::文本元素列表
+> 
+> pickerbars::元素选择BasicTinUI列表
+
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI滚动选择框.gif)
 
 ---

@@ -11,6 +11,9 @@ import threading
 from typing import Union
 from types import FunctionType
 import xml.etree.ElementTree  as ET
+import sys
+import os
+import shutil
 '''全部组件都是绘制的~~~，除了输入型组件无法使用tkinter画布完成对应效果'''
 #==========
 '''开发信息
@@ -64,6 +67,7 @@ class TinUITheme:
         return self.theme
 
 
+#弃用，将在不久后删除
 class TinUIPen:
     '''自绘引擎（试用）目前仅作为记录'''
 
@@ -77,6 +81,69 @@ class TinUIPen:
               x, y+h,
               x, y]
         return self.canvas.create_polygon(points, **kw, smooth=True, splinesteps=resolution)
+
+
+class TinUIFont:
+    #添加字体文件，参考CustomTkinter
+
+    linux_font_path = "~/.fonts/"
+
+    @classmethod
+    def init_font_manager(cls):
+        # Linux
+        if sys.platform.startswith("linux"):
+            try:
+                if not os.path.isdir(os.path.expanduser(cls.linux_font_path)):
+                    os.mkdir(os.path.expanduser(cls.linux_font_path))
+                return True
+            except Exception as err:
+                sys.stderr.write("FontManager error: " + str(err) + "\n")
+                return False
+
+        # other platforms
+        else:
+            return True
+
+    @classmethod
+    def windows_load_font(cls, font_path: Union[str, bytes], private: bool = True, enumerable: bool = False) -> bool:
+        """ Function taken from: https://stackoverflow.com/questions/11993290/truly-custom-font-in-tkinter/30631309#30631309 """
+
+        from ctypes import windll, byref, create_unicode_buffer, create_string_buffer
+
+        FR_PRIVATE = 0x10
+        FR_NOT_ENUM = 0x20
+
+        if isinstance(font_path, bytes):
+            path_buffer = create_string_buffer(font_path)
+            add_font_resource_ex = windll.gdi32.AddFontResourceExA
+        elif isinstance(font_path, str):
+            path_buffer = create_unicode_buffer(font_path)
+            add_font_resource_ex = windll.gdi32.AddFontResourceExW
+        else:
+            raise TypeError('font_path must be of type bytes or str')
+
+        flags = (FR_PRIVATE if private else 0) | (FR_NOT_ENUM if not enumerable else 0)
+        num_fonts_added = add_font_resource_ex(byref(path_buffer), flags, 0)
+        return bool(min(num_fonts_added, 1))
+
+    @classmethod
+    def load_font(cls, font_path: str) -> bool:
+        # Windows
+        if sys.platform.startswith("win"):
+            return cls.windows_load_font(font_path, private=True, enumerable=False)
+
+        # Linux
+        elif sys.platform.startswith("linux"):
+            try:
+                shutil.copy(font_path, os.path.expanduser(cls.linux_font_path))
+                return True
+            except Exception as err:
+                sys.stderr.write("FontManager error: " + str(err) + "\n")
+                return False
+
+        # macOS and others
+        else:
+            return False
 
 
 class TinUIEvent:
@@ -697,7 +764,7 @@ class BasicTinUI(Canvas):
         ti_list=[]
         for i in data[0]:
             title=self.create_text((end_x,end_y),anchor='nw',text=i,fill=fg,font=font,width=maxwidth)
-            if count==1:#只去第一个背景作为tag id
+            if count==1:#只取第一个背景作为tag id
                 uid='table'+str(title)
             self.itemconfig(title,tags=uid)
             bbox=self.bbox(title)
@@ -708,14 +775,15 @@ class BasicTinUI(Canvas):
             line_width[count]=width
             height=bbox[3]-bbox[1]
             relheight=height if height>relheight else relheight
-            ti_back=self.create_rectangle((end_x,end_y,end_x+width,end_y+height),outline=outline,fill=headbg,tags=uid)
-            ti_list.append((ti_back,end_x,end_y,end_x+width))
+            ti_back=self.create_rectangle((end_x-1,end_y,end_x+width,end_y+height),outline='',fill='',tags=uid)
+            ti_list.append((ti_back,end_x-1,end_y,end_x+width))
             end_x=end_x+width+2
             count+=1
             self.tkraise(title)
         for i in ti_list:#保持表头高度一致
             self.coords(i[0],i[1],i[2],i[3],i[2]+relheight)
-        end_y=pos[1]+relheight+2
+        end_y=pos[1]+relheight+1
+        v_endx,v_endy=pos[0],end_y+2
         for line in data[1:]:
             count=1
             a_dict={}
@@ -726,13 +794,23 @@ class BasicTinUI(Canvas):
                 cont=self.create_text((end_x,end_y),anchor='nw',text=a,fill=fg,width=width,font=font,tags=uid)
                 bbox=self.bbox(cont)
                 height=bbox[3]-bbox[1]
-                back=self.create_rectangle((end_x,end_y,end_x+width,end_y+height),outline=outline,fill=bg,tags=uid)
+                back=self.create_rectangle((end_x-1,end_y,end_x+width,end_y+height),outline=bg,fill=bg,tags=uid)
                 self.tkraise(cont)
-                a_dict[count]=(back,height,(end_x,end_y,end_x+width),cont)#(end_x,end_y,width)为重新绘制确定位置范围
+                a_dict[count]=(back,height,(end_x-1,end_y,end_x+width),cont)#(end_x,end_y,width)为重新绘制确定位置范围
                 end_x=end_x+width+2
                 count+=1
             height=get_max_height(a_dict)
-            end_y=end_y+height+2
+            end_y=end_y+height+1
+            last_line=self.create_line((pos[0],end_y-1,end_x,end_y-1),fill=outline,tags=uid)
+        self.delete(last_line)#删除最后一行水平分割线
+        for i in ti_list[1:]:#竖直分割线
+            self.create_line((i[1]-1,pos[1],i[1]-1,end_y),fill=outline,tags=uid)
+        all_back=self.create_polygon((pos[0],pos[1],end_x-1,pos[1],end_x-1,end_y-1,pos[0],end_y-1),width=9,outline=headbg,fill=headbg,tags=uid)
+        outline_back=self.create_polygon((pos[0]-1,pos[1]-1,end_x,pos[1]-1,end_x,end_y,pos[0]-1,end_y),width=9,outline=outline,fill=outline,tags=uid)
+        value_back=self.create_polygon((v_endx,v_endy,end_x-1,v_endy,end_x-1,end_y-1,pos[0],end_y-1),width=9,outline=bg,fill=bg,tags=uid)
+        self.lower(value_back)
+        self.lower(all_back)
+        self.lower(outline_back)
         return uid
 
     def add_onoff(self,pos:tuple,fg='#575757',bg='#e5e5e5',onfg='#FFFFFF',onbg='#3041d8',command=None):#绘制开关控件

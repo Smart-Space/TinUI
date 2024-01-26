@@ -79,7 +79,7 @@ class TinUIDark(TinUITheme):
     def add_table(self,pos,*arg,**kw):
         return self.ui.add_table(pos,
                 outline='#9a9a9a',fg='#ffffff',bg='#2d2d2d',
-                headbg='#b2b8f2',*arg,**kw)
+                headbg='#202020',*arg,**kw)
 
     def add_onoff(self,pos,*arg,**kw):
         return self.ui.add_onoff(pos,

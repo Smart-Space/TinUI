@@ -106,7 +106,7 @@ class TinUIDark(TinUITheme):
 
     def add_menubar(self,uid,*arg,**kw):
         return self.ui.add_menubar(uid,
-            fg='#e6e6e6',bg='#323233',
+            fg='#e6e6e6',bg='#323233',line='#3d3d3e',
             activefg='#ffffff',activebg='#3d3d3e',*arg,**kw)
 
     def add_tooltip(self,uid,*arg,**kw):

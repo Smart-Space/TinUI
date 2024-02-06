@@ -1037,7 +1037,7 @@ class BasicTinUI(Canvas):
         self.add_tooltip(uid,text=info_text,fg=info_fg,bg=bg,outline=fg,font=info_font,width=width)
         return text,back,uid
 
-    def add_menubar(self,cid='all',bind='<Button-3>',font='微软雅黑 12',fg='#ecf3e8',bg='#2b2a33',activefg='#ecf3e8',activebg='#616161',cont=(('command',print),'-'),tran='#01FF11'):#绘制菜单
+    def add_menubar(self,cid='all',bind='<Button-3>',font='微软雅黑 12',fg='#1b1b1b',bg='#fbfbfc',line='#e3e3e3',activefg='#1a1a1a',activebg='#f2f2f3',cont=(('command',print),'-'),tran='#01FF11'):#绘制菜单
         '''cont格式
         (('名称',绑定的函数（至少接受event参数）),#常规格式
         '-',#分割线
@@ -1050,8 +1050,9 @@ class BasicTinUI(Canvas):
         def repaint():#重新绘制以适配
             maxwidth=max(widths)
             for back in backs:
-                pos=bar.bbox(back)
-                bar.coords(back,(5,pos[1],maxwidth+5,pos[3]))
+                pos=bar.bbox(back[0])
+                bar.coords(back[0],(5,pos[1]+4.5,maxwidth+5-4.5,pos[1]+4.5,maxwidth+5-4.5,pos[3]-4.5,5,pos[3]-4.5))
+                bar.coords(back[1],(5,pos[1]+4.5,maxwidth+5-4.5,pos[1]+4.5,maxwidth+5-4.5,pos[3]-4.5,5,pos[3]-4.5))
             for sep in seps:
                 pos=bar.bbox(sep)
                 bar.coords(sep,(5,pos[1],5+maxwidth,pos[1]))
@@ -1066,7 +1067,7 @@ class BasicTinUI(Canvas):
             maxx=self.winfo_screenwidth()
             maxy=self.winfo_screenheight()
             wind.data=(maxx,maxy,winw,winh)
-            bar.move('all',0,17)
+            bar.move('all',0,16)
         def unshow(event):
             menu.withdraw()
             menu.unbind('<FocusOut>')
@@ -1082,18 +1083,7 @@ class BasicTinUI(Canvas):
                 y=sy-winh
             else:
                 y=sy
-            #bar.move('all',0,-height-7)
             menu.geometry(f'{winw+15}x{winh+15}+{x}+{y}')
-            #menu.deiconify()
-            #bar.update()
-            #menu.focus_set()
-            # for i in range(0,height+5,5):#滚动动画
-            #     bar.move('all',0,5)
-            #     time.sleep(0.0005)
-            #     bar.update()
-            #bar.config(scrollregion=bar.bbox('all'))
-            #bar.yview_moveto(0)
-            #bar.update()
             menu.attributes('-alpha',0)
             menu.deiconify()
             menu.focus_set()
@@ -1120,9 +1110,9 @@ class BasicTinUI(Canvas):
                 #sep=bar.add_separate((15,endy()),10,fg=activebg)
                 seps.append(sep)
             else:
-                button=bar.add_button((5,endy()),i[0],fg,bg,bg,3,activefg,activebg,activebg,font,command=lambda event,i=i:(menu.withdraw(),i[1](event)))
-                backs.append(button[1])
-                funcs.append(button[2])
+                button=bar.add_button2((5,endy()-5),i[0],fg,bg,bg,3,activefg,line,line,font,command=lambda event,i=i:(menu.withdraw(),i[1](event)))
+                backs.append((button[1],button[2]))
+                funcs.append(button[3])
                 pos=bar.bbox(button[1])
                 width=pos[2]-pos[0]
                 widths.append(width)
@@ -1135,8 +1125,11 @@ class BasicTinUI(Canvas):
         x2=bbox[0]+max(widths)+10
         gomap=((x1,bbox[1]),(x2,bbox[1]),(x2,bbox[3]),(x1,bbox[3]),(x1,bbox[1]))
         mback=bar.create_polygon(gomap,fill=bg,outline=bg,width=15)
+        gomap=((x1-1,bbox[1]-1),(x2+1,bbox[1]-1),(x2+1,bbox[3]+1),(x1-1,bbox[3]+1),(x1-1,bbox[1]-1))
+        mline=bar.create_polygon(gomap,fill=bg,outline=line,width=15)
         bar.lower(mback)
-        bar.move('all',7,0)
+        bar.lower(mline)
+        bar.move('all',12,5)
         menu.bind('<FocusOut>',unshow)
         menu.attributes('-transparent',tran)
         return menu,bar,funcs
@@ -2988,21 +2981,92 @@ class BasicTinUI(Canvas):
         del __count
         #ok button
         okpos=((5+(width-9)/2)/2,height-22)
-        ok=bar.add_button2(okpos,text='✔️',font='{Segoe UI Emoji} 12',fg=fg,bg=bg,line='',activefg=activefg,activebg=activebg,activeline='',anchor='center',command=set_it)
+        ok=bar.add_button2(okpos,text='\uE73E',font='{Segoe Fluent Icons} 12',fg=fg,bg=bg,line='',activefg=activefg,activebg=activebg,activeline='',anchor='center',command=set_it)
         bar.coords(ok[1],(10,height-35,(width-9)/2-5,height-35,(width-9)/2-5,height-9,10,height-9))
         #cancel button
         #noback=bar.create_polygon(((width-9)/2+5,height-35,width-9,height-35,width-9,height-9,(width-9)/2+5,height-9),fill=bg,outline=bg,width=7,tags='no')
         #nobbox=bar.bbox(noback)
         nopos=(((width-9)/2+width-4)/2,height-22)
         #bar.create_text(nopos,fill=fg,text='❌',font='{Segoe UI Emoji} 12',tags='no')
-        no=bar.add_button2(nopos,text='❌',font='{Segoe UI Emoji} 12',fg=fg,bg=bg,line='',activefg=activefg,activebg=activebg,activeline='',anchor='center',command=cancel)
+        no=bar.add_button2(nopos,text='\uE711',font='{Segoe Fluent Icons} 12',fg=fg,bg=bg,line='',activefg=activefg,activebg=activebg,activeline='',anchor='center',command=cancel)
         bar.coords(no[1],((width-9)/2+5,height-35,width-9,height-35,width-9,height-9,(width-9)/2+5,height-9))
         readyshow()
         #texts=[],pickerbars=[]
         return picker,bar,texts,pickerbars,uid
     
-    def add_dropdownbutton(self,pos:tuple,side='x/y(默认)'):#绘制按钮展开UI界面（悬浮窗口）
-        ...
+    def add_menubutton(self,pos:tuple,text:str,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),cont=(('command',print),'-')):#绘制按钮展开菜单
+        #(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),command=None,anchor='nw'):#绘制圆角按钮
+        #Segoe Fluent Icons x右侧展开\uE76B \uE76C，y下方展开\uE70D \uE70E，默认y
+        def in_button(event):
+            self.itemconfig(outline,outline=activeline,fill=activeline)
+            self.itemconfig(uid+'button',fill=activefg)
+        def out_button(event):
+            self.itemconfig(back,fill=bg,outline=bg)
+            self.itemconfig(outline,outline=line,fill=line)
+            self.itemconfig(uid+'button',fill=fg)
+        def on_click(event):
+            self.itemconfig(back,fill=activebg,outline=activebg)
+            self.itemconfig(uid+'button',fill=activefg)
+            self.after(500,lambda : out_button(None))
+            show()#从menu那偷过来的
+        def show(event):#显示的起始位置
+            #初始位置
+            maxx,maxy,winw,winh=wind.data
+            sx,sy=event.x_root,event.y_root
+            if sx+winw>maxx:
+                x=sx-winw
+            else:
+                x=sx
+            if sy+winh>maxy:
+                y=sy-winh
+            else:
+                y=sy
+            menu.geometry(f'{winw+15}x{winh+15}+{x}+{y}')
+            menu.attributes('-alpha',0)
+            menu.deiconify()
+            menu.focus_set()
+            for i in [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]:
+                menu.attributes('-alpha',i)
+                menu.update()
+                time.sleep(0.05)
+            menu.bind('<FocusOut>',unshow)
+            #working unshow 不能用
+        def change_command(new_func):
+            #nonlocal command
+            command=new_func
+        def disable(fg='#9d9d9d',bg='#f5f5f5'):
+            self.itemconfig(uid+'button',state='disable',fill=fg)
+            self.itemconfig(back,state='disable',disabledfill=bg)
+        def active():
+            self.itemconfig(uid+'button',state='normal')
+            self.itemconfig(back,state='normal')
+            out_button(None)
+        button=self.create_text(pos,text=text,fill=fg,font=font,anchor='nw')
+        uid='menubutton'+str(button)
+        self.itemconfig(button,tags=(uid,uid+'button'))
+        x1,y1,x2,y2=self.bbox(uid)
+        if side=='y':
+            self.create_text((x2+5,(y1+y2)/2),text='\uE70D',fill=fg,font='{Segoe Fluent Icons} 12',anchor='w',tags=(uid,uid+'button'))
+        elif side=='x':
+            ...
+        x1,y1,x2,y2=self.bbox(uid+'button')
+        linew-=1
+        outline_t=(x1-linew,y1-linew,x2+linew,y1-linew,x2+linew,y2+linew,x1-linew,y2+linew)
+        outline=self.create_polygon(outline_t,width=9,tags=uid,fill=line,outline=line)
+        back_t=(x1,y1,x2,y1,x2,y2,x1,y2)
+        back=self.create_polygon(back_t,width=7,tags=uid,fill=bg,outline=bg)
+        self.tag_bind(uid+'button','<Button-1>',on_click)
+        self.tag_bind(uid+'button','<Enter>',in_button)
+        self.tag_bind(uid+'button','<Leave>',out_button)
+        self.tag_bind(back,'<Button-1>',on_click)
+        self.tag_bind(back,'<Enter>',in_button)
+        self.tag_bind(back,'<Leave>',out_button)
+        self.tkraise(uid+'button')
+        funcs=FuncList(3)
+        funcs.change_command=change_command
+        funcs.disable=disable
+        funcs.active=active
+        return uid+'button',back,outline,funcs,uid
 
 
 class TinUI(BasicTinUI):
@@ -3395,6 +3459,7 @@ if __name__=='__main__':
     b.add_swipecontrol((320,1300),'swipe control')
     b.add_passwordbox((250,1400),350)
     b.add_picker((1400,230),command=print)
+    b.add_menubutton((1500,50),'menubutton')
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))

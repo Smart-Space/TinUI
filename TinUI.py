@@ -1053,6 +1053,7 @@ class BasicTinUI(Canvas):
                 pos=bar.bbox(back[0])
                 bar.coords(back[0],(5,pos[1]+4.5,maxwidth+5-4.5,pos[1]+4.5,maxwidth+5-4.5,pos[3]-4.5,5,pos[3]-4.5))
                 bar.coords(back[1],(5,pos[1]+4.5,maxwidth+5-4.5,pos[1]+4.5,maxwidth+5-4.5,pos[3]-4.5,5,pos[3]-4.5))
+                bar.itemconfig(back[0],state='hidden')
             for sep in seps:
                 pos=bar.bbox(sep)
                 bar.coords(sep,(5,pos[1],5+maxwidth,pos[1]))
@@ -2248,6 +2249,9 @@ class BasicTinUI(Canvas):
         self.tag_bind(back,'<Button-1>',on_click)
         self.tag_bind(back,'<Enter>',in_button)
         self.tag_bind(back,'<Leave>',out_button)
+        self.tag_bind(outline,'<Button-1>',on_click)
+        self.tag_bind(outline,'<Enter>',in_button)
+        self.tag_bind(outline,'<Leave>',out_button)
         self.tkraise(button)
         funcs=FuncList(3)
         funcs.change_command=change_command
@@ -3271,7 +3275,11 @@ class TinUIXml():#TinUI的xml渲染方式
         self.ui.delete('all')
 
 
+tinui_dir=os.path.dirname(os.path.abspath(__file__))
+TinUIFont.load_font(tinui_dir+"/Segoe Fluent Icons.ttf")
 
+
+#==========test follow==========
 def test(event):
     a.title('TinUI Test')
     b.add_paragraph((50,150),'这是TinUI按钮触达的事件函数回显，此外，窗口标题也被改变、首行标题缩进减小')

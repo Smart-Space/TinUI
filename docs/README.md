@@ -540,9 +540,9 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - font::输入框字体，同时会影响按钮字体
 - command::选值时响应的函数，必须接受一个参数，这个参数是当前选定的值
 
-> `command`返回值为`string:TinUIString`，`string`为值本身，来自于`data`。
+> `command`返回值为 `string:TinUIString`，`string`为值本身，来自于 `data`。
 > 
-> `string.num`为值在`data`中的索引，从`0`开始。
+> `string.num`为值在 `data`中的索引，从 `0`开始。
 
 绘制一个选值框。
 
@@ -621,13 +621,14 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_menubar(self,cid='all',bind='\<Button-3\>',font='微软雅黑 12',fg='#ecf3e8',bg='#2b2a33',activefg='#ecf3e8',activebg='#616161',cont=(('command',print('')),'-'),tran='#01FF11')
+### add_menubar(self,cid='all',bind='\<Button-3\>',font='微软雅黑 12',fg='#1b1b1b',bg='#fbfbfc',line='#e3e3e3',activefg='#1a1a1a',activebg='#f2f2f3',cont=(('command',print('')),'-'),tran='#01FF11')
 
 - cid::绑定的画布对象
 - bind::绑定事件的类型
 - font::菜单字体
 - fg::字体颜色
 - bg::背景颜色
+- line::边框颜色
 - activefg::选定时字体颜色
 - activebg::选定时菜单选项颜色
 - cont::菜单内容
@@ -1019,7 +1020,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > 
 > content::内容文本
 
-![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI便笺.gif)
+![](https://raw.githubusercontent.com/Smart-Space/TinUI/main/image/TinUI%E4%BE%BF%E7%AC%BA.gif)
 
 ---
 
@@ -1335,31 +1336,18 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 ### add_picker(self,pos:tuple,height=250,fg='#1b1b1b',bg='#fbfbfb',outline='#ececec',activefg='#1b1b1b',activebg='#f6f6f6',onfg='#eaecfb',onbg='#3748d9',font=('微软雅黑',10),text=(('year',60),('season',100),),data=(('2022','2023','2024'),('spring','summer','autumn','winter')),tran='#01FF11',command=None)
 
 - pos-位置
-
 - height-选择框高度
-
 - fg-文本颜色
-
 - bg-背景色
-
 - outline-边框色
-
 - activefg-选择时文本颜色
-
 - activebg-选择时背景颜色
-
 - onfg-选定时文本颜色
-
 - onbg-选定时背景颜色
-
 - font-字体
-
-- text-文本内容，需要与`data`对应。`((选值文本,元素宽度),...)`
-
-- data-选值内容，需要与`text`对应
-
+- text-文本内容，需要与 `data`对应。`((选值文本,元素宽度),...)`
+- data-选值内容，需要与 `text`对应
 - tran-透明处理规避颜色
-
 - command-响应接受函数。需要接受一个参数：所有选值列表，全被选定时触发
 
 绘制一个滚动选值框。
@@ -1375,6 +1363,67 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > pickerbars::元素选择BasicTinUI列表
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI滚动选择框.gif)
+
+---
+
+### add_menubutton(self,pos:tuple,text:str,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),cont=(('command',print),'-'),tran='#01FF11')
+
+- pos-位置
+
+- text-文本
+
+- side-展开方向。y：向下展开；x：向右展开
+
+- fg-文本颜色
+
+- bg-背景色
+
+- line-边框颜色
+
+- linew-边框宽度
+
+- activefg-响应状态文本颜色
+
+- activebg-响应状态背景色
+
+- activeline-响应状态边框颜色
+
+- font-字体
+
+- cont-菜单内容
+
+- tran-透明处理规避色
+
+> cont的格式如下：
+> 
+> ```
+> (('名称',绑定的函数（接受event参数）),#常规格式
+> '-',#分割线
+> ...,
+> )
+> ```
+
+绘制一个菜单按钮。
+
+### return: text, back, outline, funcs, uid
+
+> text-文本元素，包括标识文本
+> 
+> back-背景元素
+> 
+> outline-边框元素
+> 
+> funcs
+> 
+> > funcs.disable(fg='#9d9d9d',bg='#f5f5f5')
+> > 
+> > 禁用按钮
+> > 
+> > funcs.active()
+> > 
+> > 激活按钮
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI菜单按钮.gif)
 
 ---
 
@@ -1579,5 +1628,4 @@ dict_item::一个字典，建议是 `globals()`或 `locals()`
 # 新想法
 
 - 发送issue至GitHub-TinUI储存库
-
 - 发送邮件至tsan-zane@outlook.com或smart-space@qq.com

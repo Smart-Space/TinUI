@@ -1133,6 +1133,7 @@ class BasicTinUI(Canvas):
         bar.move('all',12,5)
         menu.bind('<FocusOut>',unshow)
         menu.attributes('-transparent',tran)
+        menu.wind=wind#给menubutton用
         return menu,bar,funcs
 
     def add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',outline='#3b3b3b',font='微软雅黑 12',tran='#01FF11',delay=0,width=400):#绘制窗口提示框
@@ -2230,9 +2231,11 @@ class BasicTinUI(Canvas):
         def disable(fg='#9d9d9d',bg='#f5f5f5'):
             self.itemconfig(button,state='disable',fill=fg)
             self.itemconfig(back,state='disable',disabledfill=bg)
+            self.itemconfig(outline,state='disable')
         def active():
             self.itemconfig(button,state='normal')
             self.itemconfig(back,state='normal')
+            self.itemconfig(outline,state='normal')
             out_button(None)
         button=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
         uid='button2-'+str(button)
@@ -2998,8 +3001,7 @@ class BasicTinUI(Canvas):
         #texts=[],pickerbars=[]
         return picker,bar,texts,pickerbars,uid
     
-    def add_menubutton(self,pos:tuple,text:str,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),cont=(('command',print),'-')):#绘制按钮展开菜单
-        #(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),command=None,anchor='nw'):#绘制圆角按钮
+    def add_menubutton(self,pos:tuple,text:str,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),cont=(('command',print),'-'),tran='#01FF11'):#绘制按钮展开菜单
         #Segoe Fluent Icons x右侧展开\uE76B \uE76C，y下方展开\uE70D \uE70E，默认y
         def in_button(event):
             self.itemconfig(outline,outline=activeline,fill=activeline)
@@ -3012,11 +3014,24 @@ class BasicTinUI(Canvas):
             self.itemconfig(back,fill=activebg,outline=activebg)
             self.itemconfig(uid+'button',fill=activefg)
             self.after(500,lambda : out_button(None))
-            show()#从menu那偷过来的
+            show(event)#从menu那偷过来的
+        def unshow(event):#重写菜单
+            menu.withdraw()
+            menu.unbind('<FocusOut>')
         def show(event):#显示的起始位置
             #初始位置
-            maxx,maxy,winw,winh=wind.data
+            maxx,maxy,winw,winh=menu.wind.data
             sx,sy=event.x_root,event.y_root
+            #
+            maxx,maxy,winw,winh=menu.wind.data
+            bbox=self.bbox(uid)
+            scx,scy=event.x_root,event.y_root#屏幕坐标
+            if side=='y':
+                dx,dy=round(self.canvasx(event.x,)-bbox[0]),round(self.canvasy(event.y)-bbox[3])#画布坐标差值
+            elif side=='x':
+                dx,dy=round(self.canvasx(event.x,)-bbox[2]),round(self.canvasy(event.y)-bbox[1])#画布坐标差值
+            sx,sy=scx-dx,scy-dy
+            #
             if sx+winw>maxx:
                 x=sx-winw
             else:
@@ -3034,16 +3049,14 @@ class BasicTinUI(Canvas):
                 menu.update()
                 time.sleep(0.05)
             menu.bind('<FocusOut>',unshow)
-            #working unshow 不能用
-        def change_command(new_func):
-            #nonlocal command
-            command=new_func
         def disable(fg='#9d9d9d',bg='#f5f5f5'):
             self.itemconfig(uid+'button',state='disable',fill=fg)
             self.itemconfig(back,state='disable',disabledfill=bg)
+            self.itemconfig(outline,state='disable')
         def active():
             self.itemconfig(uid+'button',state='normal')
             self.itemconfig(back,state='normal')
+            self.itemconfig(outline,state='normal')
             out_button(None)
         button=self.create_text(pos,text=text,fill=fg,font=font,anchor='nw')
         uid='menubutton'+str(button)
@@ -3052,22 +3065,28 @@ class BasicTinUI(Canvas):
         if side=='y':
             self.create_text((x2+5,(y1+y2)/2),text='\uE70D',fill=fg,font='{Segoe Fluent Icons} 12',anchor='w',tags=(uid,uid+'button'))
         elif side=='x':
-            ...
+            self.create_text((x2+5,(y1+y2)/2),text='\uE76C',fill=fg,font='{Segoe Fluent Icons} 12',anchor='w',tags=(uid,uid+'button'))
         x1,y1,x2,y2=self.bbox(uid+'button')
         linew-=1
         outline_t=(x1-linew,y1-linew,x2+linew,y1-linew,x2+linew,y2+linew,x1-linew,y2+linew)
         outline=self.create_polygon(outline_t,width=9,tags=uid,fill=line,outline=line)
         back_t=(x1,y1,x2,y1,x2,y2,x1,y2)
         back=self.create_polygon(back_t,width=7,tags=uid,fill=bg,outline=bg)
+        #创建菜单
+        menu=self.add_menubar(uid,'<Button-1>',font=font,fg=fg,bg=bg,line=line,activefg=activefg,activebg=activebg,cont=cont,tran=tran)[0]
+        self.tag_unbind(uid,'<Button-1>')
+        #重新绑定事件
         self.tag_bind(uid+'button','<Button-1>',on_click)
         self.tag_bind(uid+'button','<Enter>',in_button)
         self.tag_bind(uid+'button','<Leave>',out_button)
         self.tag_bind(back,'<Button-1>',on_click)
         self.tag_bind(back,'<Enter>',in_button)
         self.tag_bind(back,'<Leave>',out_button)
+        self.tag_bind(outline,'<Button-1>',on_click)
+        self.tag_bind(outline,'<Enter>',in_button)
+        self.tag_bind(outline,'<Leave>',out_button)
         self.tkraise(uid+'button')
-        funcs=FuncList(3)
-        funcs.change_command=change_command
+        funcs=FuncList(2)
         funcs.disable=disable
         funcs.active=active
         return uid+'button',back,outline,funcs,uid
@@ -3467,7 +3486,7 @@ if __name__=='__main__':
     b.add_swipecontrol((320,1300),'swipe control')
     b.add_passwordbox((250,1400),350)
     b.add_picker((1400,230),command=print)
-    b.add_menubutton((1500,50),'menubutton')
+    b.add_menubutton((1500,50),'menubutton',cont=(('command',print),('menu',test1),'-',('TinUI文本移动',test)))
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))

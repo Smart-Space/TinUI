@@ -11,12 +11,13 @@
 *2. 自定scrollbar颜色
 *3. 组合menubar和menubutton
 *4. 新介绍窗口
-2024-2- pre-2
+2024-2-9 pre-2
 1. 更新menu样式
 2. menubutton 添加segeo fluent icon字体文件
 3. 更新picker样式
 4. 新logo
 5. 新增菜单按钮 menubutton
+6. 更新黑暗样式
 2024-2-6 pre-1
 1. 添加TinUIFont类，管理字体文件
 2. 更新table样式

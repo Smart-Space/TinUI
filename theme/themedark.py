@@ -210,6 +210,26 @@ class TinUIDark(TinUITheme):
                 fg='#ffffff',bg='#2d2d2d',line='#303030',
                 activefg='#000000',activebg='#b2b8f2',activeline='#b8bef3',
                 *arg,**kw)
+    
+    def add_swipecontrol(self,pos,*arg,**kw):
+        return self.ui.add_swipecontrol(pos,
+                fg='#ffffff',bg='#202020',line='#2d2d2d',
+                data={'left':({'text':'✔️\nok','fg':'#000000','bg':'#a9a9a9','command':print},),
+                'right':({'text':'❌\nclose'},)},
+                *arg,**kw)
+
+    def add_picker(self,pos,*arg,**kw):
+        return self.ui.add_picker(pos,
+                fg='#cfcfcf',bg='#2d2d2d',outline='#303030',
+                activefg='#ffffff',activebg='#3a3a3a',
+                onfg='#000000',onbg='#a8ade4',
+                *arg,**kw)
+    
+    def add_menubutton(self,pos,*arg,**kw):
+        return self.ui.add_menubutton(pos,
+                fg='#ffffff',bg='#2d2d2d',line='#303030',
+                activefg='#ffffff',activebg='#3f3f40',activeline='#3f3f3f',
+                *arg,**kw)
 
 
 def end():
@@ -328,6 +348,12 @@ du.add_listview(end(),num=10)
 du.add_treeview(end())
 #togglebutton
 du.add_togglebutton(end(),text='状态开关按钮')
+#swipecontrol
+du.add_swipecontrol(end(),text='SwipeControl')
+#timepicker
+du.add_picker(end())
+#dropdownbutton
+du.add_menubutton(end(),text='menubutton')
 
 u.add_back(end())
 r.r.title('TinUI dark theme')

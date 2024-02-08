@@ -1,0 +1,18 @@
+<tinui>
+<line>
+    <line>
+        <title text='back'></title>
+    </line>
+    <line>
+        <paragraph text='TinUI的背景控件，用来呈现不同控件组的层次。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text='下方就是back'>p1</paragraph>
+    <button2 text='本按钮与左边文字构成控件组'>b1</button2>
+    <back uids='("b1","p1")' bg='yellow' fg='yellow'></back>
+    </line>
+</line>
+</tinui>

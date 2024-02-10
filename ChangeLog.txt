@@ -14,6 +14,7 @@
 *3. 组合menubar和menubutton
 4. 新介绍窗口
 *5. 横向滚动条字体修复
+6. 修复treeview展开时可能的提示元素的位置错位
 2024-2-9 pre-2
 1. 更新menu样式
 2. menubutton 添加segeo fluent icon字体文件

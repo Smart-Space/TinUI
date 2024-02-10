@@ -2453,7 +2453,9 @@ class BasicTinUI(Canvas):
             #click(nowid)#单级输出
             if nowid in cids:#重新显示标识元素
                 click(nowid)
-            #else:
+            else:
+                posi=box.bbox(nowid)[1]
+                box.moveto(line,1,posi+linew/5)
             #    box.move(line,0,height)
             box.config(scrollregion=box.bbox('all'))
         def close_view(sign,cid):#闭合

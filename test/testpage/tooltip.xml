@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='tooltip'></title>
+    </line>
+    <line>
+        <paragraph text='TinUI的浮动提示文本。info使用的也为tooltip。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <info info='TinUI-5.0' info_text='TinUI的第五个大版本，2024年发布'></info>
+    </line>
+</line>
+</tinui>

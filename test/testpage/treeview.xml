@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='treeview'></title>
+    </line>
+    <line>
+        <paragraph text='树状图控件。根据从属关系展现可交互的按钮或选项。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <treeview></treeview>
+    </line>
+</line>
+</tinui>

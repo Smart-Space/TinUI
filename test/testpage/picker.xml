@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='picker'></title>
+    </line>
+    <line>
+        <paragraph text='浮出数据选择器的控件。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <picker></picker>
+    </line>
+</line>
+</tinui>

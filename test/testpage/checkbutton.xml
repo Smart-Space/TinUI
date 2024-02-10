@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='checkbutton'></title>
+    </line>
+    <line>
+        <paragraph text='复选框控件，用于选择或取消操作项目。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <checkbutton text='checkbutton'></checkbutton>
+    </line>
+</line>
+</tinui>

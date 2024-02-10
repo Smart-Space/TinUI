@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='radiobutton'></title>
+    </line>
+    <line>
+        <paragraph text='提供一个单选按钮的控件。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <radiobutton width='300'></radiobutton>
+    </line>
+</line>
+</tinui>

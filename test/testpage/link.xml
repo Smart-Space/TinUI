@@ -1,0 +1,17 @@
+<tinui>
+<line>
+    <line>
+        <title text='link'></title>
+    </line>
+    <line>
+        <paragraph text='显示并打开链接，或执行链接函数的控件' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text='右侧为打开TinUI线上介绍的链接'></paragraph>
+    <link text='TinUI' url='https://tinui.smart-space.com.cn/'></link>
+    </line>
+</line>
+</tinui>

@@ -1,0 +1,15 @@
+<tinui>
+<line>
+    <line>
+        <title text='paragraph'></title>
+    </line>
+    <line>
+        <paragraph text='显示文本，无需介绍。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    </line>
+</line>
+</tinui>

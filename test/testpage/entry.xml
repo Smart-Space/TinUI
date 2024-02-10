@@ -1,0 +1,17 @@
+<tinui>
+<line>
+    <line>
+        <title text='entry'></title>
+    </line>
+    <line>
+        <paragraph text='用来输入单行文本的控件。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text='右边为一个普通输入框，通过获取返回值调用：'></paragraph>
+    <entry width='200'></entry>
+    </line>
+</line>
+</tinui>

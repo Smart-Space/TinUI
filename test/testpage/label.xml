@@ -1,0 +1,18 @@
+<tinui>
+<line>
+    <line>
+        <title text='label'></title>
+    </line>
+    <line>
+        <paragraph text='显示标签文本的控件' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text='一般在需要'></paragraph>
+    <label text='着重突出文本'></label>
+    <paragraph text='的地方使用label'></paragraph>
+    </line>
+</line>
+</tinui>

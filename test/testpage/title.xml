@@ -1,0 +1,15 @@
+<tinui>
+<line>
+    <line>
+        <title text='title'></title>
+    </line>
+    <line>
+        <paragraph text=' ↑ 就是title' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    </line>
+</line>
+</tinui>

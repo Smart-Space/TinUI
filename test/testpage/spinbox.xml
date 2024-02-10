@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='spinbox'></title>
+    </line>
+    <line>
+        <paragraph text='供上下调节内容的选值控件。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <spinbox></spinbox>
+    </line>
+</line>
+</tinui>

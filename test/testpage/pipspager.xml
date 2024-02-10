@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='pipspager'></title>
+    </line>
+    <line>
+        <paragraph text='TinUI的翻页控件。每一页都是BasicTinUI，且可以使用xml载入TinUI。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <pipspager></pipspager>
+    </line>
+</line>
+</tinui>

@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='notebook'></title>
+    </line>
+    <line>
+        <paragraph text='TinUI的选项卡控件。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <notebook>notebook</notebook>
+    </line>
+</line>
+</tinui>

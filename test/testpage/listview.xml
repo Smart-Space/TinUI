@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='listview'></title>
+    </line>
+    <line>
+        <paragraph text='显示列表视图的控件。每一个列表视图本质上是BasicTinUI，且自动生成了TinUIXml类，可以被选择。可以通过xml创建模板化的选项元素。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <listview></listview>
+    </line>
+</line>
+</tinui>

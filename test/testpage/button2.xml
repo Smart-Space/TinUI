@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='button2'></title>
+    </line>
+    <line>
+        <paragraph text='圆角按钮控件。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <button2 text='button2'></button2>
+    </line>
+</line>
+</tinui>

@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='togglebutton'></title>
+    </line>
+    <line>
+        <paragraph text='开关按钮控件。直观展示某项功能的状态。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <togglebutton text='togglebutton'></togglebutton>
+    </line>
+</line>
+</tinui>

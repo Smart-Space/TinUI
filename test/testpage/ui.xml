@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='ui'></title>
+    </line>
+    <line>
+        <paragraph text='BasicTinUI类。可以自动绑定滚动条，但建议手动绑定。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text='展示区就是ui。'></paragraph>
+    </line>
+</line>
+</tinui>

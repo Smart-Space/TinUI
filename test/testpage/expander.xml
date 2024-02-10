@@ -1,0 +1,19 @@
+<tinui>
+<line>
+    <line>
+        <title text='expander'></title>
+    </line>
+    <line>
+        <paragraph text='显示以BasicTinUI展示拓展内容的控件。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text='本控件会自动创建TinUIXml，可以通过返回值获取对应TinUIXml类，从而使用xml载入TinUI控件。' width='500'></paragraph>
+    </line>
+    <line>
+    <expander>expander</expander>
+    </line>
+</line>
+</tinui>

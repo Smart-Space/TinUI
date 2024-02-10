@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='radiobox'></title>
+    </line>
+    <line>
+        <paragraph text='显示一组单选框。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <radiobox></radiobox>
+    </line>
+</line>
+</tinui>

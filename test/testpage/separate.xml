@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='separate'></title>
+    </line>
+    <line>
+        <paragraph text='分割线。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <separate width='500'></separate>
+    </line>
+</line>
+</tinui>

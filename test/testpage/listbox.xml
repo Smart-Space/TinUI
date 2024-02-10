@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='listbox'></title>
+    </line>
+    <line>
+        <paragraph text='在一定区域内显示列表选项的控件' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <listbox></listbox>
+    </line>
+</line>
+</tinui>

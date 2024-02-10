@@ -7,8 +7,8 @@
         <image width='200' height='200' imgfile='test\LOGO.png'></image>
     </line>
     <line>
-        <listbox height='300' bg='#f0f0f0' data='self.datas["controls"]' command='self.funcs["loadcontrol"]'>controls</listbox>
+        <listbox height='320' bg='#f0f0f0' data='self.datas["controls"]' command='self.funcs["loadcontrol"]'>controls</listbox>
     </line>
-    <ui bg='#f0f0f0' width='590' height='550' scrollbar="True" region='auto'>displayui</ui>
+    <ui bg='#f0f0f0' width='590' height='570' scrollbar="True" region='auto'>displayui</ui>
 </line>
 </tinui>

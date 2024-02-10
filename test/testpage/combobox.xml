@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='combobox'></title>
+    </line>
+    <line>
+        <paragraph text='组合框，提供选择短列表。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <combobox text='combobox（选项为空）'></combobox>
+    </line>
+</line>
+</tinui>

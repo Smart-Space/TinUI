@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='menubutton'></title>
+    </line>
+    <line>
+        <paragraph text='菜单按钮。可以通过此按钮调出菜单。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <menubutton text='menubutton'></menubutton>
+    </line>
+</line>
+</tinui>

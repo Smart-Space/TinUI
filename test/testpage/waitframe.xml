@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='waitframe'></title>
+    </line>
+    <line>
+        <paragraph text='等待覆盖控件。用以覆盖在长时间等待操作的控件组上。其本身为BasicTinUI，可以加入其它控件来丰富等待操作。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <waitframe>waitframe</waitframe>
+    </line>
+</line>
+</tinui>

@@ -1,0 +1,15 @@
+<tinui>
+<line>
+    <line>
+        <title text='scrollbar'></title>
+    </line>
+    <line>
+        <paragraph text='TinUI的滚动条控件。见展示区域的右侧和下方。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    </line>
+</line>
+</tinui>

@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='notecard'></title>
+    </line>
+    <line>
+        <paragraph text='用来展示必要信息的提示卡片。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <notecard></notecard>
+    </line>
+</line>
+</tinui>

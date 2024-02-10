@@ -1,0 +1,21 @@
+<tinui>
+<line>
+    <line>
+        <title text='labelframe'></title>
+    </line>
+    <line>
+        <paragraph text='框显控件组的控件。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <button text='button'>b1</button>
+    <button2 text='button2'>b2</button2>
+    <labelframe widgets='("b1","b2")' title='button组'></labelframe>
+    </line>
+</line>
+</tinui>

@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='pivot'></title>
+    </line>
+    <line>
+        <paragraph text='支点标题。供以选择不同标题下应该展示的内容。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <pivot></pivot>
+    </line>
+</line>
+</tinui>

@@ -1429,7 +1429,7 @@ class BasicTinUI(Canvas):
             width=3,outline=color,tags=uid)
             start=pos[0]+8
             end=pos[0]+height-13
-            canmove=(end-start)*0.95
+            canmove=(end-start)*0.95#working...
             widget.config(xscrollcommand=widget_move)
         scroll=TinUINum()
         scroll.__move=False
@@ -2453,6 +2453,8 @@ class BasicTinUI(Canvas):
             #click(nowid)#单级输出
             if nowid in cids:#重新显示标识元素
                 click(nowid)
+            #else:
+            #    box.move(line,0,height)
             box.config(scrollregion=box.bbox('all'))
         def close_view(sign,cid):#闭合
             if box.itemcget(sign,'text')=='▷':

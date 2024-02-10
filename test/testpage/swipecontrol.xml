@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='swipecontrol'></title>
+    </line>
+    <line>
+        <paragraph text='滑动控件。不建议使用，因为不是每一台电脑都能够实现触控横向滚动。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <swipecontrol text='可左右滑动'></swipecontrol>
+    </line>
+</line>
+</tinui>

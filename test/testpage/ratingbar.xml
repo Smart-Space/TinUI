@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='ratingbar'></title>
+    </line>
+    <line>
+        <paragraph text='评选分数、星级的控件。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <ratingbar></ratingbar>
+    </line>
+</line>
+</tinui>

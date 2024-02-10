@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='onoff'></title>
+    </line>
+    <line>
+        <paragraph text='开关键。用来开启或者关闭操作项目。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <onoff></onoff>
+    </line>
+</line>
+</tinui>

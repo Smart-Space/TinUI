@@ -9,13 +9,48 @@ from TinUI import *
 from tkinter import Tk
 
 
+load_menubar=False
+
 def loadcontrol(controlname):
+    global load_menubar
     #导入控件说明
     cfile=open("test/testpage/"+controlname+".xml",mode='r',encoding='utf-8')
     cxml=cfile.read()
     cfile.close()
     duixml.clean()
     duixml.loadxml(cxml)
+    if controlname=='canvas':
+        canvas=duixml.tags['canvas'][0]
+        canvas.create_text((5,5),text='画布对象：文字。\n需要获取add_canvas的第一个返回值',font='微软雅黑 12',anchor='nw')
+    elif controlname=='expander':
+        expander=duixml.tags['expander'][2]
+        expander.loadxml('''<tinui><line>
+        <button2 text='拓展UI框架的按钮'></button2></line>
+        <line>
+        <paragraph text='拓展UI框架可以节省布局位置，能够使用TinUIXml为可拓展UI框架编写界面布局。' width='190'></paragraph>
+        </line>
+        <line><paragraph text='感觉如何？' width='190'></paragraph></line><line><ratingbar></ratingbar>
+        </line></tinui>
+        ''')
+    elif controlname=='menubar':
+        #if not load_menubar:
+        #    print('ok')
+        #    label=duixml.tags['label'][-1]
+        #    displayui.add_menubar(label)
+        #load_menubar=True
+        label=duixml.tags['label'][-1]
+        displayui.add_menubar(label)
+    elif controlname=='notebook':
+        notebook=duixml.tags['notebook'][-2]
+        for i in range(1,5):
+            if i==5:#第五个不可删除:
+                notebook.addpage('test'+str(i),'t'+str(i),cancancel=False)
+            else:
+                notebook.addpage('test'+str(i),'t'+str(i))
+    elif controlname=='waitframe':
+        waitframe=duixml.tags['waitframe'][-2]
+        waitframe.start()
+
 
 
 xmlf=open(r'test\testpage\main.xml','r')
@@ -37,7 +72,7 @@ uix.datas['controls']=['back', 'button', 'button2', 'canvas', 'checkbutton',
  'onoff', 'paragraph', 'passwordbox', 'picker', 'pipspager', 'pivot', 'progressbar', 
  'radiobox', 'radiobutton', 'ratingbar', 'scalebar', 'scrollbar', 'separate', 
  'spinbox', 'swipecontrol', 'table', 'textbox', 'title', 'togglebutton', 'tooltip', 
- 'treeview', 'ui', 'waitbar1', 'waitbar2', 'waitbar3', 'waitframe']
+ 'treeview', 'ui', 'waitbar', 'waitframe']
 uix.loadxml(xml)
 displayui,_,duixml,_=uix.tags['displayui']
 

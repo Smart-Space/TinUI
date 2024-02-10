@@ -1,0 +1,17 @@
+<tinui>
+<line>
+    <line>
+        <title text='textbox'></title>
+    </line>
+    <line>
+        <paragraph text='简单多行文本输入框。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <textbox></textbox>
+    <paragraph width='300' text='如果想要实现复杂的富文本效果，建议自行创建文本框类，并直接导入到TinUI中。'></paragraph>
+    </line>
+</line>
+</tinui>

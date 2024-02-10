@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='canvas'></title>
+    </line>
+    <line>
+        <paragraph text='画布控件，提供基础绘画功能。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <canvas width='350'>canvas</canvas>
+    </line>
+</line>
+</tinui>

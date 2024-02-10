@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='progressbar'></title>
+    </line>
+    <line>
+        <paragraph text='展示进度的控件。可获取进度方法返回值实现动画（本示例中不展示）。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <progressbar></progressbar>
+    </line>
+</line>
+</tinui>

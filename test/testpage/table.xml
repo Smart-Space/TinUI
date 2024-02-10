@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='table'></title>
+    </line>
+    <line>
+        <paragraph text='普通表格控件。用以展示简单数据。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <table></table>
+    </line>
+</line>
+</tinui>

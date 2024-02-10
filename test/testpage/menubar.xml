@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='menubar'></title>
+    </line>
+    <line>
+        <paragraph text='TinUI里的通用菜单。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <label text='右键单击此文本'>label</label>
+    </line>
+</line>
+</tinui>

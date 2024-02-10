@@ -1,0 +1,18 @@
+<tinui>
+<line>
+    <line>
+        <title text='info'></title>
+    </line>
+    <line>
+        <paragraph text='显示浮窗提示。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text='本示例窗口在'></paragraph>
+    <info info='TinUI-5.0' info_text='TinUI的第五个大版本，2024年发布'></info>
+    <paragraph text='中首次加入。'></paragraph>
+    </line>
+</line>
+</tinui>

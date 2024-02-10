@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='scalebar'></title>
+    </line>
+    <line>
+        <paragraph text='调节器控件' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <scalebar></scalebar>
+    </line>
+</line>
+</tinui>

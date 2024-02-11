@@ -1408,8 +1408,8 @@ class BasicTinUI(Canvas):
             width=13,outline=bg)
             uid='scrollbar'+str(back)
             self.itemconfig(back,tags=uid)
-            top=self.create_text(pos,text='▲',font='微软雅黑 8',anchor='nw',fill=oncolor,tags=uid)
-            bottom=self.create_text((pos[0],pos[1]+height),text='▼',font='微软雅黑 8',anchor='sw',fill=oncolor,tags=uid)
+            top=self.create_text((pos[0]+1,pos[1]),text='\ueddb',font='{Segoe UI Emoji} 7',anchor='nw',fill=oncolor,tags=uid)
+            bottom=self.create_text((pos[0]+1,pos[1]+height),text='\ueddc',font='{Segoe UI Emoji} 7',anchor='sw',fill=oncolor,tags=uid)
             sc=self.create_polygon((pos[0]+5,pos[1]+20,pos[0]+5,pos[1]+height-20,pos[0]+5,pos[1]+20),
             width=3,outline=color,tags=uid)
             #起始和终止位置
@@ -1423,13 +1423,13 @@ class BasicTinUI(Canvas):
             width=13,outline=bg)
             uid='scrollbar'+str(back)
             self.itemconfig(back,tags=uid)
-            top=self.create_text((pos[0]+2,pos[1]+11),text='▲',angle=90,font='微软雅黑 8',anchor='w',fill=oncolor,tags=uid)
-            bottom=self.create_text((pos[0]+height,pos[1]),text='▼',angle=90,font='微软雅黑 8',anchor='se',fill=oncolor,tags=uid)
-            sc=self.create_polygon((pos[0]+20,pos[1]+5,pos[0]+height-20,pos[1]+5,pos[0]+20,pos[1]+5),
+            top=self.create_text((pos[0],pos[1]),text='\uEDD9',font='{Segoe UI Emoji} 7',anchor='nw',fill=oncolor,tags=uid)
+            bottom=self.create_text((pos[0]+height,pos[1]),text='\uEDDA',font='{Segoe UI Emoji} 7',anchor='ne',fill=oncolor,tags=uid)
+            sc=self.create_polygon((pos[0]+12,pos[1]+5,pos[0]+height-20,pos[1]+5,pos[0]+20,pos[1]+5),
             width=3,outline=color,tags=uid)
-            start=pos[0]+8
-            end=pos[0]+height-13
-            canmove=(end-start)*0.95#working...
+            start=pos[0]+12
+            end=pos[0]+height-15
+            canmove=end-start-10#(end-start)*0.95#working...
             widget.config(xscrollcommand=widget_move)
         scroll=TinUINum()
         scroll.__move=False
@@ -1631,7 +1631,7 @@ class BasicTinUI(Canvas):
         ui_xml=TinUIXml(ui)
         return ui,re_scrollregion,ui_xml,uid
 
-    def add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',buttonbg='#f8f8f8',num:int=2):#绘制翻页视图
+    def add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',activefg='#5d5d5d',buttonbg='#f8f8f8',activebg='#f8f8f8',num:int=2):#绘制翻页视图
         def move_left(event):
             nonlocal nowui
             if nowui==0:
@@ -1651,28 +1651,31 @@ class BasicTinUI(Canvas):
             oldone=nowui
             def animate(startwidth,times):#展开动画
                 self.itemconfig(newui,width=startwidth+inchx)
+                self.update()
                 if times<19:
                     self.after(10,lambda:animate(startwidth+inchx,times+1))
                 else:
+                    self.itemconfig(newui,width=width)
                     if not first:
                         self.itemconfig(uilist[oldone][0],state='hidden')
             inchx=width/20#翻页动画参数
             newui=uilist[number][0]
+            newUI=uilist[number][1]
+            mode=None
             if number>nowui:#向右翻页
                 if self.itemcget(newui,'anchor')!='ne':#重新对齐
                     self.move(newui,width,0)
                 self.itemconfig(newui,anchor='ne')
+                mode='right'
             else:#向左翻页
-                self.itemconfig(uilist[oldone][0],state='hidden')
                 if self.itemcget(newui,'anchor')!='nw':#重新对齐
                     self.move(newui,-width,0)
                 self.itemconfig(newui,anchor='nw')
-            #startwidth=0#动画起始宽度
-            self.itemconfig(newui,width=0)
-            self.itemconfig(newui,state='normal')
+                mode='left'
+            startwidth=0#动画起始宽度
+            self.itemconfig(newui,width=0,state='normal')
             self.lift(newui)
             animate(0,0)
-            self.itemconfig(newui,width=width)
             nowui=number#新标志
         def move_to(number):
             __dot_in(dotlist[nowui])
@@ -1714,8 +1717,8 @@ class BasicTinUI(Canvas):
         doty=pos[1]+height+5#控制点的起始纵坐标
         dotlist=list()#[dot1,dot2,...]
         nowui=0#当前显示界面序号
-        leftbutton=self.add_button((startx-2,pos[1]+width/2),'◀',fg=fg,bg=buttonbg,linew=0,activefg=buttonbg,activebg=fg,command=move_left,anchor='e')[-1]
-        rightbutton=self.add_button((startx+width+2,pos[1]+width/2),'▶',fg=fg,bg=buttonbg,linew=0,activefg=buttonbg,activebg=fg,command=move_right,anchor='w')[-1]
+        leftbutton=self.add_button2((startx-2,pos[1]+width/2),'\uedd9',font='{Segoe UI Emoji} 7',fg=fg,bg=buttonbg,linew=0,activefg=activefg,activebg=activebg,command=move_left,anchor='e')[-1]
+        rightbutton=self.add_button2((startx+width+2,pos[1]+width/2),'\uedda',font='{Segoe UI Emoji} 7',fg=fg,bg=buttonbg,linew=0,activefg=activefg,activebg=activebg,command=move_right,anchor='w')[-1]
         #leftbutton=self.add_button((startx-2,pos[1]+width/2),'◁',font='{Segoe UI Emoji}',fg=fg,bg=buttonbg,linew=0,activefg=buttonbg,activebg=fg,command=move_left,anchor='e')[-1]
         #rightbutton=self.add_button((startx+width+2,pos[1]+width/2),'▷',font='{Segoe UI Emoji}',fg=fg,bg=buttonbg,linew=0,activefg=buttonbg,activebg=fg,command=move_right,anchor='w')[-1]
         uid='pipspager'+str(leftbutton)+str(rightbutton)
@@ -3324,7 +3327,7 @@ def test6():
     for i in range(0,5):
         num=i
         xml=f'''
-<tinui><line><label text='这是第{num}个BasicTinUI组件'></label></line>
+<tinui><line x='{num*10+5}'><label text='这是第{num}个BasicTinUI组件'></label></line>
 <line><button text='功能按钮' command='lambda event:print("第{i}个功能按钮")'></button>
 <combobox width='80' text='可选测试' content='("{i}","其它选项")'></combobox></line></tinui>'''
         ppgl[i][2].loadxml(xml)

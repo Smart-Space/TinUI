@@ -853,14 +853,16 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',buttonbg='#f8f8f8',num:int=2)
+### add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',activefg='#5d5d5d',buttonbg='#f8f8f8',activebg='#f8f8f8',num:int=2)
 
 - pos::位置
 - width::主视图宽度
 - height::主视图高度
 - bg::背景颜色
 - fg::按钮和导航栏前景色
+- activefg::响应时按钮文本颜色
 - buttonbg::按钮背景颜色
+- activebg::响应时按钮背景色
 - num::视图数量
 
 绘制一个横向翻页视图。

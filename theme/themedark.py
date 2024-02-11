@@ -141,6 +141,7 @@ class TinUIDark(TinUITheme):
     def add_pipspager(self,pos,*arg,**kw):
         return self.ui.add_pipspager(pos,
                 bg='#202020',fg='#9a9a9a',buttonbg='#303030',
+                activefg='#cccccc',activebg='#303030',
                                      *arg,**kw)
 
     def add_notebook(self,pos,*arg,**kw):

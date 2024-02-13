@@ -1,5 +1,5 @@
 '''
-<TinUI, a modern frame to render various widgets element for tkinter in one control.>
+<TinUI, a modern frame to render various widgets elements for tkinter in one control.>
     Copyright (C) <2021-present>  <smart-space>
 '''
 from tkinter import *
@@ -9,7 +9,7 @@ import math
 import asyncio
 import threading
 from typing import Union
-from types import FunctionType
+from types import FunctionType,BuiltinFunctionType
 import xml.etree.ElementTree  as ET
 import sys
 import os
@@ -188,6 +188,7 @@ class BasicTinUI(Canvas):
         self.images=[]
         self.title_size={0:20,1:18,2:16,3:14,4:12}
         self.pen=TinUIPen(self)
+        self.windows=[]#浮出控件的子窗口，需要开发者手动释放
     
     def __get_text_size(self,text):
         #获取文本元素字体大小
@@ -223,6 +224,16 @@ class BasicTinUI(Canvas):
             self.move(uid,0,-ycenter)
         elif anchor=='center':
             self.move(uid,-xcenter,-ycenter)
+    
+    def clean_windows(self):
+        #清除浮出控件子窗口
+        for i in self.windows:
+            try:
+                i.destroy()
+            except:
+                continue
+        self.windows=[]
+        #print(self.windows)
 
     def add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,anchor='nw',**kw):#绘制标题
         kw['anchor']=anchor
@@ -507,7 +518,7 @@ class BasicTinUI(Canvas):
         funcs.active=funcs[2]=active
         return word,choices_list,choices_back,funcs,uid
 
-    def add_link(self,pos:tuple,text,url:Union[str,FunctionType],fg='#4f62ca',activefg='red',activebg='#eaeaea',font:tuple=('微软雅黑',12),anchor='nw',command=None):#绘制超链接
+    def add_link(self,pos:tuple,text,url:Union[str,FunctionType,BuiltinFunctionType],fg='#4f62ca',activefg='red',activebg='#eaeaea',font:tuple=('微软雅黑',12),anchor='nw',command=None):#绘制超链接
         def turn_red(event):
             self.itemconfig(link,fill=activefg)
             self.itemconfig(back,fill=activebg,outline=activebg)
@@ -1037,7 +1048,7 @@ class BasicTinUI(Canvas):
         self.add_tooltip(uid,text=info_text,fg=info_fg,bg=bg,outline=fg,font=info_font,width=width)
         return text,back,uid
 
-    def add_menubar(self,cid='all',bind='<Button-3>',font='微软雅黑 12',fg='#1b1b1b',bg='#fbfbfc',line='#e3e3e3',activefg='#1a1a1a',activebg='#f2f2f3',cont=(('command',print),'-'),tran='#01FF11'):#绘制菜单
+    def add_menubar(self,cid='all',bind='<Button-3>',font='微软雅黑 12',fg='#1b1b1b',bg='#fbfbfc',line='#cccccc',activefg='#1a1a1a',activebg='#f2f2f3',cont=(('command',print),'-'),tran='#01FF11'):#绘制菜单
         '''cont格式
         (('名称',绑定的函数（至少接受event参数）),#常规格式
         '-',#分割线
@@ -1050,10 +1061,19 @@ class BasicTinUI(Canvas):
         def repaint():#重新绘制以适配
             maxwidth=max(widths)
             for back in backs:
-                pos=bar.bbox(back[0])
-                bar.coords(back[0],(5,pos[1]+4.5,maxwidth+5-4.5,pos[1]+4.5,maxwidth+5-4.5,pos[3]-4.5,5,pos[3]-4.5))
-                bar.coords(back[1],(5,pos[1]+4.5,maxwidth+5-4.5,pos[1]+4.5,maxwidth+5-4.5,pos[3]-4.5,5,pos[3]-4.5))
-                bar.itemconfig(back[0],state='hidden')
+                if len(back)==2:
+                    pos=bar.bbox(back[0])
+                    bar.coords(back[0],(5,pos[1]+4.5,maxwidth+5-4.5,pos[1]+4.5,maxwidth+5-4.5,pos[3]-4.5,5,pos[3]-4.5))
+                    bar.coords(back[1],(5,pos[1]+4.5,maxwidth+5-4.5,pos[1]+4.5,maxwidth+5-4.5,pos[3]-4.5,5,pos[3]-4.5))
+                    bar.itemconfig(back[0],state='hidden')
+                elif len(back)==3:
+                    pos=bar.bbox(back[1])
+                    bar.coords(back[1],(5,pos[1]+4.5,maxwidth+5-4.5,pos[1]+4.5,maxwidth+5-4.5,pos[3]-4.5,5,pos[3]-4.5))
+                    bar.coords(back[2],(5,pos[1]+4.5,maxwidth+5-4.5,pos[1]+4.5,maxwidth+5-4.5,pos[3]-4.5,5,pos[3]-4.5))
+                    bar.itemconfig(back[1],state='hidden')
+                    sign=bar.gettags(back[0])[-1]
+                    #bar.moveto(sign,maxwidth+5-4.5,(pos[1]+pos[3])/2)
+                    #bar.itemconfig(sign,anchor='e')
             for sep in seps:
                 pos=bar.bbox(sep)
                 bar.coords(sep,(5,pos[1],5+maxwidth,pos[1]))
@@ -1084,7 +1104,7 @@ class BasicTinUI(Canvas):
                 y=sy-winh
             else:
                 y=sy
-            menu.geometry(f'{winw+15}x{winh+15}+{x}+{y}')
+            menu.geometry(f'{winw+20}x{winh+20}+{x}+{y}')
             menu.attributes('-alpha',0)
             menu.deiconify()
             menu.focus_set()
@@ -1095,6 +1115,7 @@ class BasicTinUI(Canvas):
             menu.bind('<FocusOut>',unshow)
         self.tag_bind(cid,bind,show)
         menu=Toplevel(self)
+        self.windows.append(menu)
         menu.attributes('-topmost',1)
         menu.overrideredirect(True)
         menu.withdraw()
@@ -1110,7 +1131,15 @@ class BasicTinUI(Canvas):
                 sep=bar.create_line((5,endy(),20,endy()),fill=activebg,width=3)
                 #sep=bar.add_separate((15,endy()),10,fg=activebg)
                 seps.append(sep)
-            else:
+            elif type(i[1]) in (list,tuple):
+                #嵌套菜单，只接受列表或元组，不接受集合等
+                button=bar.add_menubutton((5,endy()-5),i[0],'x',fg,bg,line,3,activefg,line,line,font,cont=i[1],tran=tran)
+                backs.append((button[0],button[1],button[2]))
+                funcs.append(button[3])
+                pos=bar.bbox(button[1])
+                width=pos[2]-pos[0]
+                widths.append(width)
+            elif type(i[1]) in (FunctionType,BuiltinFunctionType):
                 button=bar.add_button2((5,endy()-5),i[0],fg,bg,bg,3,activefg,line,line,font,command=lambda event,i=i:(menu.withdraw(),i[1](event)))
                 backs.append((button[1],button[2]))
                 funcs.append(button[3])
@@ -1169,6 +1198,7 @@ class BasicTinUI(Canvas):
         def first_create():#首次使用时创建
             nonlocal toti, bar, bbox, width, height
             toti=Toplevel()
+            self.windows.append(toti)
             toti.withdraw()
             toti.overrideredirect(True)
             bar=BasicTinUI(toti,bg=tran)
@@ -1271,7 +1301,7 @@ class BasicTinUI(Canvas):
         start()
         return back,bar,stop,uid
 
-    def add_textbox(self,pos:tuple,width:int=200,height:int=200,text:str='',anchor='nw',font='微软雅黑 12',fg='black',bg='white',linew=3,scrollbar=False,outline='#63676b',onoutline='#3041d8'):#绘制文本框
+    def add_textbox(self,pos:tuple,width:int=200,height:int=200,text:str='',anchor='nw',font='微软雅黑 12',fg='black',bg='white',linew=3,scrollbar=False,outline='#63676b',onoutline='#3041d8',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b'):#绘制文本框
         def get(start='1.0',end='end'):#获取输入
             return textbox.get(start,end)
         def delete(start='1.0',end='end'):#删除
@@ -1285,7 +1315,7 @@ class BasicTinUI(Canvas):
         textbox.insert(1.0,text)
         if scrollbar==True:#不支持横向滚动自动绑定
             bbox=self.bbox(uid)
-            cid=self.add_scrollbar((bbox[2]+5,bbox[1]),textbox,bbox[3]-bbox[1])[-1]
+            cid=self.add_scrollbar((bbox[2]+5,bbox[1]),textbox,bbox[3]-bbox[1],'y',bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
             self.addtag_withtag(uid,cid)
         funcs=FuncList(3)
         funcs.get=get
@@ -1408,8 +1438,8 @@ class BasicTinUI(Canvas):
             width=13,outline=bg)
             uid='scrollbar'+str(back)
             self.itemconfig(back,tags=uid)
-            top=self.create_text((pos[0]+1,pos[1]),text='\ueddb',font='{Segoe UI Emoji} 7',anchor='nw',fill=oncolor,tags=uid)
-            bottom=self.create_text((pos[0]+1,pos[1]+height),text='\ueddc',font='{Segoe UI Emoji} 7',anchor='sw',fill=oncolor,tags=uid)
+            top=self.create_text((pos[0]+1,pos[1]),text='\ueddb',font='{Segoe Fluent Icons} 7',anchor='nw',fill=oncolor,tags=uid)
+            bottom=self.create_text((pos[0]+1,pos[1]+height),text='\ueddc',font='{Segoe Fluent Icons} 7',anchor='sw',fill=oncolor,tags=uid)
             sc=self.create_polygon((pos[0]+5,pos[1]+20,pos[0]+5,pos[1]+height-20,pos[0]+5,pos[1]+20),
             width=3,outline=color,tags=uid)
             #起始和终止位置
@@ -1419,12 +1449,12 @@ class BasicTinUI(Canvas):
             #绑定组件
             widget.config(yscrollcommand=widget_move)
         elif mode=='x':
-            back=self.create_polygon((pos[0]+5,pos[1]+5,pos[0]+height-5,pos[1]+5,pos[0],pos[1]+5),
+            back=self.create_polygon((pos[0]+5,pos[1]+5,pos[0]+height-5,pos[1]+5,pos[0]+5,pos[1]+5),
             width=13,outline=bg)
             uid='scrollbar'+str(back)
             self.itemconfig(back,tags=uid)
-            top=self.create_text((pos[0],pos[1]),text='\uEDD9',font='{Segoe UI Emoji} 7',anchor='nw',fill=oncolor,tags=uid)
-            bottom=self.create_text((pos[0]+height,pos[1]),text='\uEDDA',font='{Segoe UI Emoji} 7',anchor='ne',fill=oncolor,tags=uid)
+            top=self.create_text((pos[0],pos[1]+1),text='\uEDD9',font='{Segoe Fluent Icons} 7',anchor='nw',fill=oncolor,tags=uid)
+            bottom=self.create_text((pos[0]+height,pos[1]+1),text='\uEDDA',font='{Segoe Fluent Icons} 7',anchor='ne',fill=oncolor,tags=uid)
             sc=self.create_polygon((pos[0]+12,pos[1]+5,pos[0]+height-20,pos[1]+5,pos[0]+20,pos[1]+5),
             width=3,outline=color,tags=uid)
             start=pos[0]+12
@@ -1449,7 +1479,7 @@ class BasicTinUI(Canvas):
         self.tag_bind(back,'<Button-1>',backmove)
         return top,bottom,back,sc,uid
 
-    def add_listbox(self,pos:tuple,width:int=200,height:int=200,font='微软雅黑 12',data=('a','b','c'),bg='#f2f2f2',fg='black',activebg='#e9e9e9',sel='#b4bbea',anchor='nw',command=None):#绘制列表框
+    def add_listbox(self,pos:tuple,width:int=200,height:int=200,font='微软雅黑 12',data=('a','b','c'),bg='#f2f2f2',fg='black',activebg='#e9e9e9',sel='#b4bbea',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',anchor='nw',command=None):#绘制列表框
         def repaint_back():
             for v in choices.values():
                 bbox=box.coords(v[2])
@@ -1531,8 +1561,8 @@ class BasicTinUI(Canvas):
         cavui=self.create_window(pos,window=frame,width=width+24,height=height+24,anchor=anchor)
         uid='listbox'+str(cavui)
         self.addtag_withtag(uid,cavui)
-        frame.add_scrollbar((width+12,12),widget=box,height=height,bg=bg,color=fg,oncolor=fg)#纵向
-        frame.add_scrollbar((12,height+12),widget=box,height=width,direction='x',bg=bg,color=fg,oncolor=fg)#横向
+        frame.add_scrollbar((width+12,12),widget=box,height=height,bg=scrollbg,color=scrollcolor,oncolor=scrollon)#纵向
+        frame.add_scrollbar((12,height+12),widget=box,height=width,direction='x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)#横向
         #choices不返回，避免编写者直接操作选项
         all_keys=[]#[a-id,b-id,...]
         choices={}#'a-id':[a,a_text,a_back,is_sel:bool]
@@ -1589,7 +1619,7 @@ class BasicTinUI(Canvas):
         ui.bind('<MouseWheel>',bindyview)
         return ui,scro,items,uid
 
-    def add_canvas(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',linew=1,scrollbar=False,anchor='nw'):#绘制画布
+    def add_canvas(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',linew=1,scrollbar=False,anchor='nw'):#绘制画布
         def re_scrollregion():#更新滚动范围
             canvas.config(scrollregion=canvas.bbox('all'))
         canvas=Canvas(self,bg=bg,highlightthickness=linew,highlightbackground=outline,highlightcolor=outline,relief='flat')
@@ -1598,13 +1628,13 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(uid,cavui)
         if scrollbar==True:
             bbox=self.bbox(uid)
-            cid1=self.add_scrollbar((bbox[2]+5,bbox[1]),canvas,bbox[3]-bbox[1])[-1]
-            cid2=self.add_scrollbar((bbox[0],bbox[3]+5),canvas,bbox[2]-bbox[0],'x')[-1]
+            cid1=self.add_scrollbar((bbox[2]+5,bbox[1]),canvas,bbox[3]-bbox[1],bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
+            cid2=self.add_scrollbar((bbox[0],bbox[3]+5),canvas,bbox[2]-bbox[0],'x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
             self.addtag_withtag(uid,cid1)
             self.addtag_withtag(uid,cid2)
         return canvas,re_scrollregion,uid
 
-    def add_ui(self,pos:tuple,width:int=200,height:int=200,bg='white',scrollbar=False,region='man',anchor='nw'):#绘制BasicTinUI
+    def add_ui(self,pos:tuple,width:int=200,height:int=200,bg='white',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',scrollbar=False,region='man',anchor='nw'):#绘制BasicTinUI
         def __update():#更新宽高
             try:
                 re_scrollregion()
@@ -1620,8 +1650,8 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(uid,cavui)
         if scrollbar==True:
             bbox=self.bbox(uid)
-            cid1=self.add_scrollbar((bbox[2]+5,bbox[1]),ui,bbox[3]-bbox[1])[-1]
-            cid2=self.add_scrollbar((bbox[0],bbox[3]+5),ui,bbox[2]-bbox[0],'x')[-1]
+            cid1=self.add_scrollbar((bbox[2]+5,bbox[1]),ui,bbox[3]-bbox[1],bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
+            cid2=self.add_scrollbar((bbox[0],bbox[3]+5),ui,bbox[2]-bbox[0],'x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
             self.addtag_withtag(uid,cid1)
             self.addtag_withtag(uid,cid2)
         if region=='man':#手动调节
@@ -1717,8 +1747,8 @@ class BasicTinUI(Canvas):
         doty=pos[1]+height+5#控制点的起始纵坐标
         dotlist=list()#[dot1,dot2,...]
         nowui=0#当前显示界面序号
-        leftbutton=self.add_button2((startx-2,pos[1]+width/2),'\uedd9',font='{Segoe UI Emoji} 7',fg=fg,bg=buttonbg,linew=0,activefg=activefg,activebg=activebg,command=move_left,anchor='e')[-1]
-        rightbutton=self.add_button2((startx+width+2,pos[1]+width/2),'\uedda',font='{Segoe UI Emoji} 7',fg=fg,bg=buttonbg,linew=0,activefg=activefg,activebg=activebg,command=move_right,anchor='w')[-1]
+        leftbutton=self.add_button2((startx-2,pos[1]+width/2),'\uedd9',font='{Segoe Fluent Icons} 7',fg=fg,bg=buttonbg,linew=0,activefg=activefg,activebg=activebg,command=move_left,anchor='e')[-1]
+        rightbutton=self.add_button2((startx+width+2,pos[1]+width/2),'\uedda',font='{Segoe Fluent Icons} 7',fg=fg,bg=buttonbg,linew=0,activefg=activefg,activebg=activebg,command=move_right,anchor='w')[-1]
         #leftbutton=self.add_button((startx-2,pos[1]+width/2),'◁',font='{Segoe UI Emoji}',fg=fg,bg=buttonbg,linew=0,activefg=buttonbg,activebg=fg,command=move_left,anchor='e')[-1]
         #rightbutton=self.add_button((startx+width+2,pos[1]+width/2),'▷',font='{Segoe UI Emoji}',fg=fg,bg=buttonbg,linew=0,activefg=buttonbg,activebg=fg,command=move_right,anchor='w')[-1]
         uid='pipspager'+str(leftbutton)+str(rightbutton)
@@ -2965,6 +2995,7 @@ class BasicTinUI(Canvas):
         self.tag_bind(uid,'<Button-1>',show)
         #创建窗口
         picker=Toplevel(self)
+        self.windows.append(picker)
         picker.geometry(f'{width}x{height}')
         picker.overrideredirect(True)
         picker.attributes('-topmost',1)
@@ -3047,7 +3078,7 @@ class BasicTinUI(Canvas):
                 y=sy-winh
             else:
                 y=sy
-            menu.geometry(f'{winw+15}x{winh+15}+{x}+{y}')
+            menu.geometry(f'{winw+20}x{winh+20}+{x}+{y}')
             menu.attributes('-alpha',0)
             menu.deiconify()
             menu.focus_set()
@@ -3299,6 +3330,7 @@ class TinUIXml():#TinUI的xml渲染方式
 
     def clean(self):#清空TinUI
         self.ui.delete('all')
+        self.ui.clean_windows()
 
 
 tinui_dir=os.path.dirname(os.path.abspath(__file__))
@@ -3493,6 +3525,7 @@ if __name__=='__main__':
     b.add_swipecontrol((320,1300),'swipe control')
     b.add_passwordbox((250,1400),350)
     b.add_picker((1400,230),command=print)
+    #b.add_menubutton((1500,50),'menubutton',cont=(('command',print),('menu',(('cmd1',print),('cmd2',test1))),'-',('TinUI文本移动',test)))
     b.add_menubutton((1500,50),'menubutton',cont=(('command',print),('menu',test1),'-',('TinUI文本移动',test)))
 
     uevent=TinUIEvent(b)
@@ -3500,4 +3533,7 @@ if __name__=='__main__':
     bw=TinUIWidget(a,'button2',bg='black')
     bw.load((5,5),text='tinui widget')
     bw.pack()
+
+    b.bind('<Destroy>',lambda e:b.clean_windows())
+
     a.mainloop()

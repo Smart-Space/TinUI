@@ -90,6 +90,12 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > 
 > - 除了 `title`, `paragraph`, `separate`, `menubar`, `labelframe`, `tooltip`, `back`等组件，其余组件的最后一个返回值均为整个组件的画布 `tag_name`，返回值变量为 `uid`。
 
+### clean_windows()
+
+清除浮出控件的子窗口，需要开发者手动释放子窗口。
+
+---
+
 ### add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,anchor='nw',**kw)
 
 - pos::位置
@@ -717,7 +723,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_textbox(self,pos:tuple,width:int=200,height:int=200,text:str='',anchor='nw',font='微软雅黑 12',fg='black',bg='white',linew=3,scrollbar=False,outline='#63676b',onoutline='#3041d8')
+### add_textbox(self,pos:tuple,width:int=200,height:int=200,text:str='',anchor='nw',font='微软雅黑 12',fg='black',bg='white',linew=3,scrollbar=False,outline='#63676b',onoutline='#3041d8',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b')
 
 - pos::起始位置
 - width::宽度
@@ -731,6 +737,9 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - scrollbar::是否添加纵向滚动条
 - outline::边框颜色
 - onoutline::响应鼠标边框颜色
+- scrollbg::滚动条背景色
+- scrollcolor::滚动条颜色
+- scrollon::滚动条响应颜色
 
 绘制一个文本编辑框。
 
@@ -776,7 +785,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_listbox(self,pos:tuple,width:int=200,height:int=200,font='微软雅黑 12',data=('a','b','c'),bg='#f2f2f2',fg='black',activebg='#e9e9e9',sel='#b4bbea',anchor='nw',command=None)
+### add_listbox(self,pos:tuple,width:int=200,height:int=200,font='微软雅黑 12',data=('a','b','c'),bg='#f2f2f2',fg='black',activebg='#e9e9e9',sel='#b4bbea',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',anchor='nw',command=None)
 
 - pos::起始位置
 - width::列表框宽度而非框架宽度
@@ -787,6 +796,9 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - fg::文本颜色
 - activebg::响应鼠标背景色
 - sel::被选中颜色
+- scrollbg::滚动条背景色 
+- scrollcolor::滚动条颜色
+- scrollon::滚动条响应颜色
 - anchor::对齐方式
 - command::回调函数，必须接受一个选项文本参数，这个参数是data中的一个值
 
@@ -806,13 +818,16 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_canvas(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',linew=1,scrollbar=False,anchor='nw')
+### add_canvas(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',linew=1,scrollbar=False,anchor='nw')
 
 - pos::位置
 - width::宽度
 - height::高度
 - bg::背景颜色
 - outline::边框颜色
+- scrollbg::滚动条背景色
+- scrollcolor::滚动条颜色
+- scrollon::滚动条响应颜色
 - linew::边框宽度
 - scrollbar::是否添加滚动条
 - anchor::对齐方位
@@ -829,12 +844,15 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_ui(self,pos:tuple,width:int=200,height:int=200,bg='white',scrollbar=False,region='man',anchor='nw')
+### add_ui(self,pos:tuple,width:int=200,height:int=200,bg='white',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',scrollbar=False,region='man',anchor='nw')
 
 - pos::位置
 - width::宽度
 - height::高度
 - bg::背景颜色
+- scrollbg::滚动条背景色
+- scrollcolor::滚动条颜色
+- scrollon::滚动条响应颜色
 - scrollbar::是否添加滚动条
 - region::范围控制，手动“man”或自动“auto”
 - anchor::对齐方位
@@ -1614,7 +1632,7 @@ dict_item::一个字典，建议是 `globals()`或 `locals()`
 
 ### clean()
 
-清空绑定的TinUI或BasicTinUI。
+清空绑定的TinUI或BasicTinUI，同时会触发`ui.clean_windows()`。
 
 ## 特殊规则组件
 

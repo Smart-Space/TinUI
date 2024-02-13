@@ -121,6 +121,7 @@ class TinUIDark(TinUITheme):
     def add_textbox(self,pos,*arg,**kw):
         return self.ui.add_textbox(pos,fg='#ffffff',bg='#2d2d2d',
               outline='#9a9a9a',onoutline='#b2b8f2',
+              scrollbg='#2e2e2e',scrollcolor='#9f9f9f',scrollon='#a0a0a0',
                                    *arg,**kw)
 
     def add_scrollbar(self,pos,widget,*arg,**kw):
@@ -131,11 +132,13 @@ class TinUIDark(TinUITheme):
     def add_listbox(self,pos,*arg,**kw):
         return self.ui.add_listbox(pos,
                 bg='#2b2b2b',fg='white',activebg='#b4bbea',sel='#465097',
+                scrollbg='#2e2e2e',scrollcolor='#9f9f9f',scrollon='#a0a0a0',
                                    *arg,**kw)
 
     def add_canvas(self,pos,*arg,**kw):
         return self.ui.add_canvas(pos,
                 outline='#808080',linew=1,
+                scrollbg='#2e2e2e',scrollcolor='#9f9f9f',scrollon='#a0a0a0',
                                   *arg,**kw)
 
     def add_pipspager(self,pos,*arg,**kw):

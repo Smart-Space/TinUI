@@ -717,7 +717,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_textbox(self,pos:tuple,width:int=200,height:int=200,text:str='',anchor='nw',font='微软雅黑 12',fg='black',bg='white',linew=3,scrollbar=False,outline='#63676b',onoutline='#3041d8')
+### add_textbox(self,pos:tuple,width:int=200,height:int=200,text:str='',anchor='nw',font='微软雅黑 12',fg='black',bg='white',linew=3,scrollbar=False,outline='#63676b',onoutline='#3041d8',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b')
 
 - pos::起始位置
 - width::宽度
@@ -731,6 +731,9 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - scrollbar::是否添加纵向滚动条
 - outline::边框颜色
 - onoutline::响应鼠标边框颜色
+- scrollbg::滚动条背景色
+- scrollcolor::滚动条颜色
+- scrollon::滚动条响应颜色
 
 绘制一个文本编辑框。
 
@@ -776,7 +779,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_listbox(self,pos:tuple,width:int=200,height:int=200,font='微软雅黑 12',data=('a','b','c'),bg='#f2f2f2',fg='black',activebg='#e9e9e9',sel='#b4bbea',anchor='nw',command=None)
+### add_listbox(self,pos:tuple,width:int=200,height:int=200,font='微软雅黑 12',data=('a','b','c'),bg='#f2f2f2',fg='black',activebg='#e9e9e9',sel='#b4bbea',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',anchor='nw',command=None)
 
 - pos::起始位置
 - width::列表框宽度而非框架宽度
@@ -787,6 +790,9 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - fg::文本颜色
 - activebg::响应鼠标背景色
 - sel::被选中颜色
+- scrollbg::滚动条背景色 
+- scrollcolor::滚动条颜色
+- scrollon::滚动条响应颜色
 - anchor::对齐方式
 - command::回调函数，必须接受一个选项文本参数，这个参数是data中的一个值
 
@@ -806,13 +812,16 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_canvas(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',linew=1,scrollbar=False,anchor='nw')
+### add_canvas(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',linew=1,scrollbar=False,anchor='nw')
 
 - pos::位置
 - width::宽度
 - height::高度
 - bg::背景颜色
 - outline::边框颜色
+- scrollbg::滚动条背景色
+- scrollcolor::滚动条颜色
+- scrollon::滚动条响应颜色
 - linew::边框宽度
 - scrollbar::是否添加滚动条
 - anchor::对齐方位
@@ -829,12 +838,15 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_ui(self,pos:tuple,width:int=200,height:int=200,bg='white',scrollbar=False,region='man',anchor='nw')
+### add_ui(self,pos:tuple,width:int=200,height:int=200,bg='white',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',scrollbar=False,region='man',anchor='nw')
 
 - pos::位置
 - width::宽度
 - height::高度
 - bg::背景颜色
+- scrollbg::滚动条背景色
+- scrollcolor::滚动条颜色
+- scrollon::滚动条响应颜色
 - scrollbar::是否添加滚动条
 - region::范围控制，手动“man”或自动“auto”
 - anchor::对齐方位
@@ -853,14 +865,16 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',buttonbg='#f8f8f8',num:int=2)
+### add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',activefg='#5d5d5d',buttonbg='#f8f8f8',activebg='#f8f8f8',num:int=2)
 
 - pos::位置
 - width::主视图宽度
 - height::主视图高度
 - bg::背景颜色
 - fg::按钮和导航栏前景色
+- activefg::响应时按钮文本颜色
 - buttonbg::按钮背景颜色
+- activebg::响应时按钮背景色
 - num::视图数量
 
 绘制一个横向翻页视图。

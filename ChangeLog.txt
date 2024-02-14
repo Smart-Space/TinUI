@@ -11,6 +11,7 @@
 *2. notebook + 和 x（变色提示） 新样式
 *3. ratingbar新样式
 4. BasicTinUI.clean_windows()清除浮出控件的子窗口，TinUIXml的clean也会触发
+5. notebook支持自定义滚动条颜色
 2024-2-13 pre-3
 1. 优化pipspager样式
 2. textbox, listbox, canvas, ui支持自定scrollbar颜色

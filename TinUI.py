@@ -1774,7 +1774,7 @@ class BasicTinUI(Canvas):
         bar.config(scrollregion=bar.bbox('all'))
         return uilist,dotlist,move_to,uid
 
-    def add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f3f3f3',fg='#5d5d5d',bg='#f3f3f3',activefg='#727272',activebg='#eaeaea',onfg='#1a1a1a',onbg='#f9f9f9'):#绘制标签栏视图
+    def add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f3f3f3',fg='#5d5d5d',bg='#f3f3f3',activefg='#727272',activebg='#eaeaea',onfg='#1a1a1a',onbg='#f9f9f9',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b'):#绘制标签栏视图
         def __onenter(flag):
             if flag==nowpage:
                 return
@@ -1939,7 +1939,7 @@ class BasicTinUI(Canvas):
         labeluid='notebooklabel'#标签元素名称
         movename='movetags'#更改标题时整体移动的临时名称
         self.addtag_withtag(uid,tbuid)
-        scro=self.add_scrollbar((pos[0]+5,pos[1]+32),tbu,height=width-5,direction='x',bg=bg,color=fg,oncolor=onfg)
+        scro=self.add_scrollbar((pos[0]+5,pos[1]+32),tbu,height=width-5,direction='x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)
         self.addtag_withtag(uid,scro[-1])
         barheight=self.bbox(scro[-1])[3]
         backpos=(pos[0]+5,pos[1]+3,pos[0]+width+2,pos[1]+3,pos[0]+width+2,barheight+height-3,pos[0]+5,barheight+height-3,pos[0]+5,pos[1]+5)

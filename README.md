@@ -897,7 +897,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f3f3f3',fg='#5d5d5d',bg='#f3f3f3',activefg='#727272',activebg='#eaeaea',onfg='#1a1a1a',onbg='#f9f9f9')
+### add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f3f3f3',fg='#5d5d5d',bg='#f3f3f3',activefg='#727272',activebg='#eaeaea',onfg='#1a1a1a',onbg='#f9f9f9',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b')
 
 - pos::位置
 - width::页面宽度
@@ -909,6 +909,9 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - activebg::鼠标进入时提示色
 - onfg::被点击时激活色
 - onbg::被点击时激活色
+- scrollbg::滚动条背景色
+- scrollcolor::滚动条标识符颜色
+- scrollon::滚动条响应时颜色
 
 绘制一个标签栏视图。
 

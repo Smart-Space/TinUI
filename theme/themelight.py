@@ -152,6 +152,7 @@ class TinUILight(TinUITheme):
                 color='#f3f3f3',fg='#5d5d5d',bg='#f3f3f3',
                 activefg='#595959',activebg='#eaeaea',
                 onfg='#1a1a1a',onbg='#f9f9f9',
+                scrollbg='#f9f9f9',scrollcolor='#8d8d8d',scrollon='#8a8a8a',
                                     *arg,**kw)
 
     def add_radiobox(self,pos,*arg,**kw):

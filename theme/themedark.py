@@ -152,6 +152,7 @@ class TinUIDark(TinUITheme):
                 color='#202020',fg='#cccccc',bg='#202020',
                 activefg='#cfcfcf',activebg='#2d2d2d',
                 onfg='#ffffff',onbg='#282828',
+                scrollbg='#2e2e2e',scrollcolor='#9f9f9f',scrollon='#a0a0a0',
                                     *arg,**kw)
 
     def add_ratingbar(self,pos,*arg,**kw):

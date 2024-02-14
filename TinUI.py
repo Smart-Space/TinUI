@@ -592,7 +592,8 @@ class BasicTinUI(Canvas):
         start()
         return waitbar1,ok,uid
 
-    def add_labelframe(self,widgets:tuple=(),title='',fg='#A8A8A8',bg='',pos=None):#绘制标题框
+    def add_labelframe(self,widgets:tuple=(),title='',font='微软雅黑 10',fg='#A8A8A8',bg='',pos=None):#绘制标题框
+        #new font attrb
         sx,sy,ex,ey=self.bbox(widgets[0])#获取直接的起始位置
         for i in widgets:
             nsx,nsy,nex,ney=self.bbox(i)
@@ -601,12 +602,18 @@ class BasicTinUI(Canvas):
             ex=nex if nex>ex else ex
             ey=ney if ney>ey else ey
         bg=self['background'] if bg=='' else bg
-        frame=self.create_rectangle((sx-5,sy-20,ex+5,ey+5),fill=bg,outline=fg)
-        label=self.create_text(((sx+ex)//2,sy-20),font='微软雅黑 10',text=title,fill=fg,anchor='center')
-        self.create_rectangle(self.bbox(label),fill=bg,outline=bg)
+        back=self.create_polygon((sx,sy-12,ex,sy-12,ex,ey,sx,ey),fill=bg,outline=bg,width=11)
+        uid='labelframe-'+str(back)
+        self.itemconfig(back,tags=uid)
+        self.lower(back)
+        outline=self.create_polygon((sx-1,sy-12-1,ex+1,sy-12-1,ex+1,ey+1,sx-1,ey+1),fill=fg,outline=fg,width=11,tags=uid)
+        self.lower(outline)
+        # frame=self.create_rectangle((sx-5,sy-20,ex+5,ey+5),fill=bg,outline=fg)
+        label=self.create_text(((sx+ex)//2,sy-20),font=font,text=title,fill=fg,anchor='center',tags=uid)
+        self.create_rectangle(self.bbox(label),fill=bg,outline=bg,tags=uid)
         self.tag_raise(label)
-        self.tag_lower(frame)
-        return label,frame
+        #self.tag_lower(frame)
+        return label,back,outline,uid
 
     def add_waitbar2(self,pos:tuple,width:int=240,fg='#0078D7',bg='white',okcolor='lightgreen'):#绘制点状等待框
         #单点运动
@@ -3530,9 +3537,9 @@ if __name__=='__main__':
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))
-    bw=TinUIWidget(a,'button2',bg='black')
-    bw.load((5,5),text='tinui widget')
-    bw.pack()
+    # bw=TinUIWidget(a,'button2',bg='black')暂停开发单个控件
+    # bw.load((5,5),text='tinui widget')
+    # bw.pack()
 
     b.bind('<Destroy>',lambda e:b.clean_windows())
 

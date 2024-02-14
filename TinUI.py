@@ -593,7 +593,6 @@ class BasicTinUI(Canvas):
         return waitbar1,ok,uid
 
     def add_labelframe(self,widgets:tuple=(),title='',font='微软雅黑 10',fg='#A8A8A8',bg='',pos=None):#绘制标题框
-        #new font attrb
         sx,sy,ex,ey=self.bbox(widgets[0])#获取直接的起始位置
         for i in widgets:
             nsx,nsy,nex,ney=self.bbox(i)
@@ -608,11 +607,9 @@ class BasicTinUI(Canvas):
         self.lower(back)
         outline=self.create_polygon((sx-1,sy-12-1,ex+1,sy-12-1,ex+1,ey+1,sx-1,ey+1),fill=fg,outline=fg,width=11,tags=uid)
         self.lower(outline)
-        # frame=self.create_rectangle((sx-5,sy-20,ex+5,ey+5),fill=bg,outline=fg)
         label=self.create_text(((sx+ex)//2,sy-20),font=font,text=title,fill=fg,anchor='center',tags=uid)
         self.create_rectangle(self.bbox(label),fill=bg,outline=bg,tags=uid)
         self.tag_raise(label)
-        #self.tag_lower(frame)
         return label,back,outline,uid
 
     def add_waitbar2(self,pos:tuple,width:int=240,fg='#0078D7',bg='white',okcolor='lightgreen'):#绘制点状等待框
@@ -2034,13 +2031,15 @@ class BasicTinUI(Canvas):
         self.tag_bind(toptext,'<B1-Motion>',drag)
         return toptext,content,uid
 
-    def add_ratingbar(self,pos:tuple,fg='#585858',bg='#f3f3f3',onfg='#3041d8',onbg='#3041d8',r=10,num:int=5,linew:int=10,command=None):#绘制评星级控件
+    def add_ratingbar(self,pos:tuple,fg='#585858',bg='#f3f3f3',onfg='#3041d8',onbg='#3041d8',size=12,num:int=5,linew:int=10,command=None):#绘制评星级控件
         def __onnum(num):
             for i in bars[:num+1]:
-                self.itemconfig(i,fill=onbg,outline=onfg)
+                self.itemconfig(i.fill,fill=onbg)
+                self.itemconfig(i.line,fill=onfg)
             if num!=len(bars):
                 for i in bars[num+1:]:
-                    self.itemconfig(i,fill=bg,outline=fg)
+                    self.itemconfig(i.fill,fill=bg)
+                    self.itemconfig(i.line,fill=fg)
         def click(barid):
             nonlocal nowon,tempon
             oldone=nowon
@@ -2063,69 +2062,52 @@ class BasicTinUI(Canvas):
             nonlocal tempon
             if nowon==-1:
                 for i in bars:
-                    self.itemconfig(i,fill=bg,outline=fg)
+                    self.itemconfig(i.fill,fill=bg)
+                    self.itemconfig(i.line,fill=fg)
                 return
             __onnum(nowon)
             tempon=nowon
         def __ontemp(event):#鼠标没有正好点在图标上时
             click(bars[tempon])
             __onnum(tempon)
+        r=10
         nowon=-1#已选定
         tempon=-1#待选定
-        sin=math.sin
-        cos=math.cos
-        pi=math.pi
-        rm=r*sin(pi/10)/sin(7*pi/10)
         bars=[]
         item_num=1#总数量
         line_num=1#行数量
-        center_x=pos[0]+r
-        center_y=pos[1]+r
+        center_x=pos[0]+5
+        center_y=pos[1]+5
         uid='ratingbar'+str(id(bars))
+        bbox=None
         for i in range(0,num):
-            points=(
-                #左上顶点
-                center_x - (r*sin(2*pi/5)),
-                center_y - (r*cos(2*pi/5)),
-                center_x + (rm*cos(7*pi/10)),
-                center_y - (rm*sin(7*pi/10)),
-                #上顶点
-                center_x,
-                center_y - r,
-                center_x + (rm*cos(3*pi/10)),
-                center_y - (rm*sin(3*pi/10)),
-                #右上顶点
-                center_x + (r*sin(2*pi/5)),
-                center_y - (r*cos(2*pi/5)),
-                center_x + (rm*cos(19*pi/10)),
-                center_y - (rm*sin(19*pi/10)),
-                #右下顶点
-                center_x + (r*sin(pi/5)),
-                center_y + (r*cos(pi/5)),
-                center_x + (rm*cos(3*pi/2)),
-                center_y - (rm*sin(3*pi/2)),
-                #左下顶点
-                center_x - (r*sin(pi/5)),
-                center_y + (r*cos(pi/5)),
-                center_x + (rm*cos(11*pi/10)),
-                center_y - (rm*sin(11*pi/10)),
-            )
-            bar=self.create_polygon(points,fill=bg,outline=fg,tags=uid,smooth=True,splinesteps=32)
+            bar=TinUINum()
+            bar.fill=self.create_text((center_x,center_y),text='\ue735',font='{Segoe Fluent Icons} '+str(size),anchor='nw',fill=bg,tags=uid)
+            bar.line=self.create_text((center_x,center_y),text='\ue734',font='{Segoe Fluent Icons} '+str(size),anchor='nw',fill=fg,tags=uid)
             bars.append(bar)
-            self.tag_bind(bar,'<Enter>',lambda event,bar=bar:onin(bar))
-            self.tag_bind(bar,'<Leave>',lambda event,bar=bar:onleave(bar))
-            self.tag_bind(bar,'<Button-1>',lambda event,bar=bar:click(bar))
+            self.tag_bind(bar.fill,'<Enter>',lambda event,bar=bar:onin(bar))
+            self.tag_bind(bar.fill,'<Leave>',lambda event,bar=bar:onleave(bar))
+            self.tag_bind(bar.fill,'<Button-1>',lambda event,bar=bar:click(bar))
+            self.tag_bind(bar.line,'<Enter>',lambda event,bar=bar:onin(bar))
+            self.tag_bind(bar.line,'<Leave>',lambda event,bar=bar:onleave(bar))
+            self.tag_bind(bar.line,'<Button-1>',lambda event,bar=bar:click(bar))
+            if bbox==None:
+                bbox=self.bbox(bar.fill)
             if item_num==num:
                 break
             if line_num==linew:
-                center_x=pos[0]+r
-                center_y+=3*r
+                center_x=pos[0]+5
+                center_y+=5+(bbox[3]-bbox[1])
                 line_num=1
                 continue
             item_num+=1
             line_num+=1
-            center_x+=3*r
-        start=self.bbox(uid)
+            center_x+=5+(bbox[2]-bbox[0])
+        start=list(self.bbox(uid))
+        start[0]-=5
+        start[1]-=5
+        start[2]+=5
+        start[3]+=5
         back=self.create_rectangle(start,fill=bg,outline=fg,width=1,tags=uid)
         self.lower(back)
         self.tag_bind(back,'<Leave>',leaveback)

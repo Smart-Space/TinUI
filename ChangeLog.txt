@@ -9,7 +9,7 @@
 2024- pre-4
 1. labelframe改为圆角边框
 *2. notebook + 和 x（变色提示） 新样式
-*3. ratingbar新样式
+3. ratingbar新样式，参数r改size（字体大小）
 4. BasicTinUI.clean_windows()清除浮出控件的子窗口，TinUIXml的clean也会触发
 5. notebook支持自定义滚动条颜色
 2024-2-13 pre-3

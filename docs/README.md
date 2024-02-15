@@ -10,7 +10,7 @@
 
 ## 项目类型
 
-TinUI是一个基于tkinter（Python/tcl/tk）的拓展组件（Widget），可以绘制虚拟组件。
+TinUI是一个基于tkinter（Python/tcl/tk）的拓展组件（Widget），可以绘制具有现代化样式的控件。
 
 TinUI基于tkinter的画布（Canvas），可以作为整个窗口的唯一控件。TinUI能够通过自身绘制出功能组件和文字，也可以使用画布功能添加组件。使用TinUI，可以使界面设计和代码设计分离，此外，TinUI绘制的虚拟组件速度更快，样式更加丰富。
 
@@ -89,6 +89,12 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 > 所有函数均会返回主要画布对象。`TinUI.add_...(...)`。
 > 
 > - 除了 `title`, `paragraph`, `separate`, `menubar`, `labelframe`, `tooltip`, `back`等组件，其余组件的最后一个返回值均为整个组件的画布 `tag_name`，返回值变量为 `uid`。
+
+### clean_windows()
+
+清除浮出控件的子窗口，需要开发者手动释放子窗口。
+
+---
 
 ### add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,anchor='nw',**kw)
 
@@ -359,20 +365,23 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_labelframe(self,widgets:tuple=(),title='',fg='#A8A8A8',bg=''）
+### add_labelframe(self,widgets:tuple=(),title='',font='微软雅黑 10',fg='#A8A8A8',bg=''）
 
 - widgets::需要标题框囊括的画布对象
 - title::标题
+- font::字体
 - fg::边框及标题颜色
 - bg::背景色
 
 绘制一个标题框，以包含所制定的所有画布对象。
 
-### return: label, frame
+### return: label, back, outline, uid
 
 > label::标题文本
 > 
-> frame::边框画布对象
+> back::背景元素
+> 
+> outline::边框元素
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E6%A0%87%E9%A2%98%E8%BE%B9%E6%A1%86.gif)
 
@@ -790,7 +799,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - fg::文本颜色
 - activebg::响应鼠标背景色
 - sel::被选中颜色
-- scrollbg::滚动条背景色 
+- scrollbg::滚动条背景色
 - scrollcolor::滚动条颜色
 - scrollon::滚动条响应颜色
 - anchor::对齐方式
@@ -891,18 +900,21 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f3f3f3',fg='#5d5d5d',bg='#f3f3f3',activefg='#727272',activebg='#eaeaea',onfg='#1a1a1a',onbg='#f9f9f9')
+### add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f3f3f3',fg='#5d5d5d',bg='#f3f3f3',activefg='#595959',activebg='#e9e9e9',onfg='#1a1a1a',onbg='#f9f9f9',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b')
 
 - pos::位置
 - width::页面宽度
 - height::页面高度
 - color::视图背景色
-- fg::滚动条、文本颜色
+- fg::文本颜色
 - bg::标签栏标签颜色
 - activefg::鼠标进入时提示色
 - activebg::鼠标进入时提示色
 - onfg::被点击时激活色
 - onbg::被点击时激活色
+- scrollbg::滚动条背景色
+- scrollcolor::滚动条标识符颜色
+- scrollon::滚动条响应时颜色
 
 绘制一个标签栏视图。
 
@@ -966,14 +978,14 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_ratingbar(self,pos:tuple,fg='#585858',bg='#f3f3f3',onfg='#3041d8',onbg='#3041d8',r=10,num:int=5,linew:int=10,command=None)
+### add_ratingbar(self,pos:tuple,fg='#585858',bg='#f3f3f3',onfg='#3041d8',onbg='#3041d8',size=12,num:int=5,linew:int=10,command=None)
 
 - pos::位置
 - fg::边框颜色
 - bg::星级色
 - onfg::激活时星级边框
 - onbg::激活时星级色
-- r::星级半径
+- size::星级字符大小
 - num::总共的星级数量
 - linew::每一行有多少的星级
 - command::回调函数，必须接受一个参数，星级个数（1~...）
@@ -1383,29 +1395,17 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 ### add_menubutton(self,pos:tuple,text:str,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),cont=(('command',print),'-'),tran='#01FF11')
 
 - pos-位置
-
 - text-文本
-
 - side-展开方向。y：向下展开；x：向右展开
-
 - fg-文本颜色
-
 - bg-背景色
-
 - line-边框颜色
-
 - linew-边框宽度
-
 - activefg-响应状态文本颜色
-
 - activebg-响应状态背景色
-
 - activeline-响应状态边框颜色
-
 - font-字体
-
 - cont-菜单内容
-
 - tran-透明处理规避色
 
 > cont的格式如下：
@@ -1626,7 +1626,7 @@ dict_item::一个字典，建议是 `globals()`或 `locals()`
 
 ### clean()
 
-清空绑定的TinUI或BasicTinUI。
+清空绑定的TinUI或BasicTinUI，同时会触发 `ui.clean_windows()`。
 
 ## 特殊规则组件
 

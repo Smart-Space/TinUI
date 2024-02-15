@@ -900,13 +900,13 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f3f3f3',fg='#5d5d5d',bg='#f3f3f3',activefg='#727272',activebg='#eaeaea',onfg='#1a1a1a',onbg='#f9f9f9',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b')
+### add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f3f3f3',fg='#5d5d5d',bg='#f3f3f3',activefg='#595959',activebg='#e9e9e9',onfg='#1a1a1a',onbg='#f9f9f9',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b')
 
 - pos::位置
 - width::页面宽度
 - height::页面高度
 - color::视图背景色
-- fg::滚动条、文本颜色
+- fg::文本颜色
 - bg::标签栏标签颜色
 - activefg::鼠标进入时提示色
 - activebg::鼠标进入时提示色

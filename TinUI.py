@@ -1778,7 +1778,7 @@ class BasicTinUI(Canvas):
         bar.config(scrollregion=bar.bbox('all'))
         return uilist,dotlist,move_to,uid
 
-    def add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f3f3f3',fg='#5d5d5d',bg='#f3f3f3',activefg='#727272',activebg='#eaeaea',onfg='#1a1a1a',onbg='#f9f9f9',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b'):#绘制标签栏视图
+    def add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f3f3f3',fg='#5d5d5d',bg='#f3f3f3',activefg='#595959',activebg='#e9e9e9',onfg='#1a1a1a',onbg='#f9f9f9',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b'):#绘制标签栏视图
         def __onenter(flag):
             if flag==nowpage:
                 return
@@ -1959,11 +1959,11 @@ class BasicTinUI(Canvas):
         #新页面按钮（默认不显示）
         npx=3
         newpageuid='notebooknew'+str(tbuid)
-        newpagetext=tbu.create_text((npx,2),text='+',font=font,fill=fg,anchor='nw',tags=newpageuid)
+        newpagetext=tbu.create_text((npx,5),text='\uf8aa',font='{Segoe Fluent Icons} 12',fill=fg,anchor='nw',tags=newpageuid)
         nptbbox=tbu.bbox(newpagetext)
         #newpageback
-        npb=(nptbbox[0],nptbbox[1],nptbbox[2],nptbbox[1],nptbbox[2],nptbbox[3],nptbbox[0],nptbbox[3],nptbbox[0],nptbbox[1])
-        newpageback=tbu.create_polygon(npb,fill=bg,outline=bg,width=5,tags=newpageuid)
+        npb=(nptbbox[0]+2,nptbbox[1]+2,nptbbox[2]-2,nptbbox[1]+2,nptbbox[2]-2,nptbbox[3]-2,nptbbox[0]+2,nptbbox[3]-2)
+        newpageback=tbu.create_polygon(npb,fill=bg,outline=bg,width=7,tags=newpageuid)
         tbu.tkraise(newpagetext)
         tbu.itemconfig(newpageuid,state='hidden')
         newfunction=None#触发函数

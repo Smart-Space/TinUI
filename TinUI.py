@@ -300,23 +300,22 @@ class BasicTinUI(Canvas):
             if self.itemcget(check,'fill')==onbg:
                 pass
             else:
-                self.itemconfig(check,outline=activebg,fill=activebg)
-                self.itemconfig(outl,outline=activefg)
+                self.itemconfig(check,fill=activebg)
+                self.itemconfig(outl,fill=activefg)
         def button_out(event):
             if self.itemcget(check,'fill')==onbg:
                 pass
             else:
-                self.itemconfig(check,outline=bg,fill=bg)
-                self.itemconfig(outl,outline=fg)
+                self.itemconfig(check,fill=bg)
+                self.itemconfig(outl,fill=fg)
         def go_func(event):
             if self.itemcget(check,'fill')!=onbg:
-                self.itemconfig(check,fill=onbg,outline=onbg)
-                self.itemconfig(outl,outline=onfg)
+                self.itemconfig(check,fill=onbg)
+                self.itemconfig(outl,fill=onfg)
                 self.itemconfig(state,state='normal')
-                self.tkraise(state)
             else:
-                self.itemconfig(check,fill=bg,outline=bg)
-                self.itemconfig(outl,outline=fg)
+                self.itemconfig(check,fill=bg)
+                self.itemconfig(outl,fill=fg)
                 self.itemconfig(state,state='hidden')
             if command!=None:
                 command(event)
@@ -330,32 +329,29 @@ class BasicTinUI(Canvas):
             go_func(None)
         def disable():
             self.itemconfig(checkbutton,state='disable',fill='#7a7a7a')
-            self.itemconfig(check,state='disable')
-            self.itemconfig(state,state='disable')
+            self.itemconfig(checkname,state='disable')
         def active():
             self.itemconfig(checkbutton,state='normal',fill=fontfg)
-            self.itemconfig(check,state='normal')
-            self.itemconfig(state,state='normal')
+            self.itemconfig(checkname,state='normal')
         checkbutton=self.create_text(pos,text=text,fill=fontfg,font=font,anchor=anchor)
         uid='checkbutton'+str(checkbutton)
         self.itemconfig(checkbutton,tags=uid)
         bbox=self.bbox(checkbutton)
         dic=bbox[3]-bbox[1]#位移长度
+        midy=pos[1]+dic/2#中间高度坐标
+        midx=pos[0]+dic/2#中间宽度坐标
+        font_size=str(int(self.__get_text_size(checkbutton))+2)#字体大小
         self.move(checkbutton,dic+5,0)
-        outl=self.create_polygon((pos[0]+2,pos[1]+2,pos[0]+dic-2,pos[1]+2,
-        pos[0]+dic-2,pos[1]+dic-2,pos[0]+2,pos[1]+dic-2,pos[0]+2,pos[1]+2),
-        width=5,outline=fg,fill=fg,tags=uid)#外围边框
-        check=self.create_polygon((pos[0]+3,pos[1]+3,pos[0]+dic-3,pos[1]+3,pos[0]+dic-3,pos[1]+dic-3,pos[0]+3,pos[1]+dic-3,pos[0]+3,pos[1]+3),
-        width=5,outline=bg,fill=bg,tags=uid)#标识符内部元素
-        state=self.create_text((pos[0],pos[1]),text='✔️',anchor='nw',font='{Segoe UI Emoji}'+self.__get_text_size(checkbutton),fill=onfg,state='hidden',tags=uid)#勾选标识符
+        outl=self.create_text((midx,midy),text='\uE739',anchor='center',font='{Segoe Fluent Icons} '+font_size,fill=fg,tags=(uid,checkname))#外围边框
+        check=self.create_text((midx,midy),text='\uE73B',anchor='center',font='{Segoe Fluent Icons} '+font_size,fill=bg,tags=(uid,checkname))#标识符内部元素
+        state=self.create_text((midx,midy),text='\uE73E',anchor='center',font='{Segoe Fluent Icons} '+font_size,fill=onfg,state='hidden',tags=(uid,checkname))#勾选标识符
         self.tkraise(state)
-        self.tag_bind(check,'<Enter>',button_in)
-        self.tag_bind(check,'<Leave>',button_out)
+        self.tag_bind(checkname,'<Enter>',button_in)
+        self.tag_bind(checkname,'<Leave>',button_out)
+        self.tag_bind(checkname,'<Button>',go_func)
         self.tag_bind(checkbutton,'<Enter>',button_in)
         self.tag_bind(checkbutton,'<Leave>',button_out)
-        self.tag_bind(check,'<Button>',go_func)
         self.tag_bind(checkbutton,'<Button>',go_func)
-        self.tag_bind(state,'<Button>',go_func)
         funcs=FuncList(5)
         funcs.flash=funcs[0]=flash
         funcs.on=funcs[1]=on

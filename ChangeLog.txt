@@ -6,9 +6,15 @@
 
 
 ==========5.0==========
-2024- pre-5
+2024-6 pre-6
+*1. waitbar2优化标识圆点 隐藏/显示
+2024-6 pre-5
 1. 更新checkbutton样式
-*2. waitbar1
+2. waitbar2新样式
+3. 以下控件接入统一坐标对齐模式：checkbutton, entry, radiobutton,
+    link, waitbar1, waitbar2, combobox
+4. radiobutton去除边框
+5. combobox新样式
 2024-2-15 pre-4
 1. labelframe改为圆角边框
 2. notebook新样式

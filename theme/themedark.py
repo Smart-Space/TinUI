@@ -42,8 +42,8 @@ class TinUIDark(TinUITheme):
 
     def add_radiobutton(self,pos,*arg,**kw):
         return self.ui.add_radiobutton(pos,
-                  fg='#ffffff',bg='#1d1d1d',
-                  activefg='#000000',activebg='#b2b8f2',
+                  fg='#f2f2f2',bg='#2b2b2b',
+                  activefg='#ffffff',activebg='#373737',
                                 *arg,**kw)
 
     def add_link(self,pos,*arg,**kw):
@@ -62,7 +62,7 @@ class TinUIDark(TinUITheme):
 
     def add_waitbar2(self,pos,*arg,**kw):
         return self.ui.add_waitbar2(pos,
-                    fg='#b2b8f2',bg='#202020',okcolor='#b2b8f2',
+                    fg='#b2b8f2',bg='#202020',okcolor='#6ccb5f',
                                     *arg,**kw)
 
     def add_combobox(self,pos,*arg,**kw):
@@ -260,7 +260,7 @@ du.add_label(end(),text='test label')
 du.add_entry(end(),text='test entry',width=200)
 #appbarseparator
 du.add_separate(end(),width=200)
-#radiobutton
+#splitview
 du.add_radiobutton(end(),width=250,text='test radiobutton',
                   choices=('1','2','3','4','5'))
 #hyperlinkbutton

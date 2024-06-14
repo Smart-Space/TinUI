@@ -12,7 +12,7 @@
 1. 更新checkbutton样式
 2. waitbar2新样式
 3. 以下控件接入统一坐标对齐模式：checkbutton, entry, radiobutton,
-    link, waitbar1, waitbar2, combobox
+    link, waitbar1, waitbar2, combobox, button, label
 4. radiobutton去除边框
 5. combobox新样式
 2024-2-15 pre-4

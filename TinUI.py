@@ -202,45 +202,39 @@ class BasicTinUI(Canvas):
         else:
             return ' '+font[1]
     
-    def __auto_anchor(self,uid,anchor='nw'):#统一对齐
-        #在4.5之前已有anchor参数的忽略
-        #working test...
-        #更改下方三行代码，获取控件当前位置，比对中心
-        #参数添加期望位置(uid,pos,anchor)
+    def __get_center(self,bbox):#获取中心位置
+        return (bbox[0]+bbox[2])/2,(bbox[1]+bbox[3])/2
+    def __auto_anchor(self,uid,pos,anchor='nw'):#统一对齐方式
         bbox=self.bbox(uid)
-        xcenter=(bbox[2]-bbox[0])/2
-        ycenter=(bbox[3]-bbox[1])/2
-        dx,dy=0,0#相对原来位置的偏移
+        xcenter,ycenter=self.__get_center(bbox)
         if anchor=='nw':
-            pass
+            dx=pos[0]-bbox[0]
+            dy=pos[1]-bbox[1]
         elif anchor=='n':
-            self.move(uid,-xcenter,0)
-            dx=-xcenter
+            dx=pos[0]-xcenter
+            dy=pos[1]-bbox[1]
         elif anchor=='ne':
-            self.move(uid,-2*xcenter,0)
-            dx=-2*xcenter
+            dx=pos[0]-bbox[2]
+            dy=pos[1]-bbox[1]
         elif anchor=='e':
-            self.move(uid,-2*xcenter,-ycenter)
-            dx=-2*xcenter
-            dy=-ycenter
+            dx=pos[0]-bbox[2]
+            dy=pos[1]-ycenter
         elif anchor=='se':
-            self.move(uid,-2*xcenter,-2*ycenter)
-            dx=-2*xcenter
-            dy=-2*ycenter
+            dx=pos[0]-bbox[2]
+            dy=pos[1]-bbox[3]
         elif anchor=='s':
-            self.move(uid,-xcenter,-2*ycenter)
-            dx=-xcenter
-            dy=-2*ycenter
+            dx=pos[0]-xcenter
+            dy=pos[1]-bbox[3]
         elif anchor=='sw':
-            self.move(uid,0,-2*ycenter)
-            dy=-2*ycenter
+            dx=pos[0]-bbox[0]
+            dy=pos[1]-bbox[3]
         elif anchor=='w':
-            self.move(uid,0,-ycenter)
-            dy=-ycenter
+            dx=pos[0]-bbox[0]
+            dy=pos[1]-ycenter
         elif anchor=='center':
-            self.move(uid,-xcenter,-ycenter)
-            dx=-xcenter
-            dy=-ycenter
+            dx=pos[0]-xcenter
+            dy=pos[1]-ycenter
+        self.move(uid,dx,dy)
         return dx,dy
     
     def clean_windows(self):
@@ -284,7 +278,7 @@ class BasicTinUI(Canvas):
             self.itemconfig(button,state='normal')
             self.itemconfig(back,state='normal')
             out_button(None)
-        button=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
+        button=self.create_text(pos,text=text,fill=fg,font=font,anchor='nw')
         uid='button'+str(button)
         self.itemconfig(button,tags=uid)
         bbox=self.bbox(button)
@@ -297,6 +291,7 @@ class BasicTinUI(Canvas):
         self.tag_bind(back,'<Enter>',in_button)
         self.tag_bind(back,'<Leave>',out_button)
         self.tkraise(button)
+        self.__auto_anchor(uid,pos,anchor)
         funcs=FuncList(3)
         funcs.change_command=funcs[0]=change_command
         funcs.disable=funcs[1]=disable
@@ -304,13 +299,14 @@ class BasicTinUI(Canvas):
         return button,back,funcs,uid
 
     def add_label(self,pos:tuple,text:str,fg='black',bg='#f0f0f0',outline='grey',font=('微软雅黑',12),anchor='nw'):#绘制标签
-        label=self.create_text(pos,text=text,fill=fg,font=font,anchor=anchor)
+        label=self.create_text(pos,text=text,fill=fg,font=font,anchor='nw')
         uid='label'+str(label)
         self.itemconfig(label,tags=uid)
         bbox=self.bbox(label)
         x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[2]+3,bbox[3]+3
         back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=outline,tags=uid)
         self.tkraise(label)
+        self.__auto_anchor(uid,pos,anchor)
         return label,uid
 
     def add_checkbutton(self,pos:tuple,text:str,fontfg='black',fg='#868686',bg='#ededed',activefg='#868686',activebg='#e5e5e5',onfg='white',onbg='#334ac0',font=('微软雅黑',12),command=None,anchor='nw'):#绘制复选框
@@ -371,7 +367,7 @@ class BasicTinUI(Canvas):
         self.tag_bind(checkbutton,'<Enter>',button_in)
         self.tag_bind(checkbutton,'<Leave>',button_out)
         self.tag_bind(checkbutton,'<Button>',go_func)
-        self.__auto_anchor(uid,anchor)
+        self.__auto_anchor(uid,pos,anchor)
         funcs=FuncList(5)
         funcs.flash=funcs[0]=flash
         funcs.on=funcs[1]=on
@@ -424,7 +420,7 @@ class BasicTinUI(Canvas):
         h=self.bbox(funce)[3]
         bubbox=self.bbox(funcw)
         if command!=None:#调用函数的绑定仅当存在command时启动
-            button=self.add_button((w+8,pos[1]+1),text=call,font=font,command=call_command,fg=fg,bg=bg,linew=0)
+            button=self.add_button((w,pos[1]-2),text=call,font=font,command=call_command,fg=fg,bg=bg,linew=0)
             self.addtag_withtag(uid,button[-1])
             entry.bind('<Return>',call_command)
             bubbox=self.bbox(button[-1])
@@ -435,7 +431,7 @@ class BasicTinUI(Canvas):
         if command!=None:
             self.tkraise(button[-1])
         self.tkraise(funcw)
-        self.__auto_anchor(uid,anchor)
+        self.__auto_anchor(uid,pos,anchor)
         if_empty(None)
         funcs=FuncList(4)
         funcs.get=get_entry
@@ -529,7 +525,7 @@ class BasicTinUI(Canvas):
             self.tag_bind(choice,'<Button>',lambda event,_text=i,back=back,c=choice:go_func(back,_text,c))
             self.tag_bind(back,'<Button>',lambda event,_text=i,back=back,c=choice:go_func(back,_text,c))
         back_list=list(choices_back)
-        self.__auto_anchor(uid,anchor)
+        self.__auto_anchor(uid,pos,anchor)
         funcs=FuncList(3)
         funcs.select=funcs[0]=select
         funcs.disable=funcs[1]=disable
@@ -577,7 +573,7 @@ class BasicTinUI(Canvas):
         self.tag_bind(back,'<Button-1>',go_url)
         if type(url)==str:#为网址，显示提示框
             self.add_tooltip(uid,text=url,fg=fg,bg=self['background'],font=font,outline=activebg)
-        self.__auto_anchor(uid,anchor)
+        self.__auto_anchor(uid,pos,anchor)
         funcs=FuncList(2)
         funcs.disable=funcs[0]=disable
         funcs.active=funcs[1]=active
@@ -608,7 +604,7 @@ class BasicTinUI(Canvas):
         uid='waitbar1-'+str(back)
         self.itemconfig(back,tags=uid)
         waitbar1=self.create_arc(bbox,outline=fg,extent=5,start=90,width=bd,style='arc',tags=uid)
-        self.__auto_anchor(uid,anchor)
+        self.__auto_anchor(uid,pos,anchor)
         start()
         return waitbar1,ok,uid
 
@@ -671,7 +667,7 @@ class BasicTinUI(Canvas):
         back=self.create_line((pos[0],pos[1]+5,pos[0]+width+5,pos[1]+5),fill=fg,width=1,capstyle='round')
         uid='waitbar2-'+str(back)
         self.itemconfig(back,tags=uid)
-        dx,dy=self.__auto_anchor(uid,anchor)
+        dx,dy=self.__auto_anchor(uid,pos,anchor)
         pos=list(pos)
         pos[0]+=dx
         pos[1]+=dy
@@ -751,7 +747,7 @@ class BasicTinUI(Canvas):
         x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[0]+width+3,bbox[3]+3
         back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=fg,tags=uid)
         self.tkraise(main)
-        button_text,button_back,button_funcs,button_id=self.add_button((x2+3,y1+3),'∨',fg,bg,'#CCCCCC',1,activefg,activebg,'#7a7a7a',font=font,command=open_box)
+        button_text,button_back,button_funcs,button_id=self.add_button((x2,y1-1),'∨',fg,bg,'#CCCCCC',1,activefg,activebg,'#7a7a7a',font=font,command=open_box)
         self.addtag_withtag(uid,button_id)
         pickbox=Toplevel(self)
         self.windows.append(pickbox)
@@ -766,7 +762,7 @@ class BasicTinUI(Canvas):
         bar.create_polygon((9,9,width-9,9,width-9,height-9,9,height-9),fill=bg,outline=bg,width=9)
         bar.lower(bar.create_polygon((8,8,width-8,8,width-8,height-8,8,height-8),fill=outline,outline=outline,width=9))
         bar.add_listbox((8,8),width-38,height-38,bg=bg,fg=fg,data=content,activebg=activebg,sel=activebg,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)
-        self.__auto_anchor(uid,anchor)
+        self.__auto_anchor(uid,pos,anchor)
         readyshow()
         funcs=FuncList(3)
         funcs.select=funcs[0]=select
@@ -774,7 +770,7 @@ class BasicTinUI(Canvas):
         funcs.active=funcs[2]=active
         return main,back,bar,funcs,uid
 
-    def add_progressbar(self,pos:tuple,width=250,fg='#868686',bg='#334ac0',back='#f3f3f3',fontc='#79b8f8',percentage=True,text=''):#绘制进度条
+    def add_progressbar(self,pos:tuple,width=250,fg='#868686',bg='#334ac0',back='#f3f3f3',fontc='#79b8f8',percentage=True,text='',anchor='nw'):#绘制进度条
         def goto(num:int):
             if not 0<=num<=100:
                 return
@@ -795,6 +791,7 @@ class BasicTinUI(Canvas):
             self.itemconfig(text,fill=fontc)
             self.itemconfig(back,outline=fg)
             self.itemconfig(progressbar,outline=bg,fill=bg)
+        pos=list(pos)
         bbox=(pos[0],pos[1],pos[0]+width,pos[1]+15)
         back=self.create_rectangle((bbox),outline=fg,fill=back)
         uid='progressbar'+str(back)
@@ -807,13 +804,16 @@ class BasicTinUI(Canvas):
             text=self.create_text((pos[0]+width//2,pos[1]),anchor='n',text='0%',fill=fontc,font='微软雅黑 10',tags=uid)
         else:
             text=self.create_text((pos[0]+width//2,pos[1]),anchor='n',text=text,fill=fontc,font='微软雅黑 10',tags=uid)
+        dx,dy=self.__auto_anchor(uid,pos,anchor)
+        pos[0]+=dx
+        pos[1]+=dy
         funcs=FuncList(3)
         funcs.now_running=funcs[0]=now_running
         funcs.now_paused=funcs[1]=now_paused
         funcs.now_error=funcs[2]=now_error
         return back,pro_tagname,text,goto,funcs,uid
 
-    def add_table(self,pos:tuple,outline='#E1E1E1',fg='black',bg='white',data=[['1','2','3'],['a','b','c']],minwidth=100,maxwidth=300,font=('微软雅黑',12),headbg='#d9ebf9'):#绘制表格
+    def add_table(self,pos:tuple,outline='#E1E1E1',fg='black',bg='white',data=[['1','2','3'],['a','b','c']],minwidth=100,maxwidth=300,font=('微软雅黑',12),headbg='#d9ebf9',anchor='nw'):#绘制表格
         def get_max_height(widths:dict):
             height=0
             for i in widths.values():
@@ -880,6 +880,7 @@ class BasicTinUI(Canvas):
         self.lower(value_back)
         self.lower(all_back)
         self.lower(outline_back)
+        self.__auto_anchor(uid,pos,anchor)
         return uid
 
     def add_onoff(self,pos:tuple,fg='#575757',bg='#e5e5e5',onfg='#FFFFFF',onbg='#3041d8',command=None):#绘制开关控件
@@ -3462,7 +3463,7 @@ if __name__=='__main__':
     b.add_button((250,450),'测试按钮',activefg='white',activebg='red',command=test,anchor='center')
     b.add_checkbutton((60,430),'允许TinUI测试',command=test1,anchor='w')
     b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
-    b.add_entry((250,330),350,'这里用来输入',command=print)
+    b.add_entry((250,330),350,'这里用来输入',command=print,anchor='w')
     b.add_button((20,170),'创建分割线',command=lambda event:b.add_separate((20,200),600))
     b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
     b.add_link((400,500),'TinGroup知识库','https://tinhome.bk-free02.com',anchor='nw')

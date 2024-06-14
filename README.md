@@ -458,7 +458,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_progressbar(self,pos:tuple,width=250,fg='#868686',bg='#334ac0',back='#f3f3f3',fontc='#79b8f8',percentage=True,text='')
+### add_progressbar(self,pos:tuple,width=250,fg='#868686',bg='#334ac0',back='#f3f3f3',fontc='#79b8f8',percentage=True,text='',anchor='nw')
 
 - pos::位置
 - width::宽度
@@ -468,6 +468,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - fontc::字体颜色
 - percentage::是否显示进度文本，如果为False，则显示参数text的内容
 - text::当不显示进度文本时，进度条上的文本内容
+- anchor::对齐方向
 
 绘制一个进度条。
 
@@ -496,7 +497,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_table(self,pos:tuple,outline='#E1E1E1',fg='black',bg='white',data=[['1','2','3'],['a','b','c']],minwidth=100,maxwidth=300,font=('微软雅黑',12),headbg='#d9ebf9')
+### add_table(self,pos:tuple,outline='#E1E1E1',fg='black',bg='white',data=[['1','2','3'],['a','b','c']],minwidth=100,maxwidth=300,font=('微软雅黑',12),headbg='#d9ebf9',anchor='nw')
 
 - pos::位置
 - outline::边框颜色
@@ -507,6 +508,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - maxwidth::单元格最大宽度
 - font::字体
 - headbg::表头背景色
+- anchor::对齐方向
 
 绘制一个表格。
 

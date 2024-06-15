@@ -4,7 +4,7 @@
         <title text='TinUI Gallery'></title>
     </line>
     <line>
-        <image width='200' height='200' imgfile='test\LOGO.png'></image>
+        <image width='200' height='200' imgfile='LOGO.png'></image>
     </line>
     <line>
         <listbox height='320' bg='#f0f0f0' data='self.datas["controls"]' command='self.funcs["loadcontrol"]'>controls</listbox>

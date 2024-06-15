@@ -10,7 +10,7 @@
     <paragraph text=' ' width='580'></paragraph>
     </line>
     <line>
-    <image imgfile='test\LOGO.png'></image>
+    <image imgfile='LOGO.png'></image>
     </line>
     <line>
     <paragraph text='本控件使用tkinter内置图片类，只能显示gif首帧和png图片。此外，由于tkinter自身调整图片大小的方法很粗陋，尺寸差别较大的图片调整较难完成且速度较慢。如有需要，请使用PIL。' width='500'></paragraph>

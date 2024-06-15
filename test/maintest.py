@@ -8,14 +8,14 @@ import os
 sys.path.append('..')
 from TinUI import *
 from tkinter import Tk
-
+path=os.path.dirname(os.path.abspath(__file__))
 
 load_menubar=False
 
 def loadcontrol(controlname):
     global load_menubar
     #导入控件说明
-    cfile=open("test/testpage/"+controlname+".xml",mode='r',encoding='utf-8')
+    cfile=open("testpage/"+controlname+".xml",mode='r',encoding='utf-8')
     cxml=cfile.read()
     cfile.close()
     duixml.clean()
@@ -60,7 +60,7 @@ xmlf.close()
 
 window = Tk()
 window.resizable(False,False)
-window.iconbitmap('LOGO.ico')
+window.iconbitmap('../LOGO.ico')
 window.title("TinUI main test")
 window.geometry("850x600+5+5")
 ui=BasicTinUI(window)

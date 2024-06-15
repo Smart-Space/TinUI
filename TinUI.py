@@ -3392,7 +3392,6 @@ class TinUIXml():#TinUI的xml渲染方式
 
 
 tinui_dir=os.path.dirname(os.path.abspath(__file__))
-print(tinui_dir)
 TinUIFont.load_font(tinui_dir+"/Segoe Fluent Icons.ttf")
 #TinUIFont.load_font(tinui_dir+"/No.019-Sounso-Quality-2.ttf")#测试内容，正式版本中没有此字体文件
 

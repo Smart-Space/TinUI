@@ -883,7 +883,7 @@ class BasicTinUI(Canvas):
         self.__auto_anchor(uid,pos,anchor)
         return uid
 
-    def add_onoff(self,pos:tuple,fg='#575757',bg='#e5e5e5',onfg='#FFFFFF',onbg='#3041d8',command=None):#绘制开关控件
+    def add_onoff(self,pos:tuple,fg='#575757',bg='#e5e5e5',onfg='#FFFFFF',onbg='#3041d8',anchor='nw',command=None):#绘制开关控件
         def __on():
             nonlocal nowstate
             nowstate='on'
@@ -896,11 +896,11 @@ class BasicTinUI(Canvas):
                 command(False)
         def __left30():
             f=lambda:self.move(state,-1,0)
-            for i in range(0,31):
+            for i in range(0,30):
                 self.after(i*5,f)
         def __right30():
             f=lambda:self.move(state,1,0)
-            for i in range(0,31):
+            for i in range(0,30):
                 self.after(i*5,f)
         def __on_click(event):
             if nowstate=='off':
@@ -945,11 +945,13 @@ class BasicTinUI(Canvas):
                 self.itemconfig(back,fill=bg)
                 self.itemconfig(outline,fill=fg)
         nowstate='off'
-        outline=self.create_line((pos[0]+12,pos[1]+12,pos[0]+12+30,pos[1]+12),width=25,fill=fg,capstyle='round',smooth=True,splinesteps=32)
-        uid='onoff'+str(outline)
-        self.itemconfig(outline,tags=uid)
-        back=self.create_line((pos[0]+13,pos[1]+12,pos[0]+13+28,pos[1]+12),width=23,fill=bg,capstyle='round',tags=uid,smooth=True,splinesteps=32)
-        state=self.pen.oval(pos[0]+5,pos[1]+5,15,15,fill=fg,width=0,tags=uid)
+        back=self.create_text(pos,text='\uEC11',font='{Segoe Fluent Icons} 40',fill=bg,anchor='nw')
+        uid='onoff'+str(back)
+        self.itemconfig(back,tags=uid)
+        outline=self.create_text(pos,text='\uEC12',font='{Segoe Fluent Icons} 40',fill=fg,tags=uid,anchor='nw')
+        self.__auto_anchor(uid,pos,anchor)
+        bbox=self.bbox(outline)
+        state=self.create_text((bbox[0]+13,(bbox[1]+bbox[3])/2-1),text='\uF127',font='{Segoe Fluent Icons} 10',fill=fg,tags=uid,anchor='center')
         self.tag_bind(uid,'<Button-1>',__on_click)
         funcs=FuncList(4)
         funcs.on=on
@@ -958,7 +960,7 @@ class BasicTinUI(Canvas):
         funcs.active=active
         return state,back,outline,funcs,uid
 
-    def add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='#1b1b1b',bg='#ffffff',line='#e5e5e5',activefg='#818181',activebg='#f2f2f2',font=('微软雅黑',12),command=None):#绘制选值框
+    def add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='#1b1b1b',bg='#ffffff',line='#e5e5e5',activefg='#818181',activebg='#f2f2f2',font=('微软雅黑',12),anchor='nw',command=None):#绘制选值框
         def updata(event):
             val=check_in_data()
             if val[0]==True:
@@ -1018,9 +1020,10 @@ class BasicTinUI(Canvas):
         datanum=TinUINum()
         datanum.num=data.index(now)#记录数据位置
         maxnum=len(data)-1#最大位置
+        self.__auto_anchor(uid,pos,anchor)
         return wentry,button1,button2,back,outline,uid
 
-    def add_scalebar(self,pos:tuple,width=200,fg='#4554dc',activefg='#4554dc',bg='#868686',buttonbg='#ffffff',buttonoutline='#cccccc',data=(1,2,3,4,5),start=1,command=None):#绘制调节框
+    def add_scalebar(self,pos:tuple,width=200,fg='#4554dc',activefg='#4554dc',bg='#868686',buttonbg='#ffffff',buttonoutline='#cccccc',data=(1,2,3,4,5),start=1,anchor='nw',command=None):#绘制调节框
         def mousedown(event):
             scale.startx=self.canvasx(event.x)
             bbox=self.bbox(button_back)
@@ -1091,20 +1094,31 @@ class BasicTinUI(Canvas):
         self.tag_bind(button,'<Button-1>',mousedown)
         self.tag_bind(button,'<B1-Motion>',drag)
         self.tag_bind(button,'<ButtonRelease-1>',check)#矫正位置
+        dx,dy=self.__auto_anchor(uid,pos,anchor)
+        pos=list(pos)
+        pos[0]+=dx
+        pos[1]+=dy
         funcs=FuncList(3)
         funcs.select=funcs[0]=select
         funcs.disable=funcs[1]=disable
         funcs._active=funcs[2]=_active
         return name,back,button,funcs,uid
 
-    def add_info(self,pos:tuple,info='i',font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black',width=400):#绘制提示框
+    def add_info(self,pos:tuple,info='info',font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black',width=400,anchor='nw'):#绘制提示框
         text=self.create_text(pos,anchor='nw',text=info,font=font,fill=fg)
         uid='info'+str(text)
         self.itemconfig(text,tags=uid)
         bbox=self.bbox(text)
+        font_size=str(int(self.__get_text_size(text)))#字体大小
+        info=self.create_text((bbox[2],(bbox[1]+bbox[3])/2),anchor='w',text='\uF167',fill=bg,font='{Segoe Fluent Icons} '+font_size,tags=uid)
+        infoback=self.create_text((bbox[2],(bbox[1]+bbox[3])/2),anchor='w',text='\uE946',fill=fg,font='{Segoe Fluent Icons} '+font_size,tags=uid)
+        bbox=self.bbox(uid)
         back=self.create_rectangle((bbox[0]-2,bbox[1]-2,bbox[2]+2,bbox[3]+2),fill=bg,outline=fg,width=2,tags=uid)
         self.tkraise(text)
+        self.tkraise(info)
+        self.tkraise(infoback)
         self.add_tooltip(uid,text=info_text,fg=info_fg,bg=bg,outline=fg,font=info_font,width=width)
+        self.__auto_anchor(uid,pos,anchor)
         return text,back,uid
 
     def add_menubar(self,cid='all',bind='<Button-3>',font='微软雅黑 12',fg='#1b1b1b',bg='#fbfbfc',line='#cccccc',activefg='#1a1a1a',activebg='#f2f2f3',cont=(('command',print),'-'),tran='#01FF11'):#绘制菜单
@@ -3378,13 +3392,15 @@ class TinUIXml():#TinUI的xml渲染方式
 
 
 tinui_dir=os.path.dirname(os.path.abspath(__file__))
+print(tinui_dir)
 TinUIFont.load_font(tinui_dir+"/Segoe Fluent Icons.ttf")
+#TinUIFont.load_font(tinui_dir+"/No.019-Sounso-Quality-2.ttf")#测试内容，正式版本中没有此字体文件
 
 
 #==========test follow==========
 def test(event):
     a.title('TinUI Test')
-    b.add_paragraph((50,150),'这是TinUI按钮触达的事件函数回显，此外，窗口标题也被改变、首行标题缩进减小')
+    b.add_paragraph((50,150),'这是TinUI按钮触达的事件函数回显，此外，窗口标题也被改变、首行标题缩进减小')#,font='{A019-Sounso Quality} 12')
     b.coords(m,100,5)
 def test1(word):
     print(word)
@@ -3481,11 +3497,11 @@ if __name__=='__main__':
     _,_,_,progressgoto,_,_=b.add_progressbar((600,510))
     b.add_table((180,630),data=(('a','space fans over the\nworld','c'),('you\ncan','2','3'),('I','II','have a dream, then try your best to get it!')))
     b.add_paragraph((300,850),text='上面是一个表格')
-    b.add_onoff((600,100))
+    b.add_onoff((600,100),anchor='se')
     b.add_spinbox((680,100),command=lambda string:print(f'{string.num}: {string}'))
     b.add_scalebar((680,50),command=test5)
     scale_text,_=b.add_label((890,50),text='当前选值：2')
-    b.add_info((710,140),info_text='this is info widget in TinUI, using TinUI\'s tooltip widget with its own style.')
+    b.add_info((710,140),info_text='this is info widget in TinUI, using TinUI\'s tooltip widget with its own style.',anchor='n')
     mtb=b.add_paragraph((0,720),'测试菜单（右键单击）')
     b.add_menubar(mtb,cont=(('command',print),('menu',test1),'-',('TinUI文本移动',test)))
     ttb=b.add_paragraph((10,800),'TinUI能做些什么？')

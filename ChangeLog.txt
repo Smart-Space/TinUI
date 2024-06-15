@@ -12,9 +12,12 @@
 1. 更新checkbutton样式
 2. waitbar2新样式
 3. 以下控件接入统一坐标对齐模式：checkbutton, entry, radiobutton,
-    link, waitbar1, waitbar2, combobox, button, label
+    link, waitbar1, waitbar2, combobox, button, label, progressbar,
+    table, onoff, spinbox, scalebar, info
 4. radiobutton去除边框
 5. combobox新样式
+6. onoff新样式
+7. info提示触发文本后加入叹号提示文本标识符
 2024-2-15 pre-4
 1. labelframe改为圆角边框
 2. notebook新样式

@@ -520,13 +520,14 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_onoff(self,pos:tuple,fg='#575757',bg='#e5e5e5',onfg='#FFFFFF',onbg='#3041d8',command=None)
+### add_onoff(self,pos:tuple,fg='#575757',bg='#e5e5e5',onfg='#FFFFFF',onbg='#3041d8',anchor='nw',command=None)
 
 - pos::位置
 - fg::关闭状态下的文本、边框颜色
 - bg::关闭状态下的背景颜色
 - onfg::开启状态下的文本颜色
 - onbg::开启状态下的边框、背景颜色
+- anchor::对齐方向
 - command::当被点击时调用的函数，函数只有一个参数：布尔值。调用参数True表示开启，False表示关闭
 
 绘制一个开关。
@@ -554,7 +555,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='#1b1b1b',bg='#ffffff',line='#e5e5e5',activefg='#818181',activebg='#f2f2f2',font=('微软雅黑',12),command=None)
+### add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='#1b1b1b',bg='#ffffff',line='#e5e5e5',activefg='#818181',activebg='#f2f2f2',font=('微软雅黑',12),anchor='nw',command=None)
 
 - pos::位置
 - width::宽度
@@ -565,6 +566,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - activefg::按钮响应文本颜色
 - activebg::按钮响应背景色
 - font::输入框字体，同时会影响按钮字体
+- anchor::对齐方向
 - command::选值时响应的函数，必须接受一个参数，这个参数是当前选定的值
 
 > `command`返回值为 `string:TinUIString`，`string`为值本身，来自于 `data`。
@@ -589,7 +591,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_scalebar(self,pos:tuple,width=200,fg='#4554dc',activefg='#4554dc',bg='#868686',buttonbg='#ffffff',buttonoutline='#cccccc',data=(1,2,3,4,5),start=1,command=None)
+### add_scalebar(self,pos:tuple,width=200,fg='#4554dc',activefg='#4554dc',bg='#868686',buttonbg='#ffffff',buttonoutline='#cccccc',data=(1,2,3,4,5),start=1,anchor='nw',command=None)
 
 - pos::位置
 - width::长度（宽度）
@@ -625,7 +627,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_info(self,pos:tuple,info='i',font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black',width=400)
+### add_info(self,pos:tuple,info='info',font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black',width=400,anchor='nw')
 
 - pos::位置
 - font::标识符字体
@@ -636,6 +638,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - info_width::提示文本每一行的宽度
 - info_fg::提示文本颜色
 - width::文本宽度
+- anchor::对齐方向
 
 绘制一个气泡提示框组件。
 

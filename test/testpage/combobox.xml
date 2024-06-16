@@ -10,7 +10,7 @@
     <paragraph text=' ' width='580'></paragraph>
     </line>
     <line>
-    <combobox text='combobox（选项为空）'></combobox>
+    <combobox text='combobox（选项为空）' content='("a","b","c")'></combobox>
     </line>
 </line>
 </tinui>

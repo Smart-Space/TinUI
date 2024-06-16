@@ -726,13 +726,14 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_waitbar3(self,pos:tuple,width:int=200,fg='#3041d8',bg='#f3f3f3',okcolor='lightgreen')
+### add_waitbar3(self,pos:tuple,width:int=200,fg='#3041d8',bg='#f3f3f3',okcolor='#0f7b0f',anchor='nw')
 
 - pos::起始位置
 - width::宽度
 - fg::动画块颜色
 - bg::背景色
 - okcolor::完成时的颜色
+- anchor::对齐方向
 
 绘制一个带状等待框。
 

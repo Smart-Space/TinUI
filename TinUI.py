@@ -1335,18 +1335,18 @@ class BasicTinUI(Canvas):
         self.lower(back)
         return back
 
-    def add_waitbar3(self,pos:tuple,width:int=200,fg='#3041d8',bg='#f3f3f3',okcolor='lightgreen'):#绘制带状等待框
+    def add_waitbar3(self,pos:tuple,width:int=200,fg='#3041d8',bg='#f3f3f3',okcolor='#0f7b0f',anchor='nw'):#绘制带状等待框
         def move(startx,endx,nowwidth):
             if nowwidth-maxwidth>width:#一轮动画完成
                 start()
                 return
-            self.coords(bar,(pos[0]+startx,pos[1],pos[0]+endx,pos[1]+4))
+            self.coords(bar,(pos[0]+startx,pos[1],pos[0]+endx,pos[1]))
             start(nowwidth+5)
         def start(nowwidth=0):#开始动画
             nonlocal timesep,maxwidth
             if ifok.ok==True:#已完成
-                self.itemconfig(bar,fill=okcolor,outline=okcolor)
-                self.coords(bar,(pos[0],pos[1],pos[0]+width,pos[1]+4))
+                self.itemconfig(bar,fill=okcolor)
+                self.coords(bar,(pos[0],pos[1],pos[0]+width,pos[1]))
             if nowwidth==0:#重新定义时间间隔与滑块长度
                 if timesep==10:
                     timesep=40
@@ -1365,12 +1365,19 @@ class BasicTinUI(Canvas):
         ifok=TinUINum()#记录是否暂停
         ifok.ok=False
         timesep=10#时间间隔，快20，慢40
-        bbox=(pos[0],pos[1],pos[0]+width,pos[1]+4)
-        back=self.create_rectangle(bbox,fill=bg,outline=bg)
+        # bbox=(pos[0],pos[1],pos[0]+width,pos[1]+4)
+        # back=self.create_rectangle(bbox,fill=bg,outline=bg)
+        bbox=(pos[0],pos[1],pos[0]+width,pos[1])
+        back=self.create_line(bbox,fill=bg,width=3,capstyle='round')
         uid='waitbar3-'+str(back)
         self.itemconfig(back,tags=uid)
         maxwidth=width//3*2#原长为三分之一，快速模式为原长两倍
-        bar=self.create_rectangle((pos[0],pos[1],pos[0],pos[1]),fill=fg,outline=fg,tags=uid)
+        # bar=self.create_rectangle((pos[0],pos[1],pos[0],pos[1]),fill=fg,outline=fg,tags=uid)
+        bar=self.create_line((pos[0],pos[1],pos[0],pos[1]),fill=fg,width=3,capstyle='round',tags=uid)
+        dx,dy=self.__auto_anchor(uid,pos,anchor)
+        pos=list(pos)
+        pos[0]+=dx
+        pos[1]+=dy
         start()
         return back,bar,stop,uid
 

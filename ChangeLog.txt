@@ -7,7 +7,9 @@
 
 ==========5.0==========
 2024-6 pre-6
-*1. waitbar2优化标识圆点 隐藏/显示
+1. 以下控件接入统一坐标对齐模式：listview, pipspager, ratingbar,
+    radiobox,
+2. radiobox使用新样式，同时更改默认间距
 2024-6-16 pre-5
 1. 更新checkbutton样式
 2. waitbar2新样式

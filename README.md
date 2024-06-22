@@ -1028,7 +1028,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_radiobox(self,pos:tuple,fontfg='black',font='微软雅黑 12',fg='#8b8b8b',bg='#ededed',activefg='#898989',activebg='#e5e5e5',onfg='#3041d8',onbg='#ffffff',content:tuple=('1','','2'),padx=10,pady=5,command=None)
+### add_radiobox(self,pos:tuple,fontfg='black',font='微软雅黑 12',fg='#8b8b8b',bg='#ededed',activefg='#898989',activebg='#e5e5e5',onfg='#3041d8',onbg='#ffffff',content:tuple=('1','','2'),padx=15,pady=10,anchor='nw',command=None)
 
 - pos::位置
 - fontfg::文本颜色
@@ -1041,6 +1041,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - content::选择文本内容。如果为空字符串则代表换行
 - padx::水平间距
 - pady::行间距
+- anchor::对齐方向
 - command::回调函数，必须接受一个参数，所选选项的文本
 
 绘制一个单选组控件。

@@ -3,6 +3,7 @@
     Copyright (C) <2021-present>  <smart-space>
 '''
 from tkinter import *
+from tkinter import font as tkfont
 from webbrowser import open as webopen
 import time
 import math
@@ -1365,14 +1366,11 @@ class BasicTinUI(Canvas):
         ifok=TinUINum()#记录是否暂停
         ifok.ok=False
         timesep=10#时间间隔，快20，慢40
-        # bbox=(pos[0],pos[1],pos[0]+width,pos[1]+4)
-        # back=self.create_rectangle(bbox,fill=bg,outline=bg)
         bbox=(pos[0],pos[1],pos[0]+width,pos[1])
         back=self.create_line(bbox,fill=bg,width=3,capstyle='round')
         uid='waitbar3-'+str(back)
         self.itemconfig(back,tags=uid)
         maxwidth=width//3*2#原长为三分之一，快速模式为原长两倍
-        # bar=self.create_rectangle((pos[0],pos[1],pos[0],pos[1]),fill=fg,outline=fg,tags=uid)
         bar=self.create_line((pos[0],pos[1],pos[0],pos[1]),fill=fg,width=3,capstyle='round',tags=uid)
         dx,dy=self.__auto_anchor(uid,pos,anchor)
         pos=list(pos)
@@ -1656,7 +1654,7 @@ class BasicTinUI(Canvas):
         funcs.delete=_delete
         return box,funcs,uid
 
-    def add_listview(self,pos:tuple,width=300,height=300,linew=80,bg='#f3f3f3',activebg='#eaeaea',oncolor='#3041d8',scrobg='#f8f8f8',scroc='#999999',scrooc='#89898b',num=5,command=None):#绘制列表视图,function:add_list
+    def add_listview(self,pos:tuple,width=300,height=300,linew=80,bg='#f3f3f3',activebg='#eaeaea',oncolor='#3041d8',scrobg='#f8f8f8',scroc='#999999',scrooc='#89898b',num=5,anchor='nw',command=None):#绘制列表视图,function:add_list
         def buttonin(itui):
             itui[0]['background']=activebg
         def buttonout(itui):
@@ -1675,9 +1673,12 @@ class BasicTinUI(Canvas):
             ui.yview_scroll(int(-1*(event.delta/120)), "units")
         nowon=-1
         ui=BasicTinUI(self,bg=bg)
-        view=self.create_window(pos,window=ui,height=height,width=width,anchor='nw')
+        view=self.create_window(pos,window=ui,height=height,width=width,anchor=anchor)
         uid='listview'+str(view)
         self.addtag_withtag(uid,view)
+        bbox=self.bbox(view)
+        pos=list(pos)
+        pos[0],pos[1]=bbox[0],bbox[1]
         scro=self.add_scrollbar((pos[0]+width+2,pos[1]),ui,height=height,bg=scrobg,color=scroc,oncolor=scrooc)
         self.addtag_withtag(uid,scro[-1])
         items=[]#使用列表作为存储类型，以后可能动态修改列表视图元素
@@ -1741,7 +1742,7 @@ class BasicTinUI(Canvas):
         ui_xml=TinUIXml(ui)
         return ui,re_scrollregion,ui_xml,uid
 
-    def add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',activefg='#5d5d5d',buttonbg='#f8f8f8',activebg='#f8f8f8',num:int=2):#绘制翻页视图
+    def add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',activefg='#5d5d5d',buttonbg='#f8f8f8',activebg='#f8f8f8',num:int=2,anchor='nw'):#绘制翻页视图
         def move_left(event):
             nonlocal nowui
             if nowui==0:
@@ -1784,7 +1785,7 @@ class BasicTinUI(Canvas):
                 mode='left'
             startwidth=0#动画起始宽度
             self.itemconfig(newui,width=0,state='normal')
-            self.lift(newui)
+            self.tkraise(newui)
             animate(0,0)
             nowui=number#新标志
         def move_to(number):
@@ -1852,6 +1853,7 @@ class BasicTinUI(Canvas):
         __dot_select(dotlist[nowui])
         __move_to(nowui,True)#first参数代表初始化
         bar.config(scrollregion=bar.bbox('all'))
+        self.__auto_anchor(uid,pos,anchor)
         return uilist,dotlist,move_to,uid
 
     def add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f3f3f3',fg='#5d5d5d',bg='#f3f3f3',activefg='#595959',activebg='#e9e9e9',onfg='#1a1a1a',onbg='#f9f9f9',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b'):#绘制标签栏视图
@@ -2022,7 +2024,7 @@ class BasicTinUI(Canvas):
         scro=self.add_scrollbar((pos[0]+5,pos[1]+32),tbu,height=width-5,direction='x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)
         self.addtag_withtag(uid,scro[-1])
         barheight=self.bbox(scro[-1])[3]
-        backpos=(pos[0]+5,pos[1]+3,pos[0]+width+2,pos[1]+3,pos[0]+width+2,barheight+height-3,pos[0]+5,barheight+height-3,pos[0]+5,pos[1]+5)
+        backpos=(pos[0]+5,pos[1]+3,pos[0]+width,pos[1]+3,pos[0]+width,barheight+height-3,pos[0]+5,barheight+height-3,pos[0]+5,pos[1]+5)
         back=self.create_polygon(backpos,outline=color,fill=color,width=11,tags=uid)
         self.tkraise(tbuid)
         self.tkraise(scro[-1])
@@ -2107,7 +2109,7 @@ class BasicTinUI(Canvas):
         self.tag_bind(toptext,'<B1-Motion>',drag)
         return toptext,content,uid
 
-    def add_ratingbar(self,pos:tuple,fg='#585858',bg='#f3f3f3',onfg='#3041d8',onbg='#3041d8',size=12,num:int=5,linew:int=10,command=None):#绘制评星级控件
+    def add_ratingbar(self,pos:tuple,fg='#585858',bg='#f3f3f3',onfg='#3041d8',onbg='#3041d8',size=12,num:int=5,linew:int=10,anchor='nw',command=None):#绘制评星级控件
         def __onnum(num):
             for i in bars[:num+1]:
                 self.itemconfig(i.fill,fill=onbg)
@@ -2188,19 +2190,20 @@ class BasicTinUI(Canvas):
         self.lower(back)
         self.tag_bind(back,'<Leave>',leaveback)
         self.tag_bind(back,'<Button>',__ontemp)
+        self.__auto_anchor(uid,pos,anchor)
         return bars,uid
 
-    def add_radiobox(self,pos:tuple,fontfg='black',font='微软雅黑 12',fg='#8b8b8b',bg='#ededed',activefg='#898989',activebg='#e5e5e5',onfg='#3041d8',onbg='#ffffff',content:tuple=('1','','2'),padx=10,pady=5,command=None):#绘制单选组控件
+    def add_radiobox(self,pos:tuple,fontfg='black',font='微软雅黑 12',fg='#8b8b8b',bg='#ededed',activefg='#898989',activebg='#e5e5e5',onfg='#3041d8',onbg='#ffffff',content:tuple=('1','','2'),padx=15,pady=10,anchor='nw',command=None):#绘制单选组控件
         def button_in(sel,sign,sback):
             if sel==select:
                 return
-            self.itemconfig(sign,fill=activebg)
-            self.itemconfig(sback,fill=activefg)
+            self.itemconfig(sign,fill=activefg)
+            self.itemconfig(sback,fill=activebg)
         def button_out(sel,sign,sback):
             if sel==select:
                 return
-            self.itemconfig(sign,fill=bg)
-            self.itemconfig(sback,fill=fg)
+            self.itemconfig(sign,fill=fg)
+            self.itemconfig(sback,fill=bg)
         def sel_it(sel,sign,sback):
             nonlocal select
             if sel==select:
@@ -2209,13 +2212,11 @@ class BasicTinUI(Canvas):
             select=sel
             if old_select>=0:#恢复原先的单选组
                 old_sign_back,old_sign=boxes[old_select][0:2]
-                #self.itemconfig(old_sign,width=2)
-                self.coords(old_sign,boxes[old_select][-2])
+                self.itemconfig(old_sign,text='\uECCA')#字符还原为空心圆
                 button_out(None,old_sign,old_sign_back)
                 self.update()
-            self.coords(sign,boxes[sel][-1])
-            self.itemconfig(sign,fill=onbg)
-            self.itemconfig(sback,fill=onfg)
+            self.itemconfig(sign,text='\uECCC',fill=onbg)#调整字符为实心小圆
+            self.itemconfig(sback,fill=onfg)#fg,bg对调，因为此时的back作为边框元素
             if command!=None:
                 textid=boxes[sel][2]
                 text=self.itemcget(textid,'text')
@@ -2224,14 +2225,14 @@ class BasicTinUI(Canvas):
         back_width=18
         back_line=2#16+2*2=20
         #active... = back...
-        on_width=6
-        on_line=4#6+(4+2)*2=18
         boxes=[]#[(sign_id,text_id,back_id),...]，换行为(None,'\n',None)
         nowx,nowy=pos#x坐标为左上角插入坐标，y坐标为底部坐标
         uid='radiobox'+str(id(pos))
         select=-1#当前选定
         count=-1
         t_bbox=None
+        _font=tkfont.Font(font=font)
+        size=str(_font.cget('size'))
         for i in content:
             count+=1#计数
             if i=='':
@@ -2246,21 +2247,18 @@ class BasicTinUI(Canvas):
             y1=nowy+back_line
             x2=nowx+back_line+back_width
             y2=nowy+back_line+back_width
-            ar=(x1+1,y1+1,x2-1,y2-1)
-            ar2=(x1+2,y1+2,x2-2,y2-2)
-            #sign=self.create_oval(ar,width=back_line,fill=bg,outline=fg,tags=uid)
-            sign_back=self.create_oval((x1-1,y1-1,x2+1,y2+1),width=0,fill=fg,tags=uid)
-            sign=self.create_oval(ar,width=0,fill=bg,tags=uid)
-            #sign=self.pen.oval(x1,y1,x2-x1,y2-y1,width=back_line,fill=bg,outline=fg,tags=uid)
-            text=self.create_text((x2+5,nowy),text=i,font=font,fill=fontfg,anchor='nw',tags=uid)
+            sign_back=self.create_text((x1-1,nowy),text='\uF127',font='{Segoe Fluent Icons} '+size,anchor='w',fill=bg,tags=uid)
+            sign=self.create_text((x1-1,nowy),text='\uECCA',font='{Segoe Fluent Icons} '+size,anchor='w',fill=fg,tags=uid)
+            text=self.create_text((x2+1,nowy),text=i,font=font,fill=fontfg,anchor='w',tags=uid)
             s_bbox=self.bbox(sign)
             t_bbox=self.bbox(text)
-            back=self.create_rectangle((s_bbox[0],s_bbox[1],t_bbox[2],t_bbox[3]),width=0,fill='',tags=uid)
-            boxes.append((sign_back,sign,text,back,ar,ar2))
+            back=self.create_rectangle((s_bbox[0],s_bbox[1],t_bbox[2],t_bbox[3]),width=0,fill='',tags=uid)#一个虚拟元素，用于判定鼠标位置
+            boxes.append((sign_back,sign,text,back))
             self.tag_bind(back,'<Enter>',lambda event,sel=count,sign=sign,sback=sign_back:button_in(sel,sign,sback))
             self.tag_bind(back,'<Leave>',lambda event,sel=count,sign=sign,sback=sign_back:button_out(sel,sign,sback))
             self.tag_bind(back,'<Button-1>',lambda event,sel=count,sign=sign,sback=sign_back:sel_it(sel,sign,sback))
             nowx=t_bbox[2]+padx
+        dx,dy=self.__auto_anchor(uid,pos,anchor)
         return boxes,uid
 
     def add_pivot(self,pos:tuple,fg='#959595',bg='',activefg='#525252',activecolor='#5969e0',content=(('a-title','tag1'),('b-title','tag2'),'',('c-title','tag3')),font='微软雅黑 16',padx=10,pady=10,command=None):#绘制支点标题

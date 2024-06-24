@@ -10,9 +10,9 @@
     <paragraph text=' ' width='580'></paragraph>
     </line>
     <line>
-    <paragraph text='一般在需要'></paragraph>
-    <label text='着重突出文本'></label>
-    <paragraph text='的地方使用label'></paragraph>
+    <paragraph text='一般在需要' anchor='w'></paragraph>
+    <label text='着重突出文本' anchor='w'></label>
+    <paragraph text='的地方使用label' anchor='w'></paragraph>
     </line>
 </line>
 </tinui>

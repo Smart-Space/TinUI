@@ -9,23 +9,23 @@ def get1(event):
 
 xml='''
 <tinui>
-<line>
-<button text="获取输入值" font='宋体 16' command='self.funcs["get1"]'></button>
-<entry width='200'>en</entry>
-<line>
-<button text="获取输入值" font='宋体 16' command='self.funcs["get1"]'></button>
-<entry width='200'>en</entry>
+<line x='5' y='44' anchor='w'>
+    <button text="获取输入值" font='宋体 16' command='self.funcs["get1"]'></button>
+    <entry width='200'>en</entry>
+    <line anchor='nw'>
+        <button text="获取输入值" font='宋体 16' command='self.funcs["get1"]'></button>
+        <entry width='200'>en</entry>
+    </line>
+    <line anchor='nw'>
+        <button text="获取输入值" font='宋体 16' command='self.funcs["get1"]'></button>
+        <entry width='200'>en</entry>
+    </line>
 </line>
 <line>
-<button text="获取输入值" font='宋体 16' command='self.funcs["get1"]'></button>
-<entry width='200'>en</entry>
-</line>
-</line>
-<line>
-<button text="hi, this is a xml TinUI test" command='print'></button>
+    <button text="hi, this is a xml TinUI test" command='print'></button>
 </line>
 <line x='100'>
-<label text='&lt;输入内容显示]' outline=''>lb1</label>
+    <label text='&lt;输入内容显示]' outline=''>lb1</label>
 </line>
 </tinui>
 '''

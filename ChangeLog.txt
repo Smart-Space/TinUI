@@ -5,11 +5,21 @@
 ==========更新日志==========
 
 
+==========5.1==========
+2024-7-
+*1. tinuixml新增padx，pady间隔参数
+*2. scalebar新样式
 ==========5.0==========
-2024-6 pre-6
+2024-6-24
 1. 以下控件接入统一坐标对齐模式：listview, pipspager, ratingbar,
-    radiobox,
+    radiobox, pivot, button2, waitframe, passwordbox, image,
+    swipecontrol, picker
 2. radiobox使用新样式，同时更改默认间距
+3. 优化expander样式
+4. 优化spinbox提示符
+5. 优化passwordbox提示符
+6. 修复TinUIXml自定义初始坐标被忽略的问题
+7. tinuixml修复x，y参数自定义，新增anchor自定义(精确到line，但是每个标签内优先级更高)
 2024-6-16 pre-5
 1. 更新checkbutton样式
 2. waitbar2新样式

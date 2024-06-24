@@ -9,7 +9,7 @@
     <line>
     <paragraph text=' ' width='580'></paragraph>
     </line>
-    <line>
+    <line anchor='w'>
     <paragraph text='下方就是back'>p1</paragraph>
     <button2 text='本按钮与左边文字构成控件组'>b1</button2>
     <back uids='("b1","p1")' bg='yellow' fg='yellow'></back>

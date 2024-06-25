@@ -1031,7 +1031,8 @@ class BasicTinUI(Canvas):
         def mousedown(event):
             scale.startx=self.canvasx(event.x)
             bbox=self.bbox(button_back)
-            self.coords(button_fore,bbox[0]+4,pos[1]+3,bbox[0]+16,pos[1]+15)#放大
+            # self.coords(button_fore,bbox[0]+4,pos[1]+3,bbox[0]+16,pos[1]+15)#放大
+            self.itemconfig(button_fore,text='\uECCC')
         def drag(event):
             move=self.canvasx(event.x)-scale.startx
             if self.canvasx(event.x)<pos[0] or self.canvasx(event.x)>pos[0]+width:
@@ -1048,7 +1049,8 @@ class BasicTinUI(Canvas):
                 move=pos[0]
             self.move(button,move-bbox[0],0)
             bbox=self.bbox(button_back)
-            self.coords(button_fore,bbox[0]+6,pos[1]+5,bbox[0]+14,pos[1]+13)#缩小
+            # self.coords(button_fore,bbox[0]+6,pos[1]+5,bbox[0]+14,pos[1]+13)#缩小
+            self.itemconfig(button_fore,text='\uE915')
             end=int(self.canvasx(event.x))
             if end<pos[0]:end=pos[0]
             if end>pos[0]+width:end=pos[0]+width
@@ -1091,8 +1093,11 @@ class BasicTinUI(Canvas):
         self.tag_bind(name,'<ButtonRelease-1>',checkval)
         self.addtag_withtag(name,active)#为重绘绑定tag名称
         button='scalebutton'+str(back)
-        button_back=self.create_oval((dash[start],pos[1],dash[start]+18,pos[1]+18),width=1,fill=buttonbg,outline=buttonoutline,tags=(uid,button))
-        button_fore=self.create_oval((dash[start]+5,pos[1]+5,dash[start]+13,pos[1]+13),width=0,fill=fg,tags=(uid,button))
+        # button_back=self.create_oval((dash[start],pos[1],dash[start]+18,pos[1]+18),width=1,fill=buttonbg,outline=buttonoutline,tags=(uid,button))
+        # button_fore=self.create_oval((dash[start]+5,pos[1]+5,dash[start]+13,pos[1]+13),width=0,fill=fg,tags=(uid,button))
+        button_back=self.create_text((dash[start]+9,pos[1]+9),text='\uF127',font='{Segoe Fluent Icons} 12',fill=buttonbg,tags=(uid,button))
+        button_line=self.create_text((dash[start]+9,pos[1]+9),text='\uECCA',font='{Segoe Fluent Icons} 12',fill=buttonoutline,tags=(uid,button))
+        button_fore=self.create_text((dash[start]+9,pos[1]+9),text='\uE915',font='{Segoe Fluent Icons} 12',fill=fg,tags=(uid,button))
         self.tag_bind(button,'<Enter>',lambda event:self.itemconfig(button_fore,fill=activefg))
         self.tag_bind(button,'<Leave>',lambda event:self.itemconfig(button_fore,fill=fg))
         self.tag_bind(button,'<Button-1>',mousedown)

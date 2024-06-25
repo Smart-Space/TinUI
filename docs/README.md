@@ -1028,7 +1028,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_radiobox(self,pos:tuple,fontfg='black',font='微软雅黑 12',fg='#8b8b8b',bg='#ededed',activefg='#898989',activebg='#e5e5e5',onfg='#3041d8',onbg='#ffffff',content:tuple=('1','','2'),padx=10,pady=5,command=None)
+### add_radiobox(self,pos:tuple,fontfg='black',font='微软雅黑 12',fg='#8b8b8b',bg='#ededed',activefg='#898989',activebg='#e5e5e5',onfg='#3041d8',onbg='#ffffff',content:tuple=('1','','2'),padx=15,pady=10,anchor='nw',command=None)
 
 - pos::位置
 - fontfg::文本颜色
@@ -1041,6 +1041,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - content::选择文本内容。如果为空字符串则代表换行
 - padx::水平间距
 - pady::行间距
+- anchor::对齐方向
 - command::回调函数，必须接受一个参数，所选选项的文本
 
 绘制一个单选组控件。
@@ -1076,7 +1077,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_pivot(self,pos:tuple,fg='#959595',bg='',activefg='#525252',activecolor='#5969e0',content=(('a-title','tag1'),('b-title','tag2'),'',('c-title','tag3')),font='微软雅黑 16',padx=10,pady=10,command=None)
+### add_pivot(self,pos:tuple,fg='#959595',bg='',activefg='#525252',activecolor='#5969e0',content=(('a-title','tag1'),('b-title','tag2'),'',('c-title','tag3')),font='微软雅黑 16',padx=10,pady=10,anchor='nw',command=None)
 
 - pos::位置
 - fg::字体颜色
@@ -1087,6 +1088,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - font::字体
 - padx::横方向间距
 - pady::纵方向间距
+- anchor::对齐方向
 - command::响应函数，必须接受一个参数，所选选项的标签
 
 绘制一个支点标题。
@@ -1168,13 +1170,14 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_waitframe(self,pos:tuple,width=300,height=300,fg='#e0e0e0',bg='#ececee')
+### add_waitframe(self,pos:tuple,width=300,height=300,fg='#e0e0e0',bg='#ececee',anchor='nw')
 
 - pos::位置
 - width::宽度
 - height::盖度
 - fg::前景色
 - bg::背景色
+- anchor::对齐方向
 
 绘制一个元素等待框。
 
@@ -1255,13 +1258,14 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_image(self,pos:tuple,width=None,height=None,state='fill',imgfile=None)
+### add_image(self,pos:tuple,width=None,height=None,state='fill',imgfile=None,anchor='nw')
 
 - pos::位置
 - width::宽度（默认为图片宽度）
 - height::高度（默认为图片高度）
 - state::尺寸状态（none左上角裁剪，fill填充，uniform等比缩放）
 - imgfile::图片文件，支持静态gif和png
+- anchor::对齐方向
 
 绘制一个静态图片。
 
@@ -1311,7 +1315,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_swipecontrol(self,pos:tuple,text:str='',height=50,width=400,fg='#1a1a1a',bg='#f3f3f3',line='#fbfbfb',data:dict=,),'right':(,)},font=('微软雅黑',12))
+### add_swipecontrol(self,pos:tuple,text:str='',height=50,width=400,fg='#1a1a1a',bg='#f3f3f3',line='#fbfbfb',data:dict=,),'right':(,)},font=('微软雅黑',12),anchor='nw')
 
 - pos-位置
 - text-文本
@@ -1345,6 +1349,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
   > 一侧元素以一个数组表示，一个及以上，不超过六个。每个元素以字典表示，文本必选，颜色有默认值。
   >
 - font-字体
+- anchor-对齐方向
 
 绘制一个滑动控件。
 
@@ -1381,7 +1386,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_picker(self,pos:tuple,height=250,fg='#1b1b1b',bg='#fbfbfb',outline='#ececec',activefg='#1b1b1b',activebg='#f6f6f6',onfg='#eaecfb',onbg='#3748d9',font=('微软雅黑',10),text=(('year',60),('season',100),),data=(('2022','2023','2024'),('spring','summer','autumn','winter')),tran='#01FF11',command=None)
+### add_picker(self,pos:tuple,height=250,fg='#1b1b1b',bg='#fbfbfb',outline='#ececec',activefg='#1b1b1b',activebg='#f6f6f6',onfg='#eaecfb',onbg='#3748d9',font=('微软雅黑',10),text=(('year',60),('season',100),),data=(('2022','2023','2024'),('spring','summer','autumn','winter')),tran='#01FF11',anchor='nw',command=None)
 
 - pos-位置
 - height-选择框高度
@@ -1396,6 +1401,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - text-文本内容，需要与 `data`对应。`((选值文本,元素宽度),...)`
 - data-选值内容，需要与 `text`对应
 - tran-透明处理规避颜色
+- anchor-对齐方向
 - command-响应接受函数。需要接受一个参数：所有选值列表，全被选定时触发
 
 绘制一个滚动选值框。

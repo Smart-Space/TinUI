@@ -8,7 +8,7 @@
 ==========5.1==========
 2024-7-
 *1. tinuixml新增padx，pady间隔参数
-*2. scalebar新样式
+2. 优化scalebar标识符元素
 ==========5.0==========
 2024-6-24
 1. 以下控件接入统一坐标对齐模式：listview, pipspager, ratingbar,

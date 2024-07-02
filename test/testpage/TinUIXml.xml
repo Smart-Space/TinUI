@@ -1,0 +1,18 @@
+<!--TinUIXml编辑-->
+<tinui>
+<line>
+    <line>
+        <title text='TinUIXml'></title>
+    </line>
+    <line>
+        <paragraph text='适用于TinUI的简易XML布局管理器.' width='580'></paragraph>
+    </line>
+    <line>
+        <paragraph text='TinUIXml类可绑定对应的TinUI或BasicTinUI控件，通过xml内容协助完成界面的快速布局。当然，这种方法有一些局限性，但是对于通过绝对坐标调整布局的多控件页面，使用TinUIXml能够更加快速的完成UI部分的开发。' width='550'></paragraph>
+    </line>
+    <line>
+        <paragraph text='此外，可以使用TinUI库test目录下的tuxmltest.py文件，通过启用十字线定位的方法，来获取某一XML布局TinUI界面的绝对坐标信息，微调或优化XML布局内容。' width='550'></paragraph>
+    </line>
+    <line><button2 text='打开tuxmltest.py' command='self.funcs["opentutest"]'></button2></line>
+</line>
+</tinui>

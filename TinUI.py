@@ -238,6 +238,47 @@ class BasicTinUI(Canvas):
         self.move(uid,dx,dy)
         return dx,dy
     
+    def show_location(self,state:bool=True,color='red',command=None):
+        #在设计时反馈鼠标所在的绝对位置
+        if state==False:
+            self.unbind('<Enter>')
+            self.unbind('<Motion>')
+            self.unbind('<Leave>')
+            return
+        self.locx=None
+        self.locy=None
+        def entercall(e):
+            bbox=self.bbox('all')
+            width=self.winfo_width()
+            height=self.winfo_height()
+            if bbox==None:
+                _width=0
+                _height=0
+            else:
+                _width=bbox[2]-bbox[0]
+                _height=bbox[3]-bbox[1]
+            if _width>width:
+                width=_width
+            if _height>height:
+                height=_height
+            self.loclx=self.create_line((0,0,width,0),width=2,dash=(5,5),fill=color)
+            self.locly=self.create_line((0,0,0,height),width=2,dash=(5,5),fill=color)
+        def motioncall(e):#鼠标在界面中滑动
+            if self.loclx!=None:
+                x=self.canvasx(e.x)
+                y=self.canvasy(e.y)
+                self.moveto(self.loclx,0,y)
+                self.moveto(self.locly,x,0)
+                if command!=None:command(x,y)
+        def leavecall(e):
+            self.delete(self.loclx)
+            self.delete(self.locly)
+            self.loclx=None
+            self.locly=None
+        self.bind('<Enter>',entercall)
+        self.bind('<Motion>',motioncall)
+        self.bind('<Leave>',leavecall)
+    
     def clean_windows(self):
         #清除浮出控件子窗口
         for i in self.windows:
@@ -328,12 +369,14 @@ class BasicTinUI(Canvas):
                 self.itemconfig(check,fill=onbg)
                 self.itemconfig(outl,fill=onfg)
                 self.itemconfig(state,state='normal')
+                stateinfo=True
             else:
                 self.itemconfig(check,fill=bg)
                 self.itemconfig(outl,fill=fg)
                 self.itemconfig(state,state='hidden')
+                stateinfo=False
             if command!=None:
-                command(event)
+                command(stateinfo)
         def flash():
             go_func(None)
         def on():
@@ -1049,8 +1092,7 @@ class BasicTinUI(Canvas):
                 move=pos[0]
             self.move(button,move-bbox[0],0)
             bbox=self.bbox(button_back)
-            # self.coords(button_fore,bbox[0]+6,pos[1]+5,bbox[0]+14,pos[1]+13)#缩小
-            self.itemconfig(button_fore,text='\uE915')
+            self.itemconfig(button_fore,text='\uE915')#小号圆点
             end=int(self.canvasx(event.x))
             if end<pos[0]:end=pos[0]
             if end>pos[0]+width:end=pos[0]+width
@@ -1093,8 +1135,6 @@ class BasicTinUI(Canvas):
         self.tag_bind(name,'<ButtonRelease-1>',checkval)
         self.addtag_withtag(name,active)#为重绘绑定tag名称
         button='scalebutton'+str(back)
-        # button_back=self.create_oval((dash[start],pos[1],dash[start]+18,pos[1]+18),width=1,fill=buttonbg,outline=buttonoutline,tags=(uid,button))
-        # button_fore=self.create_oval((dash[start]+5,pos[1]+5,dash[start]+13,pos[1]+13),width=0,fill=fg,tags=(uid,button))
         button_back=self.create_text((dash[start]+9,pos[1]+9),text='\uF127',font='{Segoe Fluent Icons} 12',fill=buttonbg,tags=(uid,button))
         button_line=self.create_text((dash[start]+9,pos[1]+9),text='\uECCA',font='{Segoe Fluent Icons} 12',fill=buttonoutline,tags=(uid,button))
         button_fore=self.create_text((dash[start]+9,pos[1]+9),text='\uE915',font='{Segoe Fluent Icons} 12',fill=fg,tags=(uid,button))
@@ -1717,8 +1757,8 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(uid,cavui)
         if scrollbar==True:
             bbox=self.bbox(uid)
-            cid1=self.add_scrollbar((bbox[2]+5,bbox[1]),canvas,bbox[3]-bbox[1],bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
             cid2=self.add_scrollbar((bbox[0],bbox[3]+5),canvas,bbox[2]-bbox[0],'x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
+            cid1=self.add_scrollbar((bbox[2]+5,bbox[1]),canvas,bbox[3]-bbox[1],bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
             self.addtag_withtag(uid,cid1)
             self.addtag_withtag(uid,cid2)
         return canvas,re_scrollregion,uid

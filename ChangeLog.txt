@@ -7,8 +7,10 @@
 
 ==========5.1==========
 2024-7-
-*1. tinuixml新增padx，pady间隔参数
+1. test\tuxmltest.py 升级为简易TinUIxml编辑器
 2. 优化scalebar标识符元素
+3. BasicTinUI新增show_location方法，用于设计时反馈坐标信息
+4. checkbutton引发响应的command接受的唯一参数为选定状态，True/False
 ==========5.0==========
 2024-6-24
 1. 以下控件接入统一坐标对齐模式：listview, pipspager, ratingbar,

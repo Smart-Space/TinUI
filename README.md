@@ -26,7 +26,7 @@ TinUI使用GPLv3（GPL）作为开源协议。
 
 非商业软件，TinUI部分代码必须开源，即使源码被修改。开源的TinUI部分代码必须采用同样的开源协议——GPL，并且注明开发者 Smart-Space（Junming Zhang），以及GitHub/TinUI的开源代码库：https://github.com/Smart-Space/TinUI/
 
-商业软件，需要添加TinUI的gpl-3.0.md的开源许可，为自身使用TinUI最初声明，并且公开TinUI部分的代码。此外，需要注明开发者Smart-Space（Junming Zhang）对TinUI的版权所有，以及GitHub/TinUI的开源代码库：https://github.com/Smart-Space/TinUI/
+商业软件，需要添加TinUI的gpl-3.0.md的开源许可，为自身使用TinUI做出声明，并且公开TinUI部分的代码。此外，需要注明开发者Smart-Space（Junming Zhang）对TinUI的版权所有，以及GitHub/TinUI的开源代码库：https://github.com/Smart-Space/TinUI/
 
 ## 简单示例
 
@@ -93,6 +93,18 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 ### clean_windows()
 
 清除浮出控件的子窗口，需要开发者手动释放子窗口。
+
+---
+
+### show_location(state=True,color='red',command=None)
+
+state::是否显示十字坐标确定线
+
+color::线条颜色
+
+command::反馈函数，应当接受两个参数，`x`, `y`
+
+启用十字定位并反馈鼠标所在位置的坐标。
 
 ---
 
@@ -197,7 +209,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - onfg::选定时文本图标颜色
 - obbg::选定时背景颜色
 - font::字体名称+大小
-- command::绑定的函数。该函数**必须要有event参数**，因为TinUI的按钮会传递点击事件的event
+- command::绑定的函数。该函数**必须要有选定状态参数，True/False，代表操作后按钮代表的状态**
 - anchor::对齐方向
 
 绘制一个复选框。这个复选框会响应鼠标的离开和进入事件，被单击时也会调用绑定的函数，并且会根据当前样式更改点击后的样式。

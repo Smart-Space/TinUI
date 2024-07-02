@@ -12,6 +12,9 @@ path=os.path.dirname(os.path.abspath(__file__))
 
 load_menubar=False
 
+def opentutest(e):
+    exec(open("tuxmltest.py",encoding='utf-8').read(),{'__file__':os.path.dirname(__file__)+r'\tuxmltest.py'})
+
 def loadcontrol(controlname):
     global load_menubar
     #导入控件说明
@@ -19,6 +22,9 @@ def loadcontrol(controlname):
     cxml=cfile.read()
     cfile.close()
     duixml.clean()
+
+    duixml.funcs["opentutest"] = opentutest
+    
     duixml.loadxml(cxml)
     if controlname=='canvas':
         canvas=duixml.tags['canvas'][0]
@@ -51,6 +57,8 @@ def loadcontrol(controlname):
     elif controlname=='waitframe':
         waitframe=duixml.tags['waitframe'][-2]
         waitframe.start()
+    elif controlname=='TinUIXml':#严格来说，这不是控件，而是TinUI框架的一部分
+        pass
 
 
 
@@ -73,9 +81,11 @@ uix.datas['controls']=['back', 'button', 'button2', 'canvas', 'checkbutton',
  'onoff', 'paragraph', 'passwordbox', 'picker', 'pipspager', 'pivot', 'progressbar', 
  'radiobox', 'radiobutton', 'ratingbar', 'scalebar', 'scrollbar', 'separate', 
  'spinbox', 'swipecontrol', 'table', 'textbox', 'title', 'togglebutton', 'tooltip', 
- 'treeview', 'ui', 'waitbar', 'waitframe']
+ 'treeview', 'ui', 'waitbar', 'waitframe','TinUIXml']
 uix.loadxml(xml)
 displayui,_,duixml,_=uix.tags['displayui']
 
 ui.pack(fill='both',expand=True)
-window.mainloop()
+
+if __name__=='__main__':
+    window.mainloop()

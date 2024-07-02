@@ -1,0 +1,11 @@
+<!--弹窗显示python代码（IDO）部分-->
+<tinui>
+<line>
+    <textbox width='500' height='500' scrollbar='True'>textbox</textbox>
+</line>
+<line anchor='w' y='530'>
+    <button text='复制' command='self.funcs["copy_pycode"]'></button>
+    <button text='标注重点' command='self.funcs["highlight"]'></button>
+    <label text='※该内容不可更改'></label>
+</line>
+</tinui>

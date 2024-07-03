@@ -186,5 +186,5 @@ p = idp.Percolator(textbox)
 d = idc.ColorDelegator()
 p.insertfilter(d)
 
-if __file__=='__main__':
+if __name__=='__main__':
     root.mainloop()

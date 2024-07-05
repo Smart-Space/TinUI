@@ -297,7 +297,7 @@ class BasicTinUI(Canvas):
         kw['anchor']=anchor
         return self.create_text(pos,text=text,fill=fg,font=font,justify=side,width=width,**kw)
 
-    def add_button(self,pos:tuple,text:str,fg='#000000',bg='#CCCCCC',line='#CCCCCC',linew='3',activefg='black',activebg='#999999',activeline='#7a7a7a',font=('微软雅黑',12),command=None,anchor='nw'):#绘制按钮
+    def add_button(self,pos:tuple,text:str,fg='#000000',bg='#CCCCCC',line='#CCCCCC',linew='3',activefg='black',activebg='#999999',activeline='#7a7a7a',font=('微软雅黑',12),minwidth=0,maxwidth=0,command=None,anchor='nw'):#绘制按钮
         def in_button(event):
             self.itemconfig(back,fill=activebg,outline=activeline)
             self.itemconfig(button,fill=activefg)
@@ -325,6 +325,21 @@ class BasicTinUI(Canvas):
         self.itemconfig(button,tags=uid)
         bbox=self.bbox(button)
         x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[2]+3,bbox[3]+3
+        #判断宽度的极限，分为最大化和最小化
+        nowwidth=x2-x1
+        if 0<maxwidth<=nowwidth:
+            self.itemconfig(button,width=maxwidth)
+            bbox=self.bbox(button)
+            x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[2]+3,bbox[3]+3
+            nowwidth=x2-x1
+        elif nowwidth<maxwidth:
+            pass
+        if 0<minwidth<=nowwidth:
+            pass
+        elif nowwidth<minwidth:
+            dx=minwidth-nowwidth
+            x2+=dx/2
+            x1-=dx/2
         back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=line,width=linew,tags=uid)
         self.tag_bind(button,'<Button-1>',on_click)
         self.tag_bind(button,'<Enter>',in_button)
@@ -2597,10 +2612,11 @@ class BasicTinUI(Canvas):
                     for uid in items[i]:
                         box.move(uid,0,height)
             box.dtag(move)
+            bbox=box.bbox(nowid)
             #click(nowid)#单级输出
             if nowid in cids:#重新显示标识元素
                 click(nowid)
-            else:
+            elif bbox!=None:
                 posi=box.bbox(nowid)[1]
                 box.moveto(line,1,posi+linew/5)
             #    box.move(line,0,height)
@@ -3547,11 +3563,11 @@ if __name__=='__main__':
     b.add_paragraph((20,290),'''     TinUI是基于tkinter画布开发的界面UI布局方案，作为tkinter拓展和TinEngine的拓展而存在。目前，TinUI已可应用于项目。''',
     angle=-18)
     b.add_paragraph((20,100),'下面的段落是测试画布的非平行字体显示效果，也是TinUI的简单介绍')
-    b.add_button((250,450),'测试按钮',activefg='white',activebg='red',command=test,anchor='center')
+    b.add_button((250,450),'测试按钮',activefg='white',activebg='red',command=test,anchor='center',maxwidth=100)
     b.add_checkbutton((60,430),'允许TinUI测试',command=test1,anchor='w')
     b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
     b.add_entry((250,330),350,'这里用来输入',command=print,anchor='w')
-    b.add_button((20,170),'创建分割线',command=lambda event:b.add_separate((20,200),600))
+    b.add_button((20,170),'创建分割线',command=lambda event:b.add_separate((20,200),600),minwidth=200)
     b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
     b.add_link((400,500),'TinGroup知识库','https://tinhome.bk-free02.com',anchor='nw')
     b.add_link((400,530),'执行print函数',print)

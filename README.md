@@ -1113,7 +1113,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_button2(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),command=None,anchor='nw')
+### add_button2(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),minwidth=0,maxwidth=0,command=None,anchor='nw')
 
 - pos::位置
 - text::标题文字
@@ -1125,6 +1125,8 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - activebg::响应鼠标的按钮颜色
 - activeline::响应鼠标的边框颜色
 - font::字体名称+大小
+- minwidth::最小宽度，为0忽略
+- maxwidth::最大宽度，为0忽略
 - command::绑定的函数。该函数**必须要有event参数**，因为TinUI的按钮会传递点击事件的event
 - anchor::对齐方向
 

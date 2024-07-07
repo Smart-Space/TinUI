@@ -2371,7 +2371,7 @@ class BasicTinUI(Canvas):
         sel_it(0,texts[0][2],texts[0][1])
         return texts,uid
 
-    def add_button2(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),command=None,anchor='nw'):#绘制圆角按钮
+    def add_button2(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),minwidth=0,maxwidth=0,command=None,anchor='nw'):#绘制圆角按钮
         def in_button(event):
             self.itemconfig(outline,outline=activeline,fill=activeline)
             self.itemconfig(button,fill=activefg)
@@ -2402,6 +2402,21 @@ class BasicTinUI(Canvas):
         self.itemconfig(button,tags=uid)
         x1,y1,x2,y2=self.bbox(button)
         linew-=1
+         #判断宽度的极限，分为最大化和最小化
+        nowwidth=x2-x1
+        if 0<maxwidth<=nowwidth:
+            self.itemconfig(button,width=maxwidth)
+            bbox=self.bbox(button)
+            x1,y1,x2,y2=bbox[0],bbox[1],bbox[2],bbox[3]
+            nowwidth=x2-x1
+        elif nowwidth<maxwidth:
+            pass
+        if 0<minwidth<=nowwidth:
+            pass
+        elif nowwidth<minwidth:
+            dx=minwidth-nowwidth
+            x2+=dx/2
+            x1-=dx/2
         outline_t=(x1-linew,y1-linew,x2+linew,y1-linew,x2+linew,y2+linew,x1-linew,y2+linew)
         outline=self.create_polygon(outline_t,width=9,tags=uid,fill=line,outline=line)
         back_t=(x1,y1,x2,y1,x2,y2,x1,y2)
@@ -3629,7 +3644,7 @@ if __name__=='__main__':
     b.add_notecard((1200,50))
     pivott=b.create_text((1200,400),text='pivot text',anchor='nw',font='微软雅黑 12')
     b.add_pivot((1200,300),command=test10)
-    b.add_button2((1200,180),text='圆角按钮')
+    b.add_button2((1200,180),text='圆角按钮',minwidth=200)
     exux=b.add_expander((1200,500))[2]
     exux.loadxml('''<tinui><line>
     <button2 text='拓展UI框架的按钮'></button2></line>

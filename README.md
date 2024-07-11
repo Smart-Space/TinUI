@@ -841,7 +841,8 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - scrollcolor::滚动条颜色
 - scrollon::滚动条响应颜色
 - anchor::对齐方式
-- command::回调函数，必须接受一个选项文本参数，这个参数是data中的一个值
+- command::回调函数，必须接受一个选项参数 `result`
+  - 这个参数来自data，使用 `result.index`获取该选项当前的位置，仅对触发时准确
 
 绘制一个列表框。
 

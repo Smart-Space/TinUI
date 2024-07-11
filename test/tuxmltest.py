@@ -47,6 +47,7 @@ def inxml(e):#注入xml界面
     duixml.clean()
     duixml.loadxml(xml)
     rescroll()
+    reset_marks()
 
 def write(text):
     textbox.insert('end',text)
@@ -107,6 +108,41 @@ def highlight(e):#标注funcs,datas等重点
         write(f'#  {tag}\n')
     textbox.configure(state='disabled')
 
+now_mark=None#mark_index
+def open_markw(e):
+    markw.deiconify()
+def del_mark(e):#删除选定标记点
+    global now_mark
+    if now_mark==None:
+        return
+    listbox.delete(now_mark)
+    displayui.delete(mark_points[now_mark][1])
+    del mark_points[now_mark]
+    now_mark=None
+def sel_mark(name):#选定标记点
+    global now_mark
+    if name.index==0:
+        now_mark=None
+    else:
+        if now_mark!=None:
+            displayui.itemconfigure(mark_points[now_mark][1],outline='black',fill="black")
+        now_mark=name.index
+        displayui.itemconfigure(mark_points[now_mark][1],outline='red',fill='red')
+def __set_mark(x,y):
+    mark=displayui.create_oval((x,y,x+3,y+3),outline='black',fill="black")
+    mark_points.append(((x,y),mark))
+    listbox.add(f'({x} , {y})')
+def set_mark(e):#绘制标记点
+    __set_mark(e.x,e.y)
+def reset_marks():#重新绘制标记点
+    if len(mark_points)==0:
+        return
+    index=1
+    for i in mark_points[1:]:
+        mark=displayui.create_oval((i[0][0],i[0][1],i[0][0]+3,i[0][1]+3),outline='black',fill="black")
+        mark_points[index]=(i[0],mark)
+        index+=1
+
 
 root=Tk()
 root.geometry('1300x700+5+5')
@@ -135,10 +171,8 @@ initial_xml='''<!--TinUIXml编辑-->
 text=ScrolledText(root,font='微软雅黑 13')
 text.place(x=0,y=0,width=400,height=700)
 text.insert(1.0,initial_xml)
-tinui=TinUI(root,update=False,bg='#f3f3f3')
+tinui=BasicTinUI(root,bg='#f3f3f3')
 tinui.place(x=401,y=0,width=899,height=700)
-tinui.vbar.pack_forget()
-tinui.hbar.pack_forget()
 x=TinUIXml(tinui)
 x.environment(globals())
 
@@ -185,6 +219,27 @@ idc.color_config(textbox)
 p = idp.Percolator(textbox)
 d = idc.ColorDelegator()
 p.insertfilter(d)
+
+
+#标记点管理页面
+markw = Toplevel(root)
+markw.title("标记点管理")
+markw.geometry("400x600")
+markw.resizable(width=False, height=False)  # 禁止改变窗口大小
+markw.protocol("WM_DELETE_WINDOW", lambda: markw.withdraw())  # 忽略关闭窗口的协议
+markui=BasicTinUI(markw)
+markui.pack(fill='both',expand=True)
+markw.withdraw()
+markuix=TinUIXml(markui)
+
+xmlf=open(os.path.dirname(__file__)+r'\xmltestpage\marks.xml','r',encoding='utf-8')
+xml=xmlf.read()
+xmlf.close()
+markuix.environment(globals())
+markuix.loadxml(xml)
+listbox=markuix.tags['listbox'][-2]
+mark_points=[((None,None),None)]#与listbox内列表同步更新，[((x,y), point_uid), ...]
+displayui.bind('<Button-3>',set_mark)
 
 if __name__=='__main__':
     root.mainloop()

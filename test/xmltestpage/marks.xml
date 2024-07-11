@@ -1,0 +1,10 @@
+<!--标记点控制窗口-->
+<tinui>
+<line y='14' anchor='w'>
+    <paragraph text='鼠标右键单击确立标记点'></paragraph>
+    <button2 text='删除标记点' command='self.funcs["del_mark"]'></button2>
+</line>
+<line>
+    <listbox data='("TinUIXml编辑器标记点",)' width="365" height="535" command='self.funcs["sel_mark"]'>listbox</listbox>
+</line>
+</tinui>

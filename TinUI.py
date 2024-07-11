@@ -48,6 +48,12 @@ class TinUIString(str):#TinUI字符串类
         str.__init__(self)
         self.text=string
 
+class TinUINum(int):#TinUI数字类
+
+    def __init__(self,integer:Union[int|float]=0):
+        int.__init__(self)
+        self.num=integer
+
 
 class TinUITheme:
     '''
@@ -1644,7 +1650,11 @@ class BasicTinUI(Canvas):
                 choices[i][-1]=False
                 out_mouse(i)
             if command!=None:
-                command(choices[t][0])
+                name=choices[t][0]
+                index=all_keys.index(t)
+                result=TinUIString(name)
+                result.index=index
+                command(result)
         def _add(item:str='new item'):#添加元素
             load_data({item})
             #return choices
@@ -1674,11 +1684,11 @@ class BasicTinUI(Canvas):
         def load_data(datas):#导入元素
             nonlocal maxwidth
             for i in datas:
-                end=box.bbox('all')
+                end=box.bbox('item')
                 end=5 if end==None else end[-1]
-                text=box.create_text((5,end+7),text=i,fill=fg,font=font,anchor='nw',tags=('textcid'))
+                text=box.create_text((5,end+7),text=i,fill=fg,font=font,anchor='nw',tags=('textcid','item'))
                 bbox=box.bbox(text)#获取文本宽度
-                back=box.create_rectangle((3,bbox[1]-4,bbox[2]+2,bbox[3]+4),width=0,fill=bg)
+                back=box.create_rectangle((3,bbox[1]-4,bbox[2]+2,bbox[3]+4),width=0,fill=bg,tags=('item'))
                 box.tkraise(text)
                 choices[text]=[i,text,back,False]#用文本id代表键，避免选项文本重复带来的逻辑错误
                 all_keys.append(text)

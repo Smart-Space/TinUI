@@ -168,8 +168,9 @@ initial_xml='''<!--TinUIXml编辑-->
     </line>
 </line>
 </tinui>'''
-text=ScrolledText(root,font='微软雅黑 13')
-text.place(x=0,y=0,width=400,height=700)
+textui=BasicTinUI(root)
+textui.place(x=0,y=0,width=400,height=700)
+text=textui.add_textbox((0,0),382,700,font='微软雅黑 13',scrollbar=True)[0]
 text.insert(1.0,initial_xml)
 tinui=BasicTinUI(root,bg='#f3f3f3')
 tinui.place(x=401,y=0,width=899,height=700)

@@ -13,6 +13,12 @@ def error(*e):
 def disable(*e):
     func.disable()
 
+def active(*e):
+    func.active()
+
+def insert(*e):
+    func.insert(text='insert text')
+
 
 a=win()
 u=a.u
@@ -22,5 +28,8 @@ u.add_button((250,5),'恢复输入框',command=renormal)
 u.add_button((350,5),'显示错误样式',command=error)
 entry,func,_=u.add_entry((180,50),anchor='n',width=300)
 p=u.add_paragraph((5,100),text='输入内容：')
+
+u.add_button((10,200),'用active恢复',command=active)
+u.add_button((10,250),'插入文本',command=insert)
 
 a.go()

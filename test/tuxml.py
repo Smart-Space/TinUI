@@ -9,14 +9,14 @@ def get1(event):
 
 xml='''
 <tinui>
-<line x='5' y='44' anchor='w'>
+<line x='5' y='44' anchor='w' pady='20'>
     <button text="获取输入值" font='宋体 16' command='self.funcs["get1"]'></button>
     <entry width='200'>en</entry>
-    <line anchor='nw'>
+    <line anchor='nw' padx='20'>
         <button text="获取输入值" font='宋体 16' command='self.funcs["get1"]'></button>
         <entry width='200'>en</entry>
     </line>
-    <line anchor='nw'>
+    <line anchor='nw' y='120'>
         <button text="获取输入值" font='宋体 16' command='self.funcs["get1"]'></button>
         <entry width='200'>en</entry>
     </line>

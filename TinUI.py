@@ -462,6 +462,10 @@ class BasicTinUI(Canvas):
         #---
         def get_entry():#获取文本
             return entry.get()
+        def __delete():#删除文本
+            entry.delete(0,'end')
+        def __insert(index=0,text=''):#插入文本
+            entry.insert(index,text)
         def __error(errorline='#c42b1c'):#错误样式
             self.itemconfig(back,outline=errorline,fill=errorline)
         def __normal():#正常样式
@@ -498,10 +502,13 @@ class BasicTinUI(Canvas):
         self.tkraise(funcw)
         self.__auto_anchor(uid,pos,anchor)
         if_empty(None)
-        funcs=FuncList(4)
+        funcs=FuncList(7)
         funcs.get=get_entry
+        funcs.insert=__insert
+        funcs.delete=__delete
         funcs.error=__error
         funcs.normal=__normal
+        funcs.active=__normal
         funcs.disable=__disable
         return entry,funcs,uid
 
@@ -3200,7 +3207,7 @@ class BasicTinUI(Canvas):
         self.__auto_anchor(uid,pos,anchor)
         return picker,bar,texts,pickerbars,uid
     
-    def add_menubutton(self,pos:tuple,text:str,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),cont=(('command',print),'-'),tran='#01FF11',anchor='nw'):#绘制按钮展开菜单
+    def add_menubutton(self,pos:tuple,text:str,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),cont=(('command',print),'-'),widget=True,tran='#01FF11',anchor='nw'):#绘制按钮展开菜单
         #Segoe Fluent Icons x右侧展开\uE76B \uE76C，y下方展开\uE70D \uE70E，默认y
         def in_button(event):
             self.itemconfig(outline,outline=activeline,fill=activeline)
@@ -3262,9 +3269,11 @@ class BasicTinUI(Canvas):
         self.itemconfig(button,tags=(uid,uid+'button'))
         x1,y1,x2,y2=self.bbox(uid)
         if side=='y':
-            self.create_text((x2+5,(y1+y2)/2),text='\uE70D',fill=fg,font='{Segoe Fluent Icons} 12',anchor='w',tags=(uid,uid+'button'))
+            self.create_text((x2+5,(y1+y2)/2),text='\uE70D',fill=fg,font='{Segoe Fluent Icons} 12',anchor='w',tags=(uid,uid+'button',uid+'widget'))
         elif side=='x':
-            self.create_text((x2+5,(y1+y2)/2),text='\uE76C',fill=fg,font='{Segoe Fluent Icons} 12',anchor='w',tags=(uid,uid+'button'))
+            self.create_text((x2+5,(y1+y2)/2),text='\uE76C',fill=fg,font='{Segoe Fluent Icons} 12',anchor='w',tags=(uid,uid+'button',uid+'widget'))
+        if not widget:#如果被指定不显示标识符
+            self.delete(uid+'widget')
         x1,y1,x2,y2=self.bbox(uid+'button')
         linew-=1
         outline_t=(x1-linew,y1-linew,x2+linew,y1-linew,x2+linew,y2+linew,x1-linew,y2+linew)
@@ -3411,10 +3420,18 @@ class TinUIXml():#TinUI的xml渲染方式
             uid=name[-1]
         return uid
 
-    def __load_line(self,line,x=5,y=5,anchor='nw'):#根据xml的<line>逐行渲染TinUI组件
+    def __load_line(self,line,x=5,y=5,padx=5,pady=5,anchor='nw'):#根据xml的<line>逐行渲染TinUI组件
         lineatt=line.attrib
         last_y=y
         linex=None#纵块中的最大宽度
+        if 'padx' in lineatt.keys():
+            padx=int(lineatt['padx'])
+        else:
+            pass
+        if 'pady' in lineatt.keys():
+            pady=int(lineatt['pady'])
+        else:
+            pass
         if 'x' in lineatt.keys():
             xendx=int(line.get('x'))
         else:
@@ -3433,13 +3450,13 @@ class TinUIXml():#TinUI的xml渲染方式
         for i in line.iterfind('*'):#只检索直接子元素
             if i.tag=='line':
                 #linex=0
-                liney,newlinex=self.__load_line(i,xendx,xendy,allanchor)
-                if liney>self.yendy-5:#在同一位置判断纵向大小
+                liney,newlinex=self.__load_line(i,xendx,xendy,padx,pady,allanchor)
+                if liney>self.yendy-pady:#在同一位置判断纵向大小
                     last_y=xendy=liney
                 if linex==None:#判断是否是该纵块的第一个<line>
                     linex=0
-                if newlinex>linex-5:
-                    linex=newlinex+5
+                if newlinex>linex-padx:
+                    linex=newlinex+padx
                 continue
             elif i.tag in self.noload:#不渲染的组件
                 continue
@@ -3476,9 +3493,9 @@ class TinUIXml():#TinUI的xml渲染方式
             else:
                 bboxtag=tagall[-1]
             bbox=self.ui.bbox(bboxtag)
-            xendx=bbox[2]+10
-            if bbox[3]>last_y-5:#比较当前最低y坐标
-                last_y=bbox[3]+5#获取下一行最高y坐标
+            xendx=bbox[2]+padx#获取当前最大x坐标
+            if bbox[3]>last_y-pady:#比较当前最低y坐标
+                last_y=bbox[3]+pady#获取下一行最高y坐标
             #为内部组件命名
             if i.text!=None:
                 self.tags[i.text]=tagall
@@ -3697,7 +3714,7 @@ if __name__=='__main__':
     b.add_swipecontrol((320,1300),'swipe control')
     b.add_passwordbox((250,1400),350)
     b.add_picker((1400,230),command=print)
-    #b.add_menubutton((1500,50),'menubutton',cont=(('command',print),('menu',(('cmd1',print),('cmd2',test1))),'-',('TinUI文本移动',test)))
+    # b.add_menubutton((1500,50),'menubutton',widget=False,cont=(('command',print),('menu',(('cmd1',print),('cmd2',test1))),'-',('TinUI文本移动',test)))
     b.add_menubutton((1500,50),'menubutton',cont=(('command',print),('menu',test1),'-',('TinUI文本移动',test)))
 
     uevent=TinUIEvent(b)

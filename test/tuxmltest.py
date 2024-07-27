@@ -12,6 +12,7 @@ from window import *
 from tkinter import Tk,Toplevel
 from tkinter.ttk import Button
 from tkinter.scrolledtext import ScrolledText
+from tkinter.simpledialog import askinteger
 import re
 import idlelib.colorizer as idc
 import idlelib.percolator as idp
@@ -119,6 +120,14 @@ def del_mark(e):#删除选定标记点
     displayui.delete(mark_points[now_mark][1])
     del mark_points[now_mark]
     now_mark=None
+def add_mark(e):#手动添加标记点
+    x=askinteger('手动添加标记点','横坐标：',parent=markw)
+    if x==None:
+        return
+    y=askinteger('手动添加标记点','纵坐标：',parent=markw)
+    if y==None:
+        return
+    __set_mark(x,y)
 def sel_mark(name):#选定标记点
     global now_mark
     if name.index==0:
@@ -128,6 +137,7 @@ def sel_mark(name):#选定标记点
             displayui.itemconfigure(mark_points[now_mark][1],outline='black',fill="black")
         now_mark=name.index
         displayui.itemconfigure(mark_points[now_mark][1],outline='red',fill='red')
+
 def __set_mark(x,y):
     mark=displayui.create_oval((x,y,x+3,y+3),outline='black',fill="black")
     mark_points.append(((x,y),mark))
@@ -188,7 +198,7 @@ tinui.itemconfig(loctext,state='hidden')
 tinui.bind('<Enter>',lambda e:tinui.focus())
 
 
-#弹窗窗口
+#Python代码弹窗窗口
 pycodew=Toplevel()
 pycodew.title("Python代码")
 # 设置窗口大小
@@ -222,6 +232,7 @@ d = idc.ColorDelegator()
 p.insertfilter(d)
 
 
+#==========
 #标记点管理页面
 markw = Toplevel(root)
 markw.title("标记点管理")

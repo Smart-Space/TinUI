@@ -235,6 +235,12 @@ class TinUILight(TinUITheme):
                 fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',
                 activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',
                 *arg,**kw)
+    
+    def add_barbutton(self,pos,*arg,**kw):
+        return self.ui.add_barbutton(pos,
+                fg='#636363',bg='#f3f3f3',line='#f3f3f3',
+                activefg='#191919',activebg='#eaeaea',activeline='#eaeaea',sepcolor='#e5e5e5',
+                *arg,**kw)
 
 
 def end():
@@ -356,6 +362,8 @@ du.add_swipecontrol(end(),text='SwipeControl')
 du.add_picker(end())
 #dropdownbutton
 du.add_menubutton(end(),text='menubutton')
+#appbarbutton
+du.add_barbutton(end())
 
 u.add_back(end())
 r.r.title('TinUI light theme')

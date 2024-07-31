@@ -26,7 +26,7 @@ TinUI使用GPLv3（GPL）作为开源协议。
 
 非商业软件，TinUI部分代码必须开源，即使源码被修改。开源的TinUI部分代码必须采用同样的开源协议——GPL，并且注明开发者 Smart-Space（Junming Zhang），以及GitHub/TinUI的开源代码库：https://github.com/Smart-Space/TinUI/
 
-商业软件，需要添加TinUI的gpl-3.0.md的开源许可，为自身使用TinUI最初声明，并且公开TinUI部分的代码。此外，需要注明开发者Smart-Space（Junming Zhang）对TinUI的版权所有，以及GitHub/TinUI的开源代码库：https://github.com/Smart-Space/TinUI/
+商业软件，需要添加TinUI的gpl-3.0.md的开源许可，为自身使用TinUI做出声明，并且公开TinUI部分的代码。此外，需要注明开发者Smart-Space（Junming Zhang）对TinUI的版权所有，以及GitHub/TinUI的开源代码库：https://github.com/Smart-Space/TinUI/
 
 ## 简单示例
 
@@ -96,6 +96,18 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
+### show_location(state=True,color='red',command=None)
+
+state::是否显示十字坐标确定线
+
+color::线条颜色
+
+command::反馈函数，应当接受两个参数，`x`, `y`
+
+启用十字定位并反馈鼠标所在位置的坐标。
+
+---
+
 ### add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,anchor='nw',**kw)
 
 - pos::位置
@@ -131,7 +143,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_button(self,pos:tuple,text:str,fg='black',bg='#CCCCCC',line='#CCCCCC',linew=3,activefg='black',activebg='#999999',activeline='#7a7a7a',font=('微软雅黑',12),command=None,anchor='nw')
+### add_button(self,pos:tuple,text:str,fg='black',bg='#CCCCCC',line='#CCCCCC',linew=3,activefg='black',activebg='#999999',activeline='#7a7a7a',font=('微软雅黑',12),minwidth=0,maxwidth=0,command=None,anchor='nw')
 
 - pos::位置
 - text::标题文字
@@ -143,6 +155,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - activebg::响应鼠标的按钮颜色
 - activeline::响应鼠标的边框颜色
 - font::字体名称+大小
+- minwidth::最小宽度，为0忽略
+- maxwidth::最大宽度，为0忽略
 - command::绑定的函数。该函数**必须要有event参数**，因为TinUI的按钮会传递点击事件的event
 - anchor::对齐方向
 
@@ -197,7 +211,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - onfg::选定时文本图标颜色
 - obbg::选定时背景颜色
 - font::字体名称+大小
-- command::绑定的函数。该函数**必须要有event参数**，因为TinUI的按钮会传递点击事件的event
+- command::绑定的函数。该函数**必须要有选定状态参数，True/False，代表操作后按钮代表的状态**
 - anchor::对齐方向
 
 绘制一个复选框。这个复选框会响应鼠标的离开和进入事件，被单击时也会调用绑定的函数，并且会根据当前样式更改点击后的样式。
@@ -258,6 +272,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 >> `funcs.error(errorline='#c42b1c')`::显示错误样式
 >>
 >> `funcs.normal()`::回复正常样式
+>>
 >>
 >> `funcs.disable()`::禁用输入框
 >>
@@ -827,7 +842,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - scrollcolor::滚动条颜色
 - scrollon::滚动条响应颜色
 - anchor::对齐方式
-- command::回调函数，必须接受一个选项文本参数，这个参数是data中的一个值
+- command::回调函数，必须接受一个选项参数 `result`
+  - 这个参数来自data，使用 `result.index`获取该选项当前的位置，仅对触发时准确
 
 绘制一个列表框。
 
@@ -1099,7 +1115,7 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 
 ---
 
-### add_button2(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),command=None,anchor='nw')
+### add_button2(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),minwidth=0,maxwidth=0,command=None,anchor='nw')
 
 - pos::位置
 - text::标题文字
@@ -1111,6 +1127,8 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 - activebg::响应鼠标的按钮颜色
 - activeline::响应鼠标的边框颜色
 - font::字体名称+大小
+- minwidth::最小宽度，为0忽略
+- maxwidth::最大宽度，为0忽略
 - command::绑定的函数。该函数**必须要有event参数**，因为TinUI的按钮会传递点击事件的event
 - anchor::对齐方向
 

@@ -85,9 +85,9 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 ## 基础函数
 
 > - ==一般地==，会将每个函数的名称以及定义、参数内容、函数绘制说明列出来。
->
+> 
 > 所有函数均会返回主要画布对象。`TinUI.add_...(...)`。
->
+> 
 > - 除了 `title`, `paragraph`, `separate`, `menubar`, `labelframe`, `tooltip`, `back`等组件，其余组件的最后一个返回值均为整个组件的画布 `tag_name`，返回值变量为 `uid`。
 
 ### clean_windows()
@@ -165,17 +165,16 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: button_text, button_back, funcs, uid
 
 > button_text::按钮文本
->
+> 
 > button_back::按钮背景
->
+> 
 > funcs
->
->> `funcs[0]|funcs.change_command(new_func)`::为按钮绑定新函数
->>
->> `funcs[1]|funcs.disable(fg='#7a7a7a',bg='#cccccc')`::禁用按钮
->>
->> `funcs[2]|funcs.active()`::激活按钮
->>
+> 
+> > `funcs[0]|funcs.change_command(new_func)`::为按钮绑定新函数
+> > 
+> > `funcs[1]|funcs.disable(fg='#7a7a7a',bg='#cccccc')`::禁用按钮
+> > 
+> > `funcs[2]|funcs.active()`::激活按钮
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E6%8C%89%E9%92%AE.gif)
 
@@ -219,21 +218,20 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: check_text, check_mark, funcs, uid
 
 > check_text::复选框文本
->
+> 
 > check_mark::复选框矩形标记部件，除边框
->
+> 
 > funcs
->
->> `funcs[0]|funcs.flash()`::切换复选框状态
->>
->> `funcs[1]|funcs.on()`::选定
->>
->> `funcs[2]|funcs.off()`::取消选定
->>
->> `funcs[3]|funcs.disable()`::禁用
->>
->> `funcs[4]|funcs.active()`::激活
->>
+> 
+> > `funcs[0]|funcs.flash()`::切换复选框状态
+> > 
+> > `funcs[1]|funcs.on()`::选定
+> > 
+> > `funcs[2]|funcs.off()`::取消选定
+> > 
+> > `funcs[3]|funcs.disable()`::禁用
+> > 
+> > `funcs[4]|funcs.active()`::激活
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI复选框.gif)
 
@@ -264,18 +262,16 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: entry, funcs, uid
 
 > entry::输入框类（控件）
->
+> 
 > funcs
->
->> `funcs.get()`::获取输入内容
->>
->> `funcs.error(errorline='#c42b1c')`::显示错误样式
->>
->> `funcs.normal()`::回复正常样式
->>
->>
->> `funcs.disable()`::禁用输入框
->>
+> 
+> > `funcs.get()`::获取输入内容
+> > 
+> > `funcs.error(errorline='#c42b1c')`::显示错误样式
+> > 
+> > `funcs.normal()`::回复正常样式
+> > 
+> > `funcs.disable()`::禁用输入框
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI输入框.gif)
 
@@ -316,19 +312,18 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: text, choices_text_list, choices_back, funcs, uid
 
 > text::文本提示画布对象
->
+> 
 > choices_text_list::可选框的文本画布对象
->
+> 
 > choices_back::可选框的背景方框画布对象
->
+> 
 > funcs
->
->> `funcs[0]|funcs.select(num)`::选定一个选项
->>
->> `funcs[1]|funcs.disable()`::禁用
->>
->> `funcs[2]|funcs.active()`::激活
->>
+> 
+> > `funcs[0]|funcs.select(num)`::选定一个选项
+> > 
+> > `funcs[1]|funcs.disable()`::禁用
+> > 
+> > `funcs[2]|funcs.active()`::激活
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI单选框.gif)
 
@@ -353,13 +348,12 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/%E8%B6%85%E9%93%BE%E6%8E%A5.gif)
 
 > link::链接文本
->
+> 
 > funcs
->
->> `funcs[0]|funcs.disable(fg='#b0b0b0')`::禁用链接
->>
->> `funcs[1]|funcs.active()`::恢复链接
->>
+> 
+> > `funcs[0]|funcs.disable(fg='#b0b0b0')`::禁用链接
+> > 
+> > `funcs[1]|funcs.active()`::恢复链接
 
 ---
 
@@ -379,7 +373,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: waitbar1, ok, uid
 
 > waitbar1::该画布对象
->
+> 
 > ok::停止等待动画的函数。当你完成你需要等待的任务后，你可以调用此函数，停止等待动画
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E7%AD%89%E5%BE%851.gif)
@@ -399,9 +393,9 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: label, back, outline, uid
 
 > label::标题文本
->
+> 
 > back::背景元素
->
+> 
 > outline::边框元素
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E6%A0%87%E9%A2%98%E8%BE%B9%E6%A1%86.gif)
@@ -422,9 +416,9 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: back, balls:list, stop, uid
 
 > back::背景矩形画布对象
->
+> 
 > balls::五个圆形画布对象的列表
->
+> 
 > stop::停止等待动画的函数。当你完成你需要等待的任务后，你可以调用此函数，停止等待动画
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E7%AD%89%E5%BE%852.gif)
@@ -455,19 +449,18 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: main, back, bar, funcs, uid
 
 > main::显示框文字
->
+> 
 > back::显示框背景
->
+> 
 > bar::载有选项listview控件的BasicTinUI
->
+> 
 > funcs
->
->> `funcs[0]|funcs.select(num)`::选定选值，第一个值是0
->>
->> `funcs[1]|funcs.disable()`::禁用
->>
->> `funcs[2]|funcs.active()`::激活
->>
+> 
+> > `funcs[0]|funcs.select(num)`::选定选值，第一个值是0
+> > 
+> > `funcs[1]|funcs.disable()`::禁用
+> > 
+> > `funcs[2]|funcs.active()`::激活
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI%E7%BB%84%E5%90%88%E6%A1%86.gif)
 
@@ -492,21 +485,20 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: back, pro_tagname, text, goto, funcs, uid
 
 > back::背景矩形边框
->
+> 
 > pro_tagname::进度框矩形所代表的tag名称
->
+> 
 > text::进度条文本
->
+> 
 > goto::改变进度：goto(num:int)，其中，num∈[0,100]。这将改变组件进度指示
->
+> 
 > funcs
->
->> `funcs[0]|funcs.now_running()`::恢复常规样式
->>
->> `funcs[1]|funcs.now_paused(fg='#868686',bg='#9d5d00',fontc='#cdcdcd')`::改为暂停样式
->>
->> `funcs[2]|funcs.now_error(fg='#868686',bg='#c42b1c',fontc='#cdcdcd')`::改为因错误暂停样式
->>
+> 
+> > `funcs[0]|funcs.now_running()`::恢复常规样式
+> > 
+> > `funcs[1]|funcs.now_paused(fg='#868686',bg='#9d5d00',fontc='#cdcdcd')`::改为暂停样式
+> > 
+> > `funcs[2]|funcs.now_error(fg='#868686',bg='#c42b1c',fontc='#cdcdcd')`::改为因错误暂停样式
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI进度条.gif)
 
@@ -550,21 +542,20 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: state, back, outline, funcs, uid
 
 > state::开关标识符
->
+> 
 > back::背景
->
+> 
 > outline::边框，与背景为同一个类型，比背景尺寸稍大
->
+> 
 > funcs
->
->> `funcs.on`::开启
->>
->> `funcs.off`::关闭
->>
->> `funcs.active`::启用
->>
->> `fucns.disable(dfg='#f0f0f0',dbg='#bfbfbf')`::禁用
->>
+> 
+> > `funcs.on`::开启
+> > 
+> > `funcs.off`::关闭
+> > 
+> > `funcs.active`::启用
+> > 
+> > `fucns.disable(dfg='#f0f0f0',dbg='#bfbfbf')`::禁用
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI开关.gif)
 
@@ -585,7 +576,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - command::选值时响应的函数，必须接受一个参数，这个参数是当前选定的值
 
 > `command`返回值为 `string:TinUIString`，`string`为值本身，来自于 `data`。
->
+> 
 > `string.num`为值在 `data`中的索引，从 `0`开始。
 
 绘制一个选值框。
@@ -593,13 +584,13 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: wentry, button1, button2, back, outline, uid
 
 > wentry::输入框组件
->
+> 
 > button1::上调按钮
->
+> 
 > button2::下调按钮
->
+> 
 > back::背景元素
->
+> 
 > outline::边框元素
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI选值框.gif)
@@ -624,19 +615,18 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: name, back, button, funcs, uid
 
 > name::选值覆盖区域的tag名称
->
+> 
 > back::选值未覆盖区域的画布对象
->
+> 
 > button::选值滑动按钮
->
+> 
 > funcs
->
->> `funcs[0]|funcs.select(num)`::选定选值，第一个值是0
->>
->> `funcs[1]|funcs.disable()`::禁用
->>
->> `funcs[2]|funcs._active()`::激活
->>
+> 
+> > `funcs[0]|funcs.select(num)`::选定选值，第一个值是0
+> > 
+> > `funcs[1]|funcs.disable()`::禁用
+> > 
+> > `funcs[2]|funcs._active()`::激活
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI调节框.gif)
 
@@ -660,7 +650,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: text, back, uid
 
 > text::标识符文本
->
+> 
 > back::标识符背景边框
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI气泡提示.gif)
@@ -681,7 +671,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - tran::透明色
 
 > cont的格式如下：
->
+> 
 > ```
 > (('名称',绑定的函数（接受event参数）),#常规格式
 > '-',#分割线
@@ -694,9 +684,9 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: menu, bar, funcs
 
 > menu::菜单窗口（Toplevel）
->
+> 
 > bar::菜单窗口中的TinUI
->
+> 
 > funcs::所有菜单按钮的函数集，每一个元素为每一个TinUI按钮的函数集
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI菜单.gif)
@@ -755,9 +745,9 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: back, bar, stop, uid
 
 > back::背景框
->
+> 
 > bar::动画块
->
+> 
 > stop::停止等待动画的函数。当你完成你需要等待的任务后，你可以调用此函数，停止等待动画
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI等待3.gif)
@@ -787,15 +777,14 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: textbox, funcs, uid
 
 > textbox::Text控件
->
+> 
 > funcs
->
->> `funcs.get(start='1.0',end='end')`::获取输入
->>
->> `funcs.delete(start='1.0',end='end')`::删除内容
->>
->> `funcs.config(**kw)`::设置Text属性
->>
+> 
+> > `funcs.get(start='1.0',end='end')`::获取输入
+> > 
+> > `funcs.delete(start='1.0',end='end')`::删除内容
+> > 
+> > `funcs.config(**kw)`::设置Text属性
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI文本框.gif)
 
@@ -816,11 +805,11 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: top, bottom, back, sc, uid
 
 > top::上（左）标识
->
+> 
 > bottom::下（右）标识
->
+> 
 > back::背景
->
+> 
 > sc::滚动块
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI滚动条.gif)
@@ -850,13 +839,12 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: box, funcs, uid
 
 > box::绘制列表框功能区的BasicTinUI
->
+> 
 > funcs
->
->> `funcs.add(text:str)`::在尾部添加新选项
->>
->> `funcs.delete(index:int)`::删除指定序数的元素，第一个元素序号为0
->>
+> 
+> > `funcs.add(text:str)`::在尾部添加新选项
+> > 
+> > `funcs.delete(index:int)`::删除指定序数的元素，第一个元素序号为0
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI列表框.gif)
 
@@ -881,7 +869,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: canvas, re_scrollregion, uid
 
 > canvas::画布组件
->
+> 
 > re_scrollregion::刷新滚动范围，标记为“all”
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI画布.gif)
@@ -906,9 +894,9 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: ui, re_scrollregion, ui_xml, uid
 
 > ui::BasicTinUI类
->
+> 
 > re_scrollregion::刷新滚动范围，如果 `region`参数为“auto”可忽略
->
+> 
 > ui_xml::该BasicTinUI类的TinUIXml绑定
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI内置ui.gif)
@@ -932,9 +920,9 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: uilist, dotlist, move_to, uid
 
 > uilist::视图列表结构。`[(id-1,tinui-1,tinuixml-1),...]`
->
+> 
 > dotlist::导航栏列表结构。`[dot_id-1,...]`
->
+> 
 > move_to::需要一个数字参数num，转到第num个视图，第一个视图num为0
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI横向翻页视图.gif)
@@ -962,59 +950,58 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: tbu, scro, back, notebook, uid
 
 > tbu::标签栏BasicTinUI
->
+> 
 > scro::滚动条TinUI返回值
->
+> 
 > back::背景元素
->
+> 
 > notebook::TinUINum函数结构体
->
->> notebook.addpage(title,flag=None,scrollbar=False,cancancel=True)->flag
->>
->> `title`标签栏标签标题
->>
->> `flag`标识符，如果没有给定，会自动生成并返回
->>
->> `scrollbar`是否使用TinUI，默认BasicTinUI
->>
->> `cancancel`该页面是否能被删除
->>
->> notebook.showpage(flag)
->>
->> `flag`需要显示的页面的标识符
->>
->> notebook.deletepage(flag)
->>
->> `flag`需要删除的页面的标识符
->>
->> notebook.getuis(flag)->(tinui,uixml,uiid)
->>
->> `flag`页面标识符。返回TinUI组件、TinUIXml绑定、组件的画布对象
->>
->> notebook.gettitles(flag)->(title,cb,bu)
->>
->> `flag`页面标识符。返回标题tbu对象、删除键tbu对象、标签tbu对象
->>
->> notebook.getvdic()->vdict
->>
->> 返回页面字典
->>
->> notebook.gettbdict()->tbdict
->>
->> 返回标签栏字典
->>
->> notebook.cannew(can=False,newfunc=None)
->>
->> `can`是否响应&显示新界面按钮
->>
->> `newfunc`响应函数，如果为None则不执行
->>
->> notebook.newtitle(flag,title_text='')
->>
->> `flag`需要更换标题的页面的标识符
->>
->> `title_text`新标题文本
->>
+> 
+> > notebook.addpage(title,flag=None,scrollbar=False,cancancel=True)->flag
+> > 
+> > `title`标签栏标签标题
+> > 
+> > `flag`标识符，如果没有给定，会自动生成并返回
+> > 
+> > `scrollbar`是否使用TinUI，默认BasicTinUI
+> > 
+> > `cancancel`该页面是否能被删除
+> > 
+> > notebook.showpage(flag)
+> > 
+> > `flag`需要显示的页面的标识符
+> > 
+> > notebook.deletepage(flag)
+> > 
+> > `flag`需要删除的页面的标识符
+> > 
+> > notebook.getuis(flag)->(tinui,uixml,uiid)
+> > 
+> > `flag`页面标识符。返回TinUI组件、TinUIXml绑定、组件的画布对象
+> > 
+> > notebook.gettitles(flag)->(title,cb,bu)
+> > 
+> > `flag`页面标识符。返回标题tbu对象、删除键tbu对象、标签tbu对象
+> > 
+> > notebook.getvdic()->vdict
+> > 
+> > 返回页面字典
+> > 
+> > notebook.gettbdict()->tbdict
+> > 
+> > 返回标签栏字典
+> > 
+> > notebook.cannew(can=False,newfunc=None)
+> > 
+> > `can`是否响应&显示新界面按钮
+> > 
+> > `newfunc`响应函数，如果为None则不执行
+> > 
+> > notebook.newtitle(flag,title_text='')
+> > 
+> > `flag`需要更换标题的页面的标识符
+> > 
+> > `title_text`新标题文本
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI标签栏视图.gif)
 
@@ -1037,7 +1024,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: bars, uid
 
 > bars::评星级元素列表
->
+> 
 > 当只选定一个星级，再次选择第一个星级时，取消选择，command个数为0
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI评星级控件.gif)
@@ -1086,7 +1073,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: toptext, content, uid
 
 > toptext::标题文本
->
+> 
 > content::内容文本
 
 ![](https://raw.githubusercontent.com/Smart-Space/TinUI/main/image/TinUI%E4%BE%BF%E7%AC%BA.gif)
@@ -1115,10 +1102,12 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_button2(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),minwidth=0,maxwidth=0,command=None,anchor='nw')
+### add_button2(self,pos:tuple,text:str,icon=None,compound='left',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),minwidth=0,maxwidth=0,command=None,anchor='nw')
 
 - pos::位置
 - text::标题文字
+- icon::Segoe Fluent Icons符号编号，为None忽略
+- compound::存在icon时，文本相对于符号的位置，left, right, top, bottom
 - fg::文字颜色
 - bg::按钮颜色
 - line::边框颜色
@@ -1137,25 +1126,24 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: button, back, outline, funcs, uid
 
 > button::按钮文本
->
+> 
 > back::背景元素
->
+> 
 > outline::边框元素
->
+> 
 > funcs
->
->> funcs.change_command(new_func)
->>
->> `new_func`切换的新函数
->>
->> funcs.disable(fg='#9d9d9d',bg='#f5f5f5')
->>
->> 禁用按钮
->>
->> funcs.active()
->>
->> 激活按钮
->>
+> 
+> > funcs.change_command(new_func)
+> > 
+> > `new_func`切换的新函数
+> > 
+> > funcs.disable(fg='#9d9d9d',bg='#f5f5f5')
+> > 
+> > 禁用按钮
+> > 
+> > funcs.active()
+> > 
+> > 激活按钮
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI按钮2.gif)
 
@@ -1179,9 +1167,9 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: toptext, ui, ux, uid
 
 > toptext::标题文本
->
+> 
 > ui::BasicTinUI或TinUI
->
+> 
 > ux::绑定到UI的TinUIXml
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI可折叠UI.gif)
@@ -1202,17 +1190,16 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: frame, itemfg, itembg, funcs, uid
 
 > frame::元素框控件（BasicTinUI）
->
+> 
 > itemfg::标识元素1
->
+> 
 > itembg::标识元素2
->
+> 
 > funcs
->
->> `funcs.start()`::开启等待覆盖
->>
->> `fucns.end()`::结束等待覆盖
->>
+> 
+> > `funcs.start()`::开启等待覆盖
+> > 
+> > `fucns.end()`::结束等待覆盖
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI元素等待框.gif)
 
@@ -1238,9 +1225,9 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: ui, scro, items, uid
 
 > ui::列表框架BasicTinUI
->
+> 
 > scro::滚动条返回值，`add_scrollbar`
->
+> 
 > items::元素列表，每个元素为ui返回值，`add_ui`
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI列表视图.gif)
@@ -1267,9 +1254,9 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: items, items_dict, box, uid
 
 > items::所有元素id对应的文本id、背景id，以及可能的伸缩提示文本id的字典
->
+> 
 > items_dict::所有含子级元素id对应下一级id的字典
->
+> 
 > box::作为树状图父组件的BasicTinUI
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI树状图.gif)
@@ -1315,19 +1302,18 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: button, back, outline, funcs, uid
 
 > button::文本元素
->
+> 
 > back::背景元素
->
+> 
 > outline::边框元素
->
+> 
 > funcs
->
->> `funcs.change_command()`::更换响应函数
->>
->> `funcs.disable(fg='#9d9d9d',bg='#f5f5f5')`::禁用
->>
->> `funcs.active()`::启用
->>
+> 
+> > `funcs.change_command()`::更换响应函数
+> > 
+> > `funcs.disable(fg='#9d9d9d',bg='#f5f5f5')`::禁用
+> > 
+> > `funcs.active()`::启用
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI状态开关按钮.gif)
 
@@ -1336,16 +1322,23 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### add_swipecontrol(self,pos:tuple,text:str='',height=50,width=400,fg='#1a1a1a',bg='#f3f3f3',line='#fbfbfb',data:dict=,),'right':(,)},font=('微软雅黑',12),anchor='nw')
 
 - pos-位置
-- text-文本
-- height-高度
-- width-宽度
-- fg-文本颜色
-- bg-背景色
-- line-边框颜色
-- data-滑动操作元素参数
 
+- text-文本
+
+- height-高度
+
+- width-宽度
+
+- fg-文本颜色
+
+- bg-背景色
+
+- line-边框颜色
+
+- data-滑动操作元素参数
+  
   > data结构：
-  >
+  > 
   > ```json
   > {
   >     'left':({
@@ -1362,11 +1355,12 @@ command::反馈函数，应当接受两个参数，`x`, `y`
   >     )
   > }
   > ```
-  >
+  > 
   > 其中，字典键值 `left`表示往右滑动显示的左边元素，`right`表示往左滑动显示的右边元素。两者皆可选。
   > 一侧元素以一个数组表示，一个及以上，不超过六个。每个元素以字典表示，文本必选，颜色有默认值。
-  >
+
 - font-字体
+
 - anchor-对齐方向
 
 绘制一个滑动控件。
@@ -1374,7 +1368,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: back, backitem
 
 > back::容器BasicTinUI
->
+> 
 > backitem::控件的画布元素
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI滑动控件.gif)
@@ -1427,11 +1421,11 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: picker, bar, texts, pickerbars, uid
 
 > picker::选择器所在的窗口
->
+> 
 > bar::选择器所在的BasicTinUI
->
+> 
 > texts::文本元素列表
->
+> 
 > pickerbars::元素选择BasicTinUI列表
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI滚动选择框.gif)
@@ -1455,7 +1449,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - tran-透明处理规避色
 
 > cont的格式如下：
->
+> 
 > ```
 > (('名称',绑定的函数（接受event参数）),#常规格式
 > '-',#分割线
@@ -1468,23 +1462,71 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: text, back, outline, funcs, uid
 
 > text-文本元素，包括标识文本
->
+> 
 > back-背景元素
->
+> 
 > outline-边框元素
->
+> 
 > funcs
->
->> funcs.disable(fg='#9d9d9d',bg='#f5f5f5')
->>
->> 禁用按钮
->>
->> funcs.active()
->>
->> 激活按钮
->>
+> 
+> > funcs.disable(fg='#9d9d9d',bg='#f5f5f5')
+> > 
+> > 禁用按钮
+> > 
+> > funcs.active()
+> > 
+> > 激活按钮
 
-![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI菜单按钮.gif)
+<img src="https://github.com/Smart-Space/TinUI/raw/main/image/TinUI菜单按钮.gif" title="" alt="" data-align="inline">
+
+---
+
+### add_barbutton(self,pos:tuple,font='微软雅黑 14',fg='#636363',bg='#f3f3f3',line='#f3f3f3',linew=0,activefg='#191919',activebg='#eaeaea',activeline='#eaeaea',sepcolor='#e5e5e5',content=(('保存','\uE74E',None),('','\uE792',None),'',('','\uE74D',None)),anchor='nw')
+
+- pos-位置
+
+- font-字体
+
+- fg-文本颜色
+
+- bg-背景颜色
+
+- line-边框颜色
+
+- linew-边框宽度
+
+- activefg-响应时文本颜色
+
+- activebg-响应时背景色
+
+- activeline-响应时边框颜色
+
+- sepcolor-分割线颜色
+
+- content-按钮内容
+  
+  > ```python
+  > (
+  >     ('text','Segoe Fluent Icons code',command),
+  >     ...,
+  >     '',#分割线
+  >     ('text','Segoe Fluent Icons code',command),
+  > )
+  > ```
+
+- anchor-对齐方向
+
+绘制一个工具栏按钮组件。
+
+### return outline, back, buttons, uid
+
+> outline::边框元素
+> 
+> back::背景板元素
+> 
+> buttons::按顺序的所有按钮列表，每一个值为`add_button2()`的返回值
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI工具栏按钮组件.gif)
 
 ---
 
@@ -1494,14 +1536,14 @@ TinUI的基础类，仅提供组件绘制。
 
 `BasicTinUI`的用法与TinUI完全一致，虽然TinUI基于BasicTinUI，但是TinUI更适合作为窗口主组件，以下是二者区别：
 
-| 项目          | BasicTinUI | TinUI |
-| ------------- | ---------- | ----- |
-| TinUI绘制组件 | √         | √    |
-| 自动刷新      | ×         | √    |
-| 滚动条支持    | ×         | √    |
-| 窗口主组件    | ×         | √    |
-| 主窗口        | ×         | √    |
-| 区域渲染组件  | √         | ×    |
+| 项目        | BasicTinUI | TinUI |
+| --------- | ---------- | ----- |
+| TinUI绘制组件 | √          | √     |
+| 自动刷新      | ×          | √     |
+| 滚动条支持     | ×          | √     |
+| 窗口主组件     | ×          | √     |
+| 主窗口       | ×          | √     |
+| 区域渲染组件    | √          | ×     |
 
 ---
 
@@ -1610,12 +1652,15 @@ self.tags::内部组件tag集合
 以下是使用 `TinUIXml`中xml字符串的若干规定：
 
 1. 根元素必须是 `<tinui>`
-2. 行元素必须是 `<line>`
-3. 根元素的直接子集不能有除了行元素的其它元素
-4. 行元素可以嵌套
 
+2. 行元素必须是 `<line>`
+
+3. 根元素的直接子集不能有除了行元素的其它元素
+
+4. 行元素可以嵌套
+   
    > 可以如下写法：
-   >
+   > 
    > ```xml
    > <tinui>
    > <line>
@@ -1633,17 +1678,19 @@ self.tags::内部组件tag集合
    > </line>
    > </tinui>
    > ```
-   >
-5. 所有xml使用的函数需要使用字符串中表述为 `self.funcs[...]`
 
+5. 所有xml使用的函数需要使用字符串中表述为 `self.funcs[...]`
+   
    > 即：
-   >
+   > 
    > ```xml
    > <button text='one' command='self.funcs["funcstion"]'></button>
    > ```
-   >
+
 6. 若需要，如【5】中类似地使用 `self.datas[...]`
+
 7. 若需要使用**整数**定义宽度参数等，也如同 `width='200'`使用
+
 8. 字体使用如 `font="微软雅黑 12"`的写法
 
 ## 基本语法

@@ -4,11 +4,26 @@
 
 ==========更新日志==========
 
-
+==========
+2024-7-31
+1. TinUIXml编辑器手动输入标记点信息
+2. entry添加删除、插入文本方法
+3. menubutton可选是否显示标识符
+4. TinUIXml自定义间距，优先级比坐标自定低
+==========5.2==========
+2024-7-16
+1. button最大化宽度、最小化宽度参数
+2. button2最大化宽度、最小化宽度参数
+3. 修复treeview跨级选定展开单层后的报错问题
+4. TinUIXml简易编辑器添加标记点管理
+5. listbox的add方法中重新设计位置确定逻辑
+6. listbox回调command参数result增加result.index属性
 ==========5.1==========
-2024-7-
-*1. tinuixml新增padx，pady间隔参数
-*2. scalebar新样式
+2024-7-5
+1. test\tuxmltest.py 升级为简易TinUIxml编辑器
+2. 优化scalebar标识符元素
+3. BasicTinUI新增show_location方法，用于设计时反馈坐标信息
+4. checkbutton引发响应的command接受的唯一参数为选定状态，True/False
 ==========5.0==========
 2024-6-24
 1. 以下控件接入统一坐标对齐模式：listview, pipspager, ratingbar,

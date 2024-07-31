@@ -235,6 +235,12 @@ class TinUIDark(TinUITheme):
                 fg='#ffffff',bg='#2d2d2d',line='#303030',
                 activefg='#ffffff',activebg='#3f3f40',activeline='#3f3f3f',
                 *arg,**kw)
+    
+    def add_barbutton(self,pos,*arg,**kw):
+        return self.ui.add_barbutton(pos,
+                fg='#ffffff',bg='#202020',line='#202020',
+                activefg='#cecece',activebg='#2d2d2d',activeline='#2d2d2d',sepcolor='#323232',
+                *arg,**kw)
 
 
 def end():
@@ -359,6 +365,8 @@ du.add_swipecontrol(end(),text='SwipeControl')
 du.add_picker(end())
 #dropdownbutton
 du.add_menubutton(end(),text='menubutton')
+#appbarbutton
+du.add_barbutton(end())
 
 u.add_back(end())
 r.r.title('TinUI dark theme')

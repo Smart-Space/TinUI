@@ -1481,7 +1481,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_barbutton(self,pos:tuple,font='微软雅黑 14',fg='#636363',bg='#f3f3f3',line='#f3f3f3',linew=0,activefg='#191919',activebg='#eaeaea',activeline='#eaeaea',sepcolor='#e5e5e5',content=(('保存','\uE74E',None),('','\uE792',None),'',('','\uE74D',None)),anchor='nw')
+### add_barbutton(self,pos:tuple,font='微软雅黑 14',fg='#636363',bg='#f3f3f3',line='#f3f3f3',linew=0,activefg='#191919',activebg='#eaeaea',activeline='#eaeaea',sepcolor='#e6e6e6',content=(('保存','\uE74E',None),('','\uE792',None),'',('','\uE74D',None)),anchor='nw')
 
 - pos-位置
 

@@ -4,7 +4,12 @@
 
 ==========更新日志==========
 
-==========
+==========5.4==========
+2024-8-8
+1. 新增工具栏按钮组件，barbutton(AppBarButton)
+2. button2添加icon参数，用来使用Fluent Icons符号，compound in top,bottom,left,right
+3. 修复ratingbar某些情况下无法选中的错误
+==========5.3==========
 2024-7-31
 1. TinUIXml编辑器手动输入标记点信息
 2. entry添加删除、插入文本方法

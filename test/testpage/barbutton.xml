@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='barbutton'></title>
+    </line>
+    <line>
+        <paragraph text='工具栏按钮组件。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <barbutton></barbutton>
+    </line>
+</line>
+</tinui>

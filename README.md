@@ -34,7 +34,8 @@ TinUI使用GPLv3（GPL）作为开源协议。
 
 ```python
 from tkinter import Tk
-from tinui.TinUI import TinUI #导入TinUI
+#from tinui.TinUI import TinUI #导入TinUI
+from tinui import TinUI
 
 def dop(cont):#处理输入框返回事件
     print(f'输入框内容为：{cont}')
@@ -1524,7 +1525,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 > 
 > back::背景板元素
 > 
-> buttons::按顺序的所有按钮列表，每一个值为`add_button2()`的返回值
+> buttons::按顺序的所有按钮列表，每一个值为 `add_button2()`的返回值
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI工具栏按钮组件.gif)
 
@@ -1547,9 +1548,54 @@ TinUI的基础类，仅提供组件绘制。
 
 ---
 
-# Class: TinUINum
+# Class: TinUIDialog
 
-TinUI中使用数据结构载体，不需要知道。
+TinUIDialog是一个基础类，使用时无需在意，只需要从tinui包中导入相关对话框函数即可。
+
+```python
+from tinui import show_msg
+```
+
+不过，`show_msg`是一个“朴素”的信息提示框，一般情况下应当导入以下对话框函数：
+
+```python
+from tinui import show_info, show_success, show_error,\
+    show_warning, show_question,\
+    ask_string, ask_integer, ask_float
+"""
+上述分别对应：
+信息提示
+成功提示
+警告提示
+错误提示
+问答提示
+文本输入
+整数输入
+浮点输入
+"""
+```
+
+以`show_msg`为例。
+
+```python
+def show_msg(master,title,content,yestext='OK',notext='Cancel'):
+    """
+    master - 父窗口
+    title - 标题
+    context - 信息内容
+    yestext - 确认文本
+    notext - 取消文本
+    """
+    ...
+```
+
+对话框只有在“确认按钮”被点击后才返回交互值。
+
+- 对于信息提示对话框，“取消按钮”返回`False`，关闭窗口返回`None`。
+
+- 对于输入对话框，“取消按钮”和关闭窗口均返回`None`。
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI信息提示对话框.gif)
 
 ---
 
@@ -1560,6 +1606,8 @@ TinUI控件使用的方法列表，既可以当做列表获取返回函数，也
 使用button的禁用方法（已获取 `funcs`返回值）。既可以使用 `funcs[1]()`，也可以使用 `funcs.disable()`。方便使用。
 
 > 本文档中比较久之前的函数返回调用，沿用最初列表式结构说明，具体返回的 `FuncList`类见源码。
+> 
+> 无论怎样，使用`funcs.<function-name>`是正确的。
 
 ---
 

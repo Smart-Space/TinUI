@@ -116,26 +116,6 @@ class Dialog(Toplevel):
 
         return self.load_window()
 
-    def load_window(self):
-        #获取窗口内所有控件的bbox，窗口居中布局
-        bboxall=self.tinui.bbox('all')
-        w,h=bboxall[2]-bboxall[0],bboxall[3]-bboxall[1]+1
-        screenw=self.winfo_screenwidth()
-        screenh=self.winfo_screenheight()
-        x,y=(screenw-w)/2,(screenh-h)/2
-        self.geometry(f'{w}x{h}+{int(x)}+{int(y)-10}')
-        self.deiconify()
-
-        self.tinui.config(scrollregion=bboxall)
-
-        self.transient(self.master)
-        self.focus_set()
-        self.wait_visibility()
-        self.grab_set()
-        self.wait_window(self)
-
-        return self.result
-
     def return_input(self,val):
         #返回输入内容
         self.result=val
@@ -155,6 +135,26 @@ class Dialog(Toplevel):
                 return
         self.destroy()
         self.master.focus_set()
+    
+    def load_window(self):
+        #获取窗口内所有控件的bbox，窗口居中布局
+        bboxall=self.tinui.bbox('all')
+        w,h=bboxall[2]-bboxall[0],bboxall[3]-bboxall[1]+1
+        screenw=self.winfo_screenwidth()
+        screenh=self.winfo_screenheight()
+        x,y=(screenw-w)/2,(screenh-h)/2
+        self.geometry(f'{w}x{h}+{int(x)}+{int(y)-10}')
+        self.deiconify()
+
+        self.tinui.config(scrollregion=bboxall)
+
+        self.transient(self.master)
+        self.focus_set()
+        self.wait_visibility()
+        self.grab_set()
+        self.wait_window(self)
+
+        return self.result
 
 
 

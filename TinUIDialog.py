@@ -165,63 +165,63 @@ def show_msg(master,title,content):
     dialog=Dialog(master,'normal')
     return dialog.initial_msg(title,content)
 
-def show_info(master,title,content):
+def show_info(master,title,content,yestext='OK',notext='Cancel'):
     """
     显示信息对话框
     """
     dialog=Dialog(master,'info')
-    return dialog.initial_msg(title,content)
+    return dialog.initial_msg(title,content,yestext,notext)
 
-def show_success(master,title,content):
+def show_success(master,title,content,yestext='OK',notext='Cancel'):
     """
     显示成功对话框
     """
     dialog=Dialog(master,'success')
-    return dialog.initial_msg(title,content)
+    return dialog.initial_msg(title,content,yestext,notext)
 
 
-def show_warning(master,title,content):
+def show_warning(master,title,content,yestext='OK',notext='Cancel'):
     """
     显示警告对话框
     """
     dialog=Dialog(master,'warning')
-    return dialog.initial_msg(title,content)
+    return dialog.initial_msg(title,content,yestext,notext)
 
-def show_error(master,title,content):
+def show_error(master,title,content,yestext='OK',notext='Cancel'):
     """
     显示错误对话框
     """
     dialog=Dialog(master,'error')
-    return dialog.initial_msg(title,content)
+    return dialog.initial_msg(title,content,yestext,notext)
 
-def show_question(master,title,content):
+def show_question(master,title,content,yestext='YES',notext='NO'):
     """
     显示询问对话框
     """
     dialog=Dialog(master,'question')
-    return dialog.initial_msg(title,content,'YES','NO')
+    return dialog.initial_msg(title,content,yestext,notext)
 
 
-def ask_string(master,title,content):
+def ask_string(master,title,content,yestext='OK',notext='Cancel'):
     """
     输入字符串对话框
     """
     dialog=Dialog(master,'string')
-    return dialog.initial_input(title,content)
+    return dialog.initial_input(title,content,yestext,notext)
 
-def ask_integer(master,title,content):
+def ask_integer(master,title,content,yestext='OK',notext='Cancel'):
     """
     输入整数对话框
     """
     dialog=Dialog(master,'integer')
-    return dialog.initial_input(title,content)
+    return dialog.initial_input(title,content,yestext,notext)
 
-def ask_float(master,title,content):
+def ask_float(master,title,content,yestext='OK',notext='Cancel'):
     """
     输入浮点数对话框
     """
     dialog=Dialog(master,'float')
-    return dialog.initial_input(title,content)
+    return dialog.initial_input(title,content,yestext,notext)
 
 
 

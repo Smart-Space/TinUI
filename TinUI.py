@@ -3,6 +3,7 @@
     Copyright (C) <2021-present>  <smart-space>
 '''
 from tkinter import *
+from tkinter import ttk
 from tkinter import font as tkfont
 from webbrowser import open as webopen
 import time
@@ -790,7 +791,7 @@ class BasicTinUI(Canvas):
             for i in [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]:
                 pickbox.attributes('-alpha',i)
                 pickbox.update()
-                time.sleep(0.05)
+                time.sleep(0.02)
             pickbox.bind('<FocusOut>',unshow)
         def unshow(event):
             pickbox.withdraw()
@@ -1261,7 +1262,7 @@ class BasicTinUI(Canvas):
             for i in [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]:
                 menu.attributes('-alpha',i)
                 menu.update()
-                time.sleep(0.05)
+                time.sleep(0.02)
             menu.bind('<FocusOut>',unshow)
         self.tag_bind(cid,bind,show)
         menu=Toplevel(self)
@@ -3121,7 +3122,7 @@ class BasicTinUI(Canvas):
             for i in [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]:
                 picker.attributes('-alpha',i)
                 picker.update()
-                time.sleep(0.05)
+                time.sleep(0.02)
             picker.bind('<FocusOut>',unshow)
         def unshow(event):
             picker.withdraw()
@@ -3269,7 +3270,7 @@ class BasicTinUI(Canvas):
             for i in [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]:
                 menu.attributes('-alpha',i)
                 menu.update()
-                time.sleep(0.05)
+                time.sleep(0.02)
             menu.bind('<FocusOut>',unshow)
         def disable(fg='#9d9d9d',bg='#f5f5f5'):
             self.itemconfig(uid+'button',state='disable',fill=fg)
@@ -3360,7 +3361,7 @@ class TinUI(BasicTinUI):
 
     def __init__(self,master,update:bool=True,update_time:int=1000,**kw):
         self.frame = Frame(master)
-        self.vbar = Scrollbar(self.frame)
+        self.vbar = ttk.Scrollbar(self.frame)
         self.vbar.pack(side=RIGHT, fill=Y)
         ###
         kw.update({'yscrollcommand': self.vbar.set})

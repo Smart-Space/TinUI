@@ -101,11 +101,11 @@ class Dialog(Toplevel):
         self.title(title)
         self.protocol('WM_DELETE_WINDOW',lambda:self.return_input(None))
         
-        self.tinui.add_paragraph((5,5),text=content,anchor='nw')
+        self.tinui.add_paragraph((5,5),text=content)
         content_bbox=self.tinui.bbox('all')
         entry_width=content_bbox[2]-content_bbox[0]
         width=entry_width if entry_width>200 else 200
-        self.entry=self.tinui.add_entry((5,self._endy()+5),width=width)[-2]# tinui entry funcs
+        self.entry=self.tinui.add_entry((5,self._endy()+5),width=width)[-2]# tinui entry widget, funcs
         bbox=self.tinui.bbox('all')
         btn_width=(bbox[2]-bbox[0])/2
         button_width=btn_width-10 if btn_width>110 else 100
@@ -136,6 +136,49 @@ class Dialog(Toplevel):
         self.destroy()
         self.master.focus_set()
     
+    def initial_choice(self,title,content,choices,yestext='OK',notext='Cancel'):
+        """
+        初始化对话框-选择类
+        """
+        YES=yestext
+        NO=notext
+        self.result=None
+
+        self.tinui['bg']='#ffffff'
+
+        self.title(title)
+        self.protocol('WM_DELETE_WINDOW',lambda:self.return_choice(None))
+
+        self.tinui.add_paragraph((5,5),text=content)
+        content_bbox=self.tinui.bbox('all')
+
+        if self.type=='listbox':
+            self.tinui.add_listbox(((content_bbox[0]+content_bbox[2])/2,self._endy()+5),data=choices,command=self.return_choice,anchor='n')
+
+        bbox=self.tinui.bbox('all')
+        btn_width=(bbox[2]-bbox[0])/2
+        button_width=btn_width-10 if btn_width>110 else 100
+        button_endy=self._endy()+15
+        yesbutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2-5,button_endy),text=YES,minwidth=button_width,command=lambda e:self.return_choice(True),anchor='ne')[-1]
+        nobutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:self.return_choice(None),anchor='nw')[-1]
+        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg='#f3f3f3',fg='#f3f3f3',linew=9)
+
+        return self.load_window()
+    
+    def return_choice(self,val):
+        #返回选择内容
+        if val==True:#YES
+            if self.result==None:
+                return
+            self.destroy()
+            self.master.focus_set()
+        elif val==None:#NO
+            self.result=None
+            self.destroy()
+            self.master.focus_set()
+        else:#输入值
+            self.result=val
+
     def load_window(self):
         #获取窗口内所有控件的bbox，窗口居中布局
         bboxall=self.tinui.bbox('all')
@@ -223,6 +266,13 @@ def ask_float(master,title,content,yestext='OK',notext='Cancel'):
     dialog=Dialog(master,'float')
     return dialog.initial_input(title,content,yestext,notext)
 
+def ask_choice(master,title,content,choices,yestext='OK',notext='Cancel'):
+    """
+    选择列表对话框
+    """
+    dialog=Dialog(master,'listbox')
+    return dialog.initial_choice(title,content,choices,yestext,notext)
+
 
 
 #test
@@ -240,4 +290,6 @@ if __name__=='__main__':
     ask_integer(root,'test','input integer')
     ask_float(root,'test','input float')
     # print(b)
+    c=ask_choice(root,'test','choose one',('a','b','c'))
+    # print(c)
     root.mainloop()

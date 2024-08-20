@@ -541,7 +541,7 @@ class BasicTinUI(Canvas):
         self.coords(separate,bbox)
         return separate
 
-    def add_radiobutton(self,pos:tuple,width,text='',choices=('choose me'),fg='#1a1a1a',bg='#f2f2f2',font=('微软雅黑',12),activefg='#3c3c3c',activebg='#e9e9e9',command=None,anchor='nw'):#绘制单选框
+    def add_radiobutton(self,pos:tuple,width,text='',choices=('choose me',),fg='#1a1a1a',bg='#f2f2f2',font=('微软雅黑',12),activefg='#3c3c3c',activebg='#e9e9e9',command=None,anchor='nw'):#绘制单选框
         def button_in(tag,t):
             self.itemconfig(tag,fill=activebg,outline=activebg)
         def button_out(_tag,t):
@@ -1989,9 +1989,10 @@ class BasicTinUI(Canvas):
                 flag='flag'+str(titleu)
             if scrollbar:
                 page=TinUI(self,True,bg=self['background'])
+                uiid=self.create_window(viewpos,window=page.frame,width=width,height=height-5,anchor='nw',state='hidden')
             elif scrollbar==False:
                 page=BasicTinUI(self,bg=self['background'])
-            uiid=self.create_window(viewpos,window=page,width=width,height=height-5,anchor='nw',state='hidden')
+                uiid=self.create_window(viewpos,window=page,width=width,height=height-5,anchor='nw',state='hidden')
             uixml=TinUIXml(page)
             bbox=tbu.bbox('all')
             tbu.config(scrollregion=bbox)

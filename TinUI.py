@@ -387,7 +387,8 @@ class BasicTinUI(Canvas):
                 self.itemconfig(check,fill=bg)
                 self.itemconfig(outl,fill=fg)
         def go_func(event):
-            if self.itemcget(check,'fill')!=onbg:
+            nonlocal stateinfo
+            if not stateinfo:
                 self.itemconfig(check,fill=onbg)
                 self.itemconfig(outl,fill=onfg)
                 self.itemconfig(state,state='normal')
@@ -410,9 +411,14 @@ class BasicTinUI(Canvas):
         def disable():
             self.itemconfig(checkbutton,state='disable',fill='#7a7a7a')
             self.itemconfig(checkname,state='disable')
+            if not stateinfo:#因为上面设置了checkname三个子元素，标识符会自动显示
+                self.itemconfig(state,state='hidden')
         def active():
             self.itemconfig(checkbutton,state='normal',fill=fontfg)
             self.itemconfig(checkname,state='normal')
+            if not stateinfo:
+                self.itemconfig(state,state='hidden')
+        stateinfo=False#是否勾选
         checkbutton=self.create_text(pos,text=text,fill=fontfg,font=font,anchor='nw')
         uid='checkbutton'+str(checkbutton)
         self.itemconfig(checkbutton,tags=uid)
@@ -1143,7 +1149,9 @@ class BasicTinUI(Canvas):
             self.itemconfig(button_fore,state='disable',fill='#7a7a7a')
             self.itemconfig(back,state='disable')
             self.itemconfig(name,state='disable',fill='#7a7a7a')
+            self.itemconfig(uid,state='disable')
         def _active():
+            self.itemconfig(uid,state='normal')
             self.itemconfig(button_fore,state='normal',fill=fg)
             self.itemconfig(back,state='normal')
             self.itemconfig(name,state='normal',fill=fg)

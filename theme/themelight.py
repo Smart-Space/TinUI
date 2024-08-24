@@ -32,8 +32,9 @@ class TinUILight(TinUITheme):
 
     def add_entry(self,pos,*arg,**kw):
         return self.ui.add_entry(pos,fg='#606060',bg='#fbfbfb',
-            activefg='black',activebg='#fbfbfb',
-            linew=2,outline='#868686',onoutline='#3041d8',
+            activefg='#1b1b1b',activebg='#ffffff',
+            line='#e5e5e5',activeline='#e5e5e5',
+            outline='#868686',onoutline='#3041d8',
                           *arg,**kw)
 
     def add_separate(self,pos,*arg,**kw):

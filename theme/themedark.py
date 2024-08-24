@@ -33,7 +33,8 @@ class TinUIDark(TinUITheme):
     def add_entry(self,pos,*arg,**kw):
         return self.ui.add_entry(pos,fg='#cfcfcf',bg='#2d2d2d',
             activefg='#e6e6e6',activebg='#1f1f1f',
-            linew=2,outline='#9a9a9a',onoutline='#b2b8f2',
+            line='#303030',activeline='#303030',
+            outline='#9a9a9a',onoutline='#b2b8f2',
                           *arg,**kw)
 
     def add_separate(self,pos,*arg,**kw):

@@ -498,7 +498,7 @@ class BasicTinUI(Canvas):
             self.lower(bottomline,back)
             self.itemconfig(back,fill='#f0f0f0',outline='#f0f0f0')
             self.itemconfig(bottomline,fill=outline)
-        entry=Entry(self,fg=fg,bg=bg,font=font,relief='flat',bd=0)
+        entry=Entry(self,fg=fg,bg=bg,font=font,relief='flat',bd=0,insertbackground=activefg)
         entry.insert(0,text)
         entry.bind('<KeyRelease>',if_empty)
         entry.bind('<FocusIn>',focus_in)
@@ -2504,19 +2504,18 @@ class BasicTinUI(Canvas):
         if icon:#Fluent Icons编码图标
             icontext=self.create_text(pos,text=icon,fill=fg,font='{Segoe Fluent Icons} '+font_size,tags=(uid,buttonuid))
             iconbbox=self.bbox(icontext)
-            match compound:#方向以文本为基准，但是移动的是文本部分
-                case 'left':
-                    textpos=(iconbbox[2]+1,(iconbbox[3]+iconbbox[1])/2)
-                    self.__auto_anchor(button,textpos,'w')
-                case 'right':
-                    textpos=(iconbbox[0]-1,(iconbbox[3]+iconbbox[1])/2)
-                    self.__auto_anchor(button,textpos,'e')
-                case 'top':
-                    textpos=((iconbbox[0]+iconbbox[2])/2,iconbbox[3]+1)
-                    self.__auto_anchor(button,textpos,'n')
-                case 'bottom':
-                    textpos=((iconbbox[0]+iconbbox[2])/2,iconbbox[1]-1)
-                    self.__auto_anchor(button,textpos,'s')
+            if compound=='left':
+                textpos=(iconbbox[2]+1,(iconbbox[3]+iconbbox[1])/2)
+                self.__auto_anchor(button,textpos,'w')
+            elif compound=='right':
+                textpos=(iconbbox[0]-1,(iconbbox[3]+iconbbox[1])/2)
+                self.__auto_anchor(button,textpos,'e')
+            elif compound=='top':
+                textpos=((iconbbox[0]+iconbbox[2])/2,iconbbox[3]+1)
+                self.__auto_anchor(button,textpos,'n')
+            elif compound=='bottom':
+                textpos=((iconbbox[0]+iconbbox[2])/2,iconbbox[1]-1)
+                self.__auto_anchor(button,textpos,'s')
             if text=='':#有图标的时候，如果无文本，则隐藏文本元素
                 self.itemconfig(button,state='hidden')
         x1,y1,x2,y2=self.bbox(buttonuid)

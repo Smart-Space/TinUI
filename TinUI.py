@@ -1760,6 +1760,50 @@ class BasicTinUI(Canvas):
                 command(nowon)
         def bindyview(event):
             ui.yview_scroll(int(-1*(event.delta/120)), "units")
+        def _load_item(num):
+            nonlocal endy
+            for i in range(0,num):
+                item=ui.add_ui((3,endy),width=width-3,height=linew,bg=bg)
+                items.append(item)
+                ui.addtag_withtag('item',item[-1])
+                endy+=linew+2
+                item[0].bind('<Enter>',lambda event,item=item:buttonin(item))
+                item[0].bind('<Button-1>',lambda event,item=item:click(item))
+                item[0].bind('<Leave>',lambda event,item=item:buttonout(item))
+                item[0].bind('<MouseWheel>',bindyview)
+            bbox=list(ui.bbox('item'))
+            bbox[0]-=3
+            ui.config(scrollregion=bbox)
+        def getitems():#获取items
+            return items
+        def getui(index):#获取 add_ui uid
+            return items[index]
+        def delete(index):#删除 add_ui uid
+            nonlocal endy, nowon
+            if index>len(items)-1:
+                return
+            if index==nowon:
+                ui.move(line,0,-linew-height)
+            elif index>nowon:
+                pass
+            elif index<nowon:
+                nowon-=1
+                ui.coords(line,1,index*(linew+2)+lineheight,1,index*(linew+2)+lineheight*2) 
+            endy-=linew+2
+            subui=items[index]
+            ui.delete(subui[-1])
+            del items[index]#删除元素
+            #其它UI上移
+            if index==len(items):
+                return
+            for item in items[index:]:
+                ui.move(item[-1],0,-linew-2)
+            bbox=list(ui.bbox('item'))
+            bbox[0]-=3
+            ui.config(scrollregion=bbox)
+        def add():#增加 add_ui uid 到底部，并获取返回值
+            _load_item(1)
+            return items[-1]
         nowon=-1
         ui=BasicTinUI(self,bg=bg)
         view=self.create_window(pos,window=ui,height=height,width=width,anchor=anchor)
@@ -1772,14 +1816,7 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(uid,scro[-1])
         items=[]#使用列表作为存储类型，以后可能动态修改列表视图元素
         endy=0
-        for i in range(0,num):
-            item=ui.add_ui((3,endy),width=width-3,height=linew,bg=bg)
-            items.append(item)
-            endy+=linew+2
-            item[0].bind('<Enter>',lambda event,item=item:buttonin(item))
-            item[0].bind('<Button-1>',lambda event,item=item:click(item))
-            item[0].bind('<Leave>',lambda event,item=item:buttonout(item))
-            item[0].bind('<MouseWheel>',bindyview)
+        _load_item(num)#载入元素
         lineheight=linew/3
         line=ui.create_line((1,linew/3,1,linew*2/3),fill=oncolor,width=3,capstyle='round')
         ui.config(scrollregion=ui.bbox('all'))
@@ -1787,7 +1824,12 @@ class BasicTinUI(Canvas):
         allback=self.add_back((),(view,scro[-1]),fg=bg,bg=bg,linew=3)
         self.addtag_withtag(uid,allback)
         ui.bind('<MouseWheel>',bindyview)
-        return ui,scro,items,uid
+        funcs=FuncList(4)
+        funcs.getitems=getitems
+        funcs.getui=getui
+        funcs.add=add
+        funcs.delete=delete
+        return ui,scro,items,funcs,uid
 
     def add_canvas(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',linew=1,scrollbar=False,anchor='nw'):#绘制画布
         def re_scrollregion():#更新滚动范围
@@ -2446,9 +2488,11 @@ class BasicTinUI(Canvas):
                 case 'bottom':
                     textpos=((iconbbox[0]+iconbbox[2])/2,iconbbox[1]-1)
                     self.__auto_anchor(button,textpos,'s')
+            if text=='':#有图标的时候，如果无文本，则隐藏文本元素
+                self.itemconfig(button,state='hidden')
         x1,y1,x2,y2=self.bbox(buttonuid)
         linew-=1
-         #判断宽度的极限，分为最大化和最小化
+        #判断宽度的极限，分为最大化和最小化
         nowwidth=x2-x1
         if 0<maxwidth<=nowwidth:
             self.itemconfig(button,width=maxwidth)

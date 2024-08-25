@@ -1388,7 +1388,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_passwordbox(self,pos:tuple,width:int,fg='#606060',bg='#f6f6f6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#868686',onoutline='#3041d8',anchor='nw')
+### add_passwordbox(self,pos:tuple,width:int,fg='#606060',bg='#f6f6f6',activefg='#1b1b1b',activebg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#808080',font=('微软雅黑',12),linew=3,outline='#868686',onoutline='#3041d8',anchor='nw',command=None)
 
 - pos-位置
 - width-宽度
@@ -1396,11 +1396,13 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - bg-背景色
 - activefg-响应时文本颜色
 - activebg-响应时背景颜色
+- line-边框颜色
+- activeline-响应式边框颜色
 - insert-光标颜色
 - font-字体
-- linew-边框宽度
-- outline-边框颜色
-- onoutline-响应时边框颜色
+- linew-底边提示线宽度
+- outline-提示线颜色
+- onoutline-响应时提示线颜色
 - anchor-对齐方向
 
 绘制一个密码输入框。

@@ -10,7 +10,8 @@
 1. button2, barbutton优化有图标无文字的排版
 2. listview新增元素获取、删除、增加方法
 3. 更新entry样式
-*4. 更新passwordbox样式
+4. 更新passwordbox样式
+5. barbutton兼容3.6~3.9版本python
 
 ==========5.7==========
 2024-8-23

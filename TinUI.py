@@ -503,37 +503,28 @@ class BasicTinUI(Canvas):
         entry.bind('<KeyRelease>',if_empty)
         entry.bind('<FocusIn>',focus_in)
         entry.bind('<FocusOut>',focus_out)
-        # entry.bind('<FocusIn>',lambda event:(self.itemconfig(back,outline=onoutline),entry.config(background=activebg,foreground=activefg)))
-        # entry.bind('<FocusOut>',lambda event:(self.itemconfig(back,outline=outline),entry.config(background=bg,foreground=fg)))
         funce=self.create_window(pos,window=entry,width=width,anchor='nw')#输入框画布对象
         uid='entry'+str(funce)
         self.itemconfig(funce,tags=uid)
         bbox=self.bbox(funce)
         funcw=self.create_text((bbox[0]+width,bbox[1]),text=icon,fill=fg,font=font,anchor='nw',tags=uid)
-        # w=self.bbox(funcw)[2]
-        # h=self.bbox(funce)[3]
         bubbox=self.bbox(funcw)
         if command!=None:#调用函数的绑定仅当存在command时启动
-            # button=self.add_button((w,pos[1]-2),text=call,font=font,command=call_command,fg=fg,bg=bg,linew=0)
             button=self.create_text((bubbox[2]+2,(bbox[1]+bbox[3])/2),text=call,fill=fg,font=font,anchor='w',tags=uid)
             self.tag_bind(button,'<Enter>',lambda event:self.itemconfig(button,fill=onoutline))
             self.tag_bind(button,'<Leave>',lambda event:self.itemconfig(button,fill=fg))
             self.tag_bind(button,'<Button-1>',call_command)
-            # self.addtag_withtag(uid,button[-1])
             entry.bind('<Return>',call_command)
-            # bubbox=self.bbox(button[-1])
             bubbox=self.bbox(button)
         backpos=(bbox[0]+1,bbox[1]+1,bubbox[2]-1,bbox[1]+1,bubbox[2]-1,bbox[3]-1,bbox[0]+1,bbox[3]-1,bbox[0]+1,bbox[1]+1)
         bottomlinepos=(bbox[0],bbox[3]+2,bubbox[2],bbox[3]+2)
         outlinepos=(bbox[0],bbox[1],bubbox[2],bbox[1],bubbox[2],bbox[3],bbox[0],bbox[3],bbox[0],bbox[1])
-        # bottomline=self.create_polygon(bottomlinepos,fill=outline,outline=outline,width=7+linew,tags=uid)#bottomline
         bottomline=self.create_line(bottomlinepos,fill=outline,width=linew,capstyle='round',tags=uid)#bottomline
         back=self.create_polygon(backpos,fill=bg,outline=bg,width=7,tags=uid)#back
         outl=self.create_polygon(outlinepos,fill=line,outline=line,width=7,tags=uid)#outline
         self.lower(outl,bottomline)
         #outline
         if command!=None:
-            # self.tkraise(button[-1])
             self.tkraise(button)
         self.tkraise(funcw)
         self.__auto_anchor(uid,pos,anchor)
@@ -2821,7 +2812,7 @@ class BasicTinUI(Canvas):
         box.bind('<MouseWheel>',bindview)
         return items,items_dict,box,uid
 
-    def add_passwordbox(self,pos:tuple,width:int,fg='#606060',bg='#f6f6f6',activefg='black',activebg='white',insert='#808080',font=('微软雅黑',12),linew=3,outline='#868686',onoutline='#3041d8',anchor='nw',command=None):#绘制密码输入框
+    def add_passwordbox(self,pos:tuple,width:int,fg='#606060',bg='#f6f6f6',activefg='#1b1b1b',activebg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#808080',font=('微软雅黑',12),linew=3,outline='#868686',onoutline='#3041d8',anchor='nw',command=None):#绘制密码输入框
         #参考entry控件
         def if_empty(event):
             if nowstate=='hidden':
@@ -2844,23 +2835,38 @@ class BasicTinUI(Canvas):
             self.itemconfig(funcw,fill=fg)
             entry.config(show='●')
             if_empty(None)
+        def focus_in(e):
+            self.itemconfig(bottomline,fill=onoutline)
+            self.tkraise(bottomline,back)
+            self.itemconfig(back,fill=activebg,outline=activebg)
+            self.itemconfig(outl,fill=activeline,outline=activeline)
+            entry.config(background=activebg,foreground=activefg)
+        def focus_out(e):
+            self.itemconfig(bottomline,fill=outline)
+            self.lower(bottomline,back)
+            self.itemconfig(back,fill=bg,outline=bg)
+            self.itemconfig(outl,fill=line,outline=line)
+            entry.config(background=bg,foreground=fg)
         #---
         def get_entry():#获取文本
             return entry.get()
         def __error(errorline='#c42b1c'):#错误样式
-            self.itemconfig(back,outline=errorline,fill=errorline)
+            self.itemconfig(bottomline,fill=errorline)
         def __normal():#正常样式
             entry['state']='normal'
             entry.focus_set()
-            self.itemconfig(back,outline=onoutline,fill=onoutline)
+            self.itemconfig(back,outline=activebg,fill=activebg)
+            self.itemconfig(bottom,fill=onoutline)
         def __disable():#禁用
             entry['state']='disable'
-            self.itemconfig(back,outline=outline,fill=outline)
+            self.lower(bottomline,back)
+            self.itemconfig(back,fill='#f0f0f0',outline='#f0f0f0')
+            self.itemconfig(bottomline,fill=outline)
         nowstate='hidden'#'shown'
         entry=Entry(self,fg=fg,bg=bg,font=font,relief='flat',bd=0,show='●')
         entry.bind('<KeyRelease>',if_empty)
-        entry.bind('<FocusIn>',lambda event:(self.itemconfig(back,outline=onoutline),entry.config(background=activebg,foreground=activefg)))
-        entry.bind('<FocusOut>',lambda event:(self.itemconfig(back,outline=outline),entry.config(background=bg,foreground=fg)))
+        entry.bind('<FocusIn>',focus_in)
+        entry.bind('<FocusOut>',focus_out)
         funce=self.create_window(pos,window=entry,width=width,anchor=anchor)#输入框画布对象
         uid='entry'+str(funce)
         self.itemconfig(funce,tags=uid)
@@ -2869,10 +2875,13 @@ class BasicTinUI(Canvas):
         font_size=str(_font.cget('size'))
         funcw=self.create_text((bbox[0]+width,(bbox[1]+bbox[3])/2),text='\uF78D',fill=fg,font='{Segoe Fluent Icons} '+font_size,anchor='w',tags=uid)
         bubbox=self.bbox(funcw)
-        backpos=(bbox[0],bbox[1],bubbox[2],bbox[1],bubbox[2],bbox[3],bbox[0],bbox[3],bbox[0],bbox[1])
-        outlinepos=(bbox[0]+linew,bbox[3]+4-linew,bubbox[2]-linew,bbox[3]+4-linew)
-        back=self.create_polygon(outlinepos,fill=outline,outline=outline,width=6+linew,tags=uid)#outline
-        back1=self.create_polygon(backpos,fill=bg,outline=bg,width=6,tags=uid)#back
+        backpos=(bbox[0]+1,bbox[1]+1,bubbox[2]-1,bbox[1]+1,bubbox[2]-1,bbox[3]-1,bbox[0]+1,bbox[3]-1,bbox[0]+1,bbox[1]+1)
+        bottomlinepos=(bbox[0],bbox[3]+2,bubbox[2],bbox[3]+2)
+        outlinepos=(bbox[0],bbox[1],bubbox[2],bbox[1],bubbox[2],bbox[3],bbox[0],bbox[3],bbox[0],bbox[1])
+        bottomline=self.create_line(bottomlinepos,fill=outline,width=linew,capstyle='round',tags=uid)#bottomline
+        back=self.create_polygon(backpos,fill=bg,outline=bg,width=7,tags=uid)#back
+        outl=self.create_polygon(outlinepos,fill=line,outline=line,width=7,tags=uid)#out
+        self.lower(outl,bottomline)
         self.tkraise(funcw)
         if_empty(None)
         self.__auto_anchor(uid,pos,anchor)

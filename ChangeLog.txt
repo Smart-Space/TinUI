@@ -12,6 +12,7 @@
 3. 更新entry样式
 4. 更新passwordbox样式
 5. barbutton兼容3.6~3.9版本python
+6. 更新combobox样式
 
 ==========5.7==========
 2024-8-23

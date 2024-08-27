@@ -780,12 +780,22 @@ class BasicTinUI(Canvas):
 
     def add_combobox(self,pos:tuple,width:int=200,height:int=200,text='',content:tuple=(),fg='#1a1a1a',bg='#f8f8f8',outline='#c8c8c8',activefg='#191919',activebg='#f1f1f1',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',tran='#01FF11',font=('微软雅黑',12),anchor='nw',command=None):#绘制组合/下拉框
         def open_box(event):
-            if self.itemcget(button_text,'text')=='∨':
-                self.itemconfig(button_text,text='∧',fill=activefg)
+            if not drop:#未展开
+                self.itemconfig(button,text='∧')
                 show(event)
             else:
                 unshow(None)
-                self.itemconfig(button_text,text='∨',fill=fg)
+                self.itemconfig(button,text='∨')
+        def mousein(e):
+            #鼠标进入
+            self.itemconfig(back,fill=activebg,outline=activebg)
+            self.itemconfig(main,fill=activefg)
+            self.itemconfig(button,fill=activefg)
+        def mouseout(e):
+            #鼠标离开
+            self.itemconfig(back,fill=bg,outline=bg)
+            self.itemconfig(main,fill=fg)
+            self.itemconfig(button,fill=fg)
         def readyshow():#计算显示位置
             allpos=bar.bbox('all')
             #菜单尺寸
@@ -796,6 +806,8 @@ class BasicTinUI(Canvas):
             maxy=self.winfo_screenheight()
             wind.data=(maxx,maxy,winw,winh)
         def show(event):#显示的起始位置
+            nonlocal drop
+            drop=True
             #初始位置
             maxx,maxy,winw,winh=wind.data
             bbox=self.bbox(uid)
@@ -820,35 +832,51 @@ class BasicTinUI(Canvas):
                 time.sleep(0.02)
             pickbox.bind('<FocusOut>',unshow)
         def unshow(event):
+            nonlocal drop
+            drop=False
             pickbox.withdraw()
             pickbox.unbind('<FocusOut>')
-            self.itemconfig(button_text,text='∨',fill=fg)
+            self.itemconfig(button,text='∨',fill=fg)
         def choose_this(word):
             self.itemconfig(main,text=word)
             unshow(None)
             if command!=None:
                 command(word)
         def select(num):
-            self.itemconfig(button_text,text='∧',fill=activefg)
-            choose_this(*info[num])
-        def disable():
-            self.itemconfig(button_text,text='∧',fill=activefg)
-            open_box(None)
-            button_funcs[1](bg=bg)
+            self.itemconfig(button,text='∧',fill=activefg)
+            choose_this(content[num])
+        def disable(fg='#9d9d9d',bg='#f5f5f5'):
+            self.itemconfig(button,text='∨',fill=fg)
+            self.itemconfig(main,fill=fg)
+            self.itemconfig(back,fill=bg,outline=bg)
+            self.itemconfig(uid,state='disabled')
+            unshow(None)
         def active():
-            button_funcs[2]()
+            self.itemconfig(button,fill=fg)
+            self.itemconfig(main,fill=fg)
+            self.itemconfig(back,fill=bg,outline=bg)
+            self.itemconfig(uid,state='normal')
         if activefg=='':
             activefg=self['background']
         main=self.create_text(pos,text=text,font=font,fill=fg,anchor='nw')
         uid='combobox'+str(main)
         self.itemconfig(main,tags=uid)
-        bbox=self.bbox(main)
-        x1,y1,x2,y2=bbox[0]-3,bbox[1]-3,bbox[0]+width+3,bbox[3]+3
-        back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=fg,tags=uid)
+        bbox=self.bbox(main)#文本尺寸
+        x1,y1,x2,y2=bbox[0]+3,bbox[1]+3,bbox[0]+width-3,bbox[3]-3
+        drop=False#未展开
+        button=self.create_text((x2-1,(y1+y2)/2),text='∨',fill=fg,font=font,tags=uid,anchor='w')#按钮
+        x1,y1,x2,y2=self.bbox(uid)#文本与按钮区域
+        backpos=(x1,y1,x2,y1,x2,y2,x1,y2)
+        outlinepos=(x1-1,y1-1,x2+1,y1-1,x2+1,y2+1,x1-1,y2+1)
+        back=self.create_polygon(backpos,fill=bg,outline=bg,width=7,tags=uid)
+        outl=self.create_polygon(outlinepos,fill=outline,outline=outline,width=7,tags=uid)
+        self.tkraise(back)
         self.tkraise(main)
-        button_text,button_back,button_funcs,button_id=self.add_button((x2,y1-1),'∨',fg,bg,'#CCCCCC',1,activefg,activebg,'#7a7a7a',font=font,command=open_box)
-        self.addtag_withtag(uid,button_id)
-        pickbox=Toplevel(self)
+        self.tkraise(button)
+        self.tag_bind(uid,'<Button-1>',open_box)
+        self.tag_bind(uid,'<Enter>',mousein)
+        self.tag_bind(uid,'<Leave>',mouseout)
+        pickbox=Toplevel(self)#浮出窗口
         self.windows.append(pickbox)
         pickbox.geometry(f'{width}x{height}')
         pickbox.overrideredirect(True)
@@ -860,7 +888,7 @@ class BasicTinUI(Canvas):
         bar.pack(fill='both',expand=True)
         bar.create_polygon((9,9,width-9,9,width-9,height-9,9,height-9),fill=bg,outline=bg,width=9)
         bar.lower(bar.create_polygon((8,8,width-8,8,width-8,height-8,8,height-8),fill=outline,outline=outline,width=9))
-        bar.add_listbox((8,8),width-38,height-38,bg=bg,fg=fg,data=content,activebg=activebg,sel=activebg,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)
+        bar.add_listbox((6,6),width-36,height-36,bg=bg,fg=fg,data=content,activebg=activebg,sel=activebg,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)
         self.__auto_anchor(uid,pos,anchor)
         readyshow()
         funcs=FuncList(3)
@@ -3766,7 +3794,7 @@ if __name__=='__main__':
     bu3=b.add_button((700,300),'nothing button 3')[1]
     b.add_labelframe((bu1,bu2,bu3),'box buttons')
     _,_,ok2,_=b.add_waitbar2((600,400))
-    b.add_combobox((600,550),text='你有多大可能去珠穆朗玛峰',content=('20%','40%','60%','80%','100%','1000%'))
+    b.add_combobox((600,550),text='你有多大可能去珠穆朗玛峰',width=230,content=('20%','40%','60%','80%','100%','1000%'))
     b.add_button((600,480),text='测试进度条（无事件版本）',command=test4)
     _,_,_,progressgoto,_,_=b.add_progressbar((600,510))
     b.add_table((180,630),data=(('a','space fans over the\nworld','c'),('you\ncan','2','3'),('I','II','have a dream, then try your best to get it!')))

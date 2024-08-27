@@ -461,7 +461,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 > 
 > > `funcs[0]|funcs.select(num)`::选定选值，第一个值是0
 > > 
-> > `funcs[1]|funcs.disable()`::禁用
+> > `funcs[1]|funcs.disable(fg='#9d9d9d',bg='#f5f5f5')`::禁用
 > > 
 > > `funcs[2]|funcs.active()`::激活
 

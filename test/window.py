@@ -1,6 +1,7 @@
 import sys
 sys.path.append('..')
 from TinUI import *
+import extension
 from tkinter import Tk
 
 

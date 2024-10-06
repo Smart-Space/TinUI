@@ -1052,7 +1052,15 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 绘制一个单选组控件。
 
-### return: boxes, uid
+### return: boxes, funcs, uid
+
+> boxes::元素组：(标识符背景, 标识符, 文本, 背景元素)
+> 
+> funcs
+> 
+> > `funcs.active()`::激活控件
+> > 
+> > `funcs.disable(fg='#c1c1c1',bg='#f3f3f3')`::禁用控件
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI单选组控件.gif)
 
@@ -1610,6 +1618,32 @@ def show_msg(master,title,content,yestext='OK',notext='Cancel'):
 - 对于输入对话框，“取消按钮”和关闭窗口均返回 `None`。
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI信息提示对话框.gif)
+
+---
+
+# Class: extension
+
+TinUI拓展工具包，通过`from tinui import extension`导入。
+
+`extension`目前含有如下方法：
+
+## buttonlize(tinui,uid,bg='#fbfbfb',line='#CCCCCC',activebg='#f5f5f5',activeline='#e5e5e5',command=None)
+
+- tinui - TinUI控件所属的TinUI或BasicTinUI
+
+- uid - 元素名称或代码
+
+- bg - 背景颜色
+
+- line - 边框颜色
+
+- activebg - 响应背景色
+
+- activeline - 响应边框颜色
+
+- command - 响应函数
+
+> 注意，如果元素控件组(`uid`)中含有按钮之类的响应点击的控件，点击时会同时触发控件响应函数和该函数。
 
 ---
 

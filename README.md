@@ -1052,7 +1052,15 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 绘制一个单选组控件。
 
-### return: boxes, uid
+### return: boxes, funcs, uid
+
+> boxes::元素组：(标识符背景, 标识符, 文本, 背景元素)
+> 
+> funcs
+> 
+> > `funcs.active()`::激活控件
+> > 
+> > `funcs.disable(fg='#c1c1c1',bg='#f3f3f3')`::禁用控件
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI单选组控件.gif)
 

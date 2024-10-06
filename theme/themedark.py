@@ -12,6 +12,7 @@ class TinUIDark(TinUITheme):
     def __init__(self,ui:Union[TinUI,BasicTinUI]):
         super().__init__(ui,'tinui-dark-theme')
         self.label='dark'
+        self.ui['background']='#202020'
 
     def add_button(self,pos,*arg,**kw):
         return self.ui.add_button(pos,fg='#ffffff',bg='#2d2d2d',

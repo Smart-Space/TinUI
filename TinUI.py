@@ -16,12 +16,13 @@ import xml.etree.ElementTree  as ET
 import sys
 import os
 import shutil
-'''全部组件都是绘制的~~~，除了输入型组件无法使用tkinter画布完成对应效果'''
+import platform
+'''全部组件都是绘制的，除了输入型组件无法使用tkinter画布完成对应效果'''
 #==========
 '''开发信息
 开发者：Smart-Space（Junming Zhang）
 版权：版权所有(C) 2019（原型框架，TinGroup子项目）|2021（正式命名TinUI）- present Smart-Space（Junming Zhang）
-开发者邮箱：smart-space@qq.com
+开发者邮箱：smart-space@qq.com|tsan-zane@outlook.com
 语言：Python
 技术基础：tkinter（tcl/tk）
 开源平台：pypi、GitHub、csdn
@@ -1650,8 +1651,8 @@ class BasicTinUI(Canvas):
             width=13,outline=bg)
             uid='scrollbar'+str(back)
             self.itemconfig(back,tags=uid)
-            top=self.create_text((pos[0]+1,pos[1]),text='\ueddb',font='{Segoe Fluent Icons} 7',anchor='nw',fill=oncolor,tags=uid)
-            bottom=self.create_text((pos[0]+1,pos[1]+height),text='\ueddc',font='{Segoe Fluent Icons} 7',anchor='sw',fill=oncolor,tags=uid)
+            top=self.create_text((pos[0]+5,pos[1]+10),text='\ueddb',font='{Segoe Fluent Icons} 7',anchor='s',fill=oncolor,tags=uid)
+            bottom=self.create_text((pos[0]+5,pos[1]-10+height),text='\ueddc',font='{Segoe Fluent Icons} 7',anchor='n',fill=oncolor,tags=uid)
             sc=self.create_polygon((pos[0]+5,pos[1]+20,pos[0]+5,pos[1]+height-20,pos[0]+5,pos[1]+20),
             width=3,outline=color,tags=uid)
             #起始和终止位置
@@ -1665,11 +1666,11 @@ class BasicTinUI(Canvas):
             width=13,outline=bg)
             uid='scrollbar'+str(back)
             self.itemconfig(back,tags=uid)
-            top=self.create_text((pos[0],pos[1]+1),text='\uEDD9',font='{Segoe Fluent Icons} 7',anchor='nw',fill=oncolor,tags=uid)
-            bottom=self.create_text((pos[0]+height,pos[1]+1),text='\uEDDA',font='{Segoe Fluent Icons} 7',anchor='ne',fill=oncolor,tags=uid)
-            sc=self.create_polygon((pos[0]+12,pos[1]+5,pos[0]+height-20,pos[1]+5,pos[0]+20,pos[1]+5),
+            top=self.create_text((pos[0]+10,pos[1]+5),text='\uEDD9',font='{Segoe Fluent Icons} 7',anchor='e',fill=oncolor,tags=uid)
+            bottom=self.create_text((pos[0]-10+height,pos[1]+5),text='\uEDDA',font='{Segoe Fluent Icons} 7',anchor='w',fill=oncolor,tags=uid)
+            sc=self.create_polygon((pos[0]+20,pos[1]+5,pos[0]+height-20,pos[1]+5,pos[0]+20,pos[1]+5),
             width=3,outline=color,tags=uid)
-            start=pos[0]+12
+            start=pos[0]+15
             end=pos[0]+height-15
             canmove=end-start-10#(end-start)*0.95#working...
             widget.config(xscrollcommand=widget_move)
@@ -2071,8 +2072,10 @@ class BasicTinUI(Canvas):
             else:
                 endx=tbu.bbox(labeluid)[2]+3
             titleu=tbu.create_text((endx,2),text=title,fill=fg,font=font,anchor='nw',tags=(labeluid))#标题
-            cbx=tbu.bbox(titleu)[2]+10
-            cb=tbu.create_text((cbx,2),text='×',font=font,fill=fg,anchor='nw',tags=(labeluid))#页面删除按钮文本
+            tbubbox=tbu.bbox(titleu)
+            cby=(tbubbox[1]+tbubbox[3])//2
+            cbx=tbubbox[2]+10
+            cb=tbu.create_text((cbx,cby),text='\uE8BB',font='{Segoe Fluent Icons} 7',fill=fg,anchor='w',tags=(labeluid))#页面删除按钮文本
             tbbbox=tbu.bbox(titleu)
             if cancancel==False:
                 tbu.itemconfig(cb,state='hidden')
@@ -3464,7 +3467,7 @@ class BasicTinUI(Canvas):
         funcs.active=active
         return uid+'button',back,outline,funcs,uid
     
-    def add_barbutton(self,pos:tuple,font='微软雅黑 14',fg='#636363',bg='#f3f3f3',line='#f3f3f3',linew=0,activefg='#191919',activebg='#eaeaea',activeline='#eaeaea',sepcolor='#e4e4e4',content=(('保存','\uE74E',None),('','\uE792',None),'',('','\uE74D',None)),anchor='nw'):#绘制一个工具栏按钮组件
+    def add_barbutton(self,pos:tuple,font='微软雅黑 12',fg='#636363',bg='#f3f3f3',line='#f3f3f3',linew=0,activefg='#191919',activebg='#eaeaea',activeline='#eaeaea',sepcolor='#e4e4e4',content=(('保存','\uE74E',None),('','\uE792',None),'',('','\uE74D',None)),anchor='nw'):#绘制一个工具栏按钮组件
         def new_pos():
             #获取最新位置
             bbox=self.bbox(buttons_id)
@@ -3801,6 +3804,7 @@ if __name__=='__main__':
 
     b=TinUI(a,bg='white')
     b.pack(fill='both',expand=True)
+
     m=b.add_title((600,0),'TinUI is a modern way to show tkinter widget in your application, as they are drawn by tkinter canvas')
     m1=b.add_title((0,680),'test TinUI scrolled',size=2,angle=24)
     b.add_paragraph((2000,5),'location')
@@ -3927,5 +3931,12 @@ if __name__=='__main__':
     # bw.pack()
 
     b.bind('<Destroy>',lambda e:b.clean_windows())
+
+    # if platform.system()=='Windows':
+    #     import ctypes
+    #     ctypes.windll.shcore.SetProcessDpiAwareness(1)
+    #     factor=ctypes.windll.shcore.GetScaleFactorForDevice(0)
+    #     a.tk.call('tk', 'scaling', 96/72)
+    #     b.scale('all', 0, 0, 96/72, 96/72)
 
     a.mainloop()

@@ -2753,7 +2753,8 @@ class BasicTinUI(Canvas):
                     back=box.add_back((),tuple([te]),fg=bg,bg=bg,linew=3)
                     items[back]=(te,back)
                 else:#存在子级
-                    sign=box.create_text((padx,y),text='▽',font='Consolas 13',fill=signcolor,anchor='nw')#▷
+                    # sign=box.create_text((padx,y),text='▽',font='Consolas 13',fill=signcolor,anchor='nw')#▷
+                    sign=box.create_text((padx-1,y+3),text='\uE96E',font='{Segoe Fluent Icons} 12',fill=signcolor,anchor='nw')
                     te=box.create_text((padx+15,y),text=text[0],font=font,fill=fg,anchor='nw')
                     back=box.add_back((),tuple((sign,te)),fg=bg,bg=bg,linew=3)
                     items[back]=(te,back,sign)
@@ -2777,10 +2778,10 @@ class BasicTinUI(Canvas):
                     cids+=ccids
             return cids
         def open_view(sign,cid):#展开
-            if box.itemcget(sign,'text')=='▽':
+            if box.itemcget(sign,'text')=='\uE96E':
                 return
             box.tag_bind(sign,'<Button-1>',lambda event:close_view(sign,cid))
-            box.itemconfig(sign,text='▽')
+            box.itemconfig(sign,text='\uE96E')
             cids=items_dict[cid]
             move='move'+str(cid)#单层管理命名元素
             for i in cids:#只展开一层
@@ -2806,10 +2807,10 @@ class BasicTinUI(Canvas):
             #    box.move(line,0,height)
             box.config(scrollregion=box.bbox('all'))
         def close_view(sign,cid):#闭合
-            if box.itemcget(sign,'text')=='▷':
+            if box.itemcget(sign,'text')=='\uE970':
                 return
             box.tag_bind(sign,'<Button-1>',lambda event:open_view(sign,cid))
-            box.itemconfig(sign,text='▷')
+            box.itemconfig(sign,text='\uE970')
             cids=get_cids(cid)
             move='move'+str(cid)#单层管理命名元素
             for i in cids:
@@ -3683,7 +3684,7 @@ class TinUIXml():#TinUI的xml渲染方式
                         news.append(uid)
                     i.attrib['widgets']=str(tuple(news))
             #调整内部参数=====
-            xendy=y#重新获取本行其实纵坐标
+            xendy=y#重新获取本行起始纵坐标
             if linex!=None:#存在纵块
                 xendx=linex
                 linex=None

@@ -1,9 +1,18 @@
 <TinUI, a modern frame to render various widgets element for tkinter in one control.>
     Copyright (C) <2021-present>  <Smart-Space | Junming Zhang> <tsan-zane@outlook.com|smart-space@qq.com>
     2019（原型框架）2021（正式命名TinUI发布）
+基于GPLv3和LGPLv3发布
 
 ==========更新日志==========
 
+
+==========5.11==========
+202x-
+1. 允许额外的LGPLv3许可
+*2. 修复密码输入框的提示符颜色错误
+3. 优化部分控件动画性能
+*4. 改进pipspager动画
+5. windows下进行部分高dpi测试
 
 ==========5.10==========
 2024-11-9

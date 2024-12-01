@@ -1,6 +1,7 @@
 '''
 <TinUI, a modern frame to render various widgets elements for tkinter in one control.>
     Copyright (C) <2021-present>  <smart-space>
+基于GPLv3和额外的LPGLv3许可发布
 '''
 from tkinter import *
 from tkinter import ttk
@@ -670,7 +671,7 @@ class BasicTinUI(Canvas):
             if is_ok:
                 return
             self.itemconfig(waitbar1,extent=i,start=90+i)
-            self.update()
+            self.update_idletasks()
             if i==355:
                 start()
         def start():
@@ -795,7 +796,7 @@ class BasicTinUI(Canvas):
             maxx,maxy,winw,winh=wind.data
             bbox=self.bbox(uid)
             scx,scy=event.x_root,event.y_root#屏幕坐标
-            dx,dy=round(self.canvasx(event.x,)-bbox[0]),round(self.canvasy(event.y)-bbox[3])#画布坐标差值
+            dx,dy=round(self.canvasx(event.x)-bbox[0]),round(self.canvasy(event.y)-bbox[3])#画布坐标差值
             sx,sy=scx-dx,scy-dy
             if sx+winw>maxx:
                 x=sx-winw
@@ -1926,7 +1927,6 @@ class BasicTinUI(Canvas):
                         self.itemconfig(uilist[oldone][0],state='hidden')
             inchx=width/20#翻页动画参数
             newui=uilist[number][0]
-            newUI=uilist[number][1]
             mode=None
             if number>nowui:#向右翻页
                 if self.itemcget(newui,'anchor')!='ne':#重新对齐
@@ -1940,7 +1940,7 @@ class BasicTinUI(Canvas):
                 mode='left'
             startwidth=0#动画起始宽度
             self.itemconfig(newui,width=0,state='normal')
-            self.tkraise(newui)
+            self.lift(newui)
             animate(0,0)
             nowui=number#新标志
         def move_to(number):
@@ -2354,7 +2354,7 @@ class BasicTinUI(Canvas):
                 old_sign_back,old_sign=boxes[old_select][0:2]
                 self.itemconfig(old_sign,text='\uECCA')#字符还原为空心圆
                 button_out(None,old_sign,old_sign_back)
-                self.update()
+                self.update_idletasks()
             self.itemconfig(sign,text='\uECCC',fill=onbg)#调整字符为实心小圆
             self.itemconfig(sback,fill=onfg)#fg,bg对调，因为此时的back作为边框元素
             if command!=None:
@@ -3023,23 +3023,23 @@ class BasicTinUI(Canvas):
                 for i in range(0,rightw+5,5):
                     back.move('cont',-5,0)
                     time.sleep(0.001)
-                    back.update()
+                    back.update_idletasks()
             elif side=='right':
                 for i in range(0,leftw+5,5):
                     back.move('cont',5,0)
                     time.sleep(0.001)
-                    back.update()
+                    back.update_idletasks()
             elif side=='center':
                 if nowmode==right:
                     for i in range(0,rightw+5,5):
                         back.move('cont',5,0)
                         time.sleep(0.001)
-                        back.update()
+                        back.update_idletasks()
                 elif nowmode==left:
                     for i in range(0,leftw+5,5):
                         back.move('cont',-5,0)
                         time.sleep(0.001)
-                        back.update()
+                        back.update_idletasks()
         def move(event):#滚动响应
             nonlocal nowmode
             back.unbind('<MouseWheel>')
@@ -3708,6 +3708,15 @@ if __name__=='__main__':
     a.geometry('700x700+5+5')
     a.iconbitmap('LOGO.ico')
     a.title('TinUI控件展示')
+
+    if platform.system()=='Windows':
+        import ctypes
+        try:
+            ctpyes.windll.shcore.SetProcessDpiAwareness(1)
+        except:
+            ctypes.windll.user32.SetProcessDPIAware()
+        # ScaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0)
+        # a.tk.call('tk', 'scaling', ScaleFactor/75)
 
     b=TinUI(a,bg='white')
     b.pack(fill='both',expand=True)

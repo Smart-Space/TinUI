@@ -253,6 +253,13 @@ def end():
 
 r=win()
 
+if platform.system()=='Windows':
+    import ctypes
+    try:
+        ctpyes.windll.shcore.SetProcessDpiAwareness(1)
+    except:
+        ctypes.windll.user32.SetProcessDPIAware()
+
 u=r.u
 du=TinUILight(u)
 u['background']='#f3f3f3'

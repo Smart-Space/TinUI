@@ -2814,12 +2814,12 @@ class BasicTinUI(Canvas):
                 self.tag_bind(funcw,'<Button-1>',showkey)
             elif nowstate=='shown':
                 self.tag_bind(funcw,'<Leave>',lambda event:self.itemconfig(funcw,fill=onoutline))
-                self.tag_bind(funcw,'<Enter>',lambda event:self.itemconfig(funcw,fill=fg))
+                self.tag_bind(funcw,'<Enter>',lambda event:self.itemconfig(funcw,fill=onoutline))
                 self.tag_bind(funcw,'<Button-1>',hidekey)
         def showkey(e):
             nonlocal nowstate
             nowstate='shown'
-            self.itemconfig(funcw,fill=activefg)
+            self.itemconfig(funcw,fill=onoutline)
             entry.config(show='')
             if_empty(None)
         def hidekey(e):

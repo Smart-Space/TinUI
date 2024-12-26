@@ -14,11 +14,11 @@ xml='''
     <entry width='200'>en</entry>
     <line anchor='nw' padx='20'>
         <button text="获取输入值" font='宋体 16' command='self.funcs["get1"]'></button>
-        <entry width='200'>en</entry>
+        <entry width='200'></entry>
     </line>
     <line anchor='nw' y='120'>
         <button text="获取输入值" font='宋体 16' command='self.funcs["get1"]'></button>
-        <entry width='200'>en</entry>
+        <entry width='200'></entry>
     </line>
 </line>
 <line>
@@ -31,6 +31,14 @@ xml='''
 '''
 
 a=Tk()
+
+if platform.system()=='Windows':
+    import ctypes
+    try:
+        ctpyes.windll.shcore.SetProcessDpiAwareness(1)
+    except:
+        ctypes.windll.user32.SetProcessDPIAware()
+
 u=TinUI(a)
 x=TinUIXml(u)
 x.environment(globals())

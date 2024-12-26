@@ -155,6 +155,14 @@ def reset_marks():#重新绘制标记点
 
 
 root=Tk()
+
+if platform.system()=='Windows':
+    import ctypes
+    try:
+        ctpyes.windll.shcore.SetProcessDpiAwareness(1)
+    except:
+        ctypes.windll.user32.SetProcessDPIAware()
+
 root.geometry('1300x700+5+5')
 root.title('TinUIXml设计测试')
 root.resizable(False,False)

@@ -1917,7 +1917,10 @@ class BasicTinUI(Canvas):
             nonlocal nowui
             oldone=nowui
             def animate(startwidth,times):#展开动画
-                self.itemconfig(newui,width=startwidth+inchx)
+                if mode == 'left':
+                    self.itemconfig(uilist[oldone][0],width=width-startwidth-inchx)
+                else:
+                    self.itemconfig(newui,width=startwidth+inchx)
                 self.update_idletasks()
                 if times<19:
                     self.after(10,lambda:animate(startwidth+inchx,times+1))
@@ -1928,18 +1931,18 @@ class BasicTinUI(Canvas):
             inchx=width/20#翻页动画参数
             newui=uilist[number][0]
             mode=None
-            if number>nowui:#向右翻页
-                if self.itemcget(newui,'anchor')!='ne':#重新对齐
-                    self.move(newui,width,0)
+            if number>=nowui:#向右翻页
+                self.moveto(newui,startx+width,pos[1])
                 self.itemconfig(newui,anchor='ne')
                 mode='right'
             else:#向左翻页
-                if self.itemcget(newui,'anchor')!='nw':#重新对齐
-                    self.move(newui,-width,0)
+                self.moveto(newui,startx,pos[1])
                 self.itemconfig(newui,anchor='nw')
+                self.itemconfig(uilist[oldone][0],anchor='ne')
+                self.moveto(uilist[oldone][0],startx,pos[1])
                 mode='left'
             startwidth=0#动画起始宽度
-            self.itemconfig(newui,width=0,state='normal')
+            self.itemconfig(newui,state='normal')
             self.lift(newui)
             animate(0,0)
             nowui=number#新标志

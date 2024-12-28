@@ -765,11 +765,11 @@ class BasicTinUI(Canvas):
     def add_combobox(self,pos:tuple,width:int=200,height:int=200,text='',content:tuple=(),fg='#1a1a1a',bg='#f8f8f8',outline='#c8c8c8',activefg='#191919',activebg='#f1f1f1',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',tran='#01FF11',font=('微软雅黑',12),anchor='nw',command=None):#绘制组合/下拉框
         def open_box(event):
             if not drop:#未展开
-                self.itemconfig(button,text='∧')
+                self.itemconfig(button,text='\uE70E')
                 show(event)
             else:
                 unshow(None)
-                self.itemconfig(button,text='∨')
+                self.itemconfig(button,text='\uE70D')
         def mousein(e):
             #鼠标进入
             self.itemconfig(back,fill=activebg,outline=activebg)
@@ -820,17 +820,17 @@ class BasicTinUI(Canvas):
             drop=False
             pickbox.withdraw()
             pickbox.unbind('<FocusOut>')
-            self.itemconfig(button,text='∨',fill=fg)
+            self.itemconfig(button,text='\uE70D',fill=fg)
         def choose_this(word):
             self.itemconfig(main,text=word)
             unshow(None)
             if command!=None:
                 command(word)
         def select(num):
-            self.itemconfig(button,text='∧',fill=activefg)
+            self.itemconfig(button,text='\uE70E',fill=activefg)
             choose_this(content[num])
         def disable(fg='#9d9d9d',bg='#f5f5f5'):
-            self.itemconfig(button,text='∨',fill=fg)
+            self.itemconfig(button,text='\uE70D',fill=fg)
             self.itemconfig(main,fill=fg)
             self.itemconfig(back,fill=bg,outline=bg)
             self.itemconfig(uid,state='disabled')
@@ -848,7 +848,9 @@ class BasicTinUI(Canvas):
         bbox=self.bbox(main)#文本尺寸
         x1,y1,x2,y2=bbox[0]+3,bbox[1]+3,bbox[0]+width-3,bbox[3]-3
         drop=False#未展开
-        button=self.create_text((x2-1,(y1+y2)/2),text='∨',fill=fg,font=font,tags=uid,anchor='w')#按钮
+        iconfont=tkfont.Font(font=font)
+        font_size=str(iconfont.cget('size'))
+        button=self.create_text((x2-1,(y1+y2)/2),text='\uE70D',fill=fg,font='{Segeo Fluent Icons} '+font_size,tags=uid,anchor='w')#按钮
         x1,y1,x2,y2=self.bbox(uid)#文本与按钮区域
         backpos=(x1,y1,x2,y1,x2,y2,x1,y2)
         outlinepos=(x1-1,y1-1,x2+1,y1-1,x2+1,y2+1,x1-1,y2+1)
@@ -863,16 +865,16 @@ class BasicTinUI(Canvas):
         pickbox=Toplevel(self)#浮出窗口
         self.windows.append(pickbox)
         pickbox.withdraw()#隐藏窗口
-        pickbox.geometry(f'{width}x{height}')
+        pickbox.geometry(f'{width+16}x{height}')
         pickbox.overrideredirect(True)
         pickbox.attributes('-topmost',1)
         pickbox.attributes('-transparent',tran)
         wind=TinUINum()#记录数据
         bar=BasicTinUI(pickbox,bg=tran)
         bar.pack(fill='both',expand=True)
-        bar.create_polygon((9,9,width-9,9,width-9,height-9,9,height-9),fill=bg,outline=bg,width=9)
-        bar.lower(bar.create_polygon((8,8,width-8,8,width-8,height-8,8,height-8),fill=outline,outline=outline,width=9))
-        bar.add_listbox((6,6),width-36,height-36,bg=bg,fg=fg,data=content,activebg=activebg,sel=activebg,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)
+        bar.create_polygon((9,9,x2-x1-1,9,x2-x1-1,height-9,9,height-9),fill=bg,outline=bg,width=9)
+        bar.lower(bar.create_polygon((8,8,x2-x1,8,x2-x1,height-8,8,height-8),fill=outline,outline=outline,width=9))
+        bar.add_listbox((6,6),x2-x1-28,height-36,bg=bg,fg=fg,data=content,activebg=activebg,sel=activebg,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)
         self.__auto_anchor(uid,pos,anchor)
         readyshow()
         funcs=FuncList(3)
@@ -1118,9 +1120,9 @@ class BasicTinUI(Canvas):
         _font=tkfont.Font(font=font)
         font_size=str(_font.cget('size'))
         x1,y1,x2,y2=self.bbox(entry)
-        button1=self.add_button2((pos[0]+width,(y1+y2)/2),anchor='w',text='\uE70E',linew=1,line=line,activeline=line,fg=fg,bg=bg,activefg=activefg,activebg=activebg,font='{Segoe Fluent Icons} '+font_size,command=updata)
+        button1=self.add_button2((pos[0]+width,(y1+y2)/2),anchor='w',text='\uE70E',linew=1,line=line,activeline=line,fg=fg,bg=bg,activefg=activefg,activebg=activebg,font='{Segeo Fluent Icons} '+font_size,command=updata)
         bbox=self.bbox(button1[-1])
-        button2=self.add_button2((bbox[2],(y1+y2)/2),anchor='w',text='\uE70D',linew=1,line=line,activeline=line,fg=fg,bg=bg,activefg=activefg,activebg=activebg,font='{Segoe Fluent Icons} '+font_size,command=downdata)
+        button2=self.add_button2((bbox[2],(y1+y2)/2),anchor='w',text='\uE70D',linew=1,line=line,activeline=line,fg=fg,bg=bg,activefg=activefg,activebg=activebg,font='{Segeo Fluent Icons} '+font_size,command=downdata)
         self.addtag_withtag(uid,button1[-1])
         self.addtag_withtag(uid,button2[-1])
         backbbox=self.bbox(uid)

@@ -95,5 +95,9 @@ displayui,_,duixml,_=uix.tags['displayui']
 
 ui.pack(fill='both',expand=True)
 
-if __name__=='__main__':
+
+def maintest():
     window.mainloop()
+
+if __name__=='__main__':
+    maintest()

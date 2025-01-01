@@ -398,10 +398,12 @@ class BasicTinUI(Canvas):
         def flash():
             go_func(None)
         def on():
-            self.itemconfig(check,fill=bg)
+            nonlocal stateinfo
+            stateinfo = False
             go_func(None)
         def off():
-            self.itemconfig(check,fill=onbg)
+            nonlocal stateinfo
+            stateinfo = True
             go_func(None)
         def disable():
             self.itemconfig(checkbutton,state='disable',fill='#7a7a7a')
@@ -2673,11 +2675,16 @@ class BasicTinUI(Canvas):
                 box.itemconfig(cid,fill=bg,outline=bg)
         def click(cid,send=False):
             nonlocal nowid
-            box.itemconfig(line,state='normal')
             box.itemconfig(nowid,fill=bg,outline=bg)#原来的
             box.itemconfig(cid,fill=onbg,outline=onbg)#现在的
             nowid=cid#互换次序
-            posi=box.bbox(nowid)[1]
+            posi=box.bbox(nowid)
+            if posi is None:
+                box.itemconfig(line, state='hidden')
+                return
+            else:
+                box.itemconfig(line, state='normal')
+                posi = posi[1]
             box.moveto(line,1,posi+linew/5)
             if command!=None and send:
                 fln.father_link=[cid]#父级关系
@@ -2732,7 +2739,7 @@ class BasicTinUI(Canvas):
                     box.addtag_withtag(move,uid)
             box.itemconfig(move,state='normal')
             bbox=box.bbox(move)
-            if bbox==None:return
+            if bbox==None: return
             index=tuple(items.keys()).index(cids[-1])+1
             if index!=len(items.keys()):
                 height=bbox[3]-bbox[1]#获取移动模块高度
@@ -2741,10 +2748,10 @@ class BasicTinUI(Canvas):
                         box.move(uid,0,height)
             box.dtag(move)
             bbox=box.bbox(nowid)
-            #click(nowid)#单级输出
             if nowid in cids:#重新显示标识元素
                 click(nowid)
             elif bbox!=None:
+                click(nowid)#单级输出
                 posi=box.bbox(nowid)[1]
                 box.moveto(line,1,posi+linew/5)
             box.config(scrollregion=box.bbox('all'))
@@ -2756,7 +2763,6 @@ class BasicTinUI(Canvas):
             cids=get_cids(cid)
             move='move'+str(cid)#单层管理命名元素
             for i in cids:
-                #print(box.itemcget(items[i][0],'text'))
                 for uid in items[i]:
                     box.addtag_withtag(move,uid)
                 if i in items_dict:
@@ -2773,7 +2779,7 @@ class BasicTinUI(Canvas):
             if nowid in cids:#标识元素控制
                 box.itemconfig(line,state='hidden')
             else:
-                click(cid)#重新绘制位置
+                click(nowid)#重新绘制位置
             box.config(scrollregion=box.bbox('all'))
         def bindview(event):
             if event.state==0:

@@ -6,7 +6,7 @@
 ==========更新日志==========
 
 
-==========5.12==========
+==========5.13==========
 2025-
 1. 统一大圆角8px（width=17），小圆角4px（width=9）。包括：
     entry, link, labelframe, combobox, table, spinbox,
@@ -15,6 +15,8 @@
     picker, menubutton, barbutotn
 *2. 优化spinbox调节按钮外观
 3. 调整barbutton，menubar，menubutton外框与内容的间距
+4. 修复checkbutton状态切换函数的问题
+5. 修复treeview展开选项的问题
 
 ==========5.11==========
 2024-12-28

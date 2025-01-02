@@ -1779,14 +1779,15 @@ class BasicTinUI(Canvas):
         def buttonout(itui):
             if items.index(itui)!=nowon:
                 itui[0]['background']=bg
-        def click(itui):
+        def click(itui, send=True):
             nonlocal nowon
             index=items.index(itui)
-            items[nowon][0]['background']=bg
+            if nowon <= len(items)-1:
+                items[nowon][0]['background']=bg
             nowon=index
             items[nowon][0]['background']=activebg
             ui.coords(line,1,index*(linew+2)+lineheight,1,index*(linew+2)+lineheight*2)
-            if command!=None:
+            if command!=None and send:
                 command(nowon)
         def bindyview(event):
             ui.yview_scroll(int(-1*(event.delta/120)), "units")
@@ -1818,7 +1819,7 @@ class BasicTinUI(Canvas):
                 pass
             elif index<nowon:
                 nowon-=1
-                ui.coords(line,1,index*(linew+2)+lineheight,1,index*(linew+2)+lineheight*2) 
+                ui.move(line, 0, -linew-2)
             endy-=linew+2
             subui=items[index]
             ui.delete(subui[-1])

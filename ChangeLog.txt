@@ -17,6 +17,7 @@
 3. 调整barbutton，menubar，menubutton外框与内容的间距
 4. 修复checkbutton状态切换函数的问题
 5. 修复treeview展开选项的问题
+7. 修复listview删除元素后的元素列表存储错误以及样式提示符位置错误
 
 ==========5.11==========
 2024-12-28

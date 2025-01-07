@@ -852,7 +852,7 @@ class BasicTinUI(Canvas):
         drop=False#未展开
         iconfont=tkfont.Font(font=font)
         font_size=str(iconfont.cget('size'))
-        button=self.create_text((x2-1,(y1+y2)/2),text='\uE70D',fill=fg,font='{Segeo Fluent Icons} '+font_size,tags=uid,anchor='w')#按钮
+        button=self.create_text((x2-1,(y1+y2)/2),text='\uE70D',fill=fg,font='{Segoe Fluent Icons} '+font_size,tags=uid,anchor='w')#按钮
         x1,y1,x2,y2=self.bbox(uid)#文本与按钮区域
         backpos=(x1+1,y1+1,x2-1,y1+1,x2-1,y2-1,x1+1,y2-1)
         outlinepos=(x1,y1,x2,y1,x2,y2,x1,y2)
@@ -1104,6 +1104,8 @@ class BasicTinUI(Canvas):
                 result=TinUIString(data[index])
                 result.num=index
                 command(result)
+        def _change_data(event):
+            self.itemconfig(cui, state='normal')
         def check_in_data():
             val=wentry.get()
             if val in data:
@@ -1122,25 +1124,38 @@ class BasicTinUI(Canvas):
         _font=tkfont.Font(font=font)
         font_size=str(_font.cget('size'))
         x1,y1,x2,y2=self.bbox(entry)
-        button1=self.add_button2((pos[0]+width,(y1+y2)/2),anchor='w',text='\uE70E',linew=1,line=line,activeline=line,fg=fg,bg=bg,activefg=activefg,activebg=activebg,font='{Segeo Fluent Icons} '+font_size,command=updata)
-        bbox=self.bbox(button1[-1])
-        button2=self.add_button2((bbox[2],(y1+y2)/2),anchor='w',text='\uE70D',linew=1,line=line,activeline=line,fg=fg,bg=bg,activefg=activefg,activebg=activebg,font='{Segeo Fluent Icons} '+font_size,command=downdata)
-        self.addtag_withtag(uid,button1[-1])
-        self.addtag_withtag(uid,button2[-1])
+        # 调节按钮触发调节按钮
+        button = self.add_button2((pos[0]+width,(y1+y2)/2),anchor='w',text='\uEC8F',linew=1,line=line,activeline=line,fg=fg,bg=bg,activefg=activefg,activebg=activebg,font='{Segoe Fluent Icons} '+font_size,command=_change_data)
+        self.addtag_withtag(uid, button[-1])
         backbbox=self.bbox(uid)
         backpos=(backbbox[0]+3,backbbox[1]+5,backbbox[2]-3,backbbox[1]+5,backbbox[2]-3,backbbox[3]-5,backbbox[0]+3,backbbox[3]-5)
         linepos=(backbbox[0]+2,backbbox[1]+4,backbbox[2]-2,backbbox[1]+4,backbbox[2]-2,backbbox[3]-4,backbbox[0]+2,backbbox[3]-4)
         back=self.create_polygon(backpos,fill=bg,outline=bg,width=9,tags=uid)
         outline=self.create_polygon(linepos,fil=line,outline=line,width=9,tags=uid)
+        # 隐藏的调节按钮
+        cui = uid + '_cui'
+        button1=self.add_button2((pos[0]+width+5,(y1+y2)/2),anchor='sw',text='\uE70E',linew=1,line=line,activeline=line,fg=fg,bg=bg,activefg=activefg,activebg=activebg,font='{Segoe Fluent Icons} '+font_size,command=updata)
+        button2=self.add_button2((pos[0]+width+5,(y1+y2)/2),anchor='nw',text='\uE70D',linew=1,line=line,activeline=line,fg=fg,bg=bg,activefg=activefg,activebg=activebg,font='{Segoe Fluent Icons} '+font_size,command=downdata)
+        cuiback = self.add_back((0, 0), (button1[-1], button2[-1]), fg=line, bg=line)
+        self.addtag_withtag(uid, button1[-1])
+        self.addtag_withtag(uid, button2[-1])
+        self.addtag_withtag(uid, cuiback)
+        self.addtag_withtag(cui, button1[-1])
+        self.addtag_withtag(cui, button2[-1])
+        self.addtag_withtag(cui, cuiback)
+        self.tag_bind(cuiback, '<Leave>', lambda event: self.itemconfig(cui, state='hidden'))
+        self.itemconfig(cui, state='hidden')
         self.tkraise(back)
         self.tkraise(entry)
+        self.tkraise(button[-1])
+        self.tkraise(cuiback)
         self.tkraise(button1[-1])
         self.tkraise(button2[-1])
         datanum=TinUINum()
         datanum.num=data.index(now)#记录数据位置
         maxnum=len(data)-1#最大位置
         self.__auto_anchor(uid,pos,anchor)
-        return wentry,button1,button2,back,outline,uid
+        return wentry,button1,button2,back,outline,button,uid
 
     def add_scalebar(self,pos:tuple,width=200,fg='#4554dc',activefg='#4554dc',bg='#868686',buttonbg='#ffffff',buttonoutline='#cccccc',data=(1,2,3,4,5),start=1,anchor='nw',command=None):#绘制调节框
         def mousedown(event):

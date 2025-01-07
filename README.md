@@ -586,7 +586,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 绘制一个选值框。
 
-### return: wentry, button1, button2, back, outline, uid
+### return: wentry, button1, button2, back, outline, button, uid
 
 > wentry::输入框组件
 > 
@@ -597,6 +597,8 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 > back::背景元素
 > 
 > outline::边框元素
+> 
+> button::打开调节框的按钮
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI选值框.gif)
 

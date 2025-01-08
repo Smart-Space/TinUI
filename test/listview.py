@@ -19,7 +19,7 @@ lvcontent=(
 ('百度','全球领先的中文搜索引擎','https://www.baidu.com/'),
 ('Smart-Space','一个平凡的中国人','https://smart-space.com.cn')
 )
-for i in range(0,5):
+for i in range(0,2):
     lvitems[i][2].loadxml(f'''<tinui>
     <line>
     <line>
@@ -28,6 +28,7 @@ for i in range(0,5):
     </line>
     <line>
     <label text='{lvcontent[i][1]}'></label>
+    <button2 text='test'></button2>
     </line>
     </line>
     </tinui>''')

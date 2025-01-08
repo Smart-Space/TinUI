@@ -1792,10 +1792,16 @@ class BasicTinUI(Canvas):
         def buttonin(itui):
             itui[0]['background']=activebg
         def buttonout(itui):
+            if itui not in items:
+                return
             if items.index(itui)!=nowon:
                 itui[0]['background']=bg
         def click(itui, send=True):
             nonlocal nowon
+            if itui not in items:
+                # 这种情况发生于点击子元素内的按钮，触发元素删除
+                # 而这仍然会触发此click事件，因此需要判断该元素是否被删除
+                return
             index=items.index(itui)
             if nowon <= len(items)-1:
                 items[nowon][0]['background']=bg
@@ -1817,9 +1823,11 @@ class BasicTinUI(Canvas):
                 item[0].bind('<Button-1>',lambda event,item=item:click(item))
                 item[0].bind('<Leave>',lambda event,item=item:buttonout(item))
                 item[0].bind('<MouseWheel>',bindyview)
-            bbox=list(ui.bbox('item'))
-            bbox[0]-=3
-            ui.config(scrollregion=bbox)
+            bbox = ui.bbox('item')
+            if bbox != None:
+                bbox = list(bbox)
+                bbox[0] -= 3
+                ui.config(scrollregion=bbox)
         def getitems():#获取items
             return items
         def getui(index):#获取 add_ui uid

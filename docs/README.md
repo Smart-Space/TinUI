@@ -28,6 +28,8 @@ TinUI使用GPLv3（GPL）作为开源协议。
 
 商业软件，需要添加TinUI的gpl-3.0.md的开源许可，为自身使用TinUI做出声明，并且公开TinUI部分的代码。此外，需要注明开发者Smart-Space（Junming Zhang）对TinUI的版权所有，以及GitHub/TinUI的开源代码库：https://github.com/Smart-Space/TinUI/
 
+> 自TinUI-**5.11**起，TinUI支持LGPL-3中的额外许可
+
 ## 简单示例
 
 以下是一段简易TinUI代码示例：
@@ -584,7 +586,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 绘制一个选值框。
 
-### return: wentry, button1, button2, back, outline, uid
+### return: wentry, button1, button2, back, outline, button, uid
 
 > wentry::输入框组件
 > 
@@ -595,6 +597,8 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 > back::背景元素
 > 
 > outline::边框元素
+> 
+> button::打开调节框的按钮
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI选值框.gif)
 

@@ -179,7 +179,7 @@ class TinUIEvent:
             self.ui.tag_bind(uid,i[0],lambda event,uid=uid,name=i[0]:self.go_func(uid,name,event))
 
     def newbind(self,uid,event_name,func):#新增同事件函数
-        self.uiddict[uid][eventname].append(func)
+        self.uiddict[uid][event_name].append(func)
 
     def cancelbind(self,uid,eventname,func):#删除同事件函数
         self.uiddict[uid][eventname].remove(func)
@@ -2889,7 +2889,7 @@ class BasicTinUI(Canvas):
             entry['state']='normal'
             entry.focus_set()
             self.itemconfig(back,outline=activebg,fill=activebg)
-            self.itemconfig(bottom,fill=onoutline)
+            self.itemconfig(bottomline,fill=onoutline)
         def __disable():#禁用
             entry['state']='disable'
             self.lower(bottomline,back)

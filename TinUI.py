@@ -1760,6 +1760,8 @@ class BasicTinUI(Canvas):
                     box.tag_bind(item_id, '<Leave>', lambda event,text=text : out_mouse(text))
                     box.tag_bind(item_id, '<Button-1>', lambda event,text=text : sel_it(text))
             tbbox=box.bbox('textcid')
+            if tbbox==None:
+                return
             twidth=tbbox[2]-tbbox[0]
             maxwidth=twidth if twidth>maxwidth else maxwidth
             if maxwidth<width:
@@ -3593,18 +3595,20 @@ class TinUIXml():#TinUI的xml渲染方式
             uid=name[-1]
         return uid
 
-    def __load_line(self,line,x=5,y=5,padx=5,pady=5,anchor='nw'):#根据xml的<line>逐行渲染TinUI组件
+    def __load_line(self,line,x=5,y=5,padx=5,pady=5,anchor='nw',ftags:list=[]):#根据xml的<line>逐行渲染TinUI组件
         last_y=y
         linex=None#纵块中的最大宽度
         padx = int(line.get('padx', padx))
         pady = int(line.get('pady', pady))
-        xendx = int(line.get('x', x))
+        xendx = x = int(line.get('x', x))
         xendy = y = int(line.get('y', y))
         allanchor = line.get('anchor', anchor)
+        lineanchor = line.get('lineanchor', '')# 整个模块的对齐方向
+        ftag = 'ftag-' + str(id(line))
+        ftags.append(ftag)
         for i in line.iterfind('*'):#只检索直接子元素
             if i.tag=='line':
-                #linex=0
-                liney,newlinex=self.__load_line(i,xendx,xendy,padx,pady,allanchor)
+                liney,newlinex=self.__load_line(i,xendx,xendy,padx,pady,allanchor,ftags)
                 if liney>self.yendy-pady:#在同一位置判断纵向大小
                     last_y=xendy=liney
                 if linex==None:#判断是否是该纵块的第一个<line>
@@ -3646,6 +3650,8 @@ class TinUIXml():#TinUI的xml渲染方式
                 bboxtag=tagall
             else:
                 bboxtag=tagall[-1]
+            for each_ftag in ftags:
+                self.ui.addtag_withtag(each_ftag,bboxtag)
             bbox=self.ui.bbox(bboxtag)
             xendx=bbox[2]+padx#获取当前最大x坐标
             if bbox[3]>last_y-pady:#比较当前最低y坐标
@@ -3653,6 +3659,45 @@ class TinUIXml():#TinUI的xml渲染方式
             #为内部组件命名
             if i.text!=None:
                 self.tags[i.text]=tagall
+        # 根据lineanchor调整最后一行的位置
+        bbox = self.ui.bbox(ftag)
+        xcenter = (bbox[0]+bbox[2])/2
+        ycenter = (bbox[1]+bbox[3])/2
+        if lineanchor == 'nw':
+            dx = x - bbox[0]
+            dy = y - bbox[1]
+        elif lineanchor == 'n':
+            dx = x - xcenter
+            dy = y - bbox[1]
+        elif lineanchor == 'ne':
+            dx = x - bbox[2]
+            dy = y - bbox[1]
+        elif lineanchor == 'e':
+            dx = x - bbox[2]
+            dy = y - ycenter
+        elif lineanchor == 'se':
+            dx = x - bbox[2]
+            dy = y - bbox[3]
+        elif lineanchor == 's':
+            dx = x - xcenter
+            dy = y - bbox[3]
+        elif lineanchor == 'sw':
+            dx = x - bbox[0]
+            dy = y - bbox[3]
+        elif lineanchor == 'w':
+            dx = x - bbox[0]
+            dy = y - ycenter
+        elif lineanchor == 'center':
+            dx = x - xcenter
+            dy = y - ycenter
+        else:
+            dx = 0
+            dy = 0
+        self.ui.move(ftag, dx, dy)
+        bbox = self.ui.bbox(ftag)
+        xendx = bbox[2] + padx
+        last_y = bbox[3] + pady
+        self.ui.dtag(ftag)
         return last_y,xendx
 
     def loadxml(self,xml:str):#从xml字符串载入窗口组件
@@ -3751,14 +3796,14 @@ if __name__=='__main__':
     a.iconbitmap('LOGO.ico')
     a.title('TinUI控件展示')
 
-    if platform.system()=='Windows':
-        import ctypes
-        try:
-            ctypes.windll.shcore.SetProcessDpiAwareness(1)
-        except:
-            ctypes.windll.user32.SetProcessDPIAware()
-        # ScaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0)
-        # a.tk.call('tk', 'scaling', ScaleFactor/75)
+    # if platform.system()=='Windows':
+    #     import ctypes
+    #     try:
+    #         ctypes.windll.shcore.SetProcessDpiAwareness(1)
+    #     except:
+    #         ctypes.windll.user32.SetProcessDPIAware()
+    #     # ScaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0)
+    #     # a.tk.call('tk', 'scaling', ScaleFactor/75)
 
     b=TinUI(a,bg='white')
     b.pack(fill='both',expand=True)

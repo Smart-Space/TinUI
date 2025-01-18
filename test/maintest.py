@@ -68,12 +68,12 @@ xmlf.close()
 
 window = Tk()
 
-if platform.system()=='Windows':
-    import ctypes
-    try:
-        ctpyes.windll.shcore.SetProcessDpiAwareness(1)
-    except:
-        ctypes.windll.user32.SetProcessDPIAware()
+# if platform.system()=='Windows':
+#     import ctypes
+#     try:
+#         ctpyes.windll.shcore.SetProcessDpiAwareness(1)
+#     except:
+#         ctypes.windll.user32.SetProcessDPIAware()
 
 window.resizable(False,False)
 window.iconbitmap('../LOGO.ico')

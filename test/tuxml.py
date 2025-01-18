@@ -9,7 +9,7 @@ def get1(event):
 
 xml='''
 <tinui>
-<line x='5' y='44' anchor='w' pady='20'>
+<line x='5' y='44' anchor='nw' lineanchor='w' pady='20'>
     <button text="获取输入值" font='宋体 16' command='self.funcs["get1"]'></button>
     <entry width='200'>en</entry>
     <line anchor='nw' padx='20'>
@@ -32,12 +32,7 @@ xml='''
 
 a=Tk()
 
-if platform.system()=='Windows':
-    import ctypes
-    try:
-        ctpyes.windll.shcore.SetProcessDpiAwareness(1)
-    except:
-        ctypes.windll.user32.SetProcessDPIAware()
+
 
 u=TinUI(a)
 x=TinUIXml(u)

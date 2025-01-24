@@ -195,7 +195,11 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 绘制一个类Label组件。
 
-### return: label, uid
+### return: label, back, uid
+
+> label::文本
+>
+> back::背景元素
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI标签.gif)
 
@@ -1534,18 +1538,20 @@ command::反馈函数，应当接受两个参数，`x`, `y`
   
   > ```python
   > (
-  >     ('text','Segoe Fluent Icons code',command),
-  >     ...,
-  >     '',#分割线
-  >     ('text','Segoe Fluent Icons code',command),
+  >  ('text','Segoe Fluent Icons code',command),
+  >  ...,
+  >  '',#分割线
+  >  ('text','Segoe Fluent Icons code',command),
   > )
   > ```
-
+  >
+  > 文本和图标参数皆可为空，但至少应该有一个是有值的
+  
 - anchor-对齐方向
 
 绘制一个工具栏按钮组件。
 
-### return outline, back, buttons, uid
+### return: outline, back, buttons, uid
 
 > outline::边框元素
 > 
@@ -1554,6 +1560,30 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 > buttons::按顺序的所有按钮列表，每一个值为 `add_button2()`的返回值
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI工具栏按钮组件.gif)
+
+---
+
+### add_flyout(self, fid, width:int=250, height:int=150, bind='\<Button-1>', line='#dcdcdc', bg='#f9f9f9', anchor='n')
+
+- fid-需要绑定的控件元素
+- width-宽度
+- height-高度
+- bind-绑定的事件
+- line-边框颜色
+- bg-背景颜色
+- anchor-相对于绑定元素的浮出位置，默认在上方
+
+绘制一个浮出ui控件
+
+### renturn: ui, uixml, hide, uid
+
+> ui::浮出元素BasicTinUI
+>
+> uixml::绑定在ui上的TinUIXml
+>
+> hide::窗口关闭函数，接受一个event参数，因此可直接绑定在浮出控件内部的按钮等关闭浮出ui的交互控件的回调
+
+![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI浮出ui控件.gif)
 
 ---
 

@@ -8,8 +8,6 @@ from tkinter import ttk
 from tkinter import font as tkfont
 from webbrowser import open as webopen
 import time
-import math
-import asyncio
 import threading
 from typing import Union
 from types import FunctionType,BuiltinFunctionType
@@ -190,7 +188,9 @@ class BasicTinUI(Canvas):
     uid参数为每一个组件（除个别）的整体tag_name"""
 
     def __init__(self,master,**kw):
-        Canvas.__init__(self,master,selectborderwidth=0,highlightthickness=0,bd=0, **kw)
+        if 'highlightthickness' not in kw:
+            kw['highlightthickness']=0
+        Canvas.__init__(self, master, selectborderwidth=0, bd=0, **kw)
         #self.bind('<Button-1>',lambda event:self.focus_set())
         self.init()
 
@@ -366,7 +366,7 @@ class BasicTinUI(Canvas):
         back=self.create_rectangle((x1,y1,x2,y2),fill=bg,outline=outline,tags=uid)
         self.tkraise(label)
         self.__auto_anchor(uid,pos,anchor)
-        return label,uid
+        return label, back, uid
 
     def add_checkbutton(self,pos:tuple,text:str,fontfg='black',fg='#868686',bg='#ededed',activefg='#868686',activebg='#e5e5e5',onfg='white',onbg='#334ac0',font=('微软雅黑',12),command=None,anchor='nw'):#绘制复选框
         def button_in(event):
@@ -552,7 +552,7 @@ class BasicTinUI(Canvas):
             maxl=pos[1]+width
             nowl=pos[1]
             count=1
-            for i in range(pos[1],maxl,5):
+            for _ in range(pos[1],maxl,5):
                 nowl+=5
                 self.after(count*5,lambda x=pos[0],y=nowl :action(x,y))
                 count+=1
@@ -751,12 +751,10 @@ class BasicTinUI(Canvas):
                 self.itemconfig(i,state='hidden')
             self.itemconfig(back,fill=okcolor,width=3)
         ifok = False
-        bbox=(pos[0],pos[1],pos[0]+width+10,pos[1]+5)
         back=self.create_line((pos[0],pos[1]+5,pos[0]+width+5,pos[1]+5),fill=fg,width=1,capstyle='round')
         uid='waitbar2-'+str(back)
         self.itemconfig(back,tags=uid)
         dx,dy=self.__auto_anchor(uid,pos,anchor)
-        new_pos = (pos[0] + dx, pos[1] + dy)
         balls=[]
         for _ in range(5):
             ball=self.create_text(pos,text='\uF127',fill=fg,state='hidden',font='{Segoe Fluent Icons} 4',tags=uid)
@@ -857,7 +855,7 @@ class BasicTinUI(Canvas):
         backpos=(x1+1,y1+1,x2-1,y1+1,x2-1,y2-1,x1+1,y2-1)
         outlinepos=(x1,y1,x2,y1,x2,y2,x1,y2)
         back=self.create_polygon(backpos,fill=bg,outline=bg,width=9,tags=uid)
-        outl=self.create_polygon(outlinepos,fill=outline,outline=outline,width=9,tags=uid)
+        self.create_polygon(outlinepos,fill=outline,outline=outline,width=9,tags=uid)
         self.tkraise(back)
         self.tkraise(main)
         self.tkraise(button)
@@ -940,7 +938,6 @@ class BasicTinUI(Canvas):
                 self.coords(widths[back][0],x1,y1,x2,y2)
                 self.tkraise(widths[back][3])
             return height
-        title_num=len(data[0])#获取表头个数
         end_x,end_y=pos#起始位置
         height,relheight=0,0
         line_width={}#获取每列的固定宽度
@@ -1123,7 +1120,7 @@ class BasicTinUI(Canvas):
         self.itemconfig(entry,tags=uid)
         _font=tkfont.Font(font=font)
         font_size=str(_font.cget('size'))
-        x1,y1,x2,y2=self.bbox(entry)
+        _,y1,_,y2=self.bbox(entry)
         # 调节按钮触发调节按钮
         button = self.add_button2((pos[0]+width,(y1+y2)/2),anchor='w',text='\uEC8F',linew=1,line=line,activeline=line,fg=fg,bg=bg,activefg=activefg,activebg=activebg,font='{Segoe Fluent Icons} '+font_size,command=_change_data)
         self.addtag_withtag(uid, button[-1])
@@ -1160,7 +1157,6 @@ class BasicTinUI(Canvas):
     def add_scalebar(self,pos:tuple,width=200,fg='#4554dc',activefg='#4554dc',bg='#868686',buttonbg='#ffffff',buttonoutline='#cccccc',data=(1,2,3,4,5),start=1,anchor='nw',command=None):#绘制调节框
         def mousedown(event):
             scale.startx=self.canvasx(event.x)
-            bbox=self.bbox(button_back)
             self.itemconfig(button_fore,text='\uECCC')
         def drag(event):
             move=self.canvasx(event.x)-scale.startx
@@ -1214,7 +1210,7 @@ class BasicTinUI(Canvas):
         dash_t=width//(len(data)-1)
         s=pos[0]#调节线段起点
         dash=[s]#调节线段的终点位置
-        for i in data[1:]:
+        for _ in data[1:]:
             s+=dash_t
             dash.append(s)
         del s
@@ -1224,7 +1220,7 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(name,active)#为重绘绑定tag名称
         button='scalebutton'+str(back)
         button_back=self.create_text((dash[start]+9,pos[1]+9),text='\uF127',font='{Segoe Fluent Icons} 12',fill=buttonbg,tags=(uid,button))
-        button_line=self.create_text((dash[start]+9,pos[1]+9),text='\uECCA',font='{Segoe Fluent Icons} 12',fill=buttonoutline,tags=(uid,button))
+        self.create_text((dash[start]+9,pos[1]+9),text='\uECCA',font='{Segoe Fluent Icons} 12',fill=buttonoutline,tags=(uid,button))
         button_fore=self.create_text((dash[start]+9,pos[1]+9),text='\uE915',font='{Segoe Fluent Icons} 12',fill=fg,tags=(uid,button))
         self.tag_bind(button,'<Enter>',lambda event:self.itemconfig(button_fore,fill=activefg))
         self.tag_bind(button,'<Leave>',lambda event:self.itemconfig(button_fore,fill=fg))
@@ -1357,7 +1353,6 @@ class BasicTinUI(Canvas):
         readyshow()
         #绘制圆角边框
         bbox=bar.bbox('all')
-        height=bbox[3]-bbox[1]
         x1=bbox[0]
         x2=bbox[0]+max(widths)+10
         gomap=((x1+1,bbox[1]+1),(x2-1,bbox[1]+1),(x2-1,bbox[3]-1),(x1+1,bbox[3]-1),(x1+1,bbox[1]+1))
@@ -1972,7 +1967,6 @@ class BasicTinUI(Canvas):
                 self.itemconfig(uilist[oldone][0],anchor='ne')
                 self.moveto(uilist[oldone][0],startx,pos[1])
                 mode='left'
-            startwidth=0#动画起始宽度
             self.itemconfig(newui,state='normal')
             self.lift(newui)
             animate(0,0)
@@ -2018,12 +2012,12 @@ class BasicTinUI(Canvas):
         dotlist=list()#[dot1,dot2,...]
         nowui=0#当前显示界面序号
         leftbutton=self.add_button2((startx,pos[1]+width/2),'\uedd9',font='{Segoe Fluent Icons} 7',fg=fg,bg=buttonbg,linew=0,activefg=activefg,activebg=activebg,command=move_left,anchor='e')[-1]
-        rightbutton=self.add_button2((startx+width,pos[1]+width/2),'\uedda',font='{Segoe Fluent Icons} 7',fg=fg,bg=buttonbg,linew=0,activefg=activefg,activebg=activebg,command=move_right,anchor='w')[-1]
+        rightbutton=self.add_button2((startx+width-1,pos[1]+width/2),'\uedda',font='{Segoe Fluent Icons} 7',fg=fg,bg=buttonbg,linew=0,activefg=activefg,activebg=activebg,command=move_right,anchor='w')[-1]
         uid='pipspager'+str(leftbutton)+str(rightbutton)
         self.addtag_withtag(uid,leftbutton)
         self.addtag_withtag(uid,rightbutton)
         bar=Canvas(self,bg=bg,highlightthickness=0,relief='flat')#导航栏
-        barid=self.create_window((startx,doty),window=bar,width=width,height=11,anchor='nw',tags=uid)
+        self.create_window((startx,doty),window=bar,width=width,height=11,anchor='nw',tags=uid)
         dotx=3
         for i in range(0,num):
             ui=BasicTinUI(self,bg=bg)
@@ -2275,7 +2269,7 @@ class BasicTinUI(Canvas):
         ay1+=8
         ax2-=8
         ay2-=8
-        allback=self.create_polygon((ax1,ay1,ax2,ay1,ax2,ay2,ax1,ay2),outline=sep,fill=sep,width=17,tags=uid)
+        self.create_polygon((ax1,ay1,ax2,ay1,ax2,ay2,ax1,ay2),outline=sep,fill=sep,width=17,tags=uid)
         #调整元素层级关系
         self.tkraise(topback)
         self.tkraise(toptext)
@@ -2285,7 +2279,7 @@ class BasicTinUI(Canvas):
         for item_id in (topback, toptext):
             self.tag_bind(item_id, '<Button-1>', mousedown)
             self.tag_bind(item_id, '<B1-Motion>', drag)
-        return toptext,content,uid
+        return toptext, content, uid
 
     def add_ratingbar(self,pos:tuple,fg='#585858',bg='#f3f3f3',onfg='#3041d8',onbg='#3041d8',size=12,num:int=5,linew:int=10,anchor='nw',command=None):#绘制评星级控件
         def __onnum(num):
@@ -2326,7 +2320,6 @@ class BasicTinUI(Canvas):
         def __ontemp(event):#鼠标没有正好点在图标上时
             click(bars[tempon])
             __onnum(tempon)
-        r=10
         nowon=-1#已选定
         tempon=-1#待选定
         bars=[]
@@ -2446,9 +2439,7 @@ class BasicTinUI(Canvas):
                 boxes.append((None,'\n',None))
                 continue
             x1=nowx+back_line
-            y1=nowy+back_line
             x2=nowx+back_line+back_width
-            y2=nowy+back_line+back_width
             sign_back=self.create_text((x1-1,nowy),text='\uF127',font='{Segoe Fluent Icons} '+size,anchor='w',fill=bg,tags=uid)
             sign=self.create_text((x1-1,nowy),text='\uECCA',font='{Segoe Fluent Icons} '+size,anchor='w',fill=fg,tags=uid)
             text=self.create_text((x2+1,nowy),text=i,font=font,fill=fontfg,anchor='w',tags=uid)
@@ -2966,8 +2957,6 @@ class BasicTinUI(Canvas):
     #    ...
 
     def add_togglebutton(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#f3f4fd',activebg='#3041d8',activeline='#5360de',font=('微软雅黑',12),command=None,anchor='nw'):#绘制状态开关按钮
-        def in_button(event):
-            pass
         #状态开关按钮当前不再对鼠标进入和离开进行响应
         def out_button(event):
             pass
@@ -3325,7 +3314,6 @@ class BasicTinUI(Canvas):
             barw=text[__count][1]#本选择列表元素宽度
             pickbar=BasicTinUI(picker,bg=bg)
             pickbar.place(x=end_x,y=y,width=barw,height=height-50)
-            maxwidth=0
             pickbar.newres=''#待选
             pickbar.res=''#选择结果
             #pickbar.all_keys=[]#[a-id,b-id,...]
@@ -3344,7 +3332,6 @@ class BasicTinUI(Canvas):
         no=bar.add_button2(nopos,text='\uE711',font='{Segoe Fluent Icons} 12',fg=fg,bg=bg,line='',activefg=activefg,activebg=activebg,activeline='',anchor='center',command=cancel)
         bar.coords(no[1],((width-9)/2+5,height-35,width-9,height-35,width-9,height-9,(width-9)/2+5,height-9))
         readyshow()
-        #texts=[],pickerbars=[]
         self.__auto_anchor(uid,pos,anchor)
         return picker,bar,texts,pickerbars,uid
     
@@ -3357,11 +3344,6 @@ class BasicTinUI(Canvas):
             self.itemconfig(back,fill=bg,outline=bg)
             self.itemconfig(outline,outline=line,fill=line)
             self.itemconfig(uid+'button',fill=fg)
-        def on_click(event):
-            self.itemconfig(back,fill=activebg,outline=activebg)
-            self.itemconfig(uid+'button',fill=activefg)
-            self.after(500,lambda : out_button(None))
-            show(event)#从menu那偷过来的
         def unshow(event):#重写菜单
             menu.withdraw()
             menu.unbind('<FocusOut>')
@@ -3474,6 +3456,95 @@ class BasicTinUI(Canvas):
         self.coords(outline,bbox)
         self.__auto_anchor(uid,pos,anchor)
         return outline,back,buttons,uid
+
+    def add_flyout(self, fid, width:int=250, height:int=150, bind='<Button-1>', line='#dcdcdc', bg='#f9f9f9', anchor='n'):# 绘制一个浮出ui控件
+        # 注意，默认布局在fid正上方
+        def show(e):
+            self.tag_unbind(fid, bind)# 避免接下来绑定self <button-1>事件时同步触发
+            self.itemconfig(uid, state='normal')
+            motion(None, 1)
+            self.after(100, go_to_bind)# 避免直接触发控件点击时间
+        def go_to_bind():
+            self.bind('<Button-1>', hide)
+        def hide(e):
+            self.unbind('<Button-1>')
+            self.tag_bind(fid, bind, show)
+            motion(None, -1)
+            self.itemconfig(uid, state='hidden')
+        def motion(e, dis):
+            # 展开/收缩动画
+            # dxy为动画方向，0为不变，1为变化
+            if dis == 1:
+                # 展开
+                _width = width * (1-dxy[0])
+                _height = height * (1-dxy[1])
+                dwidth = width / 10 * dxy[0]
+                dheight = height / 10 * dxy[1]
+            else:
+                # 收缩
+                _width = width
+                _height = height
+                dwidth = -width / 10 * dxy[0]
+                dheight = -height / 10 * dxy[1]
+            for _ in range(10):
+                time.sleep(0.01)
+                _width += dwidth
+                _height += dheight
+                self.itemconfig(uid, width=_width, height=_height)
+                self.update_idletasks()
+        ui = BasicTinUI(self, bg=bg, highlightbackground=line, highlightthickness=1, relief='flat')
+        uixml = TinUIXml(ui)
+        # 围绕fid进行布局
+        bbox = self.bbox(fid)
+        if anchor == 'nw':
+            x = bbox[0] - 4
+            y = bbox[1] - 4
+            _anchor = 'se'
+            dxy = (1, 1)
+        elif anchor == 'n':
+            x = (bbox[0] + bbox[2]) / 2
+            y = bbox[1] - 4
+            _anchor ='s'
+            dxy = (0, 1)
+        elif anchor == 'ne':
+            x = bbox[2] + 4
+            y = bbox[1] - 4
+            _anchor = 'sw'
+            dxy = (1, 1)
+        elif anchor == 'e':
+            x = bbox[2] + 4
+            y = (bbox[1] + bbox[3]) / 2
+            _anchor = 'w'
+            dxy = (1, 0)
+        elif anchor =='se':
+            x = bbox[2] + 4
+            y = bbox[3] + 4
+            _anchor = 'nw'
+            dxy = (1, 1)
+        elif anchor =='s':
+            x = (bbox[0] + bbox[2]) / 2
+            y = bbox[3] + 4
+            _anchor = 'n'
+            dxy = (0, 1)
+        elif anchor =='sw':
+            x = bbox[0] - 4
+            y = bbox[3] + 4
+            _anchor = 'ne'
+            dxy = (1, 1)
+        elif anchor == 'w':
+            x = bbox[0] - 4
+            y = (bbox[1] + bbox[3]) / 2
+            _anchor = 'e'
+            dxy = (1, 0)
+        else:# 默认为center
+            x = (bbox[0] + bbox[2]) / 2
+            y = (bbox[1] + bbox[3]) / 2
+            _anchor = 'center'
+            dxy = (1, 1)
+        uid = self.create_window(x, y, width=width, height=height, window=ui, anchor=_anchor)
+        self.itemconfig(uid, state='hidden')
+        self.tag_bind(fid, bind, show)
+        return ui, uixml, hide, uid
 
 
 class TinUI(BasicTinUI):
@@ -3838,7 +3909,7 @@ if __name__=='__main__':
     b.add_onoff((600,100),anchor='se')
     b.add_spinbox((680,100),command=lambda string:print(f'{string.num}: {string}'))
     b.add_scalebar((680,50),command=test5)
-    scale_text,_=b.add_label((890,50),text='当前选值：2')
+    scale_text,_,_=b.add_label((890,50),text='当前选值：2')
     b.add_info((710,140),info_text='this is info widget in TinUI, using TinUI\'s tooltip widget with its own style.',anchor='n')
     mtb=b.add_paragraph((0,720),'测试菜单（右键单击）')
     b.add_menubar(mtb,cont=(('command',print),('menu',test1),'-',('TinUI文本移动',test)))
@@ -3926,6 +3997,14 @@ if __name__=='__main__':
     # b.add_menubutton((1500,50),'menubutton',widget=False,cont=(('command',print),('menu',(('cmd1',print),('cmd2',test1))),'-',('TinUI文本移动',test)))
     b.add_menubutton((1500,50),'menubutton',cont=(('command',print),('menu',test1),'-',('TinUI文本移动',test)))
     b.add_barbutton((1500,150))
+    flylabel = b.add_label((1500,500),text='点击展开浮出UI')[-1]
+    _, flyxml, flyhide, _ = b.add_flyout(flylabel)
+    flyxml.funcs['flyhide']=flyhide
+    flyxml.loadxml('''<tinui><line><paragraph text='浮出UI'></paragraph></line>
+                   <line><paragraph text='add_flyout(fid, anchor="...")'></paragraph></line>
+                   <line><paragraph text='使用hide关闭'></paragraph></line>
+    <line><button2 text='关闭浮出UI控件' command="self.funcs['flyhide']"></button2>
+    </line></tinui>''')
 
     uevent=TinUIEvent(b)
     #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))

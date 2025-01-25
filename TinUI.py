@@ -3325,12 +3325,14 @@ class BasicTinUI(Canvas):
         del __count
         #ok button
         okpos=((5+(width-9)/2)/2,height-22)
-        ok=bar.add_button2(okpos,text='\uE73E',font='{Segoe Fluent Icons} 12',fg=fg,bg=bg,line='',activefg=activefg,activebg=activebg,activeline='',anchor='center',command=set_it)
-        bar.coords(ok[1],(10,height-35,(width-9)/2-5,height-35,(width-9)/2-5,height-9,10,height-9))
+        ok=bar.add_button2(okpos,text='\uE73E',font='{Segoe Fluent Icons} 12',fg=fg,bg=bg,line='',activefg=activefg,activebg=activebg,activeline=outline,anchor='center',command=set_it)
+        bar.coords(ok[1],(9,height-35,(width-9)/2-5,height-35,(width-9)/2-5,height-9,9,height-9))
+        bar.coords(ok[2],(8,height-34,(width-9)/2-4,height-34,(width-9)/2-4,height-8,8,height-8))
         #cancel button
         nopos=(((width-9)/2+width-4)/2,height-22)
-        no=bar.add_button2(nopos,text='\uE711',font='{Segoe Fluent Icons} 12',fg=fg,bg=bg,line='',activefg=activefg,activebg=activebg,activeline='',anchor='center',command=cancel)
+        no=bar.add_button2(nopos,text='\uE711',font='{Segoe Fluent Icons} 12',fg=fg,bg=bg,line='',activefg=activefg,activebg=activebg,activeline=outline,anchor='center',command=cancel)
         bar.coords(no[1],((width-9)/2+5,height-35,width-9,height-35,width-9,height-9,(width-9)/2+5,height-9))
+        bar.coords(no[2],((width-9)/2+4,height-34,width-8,height-34,width-8,height-8,((width-9)/2+4,height-8)))
         readyshow()
         self.__auto_anchor(uid,pos,anchor)
         return picker,bar,texts,pickerbars,uid
@@ -3457,13 +3459,13 @@ class BasicTinUI(Canvas):
         self.__auto_anchor(uid,pos,anchor)
         return outline,back,buttons,uid
 
-    def add_flyout(self, fid, width:int=250, height:int=150, bind='<Button-1>', line='#dcdcdc', bg='#f9f9f9', anchor='n'):# 绘制一个浮出ui控件
+    def add_flyout(self, fid, width:int=250, height:int=150, bind='<Button-1>', line='#dcdcdc', bg='#f9f9f9', anchor='n', pos=None):# 绘制一个浮出ui控件
         # 注意，默认布局在fid正上方
         def show(e):
             self.tag_unbind(fid, bind)# 避免接下来绑定self <button-1>事件时同步触发
             self.itemconfig(uid, state='normal')
             motion(None, 1)
-            self.after(100, go_to_bind)# 避免直接触发控件点击时间
+            self.after(100, go_to_bind)# 避免直接触发控件点击事件
         def go_to_bind():
             self.bind('<Button-1>', hide)
         def hide(e):
@@ -3478,16 +3480,16 @@ class BasicTinUI(Canvas):
                 # 展开
                 _width = width * (1-dxy[0])
                 _height = height * (1-dxy[1])
-                dwidth = width / 10 * dxy[0]
-                dheight = height / 10 * dxy[1]
+                dwidth = width / 20 * dxy[0]
+                dheight = height / 20 * dxy[1]
             else:
                 # 收缩
                 _width = width
                 _height = height
-                dwidth = -width / 10 * dxy[0]
-                dheight = -height / 10 * dxy[1]
-            for _ in range(10):
-                time.sleep(0.01)
+                dwidth = -width / 20 * dxy[0]
+                dheight = -height / 20 * dxy[1]
+            for _ in range(20):
+                time.sleep(0.005)
                 _width += dwidth
                 _height += dheight
                 self.itemconfig(uid, width=_width, height=_height)
@@ -3641,7 +3643,10 @@ class TinUIXml():#TinUI的xml渲染方式
     '''
 
     def __init__(self,ui:Union[BasicTinUI,TinUITheme]):
-        self.ui=ui
+        if isinstance(ui,TinUITheme):
+            self.ui=ui.ui
+        else:
+            self.ui=ui
         self.noload=('','menubar','tooltip')#当前不解析的标签
         self.intargs=('width','linew','bd','r','minwidth','maxwidth','start','padx','pady','info_width','height','num','delay',)#需要转为数字的参数
         self.dataargs=('command','choices','widgets','content','percentage','data','cont','scrollbar','widget',)#需要转为数据结构的参数
@@ -3706,6 +3711,10 @@ class TinUIXml():#TinUI的xml渲染方式
                         uid=self.__tags2uid(tag)
                         news.append(uid)
                     i.attrib['widgets']=str(tuple(news))
+            elif i.tag == 'flyout':
+                if 'fid' in i.attrib:
+                    fid = self.__tags2uid(i.attrib['fid'])
+                    i.attrib['fid'] = fid
             #调整内部参数=====
             xendy=y#重新获取本行起始纵坐标
             if linex!=None:#存在纵块
@@ -3732,6 +3741,8 @@ class TinUIXml():#TinUI的xml渲染方式
                 self.tags[i.text]=tagall
         # 根据lineanchor调整最后一行的位置
         bbox = self.ui.bbox(ftag)
+        if bbox == None:
+            return last_y, xendx
         xcenter = (bbox[0]+bbox[2])/2
         ycenter = (bbox[1]+bbox[3])/2
         if lineanchor == 'nw':
@@ -3793,7 +3804,6 @@ class TinUIXml():#TinUI的xml渲染方式
 
 tinui_dir=os.path.dirname(os.path.abspath(__file__))
 TinUIFont.load_font(tinui_dir+"/Segoe Fluent Icons.ttf")
-#TinUIFont.load_font(tinui_dir+"/No.019-Sounso-Quality-2.ttf")#测试内容，正式版本中没有此字体文件
 
 
 #==========test follow==========

@@ -84,7 +84,7 @@ uix=TinUIXml(ui)
 
 uix.funcs['loadcontrol']=loadcontrol
 uix.datas['controls']=['back', 'barbutton', 'button', 'button2', 'canvas', 'checkbutton', 
- 'combobox', 'entry', 'expander', 'image', 'info', 'label', 'labelframe',
+ 'combobox', 'entry', 'expander', 'flyout', 'image', 'info', 'label', 'labelframe',
  'link', 'listbox', 'listview', 'menubar', 'menubutton', 'notebook', 'notecard', 
  'onoff', 'paragraph', 'passwordbox', 'picker', 'pipspager', 'pivot', 'progressbar', 
  'radiobox', 'radiobutton', 'ratingbar', 'scalebar', 'scrollbar', 'separate', 

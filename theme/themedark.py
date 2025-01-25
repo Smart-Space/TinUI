@@ -244,6 +244,11 @@ class TinUIDark(TinUITheme):
                 activefg='#cecece',activebg='#2d2d2d',activeline='#2d2d2d',sepcolor='#323232',
                 *arg,**kw)
 
+    def add_flyout(self,fid,*arg,**kw):
+        return self.ui.add_flyout(fid,
+                line='#b0b0b0',bg='#2c2c2c',
+                *arg,**kw)
+
 
 def end():
     bbox=u.bbox('all')
@@ -253,12 +258,6 @@ def end():
 
 r=win()
 
-if platform.system()=='Windows':
-    import ctypes
-    try:
-        ctpyes.windll.shcore.SetProcessDpiAwareness(1)
-    except:
-        ctypes.windll.user32.SetProcessDPIAware()
 
 u=r.u
 du=TinUIDark(u)
@@ -376,6 +375,9 @@ du.add_picker(end())
 du.add_menubutton(end(),text='menubutton')
 #appbarbutton
 du.add_barbutton(end())
+#flyout
+flylabel = du.add_label(end(),text='Flyout控件-左键单击')[-1]
+du.add_flyout(flylabel,anchor='ne')
 
 u.add_back(end())
 r.r.title('TinUI dark theme')

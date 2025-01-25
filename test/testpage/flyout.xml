@@ -1,0 +1,14 @@
+<tinui>
+<line>
+    <line>
+        <label text='左键单击打开flyout控件'>flylabel</label>
+    </line>
+    <line anchor="se">
+        <flyout fid='flylabel'></flyout>
+    </line>
+    <button text='button'>btn</button>
+    <line anchor="s">
+        <flyout fid='btn'></flyout>
+    </line>
+</line>
+</tinui>

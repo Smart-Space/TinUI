@@ -9,19 +9,19 @@
     <line>
     <paragraph text=' ' width='580'></paragraph>
     </line>
-    <line>
+    <line anchor='w'>
     <paragraph text='扇形滚动框'></paragraph><waitbar1></waitbar1>
     </line>
     <line>
     <paragraph text=' ' width='580'></paragraph>
     </line>
-    <line>
+    <line anchor='w'>
     <paragraph text='点状滚动框'></paragraph><waitbar2></waitbar2>
     </line>
     <line>
     <paragraph text=' ' width='580'></paragraph>
     </line>
-    <line>
+    <line anchor='w'>
     <paragraph text='条带滚动框'></paragraph><waitbar3></waitbar3>
     </line>
 </line>

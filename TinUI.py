@@ -75,22 +75,6 @@ class TinUITheme:
         return self.theme
 
 
-#弃用，将在不久后删除
-class TinUIPen:
-    '''自绘引擎（试用）目前仅作为记录'''
-
-    def __init__(self,canvas):
-        self.canvas=canvas
-
-    def oval(self,x,y,w,h,resolution=32,**kw):
-        points = [x, y,
-              x+w, y,
-              x+w, y+h,
-              x, y+h,
-              x, y]
-        return self.canvas.create_polygon(points, **kw, smooth=True, splinesteps=resolution)
-
-
 class TinUIFont:
     #添加字体文件，参考CustomTkinter
 
@@ -197,8 +181,9 @@ class BasicTinUI(Canvas):
     def init(self):
         self.images=[]
         self.title_size={0:20,1:18,2:16,3:14,4:12}
-        self.pen=TinUIPen(self)
+        # self.pen=TinUIPen(self)
         self.windows=[]#浮出控件的子窗口，需要开发者手动释放
+
     
     # @functools.cached_property
     # def __get_ratios(self):#获取缩放比例
@@ -212,11 +197,9 @@ class BasicTinUI(Canvas):
         else:
             return ' '+font[1]
     
-    def __get_center(self,bbox):#获取中心位置
-        return (bbox[0]+bbox[2])/2,(bbox[1]+bbox[3])/2
     def __auto_anchor(self,uid,pos,anchor='nw'):#统一对齐方式
         bbox=self.bbox(uid)
-        xcenter,ycenter=self.__get_center(bbox)
+        xcenter, ycenter = (bbox[0]+bbox[2])/2, (bbox[1]+bbox[3])/2
         if anchor=='nw':
             dx=pos[0]-bbox[0]
             dy=pos[1]-bbox[1]
@@ -2072,7 +2055,7 @@ class BasicTinUI(Canvas):
                 endx=3
             else:
                 endx=tbu.bbox(labeluid)[2]+3
-            titleu=tbu.create_text((endx,2),text=title,fill=fg,font=font,anchor='nw',tags=(labeluid))#标题
+            titleu=tbu.create_text((endx,4),text=title,fill=fg,font=font,anchor='nw',tags=(labeluid))#标题
             tbubbox=tbu.bbox(titleu)
             cby=(tbubbox[1]+tbubbox[3])//2
             cbx=tbubbox[2]+10
@@ -2811,8 +2794,8 @@ class BasicTinUI(Canvas):
         cavui=self.create_window(pos,window=frame,width=width+24,height=height+24,anchor='nw')
         uid='treeview'+str(cavui)
         self.addtag_withtag(uid,cavui)
-        yscro=frame.add_scrollbar((width+12,12),widget=box,height=height,bg=bg,color=signcolor,oncolor=signcolor)#纵向
-        xscro=frame.add_scrollbar((12,height+12),widget=box,height=width,direction='x',bg=bg,color=signcolor,oncolor=signcolor)#横向
+        frame.add_scrollbar((width+12,12),widget=box,height=height,bg=bg,color=signcolor,oncolor=signcolor)#纵向
+        frame.add_scrollbar((12,height+12),widget=box,height=width,direction='x',bg=bg,color=signcolor,oncolor=signcolor)#横向
         #id为back的uid
         items=dict()#元素对象{id:(text,back,[sign]),...}
         items_dict=dict()#链接关系（下一级）{id:(id1,id2,id3,...),id2:(id2-1,id2-2,...),id-new:(...)...}
@@ -2830,7 +2813,7 @@ class BasicTinUI(Canvas):
             old_coords[0]=old_coords[6]=6.0
             old_coords[2]=old_coords[4]=6+maxwidth
             box.coords(i,old_coords)
-        allback=self.add_back((),tuple([cavui]),fg=bg,bg=bg,linew=3)
+        allback=self.add_back((),tuple([cavui]),fg=bg,bg=bg,linew=0)
         self.addtag_withtag(uid,allback)
         box.config(scrollregion=box.bbox('all'))
         box.move(line,0,-linew-height)
@@ -3637,6 +3620,50 @@ class TinUIWidget(BasicTinUI):
         self.config(scrollregion=bbox)
 
 
+class TinUIXmlFunc:
+
+    def __init__(self, function):
+        self.function = function
+    
+    def __call__(self, *args, **kwargs):
+        if self.function is None:
+            return None
+        return self.function(*args, **kwargs)
+
+
+class TinUIXmlFuncDict:
+
+    def __init__(self):
+        self.data = {}
+    
+    def __setitem__(self, key, fun):
+        if key in self.data:
+            self.data[key].function = fun
+        else:
+            self.data[key] = TinUIXmlFunc(fun)
+    
+    def __getitem__(self, key):
+        return self.data[key]
+    
+    def __delitem__(self, key):
+        self.data.pop(key)
+    
+    def __or__(self, other):
+        if not isinstance(other, dict):
+            return NotImplemented
+        # 创建一个新的TinUIXmlFuncDict实例，合并self和other的内容
+        new_dict = TinUIXmlFuncDict()
+        new_dict.update(other)
+        return new_dict
+    
+    def update(self, other):
+        for key, value in other.items():
+            self[key] = value
+    
+    def __repr__(self):
+        return f'{type(self).__name__}({self.data})'
+
+
 class TinUIXml():#TinUI的xml渲染方式
     '''为TinUI提供更加方便的平面方式，使用xml
     TinUITheme基类无法直接使用，只能够重写TinUI或BasicTinUI的样式后才能够使用，参考 /theme 中的样式重写范例
@@ -3650,18 +3677,21 @@ class TinUIXml():#TinUI的xml渲染方式
         self.noload=('','menubar','tooltip')#当前不解析的标签
         self.intargs=('width','linew','bd','r','minwidth','maxwidth','start','padx','pady','info_width','height','num','delay',)#需要转为数字的参数
         self.dataargs=('command','choices','widgets','content','percentage','data','cont','scrollbar','widget',)#需要转为数据结构的参数
-        self.funcs={}#内部调用方法集合
+        self.funcs=TinUIXmlFuncDict()# 内部调用方法集合
         self.datas={}#内部数据结构集合
         self.tags={}#内部组件tag集合
+        self.xendx,self.xendy=5,5#横向最宽原点
+        self.yendx,self.yendy=5,5#纵向最低原点
 
-    def __attrib2kws(self,args:dict):#将部分特定参数转化为正确类型
-        keys=args.keys()
-        for ia in self.intargs:
-            if ia in keys:
-                args[ia]=int(args.get(ia))
-        for da in self.dataargs:
-            if da in keys:
-                args[da]=eval(args.get(da))
+    def __attrib2kws(self, args:dict, ignorecmd):#将部分特定参数转化为正确类型
+        for key in args:
+            if key in self.intargs:
+                args[key] = int(args[key])
+            elif key in self.dataargs:
+                if key == 'command' and ignorecmd:
+                    # 忽略command参数，允许开发者稍后定义
+                    exec(f'{args[key]} = None')
+                args[key] = eval(args[key])
         return args
     def __tags2uid(self,tag:str):#将self.tags中的内容转为画布uid
         name=self.tags[tag]
@@ -3671,7 +3701,7 @@ class TinUIXml():#TinUI的xml渲染方式
             uid=name[-1]
         return uid
 
-    def __load_line(self,line,x=5,y=5,padx=5,pady=5,anchor='nw',ftags:list=[]):#根据xml的<line>逐行渲染TinUI组件
+    def __load_line(self,line,x=5,y=5,padx=5,pady=5,anchor='nw',ftags:list=[],ignorecmd=False):#根据xml的<line>逐行渲染TinUI组件
         last_y=y
         linex=None#纵块中的最大宽度
         padx = int(line.get('padx', padx))
@@ -3713,32 +3743,40 @@ class TinUIXml():#TinUI的xml渲染方式
                     i.attrib['widgets']=str(tuple(news))
             elif i.tag == 'flyout':
                 if 'fid' in i.attrib:
-                    fid = self.__tags2uid(i.attrib['fid'])
-                    i.attrib['fid'] = fid
+                    i.attrib['fid'] = self.__tags2uid(i.attrib['fid'])
+                    # fid = self.__tags2uid(i.attrib['fid'])
+                    # i.attrib['fid'] = fid
             #调整内部参数=====
             xendy=y#重新获取本行起始纵坐标
             if linex!=None:#存在纵块
                 xendx=linex
                 linex=None
             i.attrib['pos']=(xendx,xendy)
-            attrib=self.__attrib2kws(i.attrib)
+            attrib = self.__attrib2kws(i.attrib, ignorecmd)
             if 'anchor' not in i.attrib:
                 attrib['anchor']=allanchor
             #==========
             tagall=eval(f'self.ui.add_{i.tag}(**attrib)')
-            if type(tagall)!=tuple or len(tagall)==1:
-                bboxtag=tagall
-            else:
-                bboxtag=tagall[-1]
+            bboxtag = tagall[-1] if isinstance(tagall, tuple) else tagall
+            # if type(tagall)!=tuple or len(tagall)==1:
+            #     bboxtag=tagall
+            # else:
+            #     bboxtag=tagall[-1]
             for each_ftag in ftags:
                 self.ui.addtag_withtag(each_ftag,bboxtag)
             bbox=self.ui.bbox(bboxtag)
             xendx=bbox[2]+padx#获取当前最大x坐标
-            if bbox[3]>last_y-pady:#比较当前最低y坐标
-                last_y=bbox[3]+pady#获取下一行最高y坐标
+            last_y = max(last_y, bbox[3] + pady)  # 更新当前最低y坐标
+            #==========
+            #进行特定控件内部xml布局
+            if i.tag == 'ui':
+                # 判断i是否存在子元素
+                if len(i) != 0:
+                    # 存在子元素，递归渲染
+                    tagall[-2].__load_line(i, ignorecmd=True)
             #为内部组件命名
             if i.text!=None:
-                self.tags[i.text]=tagall
+                self.tags[i.text.strip()]=tagall
         # 根据lineanchor调整最后一行的位置
         bbox = self.ui.bbox(ftag)
         if bbox == None:
@@ -3980,8 +4018,8 @@ if __name__=='__main__':
     ('BasicTinUI','TinUI框架渲染核心','https://tinui.smart-space.com.cn'),
     ('TinUI','基于tkinter的现代元素控件框架','https://smart-space.com.cn/project/TinUI/index.html'),
     ('CSDN','中文IT技术交流平台','https://www.csdn.net/'),
-    ('百度','全球领先的中文搜索引擎','https://www.baidu.com/'),
-    ('Smart-Space','一个平凡的中国人','https://smart-space.com.cn')
+    ('TinText','新版TinML实现平台','https://tintext.smart-space.com.cn/'),
+    ('Smart-Space','个人开发者名称','https://smart-space.com.cn')
     )
     for i in range(0,5):
         lvitems[i][2].loadxml(f'''<tinui>

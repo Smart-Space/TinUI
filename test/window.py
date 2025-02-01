@@ -38,6 +38,7 @@ class win:
         self.r.geometry('500x500+10+10')
         self.u=TinUI(self.r)#,bg='#01FF11')
         self.u.pack(fill='both',expand=True)
+        self.uixml=TinUIXml(self.u)
     def go(self):
         self.r.mainloop()
 

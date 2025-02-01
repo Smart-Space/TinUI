@@ -1,5 +1,4 @@
 from window import win
-import ctypes
 
 
 def disable(e):

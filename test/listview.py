@@ -13,13 +13,13 @@ funcs=u.add_listview((10,5),command=print__)[-2]
 
 lvitems=funcs.getitems()
 lvcontent=(
-('BasicTinUI','TinUI框架渲染核心','https://tinui.smart-space.com.cn'),
-('TinUI','基于tkinter的现代元素控件框架','https://smart-space.com.cn/project/TinUI/index.html'),
-('CSDN','中文IT技术交流平台','https://www.csdn.net/'),
-('百度','全球领先的中文搜索引擎','https://www.baidu.com/'),
-('Smart-Space','一个平凡的中国人','https://smart-space.com.cn')
-)
-for i in range(0,2):
+    ('BasicTinUI','TinUI框架渲染核心','https://tinui.smart-space.com.cn'),
+    ('TinUI','基于tkinter的现代元素控件框架','https://smart-space.com.cn/project/TinUI/index.html'),
+    ('CSDN','中文IT技术交流平台','https://www.csdn.net/'),
+    ('TinText','新版TinML实现平台','https://tintext.smart-space.com.cn/'),
+    ('Smart-Space','个人开发者名称','https://smart-space.com.cn')
+    )
+for i in range(0,5):
     lvitems[i][2].loadxml(f'''<tinui>
     <line>
     <line>

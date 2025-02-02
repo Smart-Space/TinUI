@@ -35,7 +35,7 @@ class TinUILight(TinUITheme):
         return self.ui.add_entry(pos,fg='#606060',bg='#fbfbfb',
             activefg='#1b1b1b',activebg='#ffffff',
             line='#e5e5e5',activeline='#e5e5e5',
-            outline='#868686',onoutline='#3041d8',
+            outline='#868686',onoutline='#3041d8',insert='#000000',
                           *arg,**kw)
 
     def add_separate(self,pos,*arg,**kw):
@@ -91,8 +91,11 @@ class TinUILight(TinUITheme):
 
     def add_spinbox(self,pos,*arg,**kw):
         return self.ui.add_spinbox(pos,
-              fg='#1b1b1b',bg='#ffffff',line='#e5e5e5',
-              activefg='#818181',activebg='#f2f2f2',
+              fg='#1b1b1b',bg='#fefefe',line='#e5e5e5',
+              activefg='#1a1a1a',activebg='#fafafa',
+              onfg='#868686',onbg='#f3f3f3',
+              boxfg='#5f5f5f',boxbg='#f9f9f9',
+              boxactivefg='#5b5b5b',boxactivebg='#f0f0f0',
                                    *arg,**kw)
 
     def add_scalebar(self,pos,*arg,**kw):
@@ -186,6 +189,7 @@ class TinUILight(TinUITheme):
         return self.ui.add_button2(pos,fg='#1b1b1b',bg='#fbfbfb',
              activefg='#1a1a1a',activebg='#f6f6f6',
              line='#cccccc',linew=1,activeline='#cccccc',
+             onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',
                            *arg,**kw)
 
     def add_expander(self,pos,*arg,**kw):

@@ -255,6 +255,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - activebg::激活时背景色
 - line::边框颜色
 - activeline::激活时边框颜色
+- insert::光标颜色
 - font::字体
 - linew::边框宽度
 - outline::提示线颜色
@@ -570,7 +571,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='#1b1b1b',bg='#ffffff',line='#e5e5e5',activefg='#818181',activebg='#f2f2f2',font=('微软雅黑',12),anchor='nw',command=None)
+### add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='#1b1b1b',bg='#fefefe',line='#e5e5e5',activefg='#1a1a1a',activebg='#fafafa',onfg='#868686',onbg='#f3f3f3',boxfg='#5f5f5f',boxbg='#f9f9f9',boxactivefg='#5b5b5b',boxactivebg='#f0f0f0',font=('微软雅黑',12),anchor='nw',command=None)
 
 - pos::位置
 - width::宽度
@@ -580,6 +581,12 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - bg::输入框背景色
 - activefg::按钮响应文本颜色
 - activebg::按钮响应背景色
+- onfg::点击时按钮文本颜色
+- onbg::点击时按钮背景色
+- boxactivefg::响应鼠标进入按钮文本颜色
+- boxactivebg:: 响应鼠标进入按钮背景色
+- boxfg:: 按钮文本颜色
+- boxbg:: 按钮背景颜色
 - font::输入框字体，同时会影响按钮字体
 - anchor::对齐方向
 - command::选值时响应的函数，必须接受一个参数，这个参数是当前选定的值
@@ -1121,7 +1128,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_button2(self,pos:tuple,text:str,icon=None,compound='left',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),minwidth=0,maxwidth=0,command=None,anchor='nw')
+### add_button2(self,pos:tuple,text:str,icon=None,compound='left',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',font=('微软雅黑',12),minwidth=0,maxwidth=0,command=None,anchor='nw')
 
 - pos::位置
 - text::标题文字
@@ -1134,6 +1141,9 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - activefg::响应鼠标的文本颜色
 - activebg::响应鼠标的按钮颜色
 - activeline::响应鼠标的边框颜色
+- onfg::鼠标点击时文本颜色
+- onbg::鼠标点击时按钮颜色
+- online::鼠标点击时边框颜色
 - font::字体名称+大小
 - minwidth::最小宽度，为0忽略
 - maxwidth::最大宽度，为0忽略

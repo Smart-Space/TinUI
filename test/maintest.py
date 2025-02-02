@@ -29,16 +29,6 @@ def loadcontrol(controlname):
     if controlname=='canvas':
         canvas=duixml.tags['canvas'][0]
         canvas.create_text((5,5),text='画布对象：文字。\n需要获取add_canvas的第一个返回值',font='微软雅黑 12',anchor='nw')
-    elif controlname=='expander':
-        expander=duixml.tags['expander'][2]
-        expander.loadxml('''<tinui><line>
-        <button2 text='拓展UI框架的按钮'></button2></line>
-        <line>
-        <paragraph text='拓展UI框架可以节省布局位置，能够使用TinUIXml为可拓展UI框架编写界面布局。' width='190'></paragraph>
-        </line>
-        <line><paragraph text='感觉如何？' width='190'></paragraph></line><line><ratingbar></ratingbar>
-        </line></tinui>
-        ''')
     elif controlname=='menubar':
         #if not load_menubar:
         #    print('ok')
@@ -79,7 +69,7 @@ window.resizable(False,False)
 window.iconbitmap('../LOGO.ico')
 window.title("TinUI main test")
 window.geometry("850x600+5+5")
-ui=BasicTinUI(window)
+ui=BasicTinUI(window, bg='#f3f3f3')
 uix=TinUIXml(ui)
 
 uix.funcs['loadcontrol']=loadcontrol

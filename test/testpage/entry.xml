@@ -9,7 +9,7 @@
     <line>
     <paragraph text=' ' width='580'></paragraph>
     </line>
-    <line>
+    <line anchor='w'>
     <paragraph text='右边为一个普通输入框，通过获取返回值调用：'></paragraph>
     <entry width='200'></entry>
     </line>

@@ -857,7 +857,7 @@ class BasicTinUI(Canvas):
         bar.pack(fill='both',expand=True)
         bar.create_polygon((13,13,x2-x1-4,13,x2-x1-4,height-12,13,height-12),fill=bg,outline=bg,width=17)
         bar.lower(bar.create_polygon((12,12,x2-x1-3,12,x2-x1-3,height-11,12,height-11),fill=outline,outline=outline,width=17))
-        bar.add_listbox((7,7),x2-x1-28,height-36,bg=bg,fg=fg,data=content,activebg=activebg,sel=activebg,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)
+        bar.add_listbox((7,7),x2-x1-15,height-25,bg=bg,fg=fg,data=content,activebg=activebg,sel=activebg,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)
         self.__auto_anchor(uid,pos,anchor)
         readyshow()
         funcs=FuncList(3)
@@ -1759,14 +1759,19 @@ class BasicTinUI(Canvas):
             box.config(scrollregion=bbox)
         def set_y_view(event):
             box.yview_scroll(int(-1*(event.delta/120)), "units")
-        frame=BasicTinUI(self,bg=bg)#主显示框，显示滚动条
-        box=BasicTinUI(frame,bg=bg,width=width,height=height)#显示选择内容
+        # frame=BasicTinUI(self,bg=bg)#主显示框，显示滚动条
+        box=BasicTinUI(self,bg=bg,width=width,height=height)#显示选择内容
         box.place(x=12,y=12)
-        cavui=self.create_window(pos,window=frame,width=width+24,height=height+24,anchor=anchor)
+        cavui=self.create_window(pos,window=box,width=width,height=height,anchor=anchor)
         uid='listbox'+str(cavui)
         self.addtag_withtag(uid,cavui)
-        frame.add_scrollbar((width+12,12),widget=box,height=height,bg=scrollbg,color=scrollcolor,oncolor=scrollon)#纵向
-        frame.add_scrollbar((12,height+12),widget=box,height=width,direction='x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)#横向
+        hscroll = self.add_scrollbar((pos[0]+width,pos[1]),widget=box,height=height,bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]#纵向
+        vscroll = self.add_scrollbar((pos[0],pos[1]+height),widget=box,height=width,direction='x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]#横向
+        self.addtag_withtag(uid, hscroll)
+        self.addtag_withtag(uid, vscroll)
+        x1, y1, x2, y2 = self.bbox(uid)
+        allback = self.create_polygon((x1, y1, x2, y1, x2, y2, x1, y2), width=9, outline=bg, fill=bg, tags=uid)
+        self.lower(allback)
         #choices不返回，避免编写者直接操作选项
         all_keys=[]#[a-id,b-id,...]
         choices={}#'a-id':[a,a_text,a_back,is_sel:bool]
@@ -3744,7 +3749,7 @@ class TinUIXml():#TinUI的xml渲染方式
                     linex=0
                 linex = max(linex, newlinex+padx)
                 continue
-            elif i.tag in self.noload:#不渲染的组件
+            if i.tag in self.noload:#不渲染的组件
                 continue
             #特殊渲染的组件，有些仅对参数处理，有些需要特殊处理
             elif i.tag=='back':#调整uids参数
@@ -3766,8 +3771,6 @@ class TinUIXml():#TinUI的xml渲染方式
             elif i.tag == 'flyout':
                 if 'fid' in i.attrib:
                     i.attrib['fid'] = self.__tags2uid(i.attrib['fid'])
-                    # fid = self.__tags2uid(i.attrib['fid'])
-                    # i.attrib['fid'] = fid
             #调整内部参数=====
             xendy=y#重新获取本行起始纵坐标
             if linex!=None:#存在纵块
@@ -3895,7 +3898,7 @@ def test6():
         xml=f'''
 <tinui><line x='{num*10+5}'><label text='这是第{num}个BasicTinUI组件'></label></line>
 <line><button text='功能按钮' command='lambda event:print("第{i}个功能按钮")'></button>
-<combobox width='80' text='可选测试' content='("{i}","其它选项")'></combobox></line></tinui>'''
+<combobox width='80' text='可选测试' content='("{i}","其它")'></combobox></line></tinui>'''
         ppgl[i][2].loadxml(xml)
 def test7():
     ntvdict=ntb.getvdict()

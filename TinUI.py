@@ -2535,7 +2535,7 @@ class BasicTinUI(Canvas):
         buttonuid=uid+'button'
         self.itemconfig(button,tags=(uid,buttonuid))
         if icon:#Fluent Icons编码图标
-            icontext=self.create_text(pos,text=icon,fill=fg,font='{Segoe Fluent Icons} '+font_size,tags=(uid,buttonuid))
+            icontext=self.create_text(pos,text=icon,fill=fg,font='{Segoe Fluent Icons} '+font_size,tags=(uid,buttonuid,uid+'icon'))
             iconbbox=self.bbox(icontext)
             if compound=='left':
                 textpos=(iconbbox[2]+1,(iconbbox[3]+iconbbox[1])/2)
@@ -2579,12 +2579,12 @@ class BasicTinUI(Canvas):
         funcs.active=active
         return button,back,outline,funcs,uid
 
-    def add_expander(self,pos:tuple,title='expand content',tfg='black',tbg='#fbfbfb',bg='#f4f4f4',sep='#e5e5e5',width=200,height=200,scrollbar=False,font='微软雅黑 12',anchor=None):#绘制一个可拓展UI
+    def add_expander(self,pos:tuple,title='expand content',tfg='black',tbg='#fbfbfb',bg='#f4f4f4',sep='#e5e5e5',buttonfg='#1b1b1b',buttonbg='#fbfbfb',buttonline='#fbfbfb',activefg='#1a1a1a',activebg='#f2f2f2',activeline='#f2f2f2',onfg='#1a1a1a',onbg='#f5f5f5',online='#f5f5f5',width=200,height=200,scrollbar=False,font='微软雅黑 12',anchor=None):#绘制一个可拓展UI
         def do_expand(*e):
             nonlocal expand
             expand = not expand
             self.itemconfig(content, state='normal' if expand else 'hidden')
-            self.itemconfig(button[0], text='\uE70E' if expand else '\uE70D')
+            self.itemconfig(button[-1]+'icon', text='\uE70E' if expand else '\uE70D')
             __size_back()
         def __size_back():#调整背景
             bx1,by1,bx2,by2=self.bbox(contentid)#大背景
@@ -2604,7 +2604,7 @@ class BasicTinUI(Canvas):
             tx2=tx1+width
         topback=self.create_polygon((tx1,ty1,tx2,ty1,tx2,ty2,tx1,ty2),outline=tbg,fill=tbg,width=17,tags=(uid,contentid))#标题背景
         font_size=str(int(self.__get_text_size(toptext)))#字体大小
-        button=self.add_button2((tx2+5,(ty1+ty2)/2),anchor='e',text='\uE70D',font='{Segoe Fluent Icons} '+font_size,fg=tfg,bg=tbg,activebg=bg,command=do_expand)
+        button=self.add_button2((tx2+5,(ty1+ty2)/2),anchor='e',text='',icon='\uE70D',font='{Segoe Fluent Icons} '+font_size,fg=buttonfg,bg=buttonbg,line=buttonline,activeline=activeline,activefg=activefg,activebg=activebg,onfg=onfg,onbg=onbg,online=online,command=do_expand)
         self.addtag_withtag(uid,button[-1])
         self.addtag_withtag(contentid,button[-1])
         if not scrollbar:#不使用滚动条，BasicTinUI

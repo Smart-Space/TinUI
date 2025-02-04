@@ -198,6 +198,9 @@ class TinUILight(TinUITheme):
         return self.ui.add_expander(pos,
                 tfg='#1b1b1b',tbg='#fbfbfb',
                 bg='#f4f4f4',sep='#e5e5e5',
+                buttonfg='#1b1b1b',buttonbg='#fbfbfb',buttonline='#fbfbfb',
+                activefg='#1a1a1a',activebg='#f2f2f2',activeline='#f2f2f2',
+                onfg='#1a1a1a',onbg='#f5f5f5',online='#f5f5f5',
                                     *arg,**kw)
 
     def add_waitframe(self,pos,*arg,**kw):

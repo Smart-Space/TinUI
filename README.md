@@ -1182,7 +1182,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_expander(self,pos:tuple,title='expand content',tfg='black',tbg='#fbfbfb',bg='#f4f4f4',sep='#e5e5e5',width=200,height=200,scrollbar=False,font='微软雅黑 12')
+### add_expander(self,pos:tuple,title='expand content',tfg='black',tbg='#fbfbfb',bg='#f4f4f4',sep='#e5e5e5',buttonfg='#1b1b1b',buttonbg='#fbfbfb',buttonline='#fbfbfb',activefg='#1a1a1a',activebg='#f2f2f2',activeline='#f2f2f2',onfg='#1a1a1a',onbg='#f5f5f5',online='#f5f5f5',width=200,height=200,scrollbar=False,font='微软雅黑 12')
 
 - pos::位置
 - title::标题
@@ -1190,7 +1190,16 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - tbg::标题背景色
 - bg::UI颜色
 - sep::大背景色、分割线颜色
-- width::控件宽度，文本宽度为 `width-30`
+- buttonfg:: 按钮文本颜色
+- buttonbg:: 按钮背景颜色
+- buttonline:: 按钮边框颜色
+- activefg:: 按钮响应鼠标文本颜色
+- activebg:: 按钮响应鼠标背景颜色
+- activeline:: 按钮响应鼠标边框颜色
+- onfg:: 按钮点击时文本颜色
+- onbg:: 按钮点击时背景颜色
+- online:: 按钮点击时边框颜色
+- width::控件宽度，文本宽度为
 - height::UI高度
 - scrollbar::是否添加滚动条（是否使用TinUI）
 - font::标题字体

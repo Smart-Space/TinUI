@@ -198,6 +198,9 @@ class TinUIDark(TinUITheme):
         return self.ui.add_expander(pos,
                 tfg='#ffffff',tbg='#2b2b2b',
                 bg='#272727',sep='#1d1d1d',
+                buttonfg='#ffffff',buttonbg='#2b2b2b',buttonline='#2b2b2b',
+                activefg='#ffffff',activebg='#373737',activeline='#373737',
+                onfg='#ffffff',onbg='#333333',online='#333333',
                                     *arg,**kw)
 
     def add_waitframe(self,pos,*arg,**kw):

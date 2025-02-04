@@ -1247,7 +1247,7 @@ class BasicTinUI(Canvas):
         self.__auto_anchor(uid,pos,anchor)
         return text,back,uid
 
-    def add_menubar(self,cid='all',bind='<Button-3>',font='微软雅黑 12',fg='#1b1b1b',bg='#fbfbfc',line='#cccccc',activefg='#1a1a1a',activebg='#f2f2f3',cont=(('command',print),'-'),tran='#01FF11'):#绘制菜单
+    def add_menubar(self,cid='all',bind='<Button-3>',font='微软雅黑 12',fg='#1b1b1b',bg='#fbfbfc',line='#cccccc',activefg='#191919',activebg='#f0f0f0',activeline='#f0f0f0',cont=(('command',print),'-'),tran='#01FF11'):#绘制菜单
         '''cont格式
         (('名称',绑定的函数（至少接受event参数）),#常规格式
         '-',#分割线
@@ -1263,15 +1263,15 @@ class BasicTinUI(Canvas):
                 if len(back)==2:
                     pos=bar.bbox(back[0])
                     bar_coords = (5,pos[1]+4.5,maxwidth+5-4.5,pos[1]+4.5,maxwidth+5-4.5,pos[3]-4.5,5,pos[3]-4.5)
-                    bar.coords(back[0], bar_coords)
+                    bar_coords_2 = (6,pos[1]+5.5,maxwidth+4-4.5,pos[1]+5.5,maxwidth+4-4.5,pos[3]-5.5,6,pos[3]-5.5)
+                    bar.coords(back[0], bar_coords_2)
                     bar.coords(back[1], bar_coords)
-                    bar.itemconfig(back[0],state='hidden')
                 elif len(back)==3:
                     pos=bar.bbox(back[1])
                     bar_coords = (5,pos[1]+4.5,maxwidth+5-4.5,pos[1]+4.5,maxwidth+5-4.5,pos[3]-4.5,5,pos[3]-4.5)
-                    bar.coords(back[1], bar_coords)
+                    bar_coords_2 = (6,pos[1]+5.5,maxwidth+4-4.5,pos[1]+5.5,maxwidth+4-4.5,pos[3]-5.5,6,pos[3]-5.5)
+                    bar.coords(back[1], bar_coords_2)
                     bar.coords(back[2], bar_coords)
-                    bar.itemconfig(back[1],state='hidden')
                     # sign=bar.gettags(back[0])[-1]
             for sep in seps:
                 pos=bar.bbox(sep)
@@ -1285,7 +1285,7 @@ class BasicTinUI(Canvas):
             maxx=self.winfo_screenwidth()
             maxy=self.winfo_screenheight()
             wind.data=(maxx,maxy,winw,winh)
-            bar.move('all',0,16)
+            bar.move('all',0,14)
         def unshow(event):
             menu.withdraw()
             menu.unbind('<FocusOut>')
@@ -1301,7 +1301,7 @@ class BasicTinUI(Canvas):
                 y=sy-winh
             else:
                 y=sy
-            menu.geometry(f'{winw+20}x{winh+20}+{x}+{y}')
+            menu.geometry(f'{winw+20}x{winh+10}+{x}+{y}')
             menu.attributes('-alpha',0)
             menu.deiconify()
             menu.focus_set()
@@ -1325,18 +1325,18 @@ class BasicTinUI(Canvas):
         widths=[]#寻找最宽位置
         for i in cont:#添加菜单内容
             if i=='-':
-                sep=bar.create_line((5,endy(),20,endy()),fill=activebg,width=3)
+                sep=bar.create_line((5,endy(),20,endy()),fill=line,width=3)
                 seps.append(sep)
             elif type(i[1]) in (list,tuple):
                 #嵌套菜单，只接受列表或元组，不接受集合等
-                button=bar.add_menubutton((5,endy()-5),i[0],'x',fg,bg,line,3,activefg,line,line,font,cont=i[1],tran=tran)
+                button=bar.add_menubutton((5,endy()-5),i[0],'x',fg,bg,line,3,activefg,activebg,activeline,font,cont=i[1],tran=tran)
                 backs.append((button[0],button[1],button[2]))
                 funcs.append(button[3])
                 pos=bar.bbox(button[1])
                 width=pos[2]-pos[0]
                 widths.append(width)
             elif type(i[1]) in (FunctionType,BuiltinFunctionType):
-                button=bar.add_button2((0,endy()-13),i[0],None,'',fg,bg,bg,3,activefg,line,line,font,command=lambda event,i=i:(menu.withdraw(),i[1](event)))
+                button=bar.add_button2((0,endy()-13),i[0],None,'',fg,bg,bg,3,activefg,activebg,activeline,font=font,command=lambda event,i=i:(menu.withdraw(),i[1](event)))
                 backs.append((button[1],button[2]))
                 funcs.append(button[3])
                 pos=bar.bbox(button[1])
@@ -1347,10 +1347,10 @@ class BasicTinUI(Canvas):
         #绘制圆角边框
         bbox=bar.bbox('all')
         x1=bbox[0]
-        x2=bbox[0]+max(widths)+10
-        gomap=((x1+1,bbox[1]+1),(x2-1,bbox[1]+1),(x2-1,bbox[3]-1),(x1+1,bbox[3]-1),(x1+1,bbox[1]+1))
+        x2=bbox[0]+max(widths)+8
+        gomap=((x1+5,bbox[1]+5),(x2-5,bbox[1]+5),(x2-5,bbox[3]-5),(x1+5,bbox[3]-5),(x1+5,bbox[1]+5))
         mback=bar.create_polygon(gomap,fill=bg,outline=bg,width=17)
-        gomap=((x1,bbox[1]),(x2,bbox[1]),(x2,bbox[3]),(x1,bbox[3]),(x1,bbox[1]))
+        gomap=((x1+4,bbox[1]+4),(x2-4,bbox[1]+4),(x2-4,bbox[3]-4),(x1+4,bbox[3]-4),(x1+4,bbox[1]+4))
         mline=bar.create_polygon(gomap,fill=bg,outline=line,width=17)
         bar.lower(mback)
         bar.lower(mline)
@@ -1922,7 +1922,7 @@ class BasicTinUI(Canvas):
         ui_xml=TinUIXml(ui)
         return ui,re_scrollregion,ui_xml,uid
 
-    def add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',activefg='#5d5d5d',buttonbg='#f8f8f8',activebg='#f8f8f8',num:int=2,anchor='nw'):#绘制翻页视图
+    def add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',buttonfg='#8a8a8a',buttonbg='#f9f9f9',activefg='#5f5f5f',activebg='#f9f9f9',buttononfg='#5f5f5f',buttononbg='#f9f9f9',num:int=2,anchor='nw'):#绘制翻页视图
         def move_left(event):
             nonlocal nowui
             if nowui==0:
@@ -1937,7 +1937,7 @@ class BasicTinUI(Canvas):
             else:
                 __dot_in(dotlist[nowui+1])
                 __dot_select(dotlist[nowui+1])
-        def __move_to(number,first=False):#显示视图
+        def __move_to(number):#显示视图
             nonlocal nowui
             oldone=nowui
             def animate(startwidth,times):#展开动画
@@ -1950,17 +1950,16 @@ class BasicTinUI(Canvas):
                     self.after(10,lambda:animate(startwidth+inchx,times+1))
                 else:
                     self.itemconfig(newui,width=width)
-                    if not first:
-                        self.itemconfig(uilist[oldone][0],state='hidden')
+                    self.itemconfig(uilist[oldone][0],state='hidden')
             inchx=width/20#翻页动画参数
             newui=uilist[number][0]
             mode=None
             if number>=nowui:#向右翻页
-                self.moveto(newui,startx+width,pos[1])
+                self.moveto(newui,startx+width+2,pos[1])
                 self.itemconfig(newui,anchor='ne')
                 mode='right'
             else:#向左翻页
-                self.moveto(newui,startx,pos[1])
+                self.moveto(newui,startx+2,pos[1])
                 self.itemconfig(newui,anchor='nw')
                 self.itemconfig(uilist[oldone][0],anchor='ne')
                 self.moveto(uilist[oldone][0],startx,pos[1])
@@ -2009,15 +2008,15 @@ class BasicTinUI(Canvas):
         doty=pos[1]+height+5#控制点的起始纵坐标
         dotlist=list()#[dot1,dot2,...]
         nowui=0#当前显示界面序号
-        leftbutton=self.add_button2((startx,pos[1]+width/2),'\uedd9',font='{Segoe Fluent Icons} 7',fg=fg,bg=buttonbg,linew=0,activefg=activefg,activebg=activebg,command=move_left,anchor='e')[-1]
-        rightbutton=self.add_button2((startx+width-1,pos[1]+width/2),'\uedda',font='{Segoe Fluent Icons} 7',fg=fg,bg=buttonbg,linew=0,activefg=activefg,activebg=activebg,command=move_right,anchor='w')[-1]
+        leftbutton=self.add_button2((startx-1,pos[1]+width/2),'','\n\uedd9\n',font='{Segoe Fluent Icons} 7',fg=buttonfg,bg=buttonbg,line=buttonbg,linew=0,activefg=activefg,activebg=activebg,activeline=activebg,onbg=buttononbg,onfg=buttononfg,online=buttononbg,command=move_left,anchor='e')[-1]
+        rightbutton=self.add_button2((startx+width,pos[1]+width/2),'','\n\uedda\n',font='{Segoe Fluent Icons} 7',fg=buttonfg,bg=buttonbg,line=buttonbg,linew=0,activefg=activefg,activebg=activebg,activeline=activebg,onbg=buttononbg,onfg=buttononfg,online=buttononbg,command=move_right,anchor='w')[-1]
         uid='pipspager'+str(leftbutton)+str(rightbutton)
         self.addtag_withtag(uid,leftbutton)
         self.addtag_withtag(uid,rightbutton)
         bar=Canvas(self,bg=bg,highlightthickness=0,relief='flat')#导航栏
         self.create_window((startx,doty),window=bar,width=width,height=11,anchor='nw',tags=uid)
         dotx=3
-        for i in range(0,num):
+        for _ in range(0,num):
             ui=BasicTinUI(self,bg=bg)
             tinuixml=TinUIXml(ui)
             uiid=self.create_window((startx,pos[1]),window=ui,width=width,height=height,state='hidden',anchor='nw',tags=uid)
@@ -2028,9 +2027,8 @@ class BasicTinUI(Canvas):
             bar.tag_bind(dot,'<Enter>',lambda event,dote=dot:__dot_in(dote))
             bar.tag_bind(dot,'<Leave>',lambda event,dote=dot:__dot_out(dote))
             bar.tag_bind(dot,'<Button-1>',lambda event,dote=dot:__dot_select(dote))
-        __dot_in(dotlist[nowui])
-        __dot_select(dotlist[nowui])
-        __move_to(nowui,True)#first参数代表初始化
+        self.itemconfig(uilist[nowui][0], state='normal')
+        self.lift(uilist[nowui][0])
         bar.config(scrollregion=bar.bbox('all'))
         self.__auto_anchor(uid,pos,anchor)
         return uilist,dotlist,move_to,uid
@@ -3348,10 +3346,11 @@ class BasicTinUI(Canvas):
         self.__auto_anchor(uid,pos,anchor)
         return picker,bar,texts,pickerbars,uid
     
-    def add_menubutton(self,pos:tuple,text:str,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),cont=(('command',print),'-'),widget=True,tran='#01FF11',anchor='nw'):#绘制按钮展开菜单
+    def add_menubutton(self,pos:tuple,text:str,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',menuonfg='#191919',menuonbg='#f0f0f0',menuonline='#f0f0f0',font=('微软雅黑',12),cont=(('command',print),'-'),widget=True,tran='#01FF11',anchor='nw'):#绘制按钮展开菜单
         #Segoe Fluent Icons x右侧展开\uE76B \uE76C，y下方展开\uE70D \uE70E，默认y
         def in_button(event):
             self.itemconfig(outline,outline=activeline,fill=activeline)
+            self.itemconfig(back,fill=activebg,outline=activebg)
             self.itemconfig(uid+'button',fill=activefg)
         def out_button(event):
             self.itemconfig(back,fill=bg,outline=bg)
@@ -3361,6 +3360,11 @@ class BasicTinUI(Canvas):
             menu.withdraw()
             menu.unbind('<FocusOut>')
         def show(event):#显示的起始位置
+            # 按钮样式更改
+            self.itemconfig(outline, outline=online, fill=online)
+            self.itemconfig(back, fill=onbg, outline=onbg)
+            self.itemconfig(uid+'button', fill=onfg)
+            self.after(500, lambda: out_button(None))
             #初始位置
             maxx,maxy,winw,winh=menu.wind.data
             sx,sy=event.x_root,event.y_root
@@ -3375,14 +3379,14 @@ class BasicTinUI(Canvas):
             sx,sy=scx-dx,scy-dy
             #
             if sx+winw>maxx:
-                x=sx-winw
+                x=sx-winw-5
             else:
-                x=sx
+                x=sx-5
             if sy+winh>maxy:
                 y=sy-winh
             else:
                 y=sy
-            menu.geometry(f'{winw+20}x{winh+20}+{x}+{y}')
+            menu.geometry(f'{winw+10}x{winh+10}+{x}+{y}')
             menu.attributes('-alpha',0)
             menu.deiconify()
             menu.focus_set()
@@ -3410,6 +3414,7 @@ class BasicTinUI(Canvas):
             self.create_text((x2+5,(y1+y2)/2),text='\uE76C',fill=fg,font='{Segoe Fluent Icons} 12',anchor='w',tags=(uid,uid+'button',uid+'widget'))
         if not widget:#如果被指定不显示标识符
             self.delete(uid+'widget')
+            self.dtag(uid+'widget')
         x1,y1,x2,y2=self.bbox(uid+'button')
         linew-=1
         outline_t=(x1-linew,y1-linew,x2+linew,y1-linew,x2+linew,y2+linew,x1-linew,y2+linew)
@@ -3417,7 +3422,7 @@ class BasicTinUI(Canvas):
         back_t=(x1+1,y1+1,x2-1,y1+1,x2-1,y2-1,x1+1,y2-1)
         back=self.create_polygon(back_t,width=9,tags=uid,fill=bg,outline=bg)
         #创建菜单
-        menu=self.add_menubar(uid,'<Button-1>',font=font,fg=fg,bg=bg,line=line,activefg=activefg,activebg=activebg,cont=cont,tran=tran)[0]
+        menu=self.add_menubar(uid,'<Button-1>',font=font,fg=fg,bg=bg,line=line,activefg=menuonfg,activebg=menuonbg,activeline=menuonline,cont=cont,tran=tran)[0]
         self.tag_unbind(uid,'<Button-1>')
         #重新绑定事件
         for item_id in (uid+'button', back, outline):

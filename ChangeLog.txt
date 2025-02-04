@@ -8,6 +8,7 @@
 ==========5.X==========
 2025-
 *1. 需要用到弹窗的控件，弹窗初始化统一为第一次触发
+*2. 优化notebook标签标题布局
 
 ==========5.17==========
 2025-
@@ -17,9 +18,10 @@
 4. 修复entry、passwordbox提示符颜色错误
 5. button2添加过渡响应色
 *6. 如下控件按钮添加过渡响应色参数：
-    button2
+    button2, menu, menubutton, pipspager
 7. 如下控件背景适配改进贴合性：
-    treeview, listbox(并且改为圆角边框), combobox(得益于listbox)
+    treeview, listbox(并且改为圆角边框), combobox(得益于listbox),
+    menu, menubutton
 8. 修复TinUIXml下ui标签内绑定回调函数异常的错误
 9. 修复treeview未选中时折叠和展开的错误
 

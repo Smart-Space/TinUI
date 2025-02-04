@@ -111,8 +111,8 @@ class TinUIDark(TinUITheme):
 
     def add_menubar(self,uid,*arg,**kw):
         return self.ui.add_menubar(uid,
-            fg='#e6e6e6',bg='#323233',line='#3d3d3e',
-            activefg='#ffffff',activebg='#3d3d3e',*arg,**kw)
+            fg='#ffffff',bg='#2c2c2c',line='#b3b3b3',
+            activefg='#ffffff',activebg='#383838',activeline='#383838',*arg,**kw)
 
     def add_tooltip(self,uid,*arg,**kw):
         return self.ui.add_tooltip(uid,fg='#e8e8e8',bg='#353535',
@@ -148,8 +148,10 @@ class TinUIDark(TinUITheme):
 
     def add_pipspager(self,pos,*arg,**kw):
         return self.ui.add_pipspager(pos,
-                bg='#202020',fg='#9a9a9a',buttonbg='#303030',
-                activefg='#cccccc',activebg='#303030',
+                bg='#202020',fg='#9a9a9a',
+                buttonfg='#9f9f9f',buttonbg='#2c2c2c',
+                activefg='#cfcfcf',activebg='#2c2c2c',
+                buttononfg='#cfcfcf',buttononbg='#2c2c2c',
                                      *arg,**kw)
 
     def add_notebook(self,pos,*arg,**kw):
@@ -239,7 +241,9 @@ class TinUIDark(TinUITheme):
     def add_menubutton(self,pos,*arg,**kw):
         return self.ui.add_menubutton(pos,
                 fg='#ffffff',bg='#2d2d2d',line='#303030',
-                activefg='#ffffff',activebg='#3f3f40',activeline='#3f3f3f',
+                activefg='#ffffff',activebg='#323232',activeline='#202020',
+                onfg='#cecece',onbg='#272727',online='#303030',
+                menuonfg='#ffffff',menuonbg='#383838',menuonline='#383838',
                 *arg,**kw)
     
     def add_barbutton(self,pos,*arg,**kw):

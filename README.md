@@ -675,16 +675,17 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_menubar(self,cid='all',bind='\<Button-3\>',font='微软雅黑 12',fg='#1b1b1b',bg='#fbfbfc',line='#e3e3e3',activefg='#1a1a1a',activebg='#f2f2f3',cont=(('command',print('')),'-'),tran='#01FF11')
+### add_menubar(self,cid='all',bind='\<Button-3\>',font='微软雅黑 12',fg='#1b1b1b',bg='#fbfbfc',line='#cccccc',activefg='#191919',activebg='#f0f0f0',activeline='#f0f0f0',cont=(('command',print('')),'-'),tran='#01FF11')
 
 - cid::绑定的画布对象
 - bind::绑定事件的类型
 - font::菜单字体
 - fg::字体颜色
 - bg::背景颜色
-- line::边框颜色
+- line::边框颜色，分割线颜色
 - activefg::选定时字体颜色
 - activebg::选定时菜单选项颜色
+- activeline::选定时菜单选项边框颜色
 - cont::菜单内容
 - tran::透明色
 
@@ -921,16 +922,19 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',activefg='#5d5d5d',buttonbg='#f8f8f8',activebg='#f8f8f8',num:int=2)
+### add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',buttonfg='#8a8a8a',buttonbg='#f9f9f9',activefg='#5f5f5f',activebg='#f9f9f9',buttononfg='#5f5f5f',buttononbg='#f9f9f9',num:int=2)
 
 - pos::位置
 - width::主视图宽度
 - height::主视图高度
 - bg::背景颜色
-- fg::按钮和导航栏前景色
-- activefg::响应时按钮文本颜色
+- fg::导航栏前景色
+- buttonfg:: 按钮文本颜色
 - buttonbg::按钮背景颜色
+- activefg::响应时按钮文本颜色
 - activebg::响应时按钮背景色
+- buttononfg:: 点击时按钮文本颜色
+- buttononbg:: 点击时按钮背景颜色
 - num::视图数量
 
 绘制一个横向翻页视图。
@@ -1473,7 +1477,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_menubutton(self,pos:tuple,text:str,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),cont=(('command',print),'-'),tran='#01FF11')
+### add_menubutton(self,pos:tuple,text:str,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',menuonfg='#191919',menuonbg='#f0f0f0',menuonline='#f0f0f0',font=('微软雅黑',12),cont=(('command',print),'-'),tran='#01FF11')
 
 - pos-位置
 - text-文本
@@ -1485,6 +1489,12 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - activefg-响应状态文本颜色
 - activebg-响应状态背景色
 - activeline-响应状态边框颜色
+- onfg-点击时文本颜色
+- onbg-点击时背景颜色
+- online-点击时边框颜色
+- menuonfg-菜单选项响应文本颜色
+- menuonbg-菜单选项响应背景颜色
+- menuonline-菜单选项响应边框颜色
 - font-字体
 - cont-菜单内容
 - tran-透明处理规避色

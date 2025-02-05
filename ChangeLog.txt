@@ -13,13 +13,15 @@
 3. 优化spinbox样式
 4. 修复entry、passwordbox提示符颜色错误
 5. button2添加过渡响应色
-*6. 如下控件按钮添加过渡响应色参数：
-    button2, menu, menubutton, pipspager, expander
+6. 如下控件按钮添加过渡响应色参数：
+    button2, menu, menubutton, pipspager, expander,
+    picker, barbutton
 7. 如下控件背景适配改进贴合性：
     treeview, listbox(并且改为圆角边框), combobox,
     menu, menubutton
 8. 修复TinUIXml下ui标签内绑定回调函数异常的错误
 9. 修复treeview未选中时折叠和展开的错误
+10. 修复togglebutton颜色转换时计算出错问题（防止溢出，对十六进制个位数补位）
 
 ==========5.15==========
 2025-2-1
@@ -38,7 +40,7 @@
     entry, link, labelframe, combobox, table, spinbox,
     menu, tooltip, listview, notebook, notecard, button2,
     expander, waitframe, treeview, passwordbox, togglebutton,
-    picker, menubutton, barbutotn
+    picker, menubutton, barbutton
 2. 优化spinbox调节按钮外观
 3. 调整barbutton，menubar，menubutton外框与内容的间距
 4. 修复checkbutton状态切换函数的问题

@@ -857,7 +857,7 @@ class BasicTinUI(Canvas):
         bar.pack(fill='both',expand=True)
         bar.create_polygon((13,13,x2-x1-4,13,x2-x1-4,height-12,13,height-12),fill=bg,outline=bg,width=17)
         bar.lower(bar.create_polygon((12,12,x2-x1-3,12,x2-x1-3,height-11,12,height-11),fill=outline,outline=outline,width=17))
-        bar.add_listbox((7,7),x2-x1-15,height-25,bg=bg,fg=fg,data=content,activebg=activebg,sel=activebg,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)
+        bar.add_listbox((7,7),x2-x1-15,height-23,bg=bg,fg=fg,data=content,activebg=activebg,sel=activebg,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)
         self.__auto_anchor(uid,pos,anchor)
         readyshow()
         funcs=FuncList(3)
@@ -3007,24 +3007,26 @@ class BasicTinUI(Canvas):
             self.itemconfig(button,state='normal')
             self.itemconfig(back,state='normal')
             out_button(None)
-        def __rgb2num(rgb):#tkinter颜色类型转十进制rgb
-            return int(rgb[1:3],16),int(rgb[3:5],16),int(rgb[5:],16)
-        def __num2rgb(hexs:tuple):#十进制rgb转tkinter颜色类型
+        def __rgb2num(rgb):
+            return int(rgb[1:3],16), int(rgb[3:5],16), int(rgb[5:],16)
+        def __num2rgb(num):
             co='#'
-            for i in hexs:
-                co+=str(hex(i))[2:]
+            for i in num:
+                co += f'{i:02x}'
             return co
-        def get_color_change(st,ed):
-            colors_list=[]
-            #起始和终止颜色，十进制rgb
-            a1,a2,a3=__rgb2num(st)
-            b1,b2,b3=__rgb2num(ed)
-            #两颜色差值
-            r,g,b=(b1-a1),(b2-a2),(b3-a3)
+        def get_color_change(st, ed):
+            colors_list = []
+            # 起始和终止颜色，十进制rgb
+            a1, a2, a3 = __rgb2num(st)
+            b1, b2, b3 = __rgb2num(ed)
+            # 两颜色差值
+            r, g, b = (b1 - a1), (b2 - a2), (b3 - a3)
             for i in range(26):
-                t=i/25
-                rgb=(int(a1 + r * t), int(a2 + g * t), int(a3 + b * t))
-                colors_list.append(__num2rgb(rgb))
+                t = i / 25
+                new_rgb = (int(a1 + r * t), int(a2 + g * t), int(a3 + b * t))
+                # 确保RGB值在0到255之间
+                new_rgb = tuple(max(0, min(255, x)) for x in new_rgb)
+                colors_list.append(__num2rgb(new_rgb))
             return colors_list
         state=False#off:False on:True
         colors=[]#渐变色颜色列表，25个，off->on，[[文本颜色,...],[背景色,...]]
@@ -3160,7 +3162,7 @@ class BasicTinUI(Canvas):
         self.__auto_anchor(uid,pos,anchor)
         return back,backitem
 
-    def add_picker(self,pos:tuple,height=250,fg='#1b1b1b',bg='#fbfbfb',outline='#ececec',activefg='#1b1b1b',activebg='#f6f6f6',onfg='#eaecfb',onbg='#3748d9',font=('微软雅黑',10),text=(('year',60),('season',100),),data=(('2022','2023','2024'),('spring','summer','autumn','winter')),tran='#01FF11',anchor='nw',command=None):#绘制滚动选值框
+    def add_picker(self,pos:tuple,height=250,fg='#1b1b1b',bg='#fbfbfb',outline='#ececec',activefg='#1b1b1b',activebg='#f6f6f6',onfg='#eaecfb',onbg='#3748d9',buttonfg='#1a1a1a',buttonbg='#f9f9f9',buttonactivefg='#1a1a1a',buttonactivebg='#f3f3f3',font=('微软雅黑',10),text=(('year',60),('season',100),),data=(('2022','2023','2024'),('spring','summer','autumn','winter')),tran='#01FF11',anchor='nw',command=None):#绘制滚动选值框
         def _mouseenter(event):
             self.itemconfig(back,fill=activebg,outline=activebg)
             for i in texts:
@@ -3238,7 +3240,7 @@ class BasicTinUI(Canvas):
                 y=sy-winh
             else:
                 y=sy
-            picker.geometry(f'{winw+15}x{winh+15}+{x-4}+{y}')
+            picker.geometry(f'{winw+15}x{winh+15}+{x-3}+{y}')
             picker.attributes('-alpha',0)
             picker.deiconify()
             picker.focus_set()
@@ -3334,12 +3336,12 @@ class BasicTinUI(Canvas):
         del __count
         #ok button
         okpos=((5+(width-9)/2)/2,height-22)
-        ok=bar.add_button2(okpos,text='\uE73E',font='{Segoe Fluent Icons} 12',fg=fg,bg=bg,line='',activefg=activefg,activebg=activebg,activeline=outline,anchor='center',command=set_it)
+        ok=bar.add_button2(okpos,text='\uE73E',font='{Segoe Fluent Icons} 12',fg=buttonfg,bg=buttonbg,line='',activefg=buttonactivefg,activebg=buttonactivebg,activeline=outline,anchor='center',command=set_it)
         bar.coords(ok[1],(9,height-35,(width-9)/2-5,height-35,(width-9)/2-5,height-9,9,height-9))
         bar.coords(ok[2],(8,height-34,(width-9)/2-4,height-34,(width-9)/2-4,height-8,8,height-8))
         #cancel button
         nopos=(((width-9)/2+width-4)/2,height-22)
-        no=bar.add_button2(nopos,text='\uE711',font='{Segoe Fluent Icons} 12',fg=fg,bg=bg,line='',activefg=activefg,activebg=activebg,activeline=outline,anchor='center',command=cancel)
+        no=bar.add_button2(nopos,text='\uE711',font='{Segoe Fluent Icons} 12',fg=buttonfg,bg=buttonbg,line='',activefg=buttonactivefg,activebg=buttonactivebg,activeline=outline,anchor='center',command=cancel)
         bar.coords(no[1],((width-9)/2+5,height-35,width-9,height-35,width-9,height-9,(width-9)/2+5,height-9))
         bar.coords(no[2],((width-9)/2+4,height-34,width-8,height-34,width-8,height-8,((width-9)/2+4,height-8)))
         readyshow()
@@ -3436,7 +3438,7 @@ class BasicTinUI(Canvas):
         funcs.active=active
         return uid+'button',back,outline,funcs,uid
     
-    def add_barbutton(self,pos:tuple,font='微软雅黑 12',fg='#636363',bg='#f3f3f3',line='#f3f3f3',linew=0,activefg='#191919',activebg='#eaeaea',activeline='#eaeaea',sepcolor='#e4e4e4',content=(('保存','\uE74E',None),('','\uE792',None),'',('','\uE74D',None)),anchor='nw'):#绘制一个工具栏按钮组件
+    def add_barbutton(self,pos:tuple,font='微软雅黑 12',fg='#636363',bg='#f3f3f3',line='#f3f3f3',linew=0,activefg='#191919',activebg='#eaeaea',activeline='#eaeaea',onfg='#5a5a5a',onbg='#ededed',online='#ededed',sepcolor='#e4e4e4',content=(('保存','\uE74E',None),('','\uE792',None),'',('','\uE74D',None)),anchor='nw'):#绘制一个工具栏按钮组件
         def new_pos():
             #获取最新位置
             bbox=self.bbox(buttons_id)
@@ -3463,7 +3465,7 @@ class BasicTinUI(Canvas):
                 self.create_line(sp_pos,width=1,fill=sepcolor,tags=(uid,buttons_id))
                 continue
             position=new_pos()
-            button=self.add_button2(position,text=i[0],icon=i[1],font=font,fg=fg,bg=bg,line=line,linew=linew,activefg=activefg,activebg=activebg,activeline=activeline,anchor='w',command=i[2])
+            button=self.add_button2(position,text=i[0],icon=i[1],font=font,fg=fg,bg=bg,line=line,linew=linew,activefg=activefg,activebg=activebg,activeline=activeline,onfg=onfg,onbg=onbg,online=online,anchor='w',command=i[2])
             self.addtag_withtag(buttons_id,button[-1])
             self.addtag_withtag(uid,button[-1])
             buttons.append(button)
@@ -3702,11 +3704,12 @@ class TinUIXml():#TinUI的xml渲染方式
     TinUITheme基类无法直接使用，只能够重写TinUI或BasicTinUI的样式后才能够使用，参考 /theme 中的样式重写范例
     '''
 
-    def __init__(self,ui:Union[BasicTinUI,TinUITheme]):
-        if isinstance(ui,TinUITheme):
-            self.ui=ui.ui
+    def __init__(self,ui:Union[BasicTinUI,TinUI,TinUITheme]):
+        self.ui = ui
+        if isinstance(ui, TinUITheme):
+            self.realui = ui.ui
         else:
-            self.ui=ui
+            self.realui = ui
         self.noload=('','menubar','tooltip')#当前不解析的标签
         self.intargs=('width','linew','bd','r','minwidth','maxwidth','start','padx','pady','info_width','height','num','delay',)#需要转为数字的参数
         self.dataargs=('command','choices','widgets','content','percentage','data','cont','scrollbar','widget',)#需要转为数据结构的参数
@@ -3789,8 +3792,8 @@ class TinUIXml():#TinUI的xml渲染方式
             tagall=eval(f'self.ui.add_{i.tag}(**attrib)')
             bboxtag = tagall[-1] if isinstance(tagall, tuple) else tagall
             for each_ftag in ftags:
-                self.ui.addtag_withtag(each_ftag,bboxtag)
-            bbox=self.ui.bbox(bboxtag)
+                self.realui.addtag_withtag(each_ftag,bboxtag)
+            bbox=self.realui.bbox(bboxtag)
             xendx=bbox[2]+padx#获取当前最大x坐标
             last_y = max(last_y, bbox[3] + pady)  # 更新当前最低y坐标
             #==========
@@ -3812,7 +3815,7 @@ class TinUIXml():#TinUI的xml渲染方式
             if i.text!=None:
                 self.tags[i.text.strip()]=tagall
         # 根据lineanchor调整最后一行的位置
-        bbox = self.ui.bbox(ftag)
+        bbox = self.realui.bbox(ftag)
         if bbox == None:
             return last_y, xendx
         xcenter = (bbox[0]+bbox[2])/2
@@ -3847,11 +3850,11 @@ class TinUIXml():#TinUI的xml渲染方式
         else:
             dx = 0
             dy = 0
-        self.ui.move(ftag, dx, dy)
-        bbox = self.ui.bbox(ftag)
+        self.realui.move(ftag, dx, dy)
+        bbox = self.realui.bbox(ftag)
         xendx = bbox[2] + padx
         last_y = bbox[3] + pady
-        self.ui.dtag(ftag)
+        self.realui.dtag(ftag)
         return last_y,xendx
 
     def loadxml(self,xml:str):#从xml字符串载入窗口组件
@@ -3870,8 +3873,8 @@ class TinUIXml():#TinUI的xml渲染方式
         self.datas=self.datas|dict_item
 
     def clean(self):#清空TinUI
-        self.ui.delete('all')
-        self.ui.clean_windows()
+        self.realui.delete('all')
+        self.realui.clean_windows()
 
 
 tinui_dir=os.path.dirname(os.path.abspath(__file__))

@@ -1452,7 +1452,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_picker(self,pos:tuple,height=250,fg='#1b1b1b',bg='#fbfbfb',outline='#ececec',activefg='#1b1b1b',activebg='#f6f6f6',onfg='#eaecfb',onbg='#3748d9',font=('微软雅黑',10),text=(('year',60),('season',100),),data=(('2022','2023','2024'),('spring','summer','autumn','winter')),tran='#01FF11',anchor='nw',command=None)
+### add_picker(self,pos:tuple,height=250,fg='#1b1b1b',bg='#fbfbfb',outline='#ececec',activefg='#1b1b1b',activebg='#f6f6f6',onfg='#eaecfb',onbg='#3748d9',buttonfg='#1a1a1a',buttonbg='#f9f9f9',buttonactivefg='#1a1a1a',buttonactivebg='#f3f3f3',font=('微软雅黑',10),text=(('year',60),('season',100),),data=(('2022','2023','2024'),('spring','summer','autumn','winter')),tran='#01FF11',anchor='nw',command=None)
 
 - pos-位置
 - height-选择框高度
@@ -1463,6 +1463,10 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - activebg-选择时背景颜色
 - onfg-选定时文本颜色
 - onbg-选定时背景颜色
+- buttonfg-按钮文本颜色
+- buttonbg-按钮背景颜色
+- buttonactivefg-按钮相应鼠标文本颜色
+- buttonactivebg-按钮响应鼠标背景颜色
 - font-字体
 - text-文本内容，需要与 `data`对应。`((选值文本,元素宽度),...)`
 - data-选值内容，需要与 `text`对应
@@ -1541,7 +1545,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_barbutton(self,pos:tuple,font='微软雅黑 14',fg='#636363',bg='#f3f3f3',line='#f3f3f3',linew=0,activefg='#191919',activebg='#eaeaea',activeline='#eaeaea',sepcolor='#e6e6e6',content=(('保存','\uE74E',None),('','\uE792',None),'',('','\uE74D',None)),anchor='nw')
+### add_barbutton(self,pos:tuple,font='微软雅黑 14',fg='#636363',bg='#f3f3f3',line='#f3f3f3',linew=0,activefg='#191919',activebg='#eaeaea',activeline='#eaeaea',onfg='#5a5a5a',onbg='#ededed',online='#ededed',sepcolor='#e6e6e6',content=(('保存','\uE74E',None),('','\uE792',None),'',('','\uE74D',None)),anchor='nw')
 
 - pos-位置
 
@@ -1560,6 +1564,12 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - activebg-响应时背景色
 
 - activeline-响应时边框颜色
+
+- onfg-点击时文本颜色
+
+- onbg-点击时背景颜色
+
+- online-点击时边框颜色
 
 - sepcolor-分割线颜色
 

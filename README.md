@@ -855,12 +855,14 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 绘制一个列表框。
 
-### return: box, funcs, uid
+### return: box, allback, funcs, uid
 
 > box::绘制列表框功能区的BasicTinUI
-> 
+>
+> allback::背景元素
+>
 > funcs
-> 
+>
 > > `funcs.add(text:str)`::在尾部添加新选项
 > > 
 > > `funcs.delete(index:int)`::删除指定序数的元素，第一个元素序号为0

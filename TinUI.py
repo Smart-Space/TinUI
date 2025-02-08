@@ -857,7 +857,8 @@ class BasicTinUI(Canvas):
         bar.pack(fill='both',expand=True)
         bar.create_polygon((13,13,x2-x1-4,13,x2-x1-4,height-12,13,height-12),fill=bg,outline=bg,width=17)
         bar.lower(bar.create_polygon((12,12,x2-x1-3,12,x2-x1-3,height-11,12,height-11),fill=outline,outline=outline,width=17))
-        bar.add_listbox((7,7),x2-x1-15,height-23,bg=bg,fg=fg,data=content,activebg=activebg,sel=activebg,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)
+        boxback = bar.add_listbox((7,7),x2-x1-15,height-23,bg=bg,fg=fg,data=content,activebg=activebg,sel=activebg,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)[1]
+        bar.delete(boxback)
         self.__auto_anchor(uid,pos,anchor)
         readyshow()
         funcs=FuncList(3)
@@ -1301,7 +1302,7 @@ class BasicTinUI(Canvas):
                 y=sy-winh
             else:
                 y=sy
-            menu.geometry(f'{winw+20}x{winh+10}+{x}+{y}')
+            menu.geometry(f'{winw+30}x{winh+20}+{x}+{y}')
             menu.attributes('-alpha',0)
             menu.deiconify()
             menu.focus_set()
@@ -1348,9 +1349,9 @@ class BasicTinUI(Canvas):
         bbox=bar.bbox('all')
         x1=bbox[0]
         x2=bbox[0]+max(widths)+8
-        gomap=((x1+5,bbox[1]+5),(x2-5,bbox[1]+5),(x2-5,bbox[3]-5),(x1+5,bbox[3]-5),(x1+5,bbox[1]+5))
+        gomap=((x1+5,bbox[1]+5),(x2-5,bbox[1]+5),(x2-5,bbox[3]-5),(x1+5,bbox[3]-5))
         mback=bar.create_polygon(gomap,fill=bg,outline=bg,width=17)
-        gomap=((x1+4,bbox[1]+4),(x2-4,bbox[1]+4),(x2-4,bbox[3]-4),(x1+4,bbox[3]-4),(x1+4,bbox[1]+4))
+        gomap=((x1+4,bbox[1]+4),(x2-4,bbox[1]+4),(x2-4,bbox[3]-4),(x1+4,bbox[3]-4))
         mline=bar.create_polygon(gomap,fill=bg,outline=line,width=17)
         bar.lower(mback)
         bar.lower(mline)
@@ -1781,7 +1782,7 @@ class BasicTinUI(Canvas):
         funcs=FuncList(2)
         funcs.add=_add
         funcs.delete=_delete
-        return box,funcs,uid
+        return box,allback,funcs,uid
 
     def add_listview(self,pos:tuple,width=300,height=300,linew=80,bg='#f3f3f3',activebg='#eaeaea',oncolor='#3041d8',scrobg='#f8f8f8',scroc='#999999',scrooc='#89898b',num=5,anchor='nw',command=None):#绘制列表视图,function:add_list
         def buttonin(itui):

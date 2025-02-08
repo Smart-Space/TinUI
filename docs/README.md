@@ -255,6 +255,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - activebg::激活时背景色
 - line::边框颜色
 - activeline::激活时边框颜色
+- insert::光标颜色
 - font::字体
 - linew::边框宽度
 - outline::提示线颜色
@@ -570,7 +571,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='#1b1b1b',bg='#ffffff',line='#e5e5e5',activefg='#818181',activebg='#f2f2f2',font=('微软雅黑',12),anchor='nw',command=None)
+### add_spinbox(self,pos:tuple,width=150,data=('1','2','3'),now='',fg='#1b1b1b',bg='#fefefe',line='#e5e5e5',activefg='#1a1a1a',activebg='#fafafa',onfg='#868686',onbg='#f3f3f3',boxfg='#5f5f5f',boxbg='#f9f9f9',boxactivefg='#5b5b5b',boxactivebg='#f0f0f0',font=('微软雅黑',12),anchor='nw',command=None)
 
 - pos::位置
 - width::宽度
@@ -580,6 +581,12 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - bg::输入框背景色
 - activefg::按钮响应文本颜色
 - activebg::按钮响应背景色
+- onfg::点击时按钮文本颜色
+- onbg::点击时按钮背景色
+- boxactivefg::响应鼠标进入按钮文本颜色
+- boxactivebg:: 响应鼠标进入按钮背景色
+- boxfg:: 按钮文本颜色
+- boxbg:: 按钮背景颜色
 - font::输入框字体，同时会影响按钮字体
 - anchor::对齐方向
 - command::选值时响应的函数，必须接受一个参数，这个参数是当前选定的值
@@ -668,16 +675,17 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_menubar(self,cid='all',bind='\<Button-3\>',font='微软雅黑 12',fg='#1b1b1b',bg='#fbfbfc',line='#e3e3e3',activefg='#1a1a1a',activebg='#f2f2f3',cont=(('command',print('')),'-'),tran='#01FF11')
+### add_menubar(self,cid='all',bind='\<Button-3\>',font='微软雅黑 12',fg='#1b1b1b',bg='#fbfbfc',line='#cccccc',activefg='#191919',activebg='#f0f0f0',activeline='#f0f0f0',cont=(('command',print('')),'-'),tran='#01FF11')
 
 - cid::绑定的画布对象
 - bind::绑定事件的类型
 - font::菜单字体
 - fg::字体颜色
 - bg::背景颜色
-- line::边框颜色
+- line::边框颜色，分割线颜色
 - activefg::选定时字体颜色
 - activebg::选定时菜单选项颜色
+- activeline::选定时菜单选项边框颜色
 - cont::菜单内容
 - tran::透明色
 
@@ -914,16 +922,19 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',activefg='#5d5d5d',buttonbg='#f8f8f8',activebg='#f8f8f8',num:int=2)
+### add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',buttonfg='#8a8a8a',buttonbg='#f9f9f9',activefg='#5f5f5f',activebg='#f9f9f9',buttononfg='#5f5f5f',buttononbg='#f9f9f9',num:int=2)
 
 - pos::位置
 - width::主视图宽度
 - height::主视图高度
 - bg::背景颜色
-- fg::按钮和导航栏前景色
-- activefg::响应时按钮文本颜色
+- fg::导航栏前景色
+- buttonfg:: 按钮文本颜色
 - buttonbg::按钮背景颜色
+- activefg::响应时按钮文本颜色
 - activebg::响应时按钮背景色
+- buttononfg:: 点击时按钮文本颜色
+- buttononbg:: 点击时按钮背景颜色
 - num::视图数量
 
 绘制一个横向翻页视图。
@@ -1121,7 +1132,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_button2(self,pos:tuple,text:str,icon=None,compound='left',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),minwidth=0,maxwidth=0,command=None,anchor='nw')
+### add_button2(self,pos:tuple,text:str,icon=None,compound='left',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',font=('微软雅黑',12),minwidth=0,maxwidth=0,command=None,anchor='nw')
 
 - pos::位置
 - text::标题文字
@@ -1134,6 +1145,9 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - activefg::响应鼠标的文本颜色
 - activebg::响应鼠标的按钮颜色
 - activeline::响应鼠标的边框颜色
+- onfg::鼠标点击时文本颜色
+- onbg::鼠标点击时按钮颜色
+- online::鼠标点击时边框颜色
 - font::字体名称+大小
 - minwidth::最小宽度，为0忽略
 - maxwidth::最大宽度，为0忽略
@@ -1168,7 +1182,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_expander(self,pos:tuple,title='expand content',tfg='black',tbg='#fbfbfb',bg='#f4f4f4',sep='#e5e5e5',width=200,height=200,scrollbar=False,font='微软雅黑 12')
+### add_expander(self,pos:tuple,title='expand content',tfg='black',tbg='#fbfbfb',bg='#f4f4f4',sep='#e5e5e5',buttonfg='#1b1b1b',buttonbg='#fbfbfb',buttonline='#fbfbfb',activefg='#1a1a1a',activebg='#f2f2f2',activeline='#f2f2f2',onfg='#1a1a1a',onbg='#f5f5f5',online='#f5f5f5',width=200,height=200,scrollbar=False,font='微软雅黑 12')
 
 - pos::位置
 - title::标题
@@ -1176,7 +1190,16 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - tbg::标题背景色
 - bg::UI颜色
 - sep::大背景色、分割线颜色
-- width::控件宽度，文本宽度为 `width-30`
+- buttonfg:: 按钮文本颜色
+- buttonbg:: 按钮背景颜色
+- buttonline:: 按钮边框颜色
+- activefg:: 按钮响应鼠标文本颜色
+- activebg:: 按钮响应鼠标背景颜色
+- activeline:: 按钮响应鼠标边框颜色
+- onfg:: 按钮点击时文本颜色
+- onbg:: 按钮点击时背景颜色
+- online:: 按钮点击时边框颜色
+- width::控件宽度，文本宽度为
 - height::UI高度
 - scrollbar::是否添加滚动条（是否使用TinUI）
 - font::标题字体
@@ -1429,7 +1452,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_picker(self,pos:tuple,height=250,fg='#1b1b1b',bg='#fbfbfb',outline='#ececec',activefg='#1b1b1b',activebg='#f6f6f6',onfg='#eaecfb',onbg='#3748d9',font=('微软雅黑',10),text=(('year',60),('season',100),),data=(('2022','2023','2024'),('spring','summer','autumn','winter')),tran='#01FF11',anchor='nw',command=None)
+### add_picker(self,pos:tuple,height=250,fg='#1b1b1b',bg='#fbfbfb',outline='#ececec',activefg='#1b1b1b',activebg='#f6f6f6',onfg='#eaecfb',onbg='#3748d9',buttonfg='#1a1a1a',buttonbg='#f9f9f9',buttonactivefg='#1a1a1a',buttonactivebg='#f3f3f3',font=('微软雅黑',10),text=(('year',60),('season',100),),data=(('2022','2023','2024'),('spring','summer','autumn','winter')),tran='#01FF11',anchor='nw',command=None)
 
 - pos-位置
 - height-选择框高度
@@ -1440,6 +1463,10 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - activebg-选择时背景颜色
 - onfg-选定时文本颜色
 - onbg-选定时背景颜色
+- buttonfg-按钮文本颜色
+- buttonbg-按钮背景颜色
+- buttonactivefg-按钮相应鼠标文本颜色
+- buttonactivebg-按钮响应鼠标背景颜色
 - font-字体
 - text-文本内容，需要与 `data`对应。`((选值文本,元素宽度),...)`
 - data-选值内容，需要与 `text`对应
@@ -1463,7 +1490,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_menubutton(self,pos:tuple,text:str,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#5d5d5d',activebg='#f5f5f5',activeline='#e5e5e5',font=('微软雅黑',12),cont=(('command',print),'-'),tran='#01FF11')
+### add_menubutton(self,pos:tuple,text:str,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',menuonfg='#191919',menuonbg='#f0f0f0',menuonline='#f0f0f0',font=('微软雅黑',12),cont=(('command',print),'-'),widget=True,tran='#01FF11')
 
 - pos-位置
 - text-文本
@@ -1475,8 +1502,15 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - activefg-响应状态文本颜色
 - activebg-响应状态背景色
 - activeline-响应状态边框颜色
+- onfg-点击时文本颜色
+- onbg-点击时背景颜色
+- online-点击时边框颜色
+- menuonfg-菜单选项响应文本颜色
+- menuonbg-菜单选项响应背景颜色
+- menuonline-菜单选项响应边框颜色
 - font-字体
 - cont-菜单内容
+- widget-是否显示下拉标识符
 - tran-透明处理规避色
 
 > cont的格式如下：
@@ -1512,7 +1546,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_barbutton(self,pos:tuple,font='微软雅黑 14',fg='#636363',bg='#f3f3f3',line='#f3f3f3',linew=0,activefg='#191919',activebg='#eaeaea',activeline='#eaeaea',sepcolor='#e6e6e6',content=(('保存','\uE74E',None),('','\uE792',None),'',('','\uE74D',None)),anchor='nw')
+### add_barbutton(self,pos:tuple,font='微软雅黑 14',fg='#636363',bg='#f3f3f3',line='#f3f3f3',linew=0,activefg='#191919',activebg='#eaeaea',activeline='#eaeaea',onfg='#5a5a5a',onbg='#ededed',online='#ededed',sepcolor='#e6e6e6',content=(('保存','\uE74E',None),('','\uE792',None),'',('','\uE74D',None)),anchor='nw')
 
 - pos-位置
 
@@ -1531,6 +1565,12 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - activebg-响应时背景色
 
 - activeline-响应时边框颜色
+
+- onfg-点击时文本颜色
+
+- onbg-点击时背景颜色
+
+- online-点击时边框颜色
 
 - sepcolor-分割线颜色
 

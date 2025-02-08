@@ -1490,7 +1490,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_menubutton(self,pos:tuple,text:str,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',menuonfg='#191919',menuonbg='#f0f0f0',menuonline='#f0f0f0',font=('微软雅黑',12),cont=(('command',print),'-'),tran='#01FF11')
+### add_menubutton(self,pos:tuple,text:str,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',menuonfg='#191919',menuonbg='#f0f0f0',menuonline='#f0f0f0',font=('微软雅黑',12),cont=(('command',print),'-'),widget=True,tran='#01FF11')
 
 - pos-位置
 - text-文本
@@ -1510,6 +1510,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - menuonline-菜单选项响应边框颜色
 - font-字体
 - cont-菜单内容
+- widget-是否显示下拉标识符
 - tran-透明处理规避色
 
 > cont的格式如下：

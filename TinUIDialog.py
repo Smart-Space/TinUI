@@ -151,9 +151,10 @@ class Dialog(Toplevel):
 
         self.tinui.add_paragraph((5,5),text=content)
         content_bbox=self.tinui.bbox('all')
+        width = max(content_bbox[2]-content_bbox[0], 300)
 
         if self.type=='listbox':
-            self.tinui.add_listbox(((content_bbox[0]+content_bbox[2])/2,self._endy()+5),data=choices,command=self.return_choice,anchor='n')
+            self.tinui.add_listbox((5,self._endy()+5),width=width,height=300,data=choices,command=self.return_choice)
 
         bbox=self.tinui.bbox('all')
         btn_width=(bbox[2]-bbox[0])/2

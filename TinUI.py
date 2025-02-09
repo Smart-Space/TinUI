@@ -10,7 +10,6 @@ from webbrowser import open as webopen
 import time
 import threading
 from typing import Union
-from types import FunctionType,BuiltinFunctionType
 import xml.etree.ElementTree  as ET
 import sys
 import os
@@ -606,7 +605,7 @@ class BasicTinUI(Canvas):
         funcs.active=funcs[2]=active
         return word,choices_list,choices_back,funcs,uid
 
-    def add_link(self,pos:tuple,text,url:Union[str,FunctionType,BuiltinFunctionType],fg='#4f62ca',activefg='red',activebg='#eaeaea',font:tuple=('微软雅黑',12),anchor='nw',command=None):#绘制超链接
+    def add_link(self,pos:tuple,text,url,fg='#4f62ca',activefg='red',activebg='#eaeaea',font:tuple=('微软雅黑',12),anchor='nw',command=None):#绘制超链接
         def turn_red(event):
             self.itemconfig(link,fill=activefg)
             self.itemconfig(back,fill=activebg,outline=activebg)
@@ -623,7 +622,7 @@ class BasicTinUI(Canvas):
                 #url如果是字符串，则打开网页；是方法，则执行函数
                 if type(url)==str:
                     webopen(url)
-                else:
+                elif callable(url):
                     url(event)
         def disable(fg='#b0b0b0'):
             self.itemconfig(link,state='disable',fill=fg)
@@ -1280,8 +1279,8 @@ class BasicTinUI(Canvas):
         def readyshow():#计算显示位置
             allpos=bar.bbox('all')
             #菜单尺寸
-            winw=allpos[2]-allpos[0]+5
-            winh=allpos[3]-allpos[1]+5
+            winw=allpos[2]-allpos[0]+35
+            winh=allpos[3]-allpos[1]+35
             #屏幕尺寸
             maxx=self.winfo_screenwidth()
             maxy=self.winfo_screenheight()
@@ -1336,7 +1335,7 @@ class BasicTinUI(Canvas):
                 pos=bar.bbox(button[1])
                 width=pos[2]-pos[0]
                 widths.append(width)
-            elif type(i[1]) in (FunctionType,BuiltinFunctionType):
+            elif callable(i[1]):
                 button=bar.add_button2((0,endy()-13),i[0],None,'',fg,bg,bg,3,activefg,activebg,activeline,font=font,command=lambda event,i=i:(menu.withdraw(),i[1](event)))
                 backs.append((button[1],button[2]))
                 funcs.append(button[3])
@@ -1763,7 +1762,7 @@ class BasicTinUI(Canvas):
         # frame=BasicTinUI(self,bg=bg)#主显示框，显示滚动条
         box=BasicTinUI(self,bg=bg,width=width,height=height)#显示选择内容
         box.place(x=12,y=12)
-        cavui=self.create_window(pos,window=box,width=width,height=height,anchor=anchor)
+        cavui=self.create_window(pos,window=box,width=width,height=height,anchor='nw')
         uid='listbox'+str(cavui)
         self.addtag_withtag(uid,cavui)
         hscroll = self.add_scrollbar((pos[0]+width,pos[1]),widget=box,height=height,bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]#纵向
@@ -2461,7 +2460,7 @@ class BasicTinUI(Canvas):
         def button_out(num,text_uid):
             if num!=select:
                 self.itemconfig(text_uid,fill=fg)
-        def sel_it(num,text_uid,tag):
+        def sel_it(num,text_uid,tag,send=True):
             nonlocal select
             if num==select:
                 return
@@ -2470,7 +2469,7 @@ class BasicTinUI(Canvas):
             self.itemconfig(text_uid,fill=activefg)
             bbox=self.bbox(text_uid)
             self.coords(line,(bbox[0],bbox[3]+2,bbox[2],bbox[3]+2))
-            if command!=None:
+            if command!=None and send:
                 command(tag)
         texts=[]#[(text,tag,text-uid),...]
         count=-1
@@ -2498,7 +2497,7 @@ class BasicTinUI(Canvas):
             self.tag_bind(text,'<Leave>',lambda event,num=count,tag=text:button_out(num,tag))
             self.tag_bind(text,'<Button-1>',lambda event,num=count,tag=text,tagname=i[1]:sel_it(num,tag,tagname))
         dx,dy=self.__auto_anchor(uid,pos,anchor)
-        sel_it(0,texts[0][2],texts[0][1])
+        sel_it(0,texts[0][2],texts[0][1],False)
         return texts,uid
 
     def add_button2(self,pos:tuple,text:str,icon=None,compound='left',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',font=('微软雅黑',12),minwidth=0,maxwidth=0,command=None,anchor='nw'):#绘制圆角按钮

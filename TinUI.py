@@ -845,8 +845,8 @@ class BasicTinUI(Canvas):
         self.tag_bind(uid,'<Enter>',mousein)
         self.tag_bind(uid,'<Leave>',mouseout)
         pickbox=Toplevel(self)#浮出窗口
+        pickbox.withdraw()
         self.windows.append(pickbox)
-        pickbox.withdraw()#隐藏窗口
         pickbox.geometry(f'{width+16}x{height}')
         pickbox.overrideredirect(True)
         pickbox.attributes('-topmost',1)
@@ -1312,10 +1312,10 @@ class BasicTinUI(Canvas):
             menu.bind('<FocusOut>',unshow)
         self.tag_bind(cid,bind,show)
         menu=Toplevel(self)
+        menu.withdraw()
         self.windows.append(menu)
         menu.attributes('-topmost',1)
         menu.overrideredirect(True)
-        menu.withdraw()
         bar=BasicTinUI(menu,bg=tran)
         bar.pack(fill='both',expand=True)
         wind=TinUINum()#记录数据
@@ -1393,8 +1393,8 @@ class BasicTinUI(Canvas):
         def first_create():#首次使用时创建
             nonlocal toti, bar, bbox, width, height
             toti=Toplevel()
-            self.windows.append(toti)
             toti.withdraw()
+            self.windows.append(toti)
             toti.overrideredirect(True)
             bar=BasicTinUI(toti,bg=tran)
             bar.pack(fill='both',expand=True)
@@ -1408,10 +1408,9 @@ class BasicTinUI(Canvas):
             bbox[3]-=5
             #绘制圆角边框
             tlinemap=((bbox[0]-1,bbox[1]-1),(bbox[2]+1,bbox[1]-1),(bbox[2]+1,bbox[3]+1),(bbox[0]-1,bbox[3]+1))
-            tline=bar.create_polygon(tlinemap,fill=outline,outline=outline,width=17,splinesteps=32)
-            start=bbox[2]-bbox[0]
+            bar.create_polygon(tlinemap,fill=outline,outline=outline,width=17,splinesteps=32)# tline
             gomap=((bbox[0],bbox[1]),(bbox[2],bbox[1]),(bbox[2],bbox[3]),(bbox[0],bbox[3]))
-            tback=bar.create_polygon(gomap,fill=bg,outline=bg,width=17,splinesteps=32)
+            bar.create_polygon(gomap,fill=bg,outline=bg,width=17,splinesteps=32)# back
             bar.tkraise(info)
             toti.attributes('-transparent',tran)
             toti.attributes('-alpha',0.9)#透明度90%
@@ -2076,7 +2075,7 @@ class BasicTinUI(Canvas):
             tbbbox=tbu.bbox(titleu)
             if cancancel==False:
                 tbu.itemconfig(cb,state='hidden')
-            bux=(endx+4,tbbbox[1],cbx+13,tbbbox[1],cbx+13,tbbbox[3],endx+4,tbbbox[3],endx+4,tbbbox[1])
+            bux=(endx+2,tbbbox[1],cbx+13,tbbbox[1],cbx+13,tbbbox[3],endx+2,tbbbox[3])
             bu=tbu.create_polygon(bux,fill=bg,outline=bg,width=9,tags=(labeluid))
             tbu.lower(bu)
             #移动newpageuid
@@ -2118,7 +2117,7 @@ class BasicTinUI(Canvas):
         def deletepage(flag):#删除页面
             nonlocal nowpage,npx
             wbbox=tbu.bbox(tbdict[flag][2])
-            w = wbbox[2] - wbbox[0] + 1
+            w = wbbox[2] - wbbox[0] - 1
             for i in tbdict[flag]:
                 tbu.delete(i)
             self.delete(vdict[flag][2])
@@ -2180,7 +2179,7 @@ class BasicTinUI(Canvas):
             tbu.addtag(movename,'overlapping',pyo_bbox[2]+1,2,all_bbox[2],all_bbox[3])
             tbu.move(movename,movex,0)#移动其它标题
             tbu.dtag(movename)
-            pyo_t=(pyo_bbox[0]+7,pyo_bbox[1]+7,pyo_bbox[2]+movex-7,pyo_bbox[1]+7,pyo_bbox[2]+movex-7,pyo_bbox[3]-7,pyo_bbox[0]+7,pyo_bbox[3]-7)
+            pyo_t=(pyo_bbox[0]+6,pyo_bbox[1]+6,pyo_bbox[2]+movex-6,pyo_bbox[1]+6,pyo_bbox[2]+movex-6,pyo_bbox[3]-6,pyo_bbox[0]+6,pyo_bbox[3]-6)
             tbu.coords(pyo,pyo_t)#调整背景
             tbu.move(cb,movex,0)
             tbu.itemconfig(title,text=title_text)#修改标题
@@ -3306,11 +3305,11 @@ class BasicTinUI(Canvas):
         self.tag_bind(uid,'<Button-1>',show)
         #创建窗口
         picker=Toplevel(self)
+        picker.withdraw()
         self.windows.append(picker)
         picker.geometry(f'{width}x{height}')
         picker.overrideredirect(True)
         picker.attributes('-topmost',1)
-        picker.withdraw()#隐藏窗口
         picker.attributes('-transparent',tran)
         wind=TinUINum()#记录数据
         bar=BasicTinUI(picker,bg=tran)

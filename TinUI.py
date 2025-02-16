@@ -3,7 +3,8 @@
     Copyright (C) <2021-present>  <smart-space>
 基于GPLv3和额外的LPGLv3许可发布
 '''
-from tkinter import *
+from tkinter import Tk, Toplevel, Canvas, Entry, Text, Scrollbar, Frame, PhotoImage, StringVar,\
+    BOTH, X, Y, RIGHT, BOTTOM, Place, Grid, Pack
 from tkinter import ttk
 from tkinter import font as tkfont
 from webbrowser import open as webopen
@@ -474,9 +475,9 @@ class BasicTinUI(Canvas):
             self.lower(bottomline,back)
             self.itemconfig(back,fill='#f0f0f0',outline='#f0f0f0')
             self.itemconfig(bottomline,fill=outline)
-        entry=Entry(self,fg=fg,bg=bg,font=font,relief='flat',bd=0,insertbackground=insert)
-        entry.insert(0,text)
-        entry.bind('<KeyRelease>',if_empty)
+        var = StringVar()#变量
+        entry = Entry(self, fg=fg, bg=bg, font=font, relief='flat', bd=0, insertbackground=insert, textvariable=var)
+        entry.insert(0, text)
         entry.bind('<FocusIn>',focus_in)
         entry.bind('<FocusOut>',focus_out)
         funce=self.create_window(pos,window=entry,width=width,anchor='nw')#输入框画布对象
@@ -505,6 +506,7 @@ class BasicTinUI(Canvas):
         self.tkraise(funcw)
         self.__auto_anchor(uid,pos,anchor)
         if_empty(None)
+        var.trace_add('write', lambda name, index, mode, var=var: if_empty(None))#变量绑定
         funcs=FuncList(7)
         funcs.get=get_entry
         funcs.insert=__insert
@@ -2898,7 +2900,6 @@ class BasicTinUI(Canvas):
             self.itemconfig(bottomline,fill=outline)
         nowstate='hidden'#'shown'
         entry=Entry(self,fg=fg,bg=bg,font=font,relief='flat',bd=0,show='●',insertbackground=insert)
-        entry.bind('<KeyRelease>',if_empty)
         entry.bind('<FocusIn>',focus_in)
         entry.bind('<FocusOut>',focus_out)
         funce=self.create_window(pos,window=entry,width=width,anchor=anchor)#输入框画布对象
@@ -3973,7 +3974,8 @@ if __name__=='__main__':
     b.add_button((250,450),'测试按钮',activefg='white',activebg='red',command=test,anchor='center',maxwidth=100)
     b.add_checkbutton((60,430),'允许TinUI测试',command=test1,anchor='w')
     b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
-    b.add_entry((250,330),350,'这里用来输入',command=print,anchor='w')
+    uientry = b.add_entry((250, 330), 350, '', command=print, anchor='w')[0]
+    uientry.insert(0, '请输入内容')
     b.add_button((20,170),'创建分割线',command=lambda event:b.add_separate((20,200),600),minwidth=200)
     b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
     b.add_link((400,500),'TinGroup知识库','https://tinhome.bk-free02.com',anchor='nw')

@@ -11,6 +11,7 @@
 *1. 基于TinUILight, TinUIDark的Dialog附加样式类
 2. entry中有内容就显示删除按钮
 3. 删除passwordbox输入判定
+4. 优化entry, passwordbox提示符样式(不再支持linew参数)
 
 ==========5.18==========
 2025-2-12

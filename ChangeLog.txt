@@ -7,8 +7,8 @@
 
 
 ==========5.19==========
-2025-
-*1. 基于TinUILight, TinUIDark的Dialog附加样式类
+2025-2-27
+1. listview增加清空方法
 2. entry中有内容就显示删除按钮
 3. 删除passwordbox输入判定
 4. 优化entry, passwordbox提示符样式(不再支持linew参数)

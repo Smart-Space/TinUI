@@ -244,7 +244,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_entry(self,pos:tuple,width:int,text:str='',fg='#606060',bg='#f6f6f6',activefg='#1b1b1b',activebg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#808080',font=('微软雅黑',12),linew=3,outline='#868686',onoutline='#3041d8',icon='>',anchor='nw',call='→',command=None)
+### add_entry(self,pos:tuple,width:int,text:str='',fg='#606060',bg='#f6f6f6',activefg='#1b1b1b',activebg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#808080',font=('微软雅黑',12),outline='#868686',onoutline='#3041d8',icon='>',anchor='nw',call='→',command=None)
 
 - pos::位置
 - width::宽度
@@ -257,7 +257,6 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - activeline::激活时边框颜色
 - insert::光标颜色
 - font::字体
-- linew::边框宽度
 - outline::提示线颜色
 - onoutline::获取焦点时的提示线颜色
 - icon::内容为空时，右侧显示的字符
@@ -339,7 +338,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_link(self,pos:tuple,text,url:Union[str,FunctionType],fg='#4f62ca',activefg='red',activebg='#eaeaea',font:tuple=('微软雅黑',12),anchor='nw')
+### add_link(self,pos:tuple,text,url,fg='#4f62ca',activefg='red',activebg='#eaeaea',font:tuple=('微软雅黑',12),anchor='nw')
 
 - pos::位置
 - text::网页链接 **或者** 要执行的函数，函数需要接受 `event`参数
@@ -1269,20 +1268,22 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: ui, scro, items, funcs, uid
 
 > ui::列表框架BasicTinUI
-> 
+>
 > scro::滚动条返回值，`add_scrollbar`
-> 
+>
 > items::元素列表，每个元素为ui返回值，`add_ui`。进返回初始元素列表
-> 
+>
 > funcs
-> 
+>
 > > `funcs.getitems()`获取当前所有元素列表
-> > 
+> >
 > > `funcs.getui(index)`获取index对应的`add_ui`返回值
-> > 
+> >
 > > `funcs.delete(index)`删除index位的UI元素
-> > 
+> >
 > > `funcs.add()`在末尾追加新元素，并且返回`add_ui`返回值
+> >
+> > `funcs.clear()`清除所有元素
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI列表视图.gif)
 
@@ -1429,7 +1430,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_passwordbox(self,pos:tuple,width:int,fg='#606060',bg='#f6f6f6',activefg='#1b1b1b',activebg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#808080',font=('微软雅黑',12),linew=3,outline='#868686',onoutline='#3041d8',anchor='nw',command=None)
+### add_passwordbox(self,pos:tuple,width:int,fg='#606060',bg='#f6f6f6',activefg='#1b1b1b',activebg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#808080',font=('微软雅黑',12),outline='#868686',onoutline='#3041d8',anchor='nw',command=None)
 
 - pos-位置
 - width-宽度
@@ -1441,7 +1442,6 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - activeline-响应式边框颜色
 - insert-光标颜色
 - font-字体
-- linew-底边提示线宽度
 - outline-提示线颜色
 - onoutline-响应时提示线颜色
 - anchor-对齐方向

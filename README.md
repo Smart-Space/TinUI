@@ -338,7 +338,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_link(self,pos:tuple,text,url:Union[str,FunctionType],fg='#4f62ca',activefg='red',activebg='#eaeaea',font:tuple=('微软雅黑',12),anchor='nw')
+### add_link(self,pos:tuple,text,url,fg='#4f62ca',activefg='red',activebg='#eaeaea',font:tuple=('微软雅黑',12),anchor='nw')
 
 - pos::位置
 - text::网页链接 **或者** 要执行的函数，函数需要接受 `event`参数
@@ -1268,20 +1268,22 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: ui, scro, items, funcs, uid
 
 > ui::列表框架BasicTinUI
-> 
+>
 > scro::滚动条返回值，`add_scrollbar`
-> 
+>
 > items::元素列表，每个元素为ui返回值，`add_ui`。进返回初始元素列表
-> 
+>
 > funcs
-> 
+>
 > > `funcs.getitems()`获取当前所有元素列表
-> > 
+> >
 > > `funcs.getui(index)`获取index对应的`add_ui`返回值
-> > 
+> >
 > > `funcs.delete(index)`删除index位的UI元素
-> > 
+> >
 > > `funcs.add()`在末尾追加新元素，并且返回`add_ui`返回值
+> >
+> > `funcs.clear()`清除所有元素
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI列表视图.gif)
 

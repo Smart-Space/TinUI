@@ -4,6 +4,10 @@ def additem(e):
     funcs.add()
 def deleteitem(e):
     funcs.delete(1)
+def deleteitem1(e):
+    funcs.delete(0)
+def deleteall(e):
+    funcs.clear()
 def print__(name):
     print(name)
 
@@ -34,6 +38,8 @@ for i in range(0,5):
     </tinui>''')
 
 u.add_button((5,320),'添加元素',command=additem)
-u.add_button((120,320),'删除第二个元素',command=deleteitem)
+u.add_button((120,320),'删除第一个元素',command=deleteitem1)
+u.add_button((120,370),'删除第二个元素',command=deleteitem)
+u.add_button((120,420),'清空元素',command=deleteall)
 
 a.go()

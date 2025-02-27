@@ -479,6 +479,7 @@ class BasicTinUI(Canvas):
             self.itemconfig(bottomline,fill=outline)
         var = StringVar()#变量
         entry = Entry(self, fg=fg, bg=bg, font=font, relief='flat', bd=0, insertbackground=insert, textvariable=var)
+        entry.var = var
         entry.insert(0, text)
         entry.bind('<FocusIn>',focus_in)
         entry.bind('<FocusOut>',focus_out)
@@ -1850,8 +1851,9 @@ class BasicTinUI(Canvas):
                 nowon-=1
                 ui.move(line, 0, -linew-2)
             endy-=linew+2
-            subui=items[index]
-            ui.delete(subui[-1])
+            subui=items[index][-1]
+            ui.dtag(subui,'item')
+            ui.delete(subui)
             del items[index]#删除元素
             #其它UI上移
             if index==len(items):
@@ -1861,6 +1863,18 @@ class BasicTinUI(Canvas):
             bbox=list(ui.bbox('item'))
             bbox[0]-=3
             ui.config(scrollregion=bbox)
+        def clear():#清空所有元素
+            nonlocal endy, nowon
+            num = len(items)
+            if num == 0:
+                return
+            ui.move(line, 0, -linew*num-height)
+            endy = 0
+            nowon = -1
+            ui.delete('item')
+            ui.dtag('item')
+            items.clear()
+            ui.config(scrollregion=(0,0,width,height))
         def add():#增加 add_ui uid 到底部，并获取返回值
             _load_item(1)
             return items[-1]
@@ -1884,11 +1898,12 @@ class BasicTinUI(Canvas):
         allback=self.add_back((),(view,scro[-1]),fg=bg,bg=bg,linew=8)
         self.addtag_withtag(uid,allback)
         ui.bind('<MouseWheel>',bindyview)
-        funcs=FuncList(4)
+        funcs=FuncList(5)
         funcs.getitems=getitems
         funcs.getui=getui
         funcs.add=add
         funcs.delete=delete
+        funcs.clear=clear
         return ui,scro,items,funcs,uid
 
     def add_canvas(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',linew=1,scrollbar=False,anchor='nw'):#绘制画布

@@ -1,7 +1,11 @@
 from window import win
 
 def additem(e):
-    funcs.add()
+    uixml = funcs.add()[-2]
+    uixml.loadxml(onexml)
+def add10(e):
+    for i in range(0,10):
+        additem(e)
 def deleteitem(e):
     funcs.delete(1)
 def deleteitem1(e):
@@ -14,6 +18,16 @@ def print__(name):
 a=win()
 u=a.u
 funcs=u.add_listview((10,5),command=print__)[-2]
+
+onexml='''<tinui>
+<line>
+<title text='listview'></title>
+<line>
+<label text='列表视图'></label>
+</line>
+</line>
+</tinui>
+'''
 
 lvitems=funcs.getitems()
 lvcontent=(
@@ -41,5 +55,6 @@ u.add_button((5,320),'添加元素',command=additem)
 u.add_button((120,320),'删除第一个元素',command=deleteitem1)
 u.add_button((120,370),'删除第二个元素',command=deleteitem)
 u.add_button((120,420),'清空元素',command=deleteall)
+u.add_button((120,470),'增加十个',command=add10)
 
 a.go()

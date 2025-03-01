@@ -15,7 +15,7 @@ import xml.etree.ElementTree  as ET
 import sys
 import os
 import shutil
-import platform
+import uuid
 '''全部组件都是绘制的，除了输入型组件无法使用tkinter画布完成对应效果'''
 #==========
 '''开发信息
@@ -278,7 +278,7 @@ class BasicTinUI(Canvas):
                 i.destroy()
             except:
                 continue
-        self.windows=[]
+        self.windows.clear()
         #print(self.windows)
 
     def add_title(self,pos:tuple,text:str,fg='black',font='微软雅黑',size=1,anchor='nw',**kw):#绘制标题
@@ -1851,9 +1851,10 @@ class BasicTinUI(Canvas):
                 nowon-=1
                 ui.move(line, 0, -linew-2)
             endy-=linew+2
-            subui=items[index][-1]
-            ui.dtag(subui,'item')
-            ui.delete(subui)
+            subui=items[index]
+            ui.dtag(subui[-1],'item')
+            ui.delete(subui[-1])
+            subui[0].destroy()
             del items[index]#删除元素
             #其它UI上移
             if index==len(items):
@@ -1871,8 +1872,10 @@ class BasicTinUI(Canvas):
             ui.move(line, 0, -linew*num-height)
             endy = 0
             nowon = -1
-            ui.delete('item')
-            ui.dtag('item')
+            for subui in items:
+                ui.dtag(subui[-1],'item')
+                ui.delete(subui[-1])
+                subui[0].destroy()
             items.clear()
             ui.config(scrollregion=(0,0,width,height))
         def add():#增加 add_ui uid 到底部，并获取返回值
@@ -3784,7 +3787,7 @@ class TinUIXml():#TinUI的xml渲染方式
         xendy = y = int(line.get('y', y))
         allanchor = line.get('anchor', anchor)
         lineanchor = line.get('lineanchor', '')# 整个模块的对齐方向
-        ftag = 'ftag-' + str(id(line))
+        ftag = 'ftag-' + str(uuid.uuid1().hex)
         ftags.append(ftag)
         for i in line.iterfind('*'):#只检索直接子元素
             if i.tag=='line':
@@ -3855,6 +3858,7 @@ class TinUIXml():#TinUI的xml渲染方式
         # 根据lineanchor调整最后一行的位置
         bbox = self.realui.bbox(ftag)
         if bbox == None:
+            self.realui.dtag(ftag)
             return last_y, xendx
         xcenter = (bbox[0]+bbox[2])/2
         ycenter = (bbox[1]+bbox[3])/2

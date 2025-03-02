@@ -863,8 +863,10 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 > funcs
 >
 > > `funcs.add(text:str)`::在尾部添加新选项
-> > 
+> >
 > > `funcs.delete(index:int)`::删除指定序数的元素，第一个元素序号为0
+> >
+> > `funcs.clear()`::清空
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI列表框.gif)
 

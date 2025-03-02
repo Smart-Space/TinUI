@@ -464,6 +464,7 @@ class BasicTinUI(Canvas):
             return entry.get()
         def __delete():#删除文本
             entry.delete(0,'end')
+            entry.focus_set()
         def __insert(index=0,text=''):#插入文本
             entry.insert(index,text)
         def __error(errorline='#c42b1c'):#错误样式
@@ -1097,6 +1098,13 @@ class BasicTinUI(Canvas):
                 result=TinUIString(data[index])
                 result.num=index
                 command(result)
+        def return_data(event):
+            val=check_in_data()
+            if val[0]==True:
+                if command!=None:
+                    result=TinUIString(val[1])
+                    result.num=data.index(val[1])
+                    command(result)
         def mouse_in(event):
             wentry.config(bg=activebg, fg=activefg)
             self.itemconfig(back, outline=activebg, fill=activebg)
@@ -1106,6 +1114,7 @@ class BasicTinUI(Canvas):
         def _change_data(event):
             self.itemconfig(cui, state='normal')
             self.lift(cui)
+            self.focus(cui)
         def check_in_data():
             val=wentry.get()
             if val in data:
@@ -1158,6 +1167,7 @@ class BasicTinUI(Canvas):
         wentry.bind('<Enter>', mouse_in)
         wentry.bind('<Leave>', mouse_out)
         wentry.bind('<Button-1>', mouse_out)
+        wentry.bind('<Return>', return_data)
         return wentry,button1,button2,back,outline,button,uid
 
     def add_scalebar(self,pos:tuple,width=200,fg='#4554dc',activefg='#4554dc',bg='#868686',buttonbg='#ffffff',buttonoutline='#cccccc',data=(1,2,3,4,5),start=1,anchor='nw',command=None):#绘制调节框
@@ -1744,6 +1754,15 @@ class BasicTinUI(Canvas):
             repaint_back()
             bbox=box.bbox('all')
             box.config(scrollregion=bbox)
+        def _clear():#清空元素
+            nonlocal maxwidth
+            for key in choices.keys():
+                for cid in choices[key][1:3]:
+                    box.delete(cid)
+            choices.clear()
+            all_keys.clear()
+            maxwidth=0
+            box.config(scrollregion=(0,0,width,height))
         def load_data(datas):#导入元素
             nonlocal maxwidth
             for i in datas:
@@ -1793,6 +1812,7 @@ class BasicTinUI(Canvas):
         funcs=FuncList(2)
         funcs.add=_add
         funcs.delete=_delete
+        funcs.clear=_clear
         return box,allback,funcs,uid
 
     def add_listview(self,pos:tuple,width=300,height=300,linew=80,bg='#f3f3f3',activebg='#eaeaea',oncolor='#3041d8',scrobg='#f8f8f8',scroc='#999999',scrooc='#89898b',num=5,anchor='nw',command=None):#绘制列表视图,function:add_list

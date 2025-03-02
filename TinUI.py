@@ -2461,6 +2461,10 @@ class BasicTinUI(Canvas):
                     self.itemconfig(item[1],fill=fg)
                 self.itemconfig(item[2],fill=fg)
                 count+=1
+        def _select(index):
+            #选定指定项
+            back, sign, _, _ = boxes[index]
+            sel_it(index, sign, back)
         #标识符内部宽度width和边框宽度line
         back_width=18
         back_line=2#16+2*2=20
@@ -2497,9 +2501,10 @@ class BasicTinUI(Canvas):
             self.tag_bind(back,'<Button-1>',lambda event,sel=count,sign=sign,sback=sign_back:sel_it(sel,sign,sback))
             nowx=t_bbox[2]+padx
         self.__auto_anchor(uid,pos,anchor)
-        funcs=FuncList(2)
+        funcs=FuncList(3)
         funcs.active=active
         funcs.disable=disable
+        funcs.select=_select
         return boxes,funcs,uid
 
     def add_pivot(self,pos:tuple,fg='#959595',bg='',activefg='#525252',activecolor='#5969e0',content=(('a-title','tag1'),('b-title','tag2'),'',('c-title','tag3')),font='微软雅黑 16',padx=10,pady=10,anchor='nw',command=None):#绘制支点标题
@@ -4096,7 +4101,8 @@ if __name__=='__main__':
     ntb.cannew(True,test9)
     test7()
     b.add_ratingbar((0,1150),num=28,command=print)
-    b.add_radiobox((320,1150),content=('1','2','3','','新一行内容','','单选','组','控件'),command=test8)
+    radiofuncs = b.add_radiobox((320,1150),content=('1','2','3','','新一行内容','','单选','组','控件'),command=test8)[-2]
+    radiofuncs.select(0)
     b.add_notecard((1200,50))
     pivott=b.create_text((1200,400),text='pivot text',anchor='nw',font='微软雅黑 12')
     b.add_pivot((1200,300),command=test10)

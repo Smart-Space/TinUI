@@ -11,6 +11,7 @@
 1. listbox添加清空功能
 *2. 基于TinUILight, TinUIDark的Dialog附加样式类
 3. spinbox回车时，如果输入数据符合条件，则触发回调函数
+4. radiobox方法增加select
 
 ==========5.20==========
 2025-3-1

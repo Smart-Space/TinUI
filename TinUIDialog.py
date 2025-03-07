@@ -15,7 +15,10 @@ class Dialog(Toplevel):
     TinUI对话框基础类
     """
 
-    def __init__(self,master,dialogtype='normal',**options):
+    def __init__(self,master,dialogtype='normal',theme='light',**options):
+        """
+        theme: 'dark' or 'light'
+        """
         super().__init__(master,**options)
         self.withdraw()
         
@@ -23,6 +26,97 @@ class Dialog(Toplevel):
         self.tinui.pack(fill='both',expand=True)
 
         self.type=dialogtype#对话框类型
+
+        if theme=='light':
+            self.background = '#f3f3f3'
+            self.fg = '#000000'
+            self.barback = '#f3f3f3'
+            self.buttonargs = {
+                'fg':'#1b1b1b',
+                'bg':'#fbfbfb',
+                'line':'#cccccc',
+                'activefg':'#1a1a1a',
+                'activebg':'#f6f6f6',
+                'activeline':'#cccccc',
+                'onfg':'#5d5d5d',
+                'onbg':'#f5f5f5',
+                'online':'#e5e5e5'
+            }
+            self.entryargs = {
+                'fg':'#606060',
+                'bg':'#fbfbfb',
+                'activefg':'#1b1b1b',
+                'activebg':'#ffffff',
+                'line':'#e5e5e5',
+                'activeline':'#e5e5e5',
+                'insert':'#000000',
+                'outline':'#868686',
+                'onoutline':'#3041d8',
+            }
+            self.listargs = {
+                'fg':'#000000',
+                'bg':'#f2f2f2',
+                'activebg':'#e9e9e9',
+                'sel':'#b4b4b4',
+                'scrollbg':'#f9f9f9',
+                'scrollcolor':'#8d8d8d',
+                'scrollon':'#8a8a8a'
+            }
+            self.infocolor = '#5969e0'
+            self.infoback = '#ffffff'
+            self.successcolor = '#0f7b0f'
+            self.successback = '#dff6dd'
+            self.warningcolor = '#9d5d00'
+            self.warningback = '#fff4ce'
+            self.errorcolor = '#c42b1c'
+            self.errorback = '#fde7e9'
+            self.questioncolor = '#5969e0'
+            self.questionback = '#ffffff'
+        elif theme=='dark':
+            self.background = '#202020'
+            self.fg = '#ffffff'
+            self.barback = '#202020'
+            self.buttonargs = {
+                'fg':'#ffffff',
+                'bg':'#2d2d2d',
+                'line':'#303030',
+                'activefg':'#ffffff',
+                'activebg':'#323232',
+                'activeline':'#202020',
+                'onfg':'#cecece',
+                'onbg':'#272727',
+                'online':'#303030'
+            }
+            self.entryargs = {
+                'fg':'#cfcfcf',
+                'bg':'#2d2d2d',
+                'activefg':'#e6e6e6',
+                'activebg':'#1f1f1f',
+                'line':'#303030',
+                'activeline':'#202020',
+                'outline':'#9a9a9a',
+                'onoutline':'#b2b8f2',
+                'insert':'#e0e0e0',
+            }
+            self.listargs = {
+                'bg':'#2d2d2d',
+                'fg':'#ffffff',
+                'activebg':'#b4bbea',
+                'sel':'#465097',
+                'scrollbg':'#2e2e2e',
+                'scrollcolor':'#9f9f9f',
+                'scrollon':'#a0a0a0'
+            }
+            self.infocolor = '#4cc2ff'
+            self.infoback = '#2c2c2c'
+            self.successcolor = '#6ccb5f'
+            self.successback = '#393d1b'
+            self.warningcolor = '#fce100'
+            self.warningback = '#433519'
+            self.errorcolor = '#ff99a4'
+            self.errorback = '#442726'
+            self.questioncolor = '#4cc2ff'
+            self.questionback = '#2c2c2c'
 
         self.resizable(False,False)
         self.tk.call('wm', 'iconbitmap', self._w, '-default', '')
@@ -47,39 +141,39 @@ class Dialog(Toplevel):
         
         # contenty=5
         if self.type=='normal':
-            pass
+            self.tinui['bg']=self.background
         elif self.type=='info':
-            self.tinui['bg']='#ffffff'
-            icon_uid=self.tinui.add_paragraph((5,5),text='\uE946',fg='#5969e0',font='{Segoe Fluent Icons} 14',anchor='w')
+            self.tinui['bg']=self.infoback
+            icon_uid=self.tinui.add_paragraph((5,5),text='\uE946',fg=self.infocolor,font='{Segoe Fluent Icons} 14',anchor='w')
             self.tinui.addtag_withtag('content',icon_uid)
         elif self.type=='success':
-            self.tinui['bg']='#dff6dd'
-            icon_uid=self.tinui.add_paragraph((5,5),text='\uE73E',fg='#0f7b0f',font='{Segoe Fluent Icons} 14',anchor='w')
+            self.tinui['bg']=self.successback
+            icon_uid=self.tinui.add_paragraph((5,5),text='\uE73E',fg=self.successcolor,font='{Segoe Fluent Icons} 14',anchor='w')
             self.tinui.addtag_withtag('content',icon_uid)
         elif self.type=='warning':
-            self.tinui['bg']='#fff4ce'
-            icon_uid=self.tinui.add_paragraph((5,5),text='\uE7BA',fg='#9d5d00',font='{Segoe Fluent Icons} 14',anchor='w')
+            self.tinui['bg']=self.warningback
+            icon_uid=self.tinui.add_paragraph((5,5),text='\uE7BA',fg=self.warningcolor,font='{Segoe Fluent Icons} 14',anchor='w')
             self.tinui.addtag_withtag('content',icon_uid)
         elif self.type=='error':
-            self.tinui['bg']='#fde7e9'
-            icon_uid=self.tinui.add_paragraph((5,5),text='\uEA39',fg='#c42b1c',font='{Segoe Fluent Icons} 14',anchor='w')
+            self.tinui['bg']=self.errorback
+            icon_uid=self.tinui.add_paragraph((5,5),text='\uEA39',fg=self.errorcolor,font='{Segoe Fluent Icons} 14',anchor='w')
             self.tinui.addtag_withtag('content',icon_uid)
         elif self.type=='question':
-            self.tinui['bg']='#ffffff'
-            icon_uid1=self.tinui.add_paragraph((5,5),text='\uEA3A',fg='#5969e0',font='{Segoe Fluent Icons} 14',anchor='w')
-            icon_uid2=self.tinui.add_paragraph((5,5),text='\uF142',fg='#5969e0',font='{Segoe Fluent Icons} 14',anchor='w')
+            self.tinui['bg']=self.questionback
+            icon_uid1=self.tinui.add_paragraph((5,5),text='\uEA3A',fg=self.questioncolor,font='{Segoe Fluent Icons} 14',anchor='w')
+            icon_uid2=self.tinui.add_paragraph((5,5),text='\uF142',fg=self.questioncolor,font='{Segoe Fluent Icons} 14',anchor='w')
             self.tinui.addtag_withtag('content',icon_uid1)
             self.tinui.addtag_withtag('content',icon_uid2)
 
-        content_uid=self.tinui.add_paragraph((35,5),text=content,anchor='w')
+        content_uid=self.tinui.add_paragraph((35,5),text=content,fg=self.fg,anchor='w')
         self.tinui.addtag_withtag('content',content_uid)
         content_bbox=self.tinui.bbox('content')
         btn_width=(content_bbox[2]-content_bbox[0])/2
         button_width=btn_width-10 if btn_width>110 else 100
         button_endy=self._endy()+15
-        yesbutton_uid=self.tinui.add_button2(((content_bbox[0]+content_bbox[2])/2-5,button_endy),text=YES,minwidth=button_width,command=lambda e:self.return_msg(True),anchor='ne')[-1]
-        nobutton_uid=self.tinui.add_button2(((content_bbox[0]+content_bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:self.return_msg(False),anchor='nw')[-1]
-        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg='#f3f3f3',fg='#f3f3f3',linew=9)
+        yesbutton_uid=self.tinui.add_button2(((content_bbox[0]+content_bbox[2])/2-5,button_endy),text=YES,minwidth=button_width,command=lambda e:self.return_msg(True),anchor='ne',**self.buttonargs)[-1]
+        nobutton_uid=self.tinui.add_button2(((content_bbox[0]+content_bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:self.return_msg(False),anchor='nw',**self.buttonargs)[-1]
+        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.barback,fg=self.barback,linew=9)
 
         return self.load_window()
     
@@ -96,23 +190,23 @@ class Dialog(Toplevel):
         YES=yestext
         NO=notext
 
-        self.tinui['bg']='#ffffff'
+        self.tinui['bg']=self.background
         
         self.title(title)
         self.protocol('WM_DELETE_WINDOW',lambda:self.return_input(None))
         
-        self.tinui.add_paragraph((5,5),text=content)
+        self.tinui.add_paragraph((5,5),text=content,fg=self.fg)
         content_bbox=self.tinui.bbox('all')
         entry_width=content_bbox[2]-content_bbox[0]
         width=entry_width if entry_width>200 else 200
-        self.entry=self.tinui.add_entry((5,self._endy()+5),width=width)[-2]# tinui entry widget, funcs
+        self.entry=self.tinui.add_entry((5,self._endy()+5),width=width,**self.entryargs)[-2]# tinui entry widget, funcs
         bbox=self.tinui.bbox('all')
         btn_width=(bbox[2]-bbox[0])/2
         button_width=btn_width-10 if btn_width>110 else 100
         button_endy=self._endy()+15
-        yesbutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2-5,button_endy),text=YES,minwidth=button_width,command=lambda e:self.return_input(self.entry.get()),anchor='ne')[-1]
-        nobutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:self.return_input(None),anchor='nw')[-1]
-        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg='#f3f3f3',fg='#f3f3f3',linew=9)
+        yesbutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2-5,button_endy),text=YES,minwidth=button_width,command=lambda e:self.return_input(self.entry.get()),anchor='ne',**self.buttonargs)[-1]
+        nobutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:self.return_input(None),anchor='nw',**self.buttonargs)[-1]
+        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.barback,fg=self.barback,linew=9)
 
         return self.load_window()
 
@@ -144,25 +238,25 @@ class Dialog(Toplevel):
         NO=notext
         self.result=None
 
-        self.tinui['bg']='#ffffff'
+        self.tinui['bg']=self.background
 
         self.title(title)
         self.protocol('WM_DELETE_WINDOW',lambda:self.return_choice(None))
 
-        self.tinui.add_paragraph((5,5),text=content)
+        self.tinui.add_paragraph((5,5),text=content,fg=self.fg)
         content_bbox=self.tinui.bbox('all')
         width = max(content_bbox[2]-content_bbox[0], 300)
 
         if self.type=='listbox':
-            self.tinui.add_listbox((5,self._endy()+5),width=width,height=300,data=choices,command=self.return_choice)
+            self.tinui.add_listbox((5,self._endy()+5),width=width,height=300,data=choices,command=self.return_choice,**self.listargs)
 
         bbox=self.tinui.bbox('all')
         btn_width=(bbox[2]-bbox[0])/2
         button_width=btn_width-10 if btn_width>110 else 100
         button_endy=self._endy()+15
-        yesbutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2-5,button_endy),text=YES,minwidth=button_width,command=lambda e:self.return_choice(True),anchor='ne')[-1]
-        nobutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:self.return_choice(None),anchor='nw')[-1]
-        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg='#f3f3f3',fg='#f3f3f3',linew=9)
+        yesbutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2-5,button_endy),text=YES,minwidth=button_width,command=lambda e:self.return_choice(True),anchor='ne',**self.buttonargs)[-1]
+        nobutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:self.return_choice(None),anchor='nw',**self.buttonargs)[-1]
+        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.background,fg=self.background,linew=9)
 
         return self.load_window()
     
@@ -202,76 +296,74 @@ class Dialog(Toplevel):
 
 
 
-def show_msg(master,title,content):
+def show_msg(master,title,content,theme='light'):
     """
     显示消息对话框
     """
-    dialog=Dialog(master,'normal')
+    dialog=Dialog(master,'normal',theme)
     return dialog.initial_msg(title,content)
 
-def show_info(master,title,content,yestext='OK',notext='Cancel'):
+def show_info(master,title,content,yestext='OK',notext='Cancel',theme='light'):
     """
     显示信息对话框
     """
-    dialog=Dialog(master,'info')
+    dialog=Dialog(master,'info',theme)
     return dialog.initial_msg(title,content,yestext,notext)
-
-def show_success(master,title,content,yestext='OK',notext='Cancel'):
+def show_success(master,title,content,yestext='OK',notext='Cancel',theme='light'):
     """
     显示成功对话框
     """
-    dialog=Dialog(master,'success')
+    dialog=Dialog(master,'success',theme)
     return dialog.initial_msg(title,content,yestext,notext)
 
-
-def show_warning(master,title,content,yestext='OK',notext='Cancel'):
+def show_warning(master,title,content,yestext='OK',notext='Cancel',theme='light'):
     """
     显示警告对话框
     """
-    dialog=Dialog(master,'warning')
+    dialog=Dialog(master,'warning',theme)
     return dialog.initial_msg(title,content,yestext,notext)
 
-def show_error(master,title,content,yestext='OK',notext='Cancel'):
+def show_error(master,title,content,yestext='OK',notext='Cancel',theme='light'):
     """
     显示错误对话框
     """
-    dialog=Dialog(master,'error')
+    dialog=Dialog(master,'error',theme)
     return dialog.initial_msg(title,content,yestext,notext)
 
-def show_question(master,title,content,yestext='YES',notext='NO'):
+def show_question(master,title,content,yestext='YES',notext='NO',theme='light'):
     """
     显示询问对话框
     """
-    dialog=Dialog(master,'question')
+    dialog=Dialog(master,'question',theme)
     return dialog.initial_msg(title,content,yestext,notext)
 
 
-def ask_string(master,title,content,yestext='OK',notext='Cancel'):
+def ask_string(master,title,content,yestext='OK',notext='Cancel',theme='light'):
     """
     输入字符串对话框
     """
-    dialog=Dialog(master,'string')
+    dialog=Dialog(master,'string',theme)
     return dialog.initial_input(title,content,yestext,notext)
 
-def ask_integer(master,title,content,yestext='OK',notext='Cancel'):
+def ask_integer(master,title,content,yestext='OK',notext='Cancel',theme='light'):
     """
     输入整数对话框
     """
-    dialog=Dialog(master,'integer')
+    dialog=Dialog(master,'integer',theme)
     return dialog.initial_input(title,content,yestext,notext)
 
-def ask_float(master,title,content,yestext='OK',notext='Cancel'):
+def ask_float(master,title,content,yestext='OK',notext='Cancel',theme='light'):
     """
     输入浮点数对话框
     """
-    dialog=Dialog(master,'float')
+    dialog=Dialog(master,'float',theme)
     return dialog.initial_input(title,content,yestext,notext)
 
-def ask_choice(master,title,content,choices,yestext='OK',notext='Cancel'):
+def ask_choice(master,title,content,choices,yestext='OK',notext='Cancel',theme='light'):
     """
     选择列表对话框
     """
-    dialog=Dialog(master,'listbox')
+    dialog=Dialog(master,'listbox',theme)
     return dialog.initial_choice(title,content,choices,yestext,notext)
 
 
@@ -280,17 +372,17 @@ def ask_choice(master,title,content,choices,yestext='OK',notext='Cancel'):
 if __name__=='__main__':
     root=Tk()
     root.iconbitmap('LOGO.ico')
-    a=show_msg(root,'test','hello world!')
-    # print(a)
-    show_info(root,'test','show information\nhello world!')
-    show_success(root,'test','Success!\nhello world! hello world! hello world! hello world!')
-    show_warning(root,'test','this is a warning\nhello world!')
-    show_error(root,'test','something is wrong\nhello world! hello world! hello world! hello world!')
-    show_question(root,'test','Do you want to continue?')
-    b=ask_string(root,'test','input something input something input something input something')
-    ask_integer(root,'test','input integer')
-    ask_float(root,'test','input float')
-    # print(b)
-    c=ask_choice(root,'test','choose one',('a','b','c'))
-    # print(c)
+    a=show_msg(root,'test','hello world!',theme='dark')
+    print(a)
+    show_info(root,'test','show information\nhello world!',theme='dark')
+    show_success(root,'test','Success!\nhello world! hello world! hello world! hello world!',theme='dark')
+    show_warning(root,'test','this is a warning\nhello world!',theme='dark')
+    show_error(root,'test','something is wrong\nhello world! hello world! hello world! hello world!',theme='dark')
+    show_question(root,'test','Do you want to continue?',theme='dark')
+    b=ask_string(root,'test','input something input something input something input something',theme='dark')
+    ask_integer(root,'test','input integer',theme='dark')
+    ask_float(root,'test','input float',theme='dark')
+    print(b)
+    c=ask_choice(root,'test','choose one',('a','b','c'),theme='dark')
+    print(c)
     root.mainloop()

@@ -863,8 +863,10 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 > funcs
 >
 > > `funcs.add(text:str)`::在尾部添加新选项
-> > 
+> >
 > > `funcs.delete(index:int)`::删除指定序数的元素，第一个元素序号为0
+> >
+> > `funcs.clear()`::清空
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI列表框.gif)
 
@@ -1075,12 +1077,14 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: boxes, funcs, uid
 
 > boxes::元素组：(标识符背景, 标识符, 文本, 背景元素)
-> 
+>
 > funcs
-> 
+>
 > > `funcs.active()`::激活控件
-> > 
+> >
 > > `funcs.disable(fg='#c1c1c1',bg='#f3f3f3')`::禁用控件
+> >
+> > `funcs.select(index)`::选中第几个参数
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI单选组控件.gif)
 

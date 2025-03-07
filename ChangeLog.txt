@@ -6,10 +6,14 @@
 ==========更新日志==========
 
 
-==========5.21==========
+==========5.22==========
 2025-
+*1. 自带uixml的控件，在删除时也会删除TinUIXml
+
+==========5.21==========
+2025-3-7
 1. listbox添加清空功能
-*2. 基于TinUILight, TinUIDark的Dialog附加样式类
+2. 基于TinUILight, TinUIDark的Dialog附加样式类
 3. spinbox回车时，如果输入数据符合条件，则触发回调函数
 4. radiobox方法增加select
 

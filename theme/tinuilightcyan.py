@@ -1,8 +1,11 @@
 # generate by 豆包
 from typing import Union
 import sys
-sys.path.append('../')
-from TinUI import TinUI, BasicTinUI, TinUITheme, TinUIXml
+try:
+    from tinui import TinUI, BasicTinUI, TinUITheme
+except:
+    sys.path.append('../')
+    from TinUI import TinUI, BasicTinUI, TinUITheme
 
 class TinUILightCyan(TinUITheme):
     def __init__(self,ui:Union[TinUI,BasicTinUI]):

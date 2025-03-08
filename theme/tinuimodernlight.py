@@ -1,8 +1,11 @@
 # 由chatglm-4生成，作者小改。作为范例，不会维护
 from typing import Union
 import sys
-sys.path.append('../')
-from TinUI import TinUI, BasicTinUI, TinUITheme, TinUIXml
+try:
+    from tinui import TinUI, BasicTinUI, TinUITheme
+except:
+    sys.path.append('../')
+    from TinUI import TinUI, BasicTinUI, TinUITheme
 
 
 class TinUIModernLight(TinUITheme):

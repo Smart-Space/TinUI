@@ -229,6 +229,10 @@ class BasicTinUI(Canvas):
             dy=pos[1]-ycenter
         self.move(uid,dx,dy)
         return dx,dy
+
+    def __delete_uixml(self, uixml):
+        # 删除伴随TinUIXml
+        del uixml
     
     def show_location(self,state:bool=True,color='red',command=None):
         #在设计时反馈鼠标所在的绝对位置
@@ -1841,7 +1845,7 @@ class BasicTinUI(Canvas):
             ui.yview_scroll(int(-1*(event.delta/120)), "units")
         def _load_item(num):
             nonlocal endy
-            for i in range(0,num):
+            for _ in range(0,num):
                 item=ui.add_ui((3,endy),width=width-3,height=linew,bg=bg)
                 items.append(item)
                 ui.addtag_withtag('item',item[-1])
@@ -1969,6 +1973,7 @@ class BasicTinUI(Canvas):
         elif region=='auto':#自动调节
             __update()
         ui_xml=TinUIXml(ui)
+        ui.bind('<Destroy>', lambda event: self.__delete_uixml(ui_xml))
         return ui,re_scrollregion,ui_xml,uid
 
     def add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',buttonfg='#8a8a8a',buttonbg='#f9f9f9',activefg='#5f5f5f',activebg='#f9f9f9',buttononfg='#5f5f5f',buttononbg='#f9f9f9',num:int=2,anchor='nw'):#绘制翻页视图
@@ -2068,6 +2073,7 @@ class BasicTinUI(Canvas):
         for _ in range(0,num):
             ui=BasicTinUI(self,bg=bg)
             tinuixml=TinUIXml(ui)
+            ui.bind('<Destroy>', lambda event, uixml=tinuixml: self.__delete_uixml(uixml))
             uiid=self.create_window((startx,pos[1]),window=ui,width=width,height=height,state='hidden',anchor='nw',tags=uid)
             uilist.append((uiid,ui,tinuixml))
             dot=bar.create_text((dotx+2,5.5),text='•',fill=fg,font=('微软雅黑',8),anchor='center')
@@ -2141,6 +2147,7 @@ class BasicTinUI(Canvas):
                 page=BasicTinUI(self,bg=self['background'])
                 uiid=self.create_window(viewpos,window=page,width=width+1,height=height-3,anchor='nw',state='hidden')
             uixml=TinUIXml(page)
+            page.bind('<Destroy>', lambda event: self.__delete_uixml(uixml))
             bbox=tbu.bbox('all')
             tbu.config(scrollregion=bbox)
             vdict[flag]=(page,uixml,uiid)
@@ -2666,6 +2673,7 @@ class BasicTinUI(Canvas):
         elif scrollbar:#使用TinUI
             ui=TinUI(self,bg=bg)
         ux=TinUIXml(ui)
+        ui.bind('<Destroy>', lambda event: self.__delete_uixml(ux))
         content=self.create_window((tx1-3,ty2+10),window=ui,anchor='nw',width=width+6,height=height,tags=(uid,contentid),state='hidden')#便笺内容
         ax1,ay1,ax2,ay2=self.bbox(uid)#大背景
         ax1+=8
@@ -3580,6 +3588,7 @@ class BasicTinUI(Canvas):
                 self.update_idletasks()
         ui = BasicTinUI(self, bg=bg, highlightbackground=line, highlightthickness=1, relief='flat')
         uixml = TinUIXml(ui)
+        ui.bind('<Destroy>', lambda event: self.__delete_uixml(uixml))
         # 围绕fid进行布局
         bbox = self.bbox(fid)
         if anchor == 'nw':

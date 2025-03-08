@@ -1,8 +1,10 @@
 # generate by qwen2.5-coder-32b-instruct
-from typing import Union
 import sys
-sys.path.append('../')
-from TinUI import TinUI, BasicTinUI, TinUITheme, TinUIXml
+try:
+ from tinui import TinUITheme
+except:
+ sys.path.append('../')
+ from TinUI import TinUITheme
 
 class TinUIDarkOrange(TinUITheme):
  def __init__(self,ui):

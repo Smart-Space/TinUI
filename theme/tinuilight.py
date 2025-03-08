@@ -1,7 +1,10 @@
 from typing import Union
 import sys
-sys.path.append('../')
-from TinUI import TinUI, BasicTinUI, TinUITheme, TinUIXml
+try:
+    from tinui import TinUI, BasicTinUI, TinUITheme
+except:
+    sys.path.append('../')
+    from TinUI import TinUI, BasicTinUI, TinUITheme
 
 class TinUILight(TinUITheme):
     '''
@@ -13,6 +16,12 @@ class TinUILight(TinUITheme):
         super().__init__(ui,'tinui-light-theme')
         self.label='light'
         self.ui['background']='#f3f3f3'
+    
+    def add_title(self,pos,*arg,**kw):
+        return self.ui.add_title(pos,fg='#000000',*arg,**kw)
+
+    def add_paragraph(self,pos,*arg,**kw):
+        return self.ui.add_paragraph(pos,fg='#000000',*arg,**kw)
 
     def add_button(self,pos,*arg,**kw):
         return self.ui.add_button(pos,fg='#1b1b1b',bg='#fbfbfb',
@@ -98,6 +107,9 @@ class TinUILight(TinUITheme):
               boxfg='#5f5f5f',boxbg='#f9f9f9',
               boxactivefg='#5b5b5b',boxactivebg='#f0f0f0',
                                    *arg,**kw)
+
+    def add_image(self,pos,*arg,**kw):
+        return self.ui.add_image(pos,*arg,**kw)
 
     def add_scalebar(self,pos,*arg,**kw):
         return self.ui.add_scalebar(pos,

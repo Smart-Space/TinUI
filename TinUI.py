@@ -449,6 +449,7 @@ class BasicTinUI(Canvas):
             command(text)
         def focus_in(e):
             self.itemconfig(bottomline,fill=onoutline)
+            backpos = self.coords(back)
             backpos[5] -= 1
             backpos[7] -= 1
             self.coords(back, *backpos)
@@ -457,6 +458,7 @@ class BasicTinUI(Canvas):
             entry.config(background=activebg,foreground=activefg)
         def focus_out(e):
             self.itemconfig(bottomline,fill=outline)
+            backpos = self.coords(back)
             backpos[5] += 1
             backpos[7] += 1
             self.coords(back, *backpos)
@@ -501,26 +503,17 @@ class BasicTinUI(Canvas):
             self.tag_bind(button,'<Button-1>',call_command)
             entry.bind('<Return>',call_command)
             bubbox=self.bbox(button)
-        backpos=[bbox[0]+2,bbox[1]+2,bubbox[2]-2,bbox[1]+2,bubbox[2]-2,bbox[3]-2,bbox[0]+2,bbox[3]-2]
+        backpos=(bbox[0]+2,bbox[1]+2,bubbox[2]-2,bbox[1]+2,bubbox[2]-2,bbox[3]-2,bbox[0]+2,bbox[3]-2)
         bottomlinepos=(bbox[0]+2,bbox[3]-1,bubbox[2]-2,bbox[3]-1)
         outlinepos=(bbox[0]+1,bbox[1]+1,bubbox[2]-1,bbox[1]+1,bubbox[2]-1,bbox[3]-1,bbox[0]+1,bbox[3]-1)
         bottomline=self.create_line(bottomlinepos,fill=outline,width=9,capstyle='round',tags=uid)#bottomline
         back=self.create_polygon(backpos,fill=bg,outline=bg,width=9,tags=uid)#back
         outl=self.create_polygon(outlinepos,fill=line,outline=line,width=9,tags=uid)#outline
         self.lower(outl,bottomline)
-        #outline
         if command!=None:
             self.tkraise(button)
         self.tkraise(funcw)
-        dx, dy = self.__auto_anchor(uid,pos,anchor)
-        backpos[0] += dx
-        backpos[2] += dx
-        backpos[4] += dx
-        backpos[6] += dx
-        backpos[1] += dy
-        backpos[3] += dy
-        backpos[5] += dy
-        backpos[7] += dy
+        self.__auto_anchor(uid,pos,anchor)
         if_empty(None)
         var.trace_add('write', lambda name, index, mode, var=var: if_empty(None))#变量绑定
         funcs=FuncList(7)
@@ -1118,7 +1111,6 @@ class BasicTinUI(Canvas):
         def _change_data(event):
             self.itemconfig(cui, state='normal')
             self.lift(cui)
-            self.focus(cui)
         def check_in_data():
             val=wentry.get()
             if val in data:
@@ -1127,7 +1119,7 @@ class BasicTinUI(Canvas):
                 return False,val
         if bg=='':
             bg=self['background']
-        wentry=Entry(self,font=font,fg=fg,highlightthickness=0,insertwidth=1,bd=1,bg=bg,relief='flat')
+        wentry=Entry(self,font=font,fg=fg,highlightthickness=0,insertwidth=1,bd=1,bg=bg,relief='flat',insertbackground=fg)
         if now=='' or now not in data:
             now=data[0]
         wentry.insert(0,now)
@@ -2934,19 +2926,19 @@ class BasicTinUI(Canvas):
             if_empty(None)
         def focus_in(e):
             self.itemconfig(bottomline,fill=onoutline)
+            backpos = self.coords(back)
             backpos[5] -= 1
             backpos[7] -= 1
             self.coords(back,backpos)
-            # self.tkraise(bottomline,back)
             self.itemconfig(back,fill=activebg,outline=activebg)
             self.itemconfig(outl,fill=activeline,outline=activeline)
             entry.config(background=activebg,foreground=activefg)
         def focus_out(e):
             self.itemconfig(bottomline,fill=outline)
+            backpos = self.coords(back)
             backpos[5] += 1
             backpos[7] += 1
             self.coords(back,backpos)
-            # self.lower(bottomline,back)
             self.itemconfig(back,fill=bg,outline=bg)
             self.itemconfig(outl,fill=line,outline=line)
             entry.config(background=bg,foreground=fg)
@@ -2976,7 +2968,7 @@ class BasicTinUI(Canvas):
         font_size=str(_font.cget('size'))
         funcw=self.create_text((bbox[0]+width,(bbox[1]+bbox[3])/2),text='\uF78D',fill=fg,font='{Segoe Fluent Icons} '+font_size,anchor='w',tags=uid)
         bubbox=self.bbox(funcw)
-        backpos=[bbox[0]+2,bbox[1]+2,bubbox[2]-2,bbox[1]+2,bubbox[2]-2,bbox[3]-2,bbox[0]+2,bbox[3]-2]
+        backpos=(bbox[0]+2,bbox[1]+2,bubbox[2]-2,bbox[1]+2,bubbox[2]-2,bbox[3]-2,bbox[0]+2,bbox[3]-2)
         bottomlinepos=(bbox[0]+2,bbox[3]-1,bubbox[2]-2,bbox[3]-1)
         outlinepos=(bbox[0]+1,bbox[1]+1,bubbox[2]-1,bbox[1]+1,bubbox[2]-1,bbox[3]-1,bbox[0]+1,bbox[3]-1)
         bottomline=self.create_line(bottomlinepos,fill=outline,width=9,capstyle='round',tags=uid)#bottomline
@@ -2985,15 +2977,7 @@ class BasicTinUI(Canvas):
         self.lower(outl,bottomline)
         self.tkraise(funcw)
         if_empty(None)
-        dx, dy = self.__auto_anchor(uid,pos,anchor)
-        backpos[0] += dx
-        backpos[2] += dx
-        backpos[4] += dx
-        backpos[6] += dx
-        backpos[1] += dy
-        backpos[3] += dy
-        backpos[5] += dy
-        backpos[7] += dy
+        self.__auto_anchor(uid,pos,anchor)
         funcs=FuncList(4)
         funcs.get=get_entry
         funcs.error=__error

@@ -1681,13 +1681,14 @@ from tinui import show_info, show_success, show_error,\
 以 `show_msg`为例。
 
 ```python
-def show_msg(master,title,content,yestext='OK',notext='Cancel'):
+def show_msg(master,title,content,yestext='OK',notext='Cancel',theme='light'):
     """
     master - 父窗口
     title - 标题
     context - 信息内容
     yestext - 确认文本
     notext - 取消文本
+    theme - 样式，'light' or 'dark'
     """
     ...
 ```

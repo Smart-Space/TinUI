@@ -21,6 +21,9 @@ class Dialog(Toplevel):
         """
         super().__init__(master,**options)
         self.withdraw()
+
+        if master:
+            self.transient(self.master)
         
         self.tinui=BasicTinUI(self)
         self.tinui.pack(fill='both',expand=True)
@@ -286,7 +289,6 @@ class Dialog(Toplevel):
 
         self.tinui.config(scrollregion=bboxall)
 
-        self.transient(self.master)
         self.focus_set()
         self.wait_visibility()
         self.grab_set()

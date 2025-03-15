@@ -989,7 +989,7 @@ class BasicTinUI(Canvas):
         self.__auto_anchor(uid,pos,anchor)
         return uid
 
-    def add_onoff(self,pos:tuple,fg='#575757',bg='#e5e5e5',onfg='#FFFFFF',onbg='#3041d8',anchor='nw',command=None):#绘制开关控件
+    def add_onoff(self,pos:tuple,fg='#575757',bg='#e5e5e5',onfg='#FFFFFF',onbg='#3041d8',anchor='nw',bd:int=40,command=None):#绘制开关控件
         def __on():
             nonlocal nowstate
             nowstate='on'
@@ -1002,11 +1002,11 @@ class BasicTinUI(Canvas):
                 command(False)
         def __left30():
             f=lambda:self.move(state,-1,0)
-            for i in range(0,30):
+            for i in range(0,int(bd/4*3)):
                 self.after(i*5,f)
         def __right30():
             f=lambda:self.move(state,1,0)
-            for i in range(0,30):
+            for i in range(0,int(bd/4*3)):
                 self.after(i*5,f)
         def __on_click(event):
             if nowstate=='off':
@@ -1051,13 +1051,13 @@ class BasicTinUI(Canvas):
                 self.itemconfig(back,fill=bg)
                 self.itemconfig(outline,fill=fg)
         nowstate='off'
-        back=self.create_text(pos,text='\uEC11',font='{Segoe Fluent Icons} 40',fill=bg,anchor='nw')
+        back=self.create_text(pos,text='\uEC11',font='{Segoe Fluent Icons} '+str(bd),fill=bg,anchor='nw')
         uid='onoff'+str(back)
         self.itemconfig(back,tags=uid)
-        outline=self.create_text(pos,text='\uEC12',font='{Segoe Fluent Icons} 40',fill=fg,tags=uid,anchor='nw')
+        outline=self.create_text(pos,text='\uEC12',font='{Segoe Fluent Icons} '+str(bd),fill=fg,tags=uid,anchor='nw')
         self.__auto_anchor(uid,pos,anchor)
         bbox=self.bbox(outline)
-        state=self.create_text((bbox[0]+13,(bbox[1]+bbox[3])/2-1),text='\uF127',font='{Segoe Fluent Icons} 10',fill=fg,tags=uid,anchor='center')
+        state=self.create_text((bbox[0]+(bd/10*3)+1,(bbox[1]+bbox[3])/2-1),text='\uF127',font='{Segoe Fluent Icons} '+str(int(bd/4)),fill=fg,tags=uid,anchor='center')
         self.tag_bind(uid,'<Button-1>',__on_click)
         funcs=FuncList(4)
         funcs.on=on

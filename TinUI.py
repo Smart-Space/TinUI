@@ -805,7 +805,7 @@ class BasicTinUI(Canvas):
             pickbox.focus_set()
             for i in (0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1):
                 pickbox.attributes('-alpha',i)
-                pickbox.update()
+                pickbox.update_idletasks()
                 time.sleep(0.02)
             pickbox.bind('<FocusOut>',unshow)
         def unshow(event):
@@ -1326,7 +1326,7 @@ class BasicTinUI(Canvas):
             menu.focus_set()
             for i in (0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1):
                 menu.attributes('-alpha',i)
-                menu.update()
+                menu.update_idletasks()
                 time.sleep(0.02)
             menu.bind('<FocusOut>',unshow)
         self.tag_bind(cid,bind,show)
@@ -1749,6 +1749,8 @@ class BasicTinUI(Canvas):
                 maxwidth=width
             repaint_back()
             bbox=box.bbox('all')
+            if bbox == None:
+                bbox = (0, 0, 0, 0)
             box.config(scrollregion=bbox)
         def _clear():#清空元素
             nonlocal maxwidth
@@ -1873,12 +1875,15 @@ class BasicTinUI(Canvas):
             subui[0].destroy()
             del items[index]#删除元素
             #其它UI上移
-            if index==len(items):
-                return
-            for item in items[index:]:
-                ui.move(item[-1],0,-linew-2)
-            bbox=list(ui.bbox('item'))
-            bbox[0]-=3
+            if index != len(items):
+                for item in items[index:]:
+                    ui.move(item[-1],0,-linew-2)
+            bbox = ui.bbox('item')
+            if bbox == None:
+                bbox = (0, 0, 0, 0)
+            else:
+                bbox = list(bbox)
+                bbox[0]-=3
             ui.config(scrollregion=bbox)
         def clear():#清空所有元素
             nonlocal endy, nowon
@@ -3304,7 +3309,7 @@ class BasicTinUI(Canvas):
             picker.focus_set()
             for i in (0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1):
                 picker.attributes('-alpha',i)
-                picker.update()
+                picker.update_idletasks()
                 time.sleep(0.02)
             picker.bind('<FocusOut>',unshow)
         def unshow(event):
@@ -3452,7 +3457,7 @@ class BasicTinUI(Canvas):
             menu.focus_set()
             for i in (0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1):
                 menu.attributes('-alpha',i)
-                menu.update()
+                menu.update_idletasks()
                 time.sleep(0.02)
             menu.bind('<FocusOut>',unshow)
         def disable(fg='#9d9d9d',bg='#f5f5f5'):

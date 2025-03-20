@@ -186,7 +186,7 @@ class Dialog(Toplevel):
         self.destroy()
         self.master.focus_set()
 
-    def initial_input(self,title,content,yestext='OK',notext='Cancel'):
+    def initial_input(self,title,content,text,yestext='OK',notext='Cancel'):
         """
         初始化对话框-输入类
         """
@@ -203,6 +203,7 @@ class Dialog(Toplevel):
         entry_width=content_bbox[2]-content_bbox[0]
         width=entry_width if entry_width>200 else 200
         self.entry=self.tinui.add_entry((5,self._endy()+5),width=width,**self.entryargs)[-2]# tinui entry widget, funcs
+        self.entry.insert(0,str(text))
         bbox=self.tinui.bbox('all')
         btn_width=(bbox[2]-bbox[0])/2
         button_width=btn_width-10 if btn_width>110 else 100
@@ -340,26 +341,26 @@ def show_question(master,title,content,yestext='YES',notext='NO',theme='light'):
     return dialog.initial_msg(title,content,yestext,notext)
 
 
-def ask_string(master,title,content,yestext='OK',notext='Cancel',theme='light'):
+def ask_string(master,title,content,text:str="",yestext='OK',notext='Cancel',theme='light'):
     """
     输入字符串对话框
     """
     dialog=Dialog(master,'string',theme)
-    return dialog.initial_input(title,content,yestext,notext)
+    return dialog.initial_input(title,content,text,yestext,notext)
 
-def ask_integer(master,title,content,yestext='OK',notext='Cancel',theme='light'):
+def ask_integer(master,title,content,text:int=0,yestext='OK',notext='Cancel',theme='light'):
     """
     输入整数对话框
     """
     dialog=Dialog(master,'integer',theme)
-    return dialog.initial_input(title,content,yestext,notext)
+    return dialog.initial_input(title,content,text,yestext,notext)
 
-def ask_float(master,title,content,yestext='OK',notext='Cancel',theme='light'):
+def ask_float(master,title,content,text:float="0.0",yestext='OK',notext='Cancel',theme='light'):
     """
     输入浮点数对话框
     """
     dialog=Dialog(master,'float',theme)
-    return dialog.initial_input(title,content,yestext,notext)
+    return dialog.initial_input(title,content,text,yestext,notext)
 
 def ask_choice(master,title,content,choices,yestext='OK',notext='Cancel',theme='light'):
     """

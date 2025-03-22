@@ -3033,15 +3033,28 @@ class BasicTinUI(Canvas):
         def out_button(event):
             pass
         def on_click(event):
+            if state==False:
+                __on()
+            else:
+                __off()
+        def __on():
+            nonlocal state
+            if state==True:
+                command(state)
+                return
+            state=True
+            self.itemconfig(outline,fill=activeline,outline=activeline)
+            change_color(0,2)
+            if command!=None:
+                command(state)
+        def __off():
             nonlocal state
             if state==False:
-                state=True
-                self.itemconfig(outline,fill=activeline,outline=activeline)
-                change_color(0,2)
-            else:
-                state=False
-                self.itemconfig(outline,fill=line,outline=line)
-                change_color(0,1)
+                command(state)
+                return
+            state=False
+            self.itemconfig(outline,fill=line,outline=line)
+            change_color(0,1)
             if command!=None:
                 command(state)
         def change_color(t,change:int):#变化颜色
@@ -3109,10 +3122,12 @@ class BasicTinUI(Canvas):
         #self.tag_bind(back,'<Enter>',in_button)
         #self.tag_bind(back,'<Leave>',out_button)
         self.tkraise(button)
-        funcs=FuncList(3)
+        funcs=FuncList(5)
         funcs.change_command=change_command
         funcs.disable=disable
         funcs.active=active
+        funcs.on=__on
+        funcs.off=__off
         #处理渐变色
         colors.append(get_color_change(fg,activefg))#文本颜色
         colors.append(get_color_change(bg,activebg))#背景颜色

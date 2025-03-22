@@ -536,7 +536,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_onoff(self,pos:tuple,fg='#575757',bg='#e5e5e5',onfg='#FFFFFF',onbg='#3041d8',anchor='nw',command=None)
+### add_onoff(self,pos:tuple,fg='#575757',bg='#e5e5e5',onfg='#FFFFFF',onbg='#3041d8',anchor='nw',bd:int=40,command=None)
 
 - pos::位置
 - fg::关闭状态下的文本、边框颜色
@@ -544,6 +544,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - onfg::开启状态下的文本颜色
 - onbg::开启状态下的边框、背景颜色
 - anchor::对齐方向
+- bd::字体大小
 - command::当被点击时调用的函数，函数只有一个参数：布尔值。调用参数True表示开启，False表示关闭
 
 绘制一个开关。

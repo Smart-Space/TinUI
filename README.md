@@ -1362,18 +1362,22 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 ### return: button, back, outline, funcs, uid
 
 > button::文本元素
-> 
+>
 > back::背景元素
-> 
+>
 > outline::边框元素
-> 
+>
 > funcs
-> 
+>
 > > `funcs.change_command()`::更换响应函数
-> > 
+> >
 > > `funcs.disable(fg='#9d9d9d',bg='#f5f5f5')`::禁用
-> > 
+> >
 > > `funcs.active()`::启用
+> >
+> > `funcs.on()`::开启
+> >
+> > `funcs.off()`::关闭
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI状态开关按钮.gif)
 

@@ -38,7 +38,8 @@ def inxml(e):#注入xml界面
     duixml.funcs=dict()
     duixml.datas=dict()
     duixml.tags=dict()
-    result=re.findall("self\.(.*?)\[.(.*?).\]'",xml,re.M|re.S)
+    result=re.findall("self\.(.*?)\[.(.*?).\]",xml,re.M|re.S)
+    print(result)
     for i in result:
         if i[0]=='funcs':
             duixml.funcs[i[1]]=None
@@ -58,7 +59,7 @@ def pycode(e):#获取IDO代码
     textbox.configure(state='normal')
     textbox.delete(1.0,'end')
     uixml=text.get(1.0,'end')
-    result=re.findall("self\.(.*?)\[.(.*?).\]'",uixml,re.M|re.S)
+    result=re.findall(r"self\.(.*?)\[.(.*?).\]",uixml,re.M|re.S)
     textbox.result=result
     write('''# u = TinUI(root)
 # x = TinUIXml(u)

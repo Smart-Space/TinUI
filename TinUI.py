@@ -1788,6 +1788,11 @@ class BasicTinUI(Canvas):
             box.config(scrollregion=bbox)
         def set_y_view(event):
             box.yview_scroll(int(-1*(event.delta/120)), "units")
+        def select(index:int=0):#选中元素，默认第一个
+            if index > len(all_keys)-1:
+                return None
+            key = choices[index]
+            sel_it(key)
         # frame=BasicTinUI(self,bg=bg)#主显示框，显示滚动条
         box=BasicTinUI(self,bg=bg,width=width,height=height)#显示选择内容
         box.place(x=12,y=12)
@@ -1807,10 +1812,11 @@ class BasicTinUI(Canvas):
         maxwidth=0#最大宽度
         load_data(data)#重复使用元素添加
         box.bind('<MouseWheel>',set_y_view)
-        funcs=FuncList(2)
+        funcs=FuncList(4)
         funcs.add=_add
         funcs.delete=_delete
         funcs.clear=_clear
+        funcs.select=select
         return box,allback,funcs,uid
 
     def add_listview(self,pos:tuple,width=300,height=300,linew=80,bg='#f3f3f3',activebg='#eaeaea',oncolor='#3041d8',scrobg='#f8f8f8',scroc='#999999',scrooc='#89898b',num=5,anchor='nw',command=None):#绘制列表视图,function:add_list
@@ -2804,6 +2810,10 @@ class BasicTinUI(Canvas):
                     ccids=get_cids(i)
                     cids+=ccids
             return cids
+        def _get_last_cuid(cid):
+            while cid in items_dict:
+                cid = items_dict[cid][-1]
+            return cid
         def open_view(sign,cid):#展开
             if box.itemcget(sign,'text')=='\uE96E':
                 return
@@ -2817,7 +2827,7 @@ class BasicTinUI(Canvas):
             box.itemconfig(move,state='normal')
             bbox=box.bbox(move)
             if bbox==None: return
-            index=tuple(items.keys()).index(cids[-1])+1
+            index=tuple(items.keys()).index(_get_last_cuid(cid))+1
             if index!=len(items.keys()):
                 height=bbox[3]-bbox[1]#获取移动模块高度
                 for i in tuple(items.keys())[index:]:
@@ -2896,7 +2906,7 @@ class BasicTinUI(Canvas):
             box.coords(i,old_coords)
         x1, y1, x2, y2 = self.bbox(uid)
         backpos = (x1, y1, x2, y1, x2, y2, x1, y2)
-        allback = self.create_polygon(backpos, outline=bg, fill=bg, width=9, tags=uid)# allback
+        self.create_polygon(backpos, outline=bg, fill=bg, width=9, tags=uid)# allback
         self.lift(cavui)
         self.lift(hscroll)
         self.lift(vscroll)
@@ -4153,7 +4163,7 @@ if __name__=='__main__':
         </line>
         </line>
         </tinui>''')
-    trvl,_,trvbox,_=b.add_treeview((1220,1300),command=test12)
+    trvl,_,trvbox,_=b.add_treeview((1220,1300),content=('cpp',('test',('a','b',('test',('cp2','cp3'))))),command=test12)
     try:
         b.add_image((10,1300),200,250,imgfile=__file__[:-8]+'image/LOGO.png')#仅测试
     except Exception as err:

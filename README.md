@@ -1047,10 +1047,14 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 绘制一个评星级控件。
 
-### return: bars, uid
+### return: bars, funcs, uid
 
 > bars::评星级元素列表
-> 
+>
+> funcs
+>
+> > `funcs.setrate(p:int)`::选择评级
+>
 > 当只选定一个星级，再次选择第一个星级时，取消选择，command个数为0
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI评星级控件.gif)

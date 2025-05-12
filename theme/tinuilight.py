@@ -275,3 +275,8 @@ class TinUILight(TinUITheme):
         return self.ui.add_flyout(fid,
                 line='#dcdcdc', bg='#f9f9f9',
                 *arg,**kw)
+    
+    def add_back(self,pos,*arg,**kw):
+        return self.ui.add_back(pos,
+                fg='#f3f3f3',bg='#f3f3f3',
+                *arg,**kw)

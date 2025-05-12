@@ -2375,6 +2375,14 @@ class BasicTinUI(Canvas):
         def __ontemp(event):#鼠标没有正好点在图标上时
             click(bars[tempon])
             __onnum(tempon)
+        def setrate(p:int):
+            if p > num:
+                p = num
+            if p < 1:
+                p = 1
+            nowon = p - 1
+            __onnum(nowon)
+            click(bars[nowon])
         nowon=-1#已选定
         tempon=-1#待选定
         bars=[]
@@ -2414,8 +2422,10 @@ class BasicTinUI(Canvas):
         self.lower(back)
         self.tag_bind(back,'<Leave>',leaveback)
         self.tag_bind(back,'<Button>',__ontemp)
+        funcs = FuncList(1)
+        funcs.setrate = setrate
         self.__auto_anchor(uid,pos,anchor)
-        return bars,uid
+        return bars, funcs, uid
 
     def add_radiobox(self,pos:tuple,fontfg='black',font='微软雅黑 12',fg='#8b8b8b',bg='#ededed',activefg='#898989',activebg='#e5e5e5',onfg='#3041d8',onbg='#ffffff',content:tuple=('1','','2'),padx=15,pady=10,anchor='nw',command=None):#绘制单选组控件
         def button_in(sel,sign,sback):

@@ -275,3 +275,8 @@ class TinUIDark(TinUITheme):
         return self.ui.add_flyout(fid,
                 line='#b0b0b0',bg='#2c2c2c',
                 *arg,**kw)
+
+    def add_back(self,pos,*arg,**kw):
+        return self.ui.add_back(pos,
+                fg='#202020',bg='#202020',
+                *arg,**kw)

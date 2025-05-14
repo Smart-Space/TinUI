@@ -1047,9 +1047,11 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 绘制一个评星级控件。
 
-### return: bars, funcs, uid
+### return: bars, back, funcs, uid
 
 > bars::评星级元素列表
+>
+> back::矩形边框
 >
 > funcs
 >

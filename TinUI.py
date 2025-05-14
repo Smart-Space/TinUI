@@ -2425,7 +2425,7 @@ class BasicTinUI(Canvas):
         funcs = FuncList(1)
         funcs.setrate = setrate
         self.__auto_anchor(uid,pos,anchor)
-        return bars, funcs, uid
+        return bars, back, funcs, uid
 
     def add_radiobox(self,pos:tuple,fontfg='black',font='微软雅黑 12',fg='#8b8b8b',bg='#ededed',activefg='#898989',activebg='#e5e5e5',onfg='#3041d8',onbg='#ffffff',content:tuple=('1','','2'),padx=15,pady=10,anchor='nw',command=None):#绘制单选组控件
         def button_in(sel,sign,sback):

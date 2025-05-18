@@ -1138,7 +1138,13 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 绘制一个支点标题。
 
-### return: texts, uid
+### return: texts, funcs, uid
+
+> texts::`[(文本,文本标签,文本uid),...]`
+>
+> funcs
+>
+> > `funcs.select(index, send=False)`:: 选择第几个元素（包括空行，但不可选），当`send=False`，不会触发回调函数。
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI支点标题.gif)
 

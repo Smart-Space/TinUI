@@ -2545,6 +2545,11 @@ class BasicTinUI(Canvas):
             self.coords(line,(bbox[0],bbox[3]+2,bbox[2],bbox[3]+2))
             if command!=None and send:
                 command(tag)
+        def _select(index, send=False):
+            #选定指定项
+            text_uid=texts[index][2]
+            tag=texts[index][1]
+            sel_it(index, text_uid, tag, send)
         texts=[]#[(text,tag,text-uid),...]
         count=-1
         select=-1#当前选定
@@ -2572,7 +2577,9 @@ class BasicTinUI(Canvas):
             self.tag_bind(text,'<Button-1>',lambda event,num=count,tag=text,tagname=i[1]:sel_it(num,tag,tagname))
         dx,dy=self.__auto_anchor(uid,pos,anchor)
         sel_it(0,texts[0][2],texts[0][1],False)
-        return texts,uid
+        funcs = FuncList(1)
+        funcs.select = _select
+        return texts, funcs, uid
 
     def add_button2(self,pos:tuple,text:str,icon=None,compound='left',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',font=('微软雅黑',12),minwidth=0,maxwidth=0,command=None,anchor='nw'):#绘制圆角按钮
         def in_button(event):

@@ -41,8 +41,9 @@ class TinUIDark(TinUITheme):
                           outline='#202020',*arg,**kw)
 
     def add_entry(self,pos,*arg,**kw):
-        return self.ui.add_entry(pos,fg='#cfcfcf',bg='#2d2d2d',
-            activefg='#e6e6e6',activebg='#1f1f1f',
+        return self.ui.add_entry(pos,fg='#ffffff',bg='#2d2d2d',
+            activefg='#ffffff',activebg='#323232',
+            onfg='#ffffff',onbg='#1f1f1f',
             line='#303030',activeline='#303030',
             outline='#9a9a9a',onoutline='#b2b8f2',insert='#e0e0e0',
                           *arg,**kw)

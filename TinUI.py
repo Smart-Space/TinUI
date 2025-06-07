@@ -429,7 +429,7 @@ class BasicTinUI(Canvas):
         funcs.active=funcs[4]=active
         return checkbutton,check,funcs,uid
 
-    def add_entry(self,pos:tuple,width:int,text:str='',fg='#606060',bg='#f6f6f6',activefg='#1b1b1b',activebg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#000000',font=('微软雅黑',12),outline='#868686',onoutline='#3041d8',icon='>',anchor='nw',call='→',command=None):#绘制单行输入框
+    def add_entry(self,pos:tuple,width:int,text:str='',fg='#1b1b1b',bg='#fbfbfb',activefg='#1a1a1a',activebg='#f6f6f6',onfg='#000000',onbg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#000000',font=('微软雅黑',12),outline='#868686',onoutline='#3041d8',icon='>',anchor='nw',call='→',command=None):#绘制单行输入框
         #这是一个半绘制组件
         def if_empty(event):
             ch=entry.get()
@@ -453,9 +453,9 @@ class BasicTinUI(Canvas):
             backpos[5] -= 1
             backpos[7] -= 1
             self.coords(back, *backpos)
-            self.itemconfig(back,fill=activebg,outline=activebg)
+            self.itemconfig(back,fill=onbg,outline=onbg)
             self.itemconfig(outl,fill=activeline,outline=activeline)
-            entry.config(background=activebg,foreground=activefg)
+            entry.config(background=onbg,foreground=onfg)
         def focus_out(e):
             self.itemconfig(bottomline,fill=outline)
             backpos = self.coords(back)
@@ -465,6 +465,18 @@ class BasicTinUI(Canvas):
             self.itemconfig(back,fill=bg,outline=bg)
             self.itemconfig(outl,fill=line,outline=line)
             entry.config(background=bg,foreground=fg)
+        def mouse_enter(e):
+            if entry.focus_get() == entry.nametowidget(entry):
+                # 已获取焦点
+                return
+            self.itemconfig(back, fill=activebg, outline=activebg)
+            entry.config(background=activebg, foreground=activefg)
+        def mouse_leave(e):
+            if entry.focus_get() == entry.nametowidget(entry):
+                # 已获取焦点
+                return
+            self.itemconfig(back, fill=bg, outline=bg)
+            entry.config(background=bg, foreground=fg)
         #---
         def get_entry():#获取文本
             return entry.get()
@@ -478,7 +490,7 @@ class BasicTinUI(Canvas):
         def __normal():#正常样式
             entry['state']='normal'
             entry.focus_set()
-            self.itemconfig(back,fill=activebg,outline=activebg)
+            self.itemconfig(back,fill=onbg,outline=onbg)
             self.itemconfig(bottomline,fill=onoutline)
         def __disable():#禁用
             entry['state']='disable'
@@ -490,6 +502,8 @@ class BasicTinUI(Canvas):
         entry.insert(0, text)
         entry.bind('<FocusIn>',focus_in)
         entry.bind('<FocusOut>',focus_out)
+        entry.bind('<Enter>', mouse_enter)
+        entry.bind('<Leave>', mouse_leave)
         funce=self.create_window(pos,window=entry,width=width,anchor='nw')#输入框画布对象
         uid='entry'+str(funce)
         self.itemconfig(funce,tags=uid)
@@ -2933,7 +2947,7 @@ class BasicTinUI(Canvas):
         box.bind('<MouseWheel>',bindview)
         return items,items_dict,box,uid
 
-    def add_passwordbox(self,pos:tuple,width:int,fg='#606060',bg='#f6f6f6',activefg='#1b1b1b',activebg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#000000',font=('微软雅黑',12),outline='#868686',onoutline='#3041d8',anchor='nw',command=None):#绘制密码输入框
+    def add_passwordbox(self,pos:tuple,width:int,fg='#1b1b1b',bg='#fbfbfb',activefg='#1a1a1a',activebg='#f6f6f6',onfg='#000000',onbg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#000000',font=('微软雅黑',12),outline='#868686',onoutline='#3041d8',anchor='nw',command=None):#绘制密码输入框
         #参考entry控件
         def if_empty(event):
             if nowstate=='hidden':
@@ -2961,10 +2975,10 @@ class BasicTinUI(Canvas):
             backpos = self.coords(back)
             backpos[5] -= 1
             backpos[7] -= 1
-            self.coords(back,backpos)
-            self.itemconfig(back,fill=activebg,outline=activebg)
+            self.coords(back, *backpos)
+            self.itemconfig(back,fill=onbg,outline=onbg)
             self.itemconfig(outl,fill=activeline,outline=activeline)
-            entry.config(background=activebg,foreground=activefg)
+            entry.config(background=onbg,foreground=onfg)
         def focus_out(e):
             self.itemconfig(bottomline,fill=outline)
             backpos = self.coords(back)
@@ -2974,6 +2988,18 @@ class BasicTinUI(Canvas):
             self.itemconfig(back,fill=bg,outline=bg)
             self.itemconfig(outl,fill=line,outline=line)
             entry.config(background=bg,foreground=fg)
+        def mouse_enter(e):
+            if entry.focus_get() == entry.nametowidget(entry):
+                # 已获取焦点
+                return
+            self.itemconfig(back, fill=activebg, outline=activebg)
+            entry.config(background=activebg, foreground=activefg)
+        def mouse_leave(e):
+            if entry.focus_get() == entry.nametowidget(entry):
+                # 已获取焦点
+                return
+            self.itemconfig(back, fill=bg, outline=bg)
+            entry.config(background=bg, foreground=fg)
         #---
         def get_entry():#获取文本
             return entry.get()
@@ -2982,7 +3008,7 @@ class BasicTinUI(Canvas):
         def __normal():#正常样式
             entry['state']='normal'
             entry.focus_set()
-            self.itemconfig(back,outline=activebg,fill=activebg)
+            self.itemconfig(back,outline=onbg,fill=onbg)
             self.itemconfig(bottomline,fill=onoutline)
         def __disable():#禁用
             entry['state']='disable'
@@ -2992,6 +3018,8 @@ class BasicTinUI(Canvas):
         entry=Entry(self,fg=fg,bg=bg,font=font,relief='flat',bd=0,show='●',insertbackground=insert)
         entry.bind('<FocusIn>',focus_in)
         entry.bind('<FocusOut>',focus_out)
+        entry.bind('<Enter>', mouse_enter)
+        entry.bind('<Leave>', mouse_leave)
         funce=self.create_window(pos,window=entry,width=width,anchor=anchor)#输入框画布对象
         uid='entry'+str(funce)
         self.itemconfig(funce,tags=uid)
@@ -3671,6 +3699,10 @@ class BasicTinUI(Canvas):
         self.itemconfig(uid, state='hidden')
         self.tag_bind(fid, bind, show)
         return ui, uixml, hide, uid
+
+    def add_flyoutwindow(self, fid, width:int=250, height:int=150, bind='<Button-1>', line='#dcdcdc', bg='#f9f9f9', anchor='n', pos=None):# 悬浮窗口
+        # 注意，默认布局在fid正上方
+        ...
 
 
 class TinUI(BasicTinUI):

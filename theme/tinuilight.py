@@ -41,8 +41,9 @@ class TinUILight(TinUITheme):
                                  outline='#f3f3f3',*arg,**kw)
 
     def add_entry(self,pos,*arg,**kw):
-        return self.ui.add_entry(pos,fg='#606060',bg='#fbfbfb',
-            activefg='#1b1b1b',activebg='#ffffff',
+        return self.ui.add_entry(pos,fg='#1b1b1b',bg='#fbfbfb',
+            activefg='#1a1a1a',activebg='#f6f6f6',
+            onfg='#000000',onbg='#ffffff',
             line='#e5e5e5',activeline='#e5e5e5',
             outline='#868686',onoutline='#3041d8',insert='#000000',
                           *arg,**kw)

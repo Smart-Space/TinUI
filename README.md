@@ -244,15 +244,17 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_entry(self,pos:tuple,width:int,text:str='',fg='#606060',bg='#f6f6f6',activefg='#1b1b1b',activebg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#808080',font=('微软雅黑',12),outline='#868686',onoutline='#3041d8',icon='>',anchor='nw',call='→',command=None)
+### add_entry(self,pos:tuple,width:int,text:str='',fg='#1b1b1b',bg='#fbfbfb',activefg='#1a1a1a',activebg='#f6f6f6',onfg='#000000',onbg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#808080',font=('微软雅黑',12),outline='#868686',onoutline='#3041d8',icon='>',anchor='nw',call='→',command=None)
 
 - pos::位置
 - width::宽度
 - text::初始文字
 - fg::文字颜色
 - bg::背景颜色
-- activefg::激活时字体颜色
-- activebg::激活时背景色
+- activefg::响应鼠标文本颜色
+- activebg::响应鼠标背景色
+- onfg::激活时文本颜色
+- onbg::激活时背景色
 - line::边框颜色
 - activeline::激活时边框颜色
 - insert::光标颜色
@@ -1451,14 +1453,16 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_passwordbox(self,pos:tuple,width:int,fg='#606060',bg='#f6f6f6',activefg='#1b1b1b',activebg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#808080',font=('微软雅黑',12),outline='#868686',onoutline='#3041d8',anchor='nw',command=None)
+### add_passwordbox(self,pos:tuple,width:int,fg='#1b1b1b',bg='#fbfbfb',activefg='#1a1a1a',activebg='#f6f6f6',onfg='#000000',onbg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#808080',font=('微软雅黑',12),outline='#868686',onoutline='#3041d8',anchor='nw',command=None)
 
 - pos-位置
 - width-宽度
 - fg-文本颜色
 - bg-背景色
-- activefg-响应时文本颜色
-- activebg-响应时背景颜色
+- activefg-响应鼠标文本颜色
+- activebg-响应鼠标背景色
+- onfg-激活时文本颜色
+- onbg-激活时背景颜色
 - line-边框颜色
 - activeline-响应式边框颜色
 - insert-光标颜色

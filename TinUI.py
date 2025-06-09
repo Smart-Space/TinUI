@@ -2597,10 +2597,14 @@ class BasicTinUI(Canvas):
 
     def add_button2(self,pos:tuple,text:str,icon=None,compound='left',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',font=('微软雅黑',12),minwidth=0,maxwidth=0,command=None,anchor='nw'):#绘制圆角按钮
         def in_button(event):
+            nonlocal mouse_in
+            mouse_in=True
             self.itemconfig(outline,outline=activeline,fill=activeline)
             self.itemconfig(back,fill=activebg,outline=activebg)
             self.itemconfig(buttonuid,fill=activefg)
         def out_button(event):
+            nonlocal mouse_in
+            mouse_in=False
             self.itemconfig(back,fill=bg,outline=bg)
             self.itemconfig(outline,outline=line,fill=line)
             self.itemconfig(buttonuid,fill=fg)
@@ -2608,8 +2612,12 @@ class BasicTinUI(Canvas):
             self.itemconfig(back,fill=onbg,outline=onbg)
             self.itemconfig(buttonuid,fill=onfg)
             self.itemconfig(outline,outline=online,fill=online)
-            self.after(500,lambda : out_button(None))
-            if command!=None:
+        def out_click(event):
+            if mouse_in:
+                in_button(event)
+            else:
+                out_button(event)
+            if command != None:
                 command(event)
         def change_command(new_func):
             nonlocal command
@@ -2625,6 +2633,7 @@ class BasicTinUI(Canvas):
             out_button(None)
         font=tkfont.Font(font=font)
         font_size=str(font.cget(option='size'))
+        mouse_in = False# 鼠标是否在按钮上
         button=self.create_text(pos,text=text,fill=fg,font=font)
         uid='button2-'+str(button)
         buttonuid=uid+'button'
@@ -2664,6 +2673,7 @@ class BasicTinUI(Canvas):
         back_t=(x1+1,y1+1,x2-1,y1+1,x2-1,y2-1,x1+1,y2-1)
         back=self.create_polygon(back_t,width=9,tags=uid,fill=bg,outline=bg)
         self.tag_bind(uid, '<Button-1>', on_click)
+        self.tag_bind(uid, '<ButtonRelease-1>', out_click)
         self.tag_bind(uid, '<Enter>', in_button)
         self.tag_bind(uid, '<Leave>', out_button)
         self.tkraise(buttonuid)

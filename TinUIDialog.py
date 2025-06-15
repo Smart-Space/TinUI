@@ -48,8 +48,10 @@ class Dialog(Toplevel):
             self.entryargs = {
                 'fg':'#606060',
                 'bg':'#fbfbfb',
-                'activefg':'#1b1b1b',
-                'activebg':'#ffffff',
+                'activefg':'#1a1a1a',
+                'activebg':'#f6f6f6',
+                'onfg':'#000000',
+                'onbg':'#ffffff',
                 'line':'#e5e5e5',
                 'activeline':'#e5e5e5',
                 'insert':'#000000',
@@ -93,8 +95,10 @@ class Dialog(Toplevel):
             self.entryargs = {
                 'fg':'#cfcfcf',
                 'bg':'#2d2d2d',
-                'activefg':'#e6e6e6',
-                'activebg':'#1f1f1f',
+                'activefg':'#ffffff',
+                'activebg':'#323232',
+                'onfg':'#ffffff',
+                'onbg':'#1f1f1f',
                 'line':'#303030',
                 'activeline':'#202020',
                 'outline':'#9a9a9a',
@@ -382,7 +386,7 @@ if __name__=='__main__':
     show_warning(root,'test','this is a warning\nhello world!',theme='dark')
     show_error(root,'test','something is wrong\nhello world! hello world! hello world! hello world!',theme='dark')
     show_question(root,'test','Do you want to continue?',theme='dark')
-    b=ask_string(root,'test','input something input something input something input something',theme='dark')
+    b=ask_string(root,'test','input something input something input something input something',theme='light')
     ask_integer(root,'test','input integer',theme='dark')
     ask_float(root,'test','input float',theme='dark')
     print(b)

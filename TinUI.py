@@ -3633,7 +3633,6 @@ class BasicTinUI(Canvas):
             self.unbind('<Button-1>')
             self.tag_bind(fid, bind, show)
             motion(None, -1)
-            self.itemconfig(uid, state='hidden')
         def motion(e, dis):
             # 展开/收缩动画
             # dxy为动画方向，0为不变，1为变化
@@ -3649,12 +3648,16 @@ class BasicTinUI(Canvas):
                 _height = height
                 dwidth = -width / 20 * dxy[0]
                 dheight = -height / 20 * dxy[1]
-            for _ in range(20):
-                time.sleep(0.005)
+            for i in range(20):
                 _width += dwidth
                 _height += dheight
-                self.itemconfig(uid, width=_width, height=_height)
-                self.update_idletasks()
+                ui.after(5*i, lambda _width=_width, _height=_height, i=i: __motion(_width, _height, (i==19)+dis))
+        def __motion(_width, _height, dis_state):
+            self.itemconfig(uid, width=_width, height=_height)
+            ui.update()
+            if dis_state == 0:
+                # 仅当i=19并且是收缩时有效
+                self.itemconfig(uid, state='hidden')
         ui = BasicTinUI(self, bg=bg, highlightbackground=line, highlightthickness=1, relief='flat')
         uixml = TinUIXml(ui)
         ui.bind('<Destroy>', lambda event: self.__delete_uixml(uixml))
@@ -4043,9 +4046,8 @@ def test2(event):
 def test3(event):
     ok2()
 def test4(event):
-    from time import sleep
     for i in range(1,101):
-        sleep(0.02)
+        time.sleep(0.02)
         progressgoto(i)
 def test5(result):
     b.itemconfig(scale_text,text='当前选值：'+str(result))

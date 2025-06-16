@@ -1144,7 +1144,7 @@ class BasicTinUI(Canvas):
         font_size=str(_font.cget('size'))
         _,y1,_,y2=self.bbox(entry)
         # 调节按钮触发调节按钮
-        button = self.add_button2((pos[0]+width,(y1+y2)/2),anchor='w',text='\uEC8F',linew=1,line='',activeline='',fg=fg,bg='',activefg=onfg,activebg='',font='{Segoe Fluent Icons} '+font_size,command=_change_data)
+        button = self.add_button2((pos[0]+width,(y1+y2)/2),anchor='w',text='\uEC8F',linew=1,line='',activeline='',online='',fg=fg,bg='',activefg=activefg,activebg='',onfg=onfg,onbg='',font='{Segoe Fluent Icons} '+font_size,command=_change_data)
         self.addtag_withtag(uid, button[-1])
         backbbox=self.bbox(uid)
         backpos=(backbbox[0]+2,backbbox[1]+4,backbbox[2]-3,backbbox[1]+4,backbbox[2]-3,backbbox[3]-5,backbbox[0]+2,backbbox[3]-5)
@@ -2166,6 +2166,10 @@ class BasicTinUI(Canvas):
             uixml=TinUIXml(page)
             page.bind('<Destroy>', lambda event: self.__delete_uixml(uixml))
             bbox=tbu.bbox('all')
+            if bbox and bbox[2]-bbox[0] > width:
+                self.itemconfig(scro[-1], state='normal')
+            else:
+                self.itemconfig(scro[-1], state='hidden')
             tbu.config(scrollregion=bbox)
             vdict[flag]=(page,uixml,uiid)
             tbdict[flag]=(titleu,cb,bu)
@@ -2218,6 +2222,10 @@ class BasicTinUI(Canvas):
             del vdict[flag]
             del flaglist[index]
             bbox=tbu.bbox('all')
+            if bbox and bbox[2]-bbox[0] > width:
+                self.itemconfig(scro[-1], state='normal')
+            else:
+                self.itemconfig(scro[-1], state='hidden')
             tbu.config(scrollregion=bbox)
         def getuis(flag):#获取对应窗口
             return vdict[flag]
@@ -2260,6 +2268,10 @@ class BasicTinUI(Canvas):
             tbu.itemconfig(newpageuid,state=newpustate)#恢复样式
             npx+=movex
             bbox=tbu.bbox('all')
+            if bbox and bbox[2]-bbox[0] > int(tbu.cget('width')):
+                self.itemconfig(scro[-1], state='normal')
+            else:
+                self.itemconfig(scro[-1], state='hidden')
             tbu.config(scrollregion=bbox)
         tbu=BasicTinUI(self,bg=color)
         tbuid=self.create_window((pos[0]+2,pos[1]+2),window=tbu,width=width,height=30,anchor='nw')
@@ -2836,6 +2848,12 @@ class BasicTinUI(Canvas):
                     items[back]=(te,back,sign)
                     add_item(padx+15,text[1],back)
                     box.tag_bind(sign,'<Button-1>',lambda event,s=sign,cid=back:close_view(s,cid))
+                old_coords = box.coords(back)
+                old_coords[0] = old_coords[6] = 6
+                bbox = box.bbox(back)
+                if bbox[2]-bbox[0] < width:
+                    old_coords[2] = old_coords[4] = width-9
+                box.coords(back, old_coords)
                 for item_id in (back, te):
                     box.tag_bind(item_id, '<Enter>', lambda event,_id=back:buttonin(_id))
                     box.tag_bind(item_id, '<Leave>', lambda event,_id=back:buttonout(_id))
@@ -2870,10 +2888,10 @@ class BasicTinUI(Canvas):
             if bbox==None: return
             index=tuple(items.keys()).index(_get_last_cuid(cid))+1
             if index!=len(items.keys()):
-                height=bbox[3]-bbox[1]#获取移动模块高度
+                moveheight=bbox[3]-bbox[1]#获取移动模块高度
                 for i in tuple(items.keys())[index:]:
                     for uid in items[i]:
-                        box.move(uid,0,height)
+                        box.move(uid,0,moveheight)
             box.dtag(move)
             if nowid is not None:
                 bbox = box.bbox(nowid)
@@ -2885,7 +2903,20 @@ class BasicTinUI(Canvas):
                 click(nowid)#单级输出
                 posi=box.bbox(nowid)[1]
                 box.moveto(line,1,posi+linew/5)
-            box.config(scrollregion=box.bbox('all'))
+            bbox = box.bbox('all')
+            if bbox[2]-bbox[0] <= width:
+                self.itemconfig(cavui, height=height)
+                self.itemconfig(vscroll, state='hidden')
+            else:
+                self.itemconfig(cavui, height=height-5)
+                self.itemconfig(vscroll, state='normal')
+            if bbox[3]-bbox[1] <= height:
+                self.itemconfig(cavui, width=width)
+                self.itemconfig(hscroll, state='hidden')
+            else:
+                self.itemconfig(cavui, width=width-5)
+                self.itemconfig(hscroll, state='normal')
+            box.config(scrollregion=bbox)
         def close_view(sign,cid):#闭合
             if box.itemcget(sign,'text')=='\uE970':
                 return
@@ -2902,16 +2933,29 @@ class BasicTinUI(Canvas):
             box.itemconfig(move,state='hidden')
             index=tuple(items.keys()).index(cids[-1])+1
             if index!=len(items.keys()):
-                height=bbox[3]-bbox[1]#获取移动模块高度
+                moveheight=bbox[3]-bbox[1]#获取移动模块高度
                 for i in tuple(items.keys())[index:]:
                     for uid in items[i]:
-                        box.move(uid,0,-height)
+                        box.move(uid,0,-moveheight)
             box.dtag(move)
             if nowid in cids:#标识元素控制
                 box.itemconfig(line,state='hidden')
             elif nowid is not None:
                 click(nowid)#重新绘制位置
-            box.config(scrollregion=box.bbox('all'))
+            bbox = box.bbox('all')
+            if bbox[2]-bbox[0] <= width:
+                self.itemconfig(cavui, height=height)
+                self.itemconfig(vscroll, state='hidden')
+            else:
+                self.itemconfig(cavui, height=height-5)
+                self.itemconfig(vscroll, state='normal')
+            if bbox[3]-bbox[1] <= height:
+                self.itemconfig(cavui, width=width)
+                self.itemconfig(hscroll, state='hidden')
+            else:
+                self.itemconfig(cavui, width=width-5)
+                self.itemconfig(hscroll, state='normal')
+            box.config(scrollregion=bbox)
         def bindview(event):
             if event.state==0:
                 box.yview_scroll(int(-1*(event.delta/120)), "units")
@@ -2924,34 +2968,39 @@ class BasicTinUI(Canvas):
         cavui=self.create_window(pos,window=box,width=width,height=height,anchor='nw')
         uid='treeview'+str(cavui)
         self.addtag_withtag(uid,cavui)
-        hscroll = self.add_scrollbar((pos[0]+width,pos[1]),widget=box,height=height,bg=bg,color=signcolor,oncolor=signcolor)[-1]#纵向
-        vscroll = self.add_scrollbar((pos[0],pos[1]+height),widget=box,height=width,direction='x',bg=bg,color=signcolor,oncolor=signcolor)[-1]#横向
-        self.addtag_withtag(uid,hscroll)
-        self.addtag_withtag(uid,vscroll)
+        hscroll = self.add_scrollbar((pos[0]+width-6,pos[1]),widget=box,height=height,bg=bg,color=signcolor,oncolor=signcolor)[-1]#纵向
+        vscroll = self.add_scrollbar((pos[0],pos[1]+height-6),widget=box,height=width,direction='x',bg=bg,color=signcolor,oncolor=signcolor)[-1]#横向
+        self.addtag_withtag(uid, hscroll)
+        self.addtag_withtag(uid, vscroll)
         #id为back的uid
         items=dict()#元素对象{id:(text,back,[sign]),...}
         items_dict=dict()#链接关系（下一级）{id:(id1,id2,id3,...),id2:(id2-1,id2-2,...),id-new:(...)...}
         box.add_back((0,0,0,0),linew=0)
         add_item(5,content)
         #重绘宽度
-        bbox=box.bbox(tuple(items.keys())[0])#第一个元素高度-4
+        bbox=box.bbox(tuple(items.keys())[0])#第一个元素
         linew=bbox[3]-bbox[1]
         line=box.create_line((1,linew/3,1,linew*2/3),fill=oncolor,width=3,capstyle='round')
-        #重绘宽度
-        maxwidth=bbox[2]
-        if maxwidth<width-14:maxwidth=width-14
-        for i in items.keys():
-            old_coords=box.coords(i)
-            old_coords[0]=old_coords[6]=6.0
-            old_coords[2]=old_coords[4]=6+maxwidth
-            box.coords(i,old_coords)
         x1, y1, x2, y2 = self.bbox(uid)
         backpos = (x1, y1, x2, y1, x2, y2, x1, y2)
         self.create_polygon(backpos, outline=bg, fill=bg, width=9, tags=uid)# allback
         self.lift(cavui)
         self.lift(hscroll)
         self.lift(vscroll)
-        box.config(scrollregion=box.bbox('all'))
+        bbox = box.bbox('all')
+        if bbox[2]-bbox[0] <= width:
+            self.itemconfig(cavui, height=height)
+            self.itemconfig(vscroll, state='hidden')
+        else:
+            self.itemconfig(cavui, height=height-5)
+            self.itemconfig(vscroll, state='normal')
+        if bbox[3]-bbox[1] <= height:
+            self.itemconfig(cavui, width=width)
+            self.itemconfig(hscroll, state='hidden')
+        else:
+            self.itemconfig(cavui, width=width-5)
+            self.itemconfig(hscroll, state='normal')
+        box.config(scrollregion=bbox)
         box.move(line,0,-linew-height)
         box.itemconfig(line,state='hidden')
         box.bind('<MouseWheel>',bindview)
@@ -4182,6 +4231,7 @@ if __name__=='__main__':
             ntb.addpage('test'+str(i),'t'+str(i),cancancel=False)
         else:
             ntb.addpage('test'+str(i),'t'+str(i))
+    ntb.showpage('t1')
     ntb.cannew(True,test9)
     test7()
     b.add_ratingbar((0,1150),num=28,command=print)
@@ -4224,7 +4274,7 @@ if __name__=='__main__':
         </line>
         </line>
         </tinui>''')
-    trvl,_,trvbox,_=b.add_treeview((1220,1300),content=('cpp',('test',('a','b',('test',('cp2','cp3'))))),command=test12)
+    trvl,_,trvbox,_=b.add_treeview((1220,1300),command=test12)
     try:
         b.add_image((10,1300),200,250,imgfile=__file__[:-8]+'image/LOGO.png')#仅测试
     except Exception as err:

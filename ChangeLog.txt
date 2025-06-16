@@ -1,10 +1,17 @@
 <TinUI, a modern frame to render various widgets element for tkinter in one control.>
-    Copyright (C) <2021-present>  <Smart-Space | Junming Zhang> <tsan-zane@outlook.com|smart-space@qq.com>
+    Copyright (C) <2021-present>  <Smart-Space | Junming Zhang> <tsan-zane@outlook.com | smart-space@qq.com>
     2019（原型框架）2021（正式命名TinUI发布）
 基于GPLv3和LGPLv3发布
 
 ==========更新日志==========
 
+
+==========5.30==========
+2025-
+1. 修复spinbox样式问题
+*2. 动画效果全改由after方法实现
+3. notebook滑动块仅在栏目数大于标签栏时出现
+4. treeview滚动条仅在元素超出视图时显示
 
 ==========5.29==========
 2025-6-15

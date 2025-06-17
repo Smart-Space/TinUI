@@ -1,10 +1,7 @@
 from typing import Union
 import sys
-try:
-    from tinui import TinUI, BasicTinUI, TinUITheme
-except:
-    sys.path.append('../')
-    from TinUI import TinUI, BasicTinUI, TinUITheme
+sys.path.append('../')
+from TinUI import TinUI, BasicTinUI, TinUITheme
 
 class TinUIDark(TinUITheme):
     '''

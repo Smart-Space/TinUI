@@ -1802,6 +1802,10 @@ class BasicTinUI(Canvas):
             box.config(scrollregion=bbox)
         def set_y_view(event):
             box.yview_scroll(int(-1*(event.delta/120)), "units")
+        def clean(event):
+            nonlocal all_keys, choices
+            del all_keys
+            del choices
         def select(index:int=0):#选中元素，默认第一个
             if index > len(all_keys)-1:
                 return None
@@ -1826,6 +1830,7 @@ class BasicTinUI(Canvas):
         maxwidth=0#最大宽度
         load_data(data)#重复使用元素添加
         box.bind('<MouseWheel>',set_y_view)
+        box.bind("<Destroy>", clean)
         funcs=FuncList(4)
         funcs.add=_add
         funcs.delete=_delete
@@ -1857,6 +1862,9 @@ class BasicTinUI(Canvas):
                 command(nowon)
         def bindyview(event):
             ui.yview_scroll(int(-1*(event.delta/120)), "units")
+        def clean(event):
+            nonlocal items
+            del items
         def _load_item(num):
             nonlocal endy
             for _ in range(0,num):
@@ -1942,6 +1950,7 @@ class BasicTinUI(Canvas):
         allback=self.add_back((),(view,scro[-1]),fg=bg,bg=bg,linew=8)
         self.addtag_withtag(uid,allback)
         ui.bind('<MouseWheel>',bindyview)
+        ui.bind('<Destroy>', clean)
         funcs=FuncList(5)
         funcs.getitems=getitems
         funcs.getui=getui
@@ -2961,6 +2970,12 @@ class BasicTinUI(Canvas):
                 box.yview_scroll(int(-1*(event.delta/120)), "units")
             elif event.state==1:
                 box.xview_scroll(int(-1*(event.delta/120)), "units")
+        def clean(event):
+            # 销毁对象
+            nonlocal fln, items, items_dict
+            del fln
+            del items
+            del items_dict
         nowid=None
         fln=TinUINum()#用于寻找父级关系，目前效率比较低，之后考虑优化
         box=BasicTinUI(self,bg=bg,width=width,height=height)#显示选择内容
@@ -3004,6 +3019,7 @@ class BasicTinUI(Canvas):
         box.move(line,0,-linew-height)
         box.itemconfig(line,state='hidden')
         box.bind('<MouseWheel>',bindview)
+        box.bind('<Destroy>', clean)
         return items,items_dict,box,uid
 
     def add_passwordbox(self,pos:tuple,width:int,fg='#1b1b1b',bg='#fbfbfb',activefg='#1a1a1a',activebg='#f6f6f6',onfg='#000000',onbg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#000000',font=('微软雅黑',12),outline='#868686',onoutline='#3041d8',anchor='nw',command=None):#绘制密码输入框

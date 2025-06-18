@@ -1,9 +1,7 @@
 # 由chat-glm4生成，作者小改。作为示例，不会维护
 from typing import Union
-import sys
 from tkinter import Tk, Toplevel
-sys.path.append('../')
-from TinUI import TinUI, BasicTinUI, TinUITheme, TinUIXml
+from tinui import TinUI, BasicTinUI, TinUITheme, TinUIXml
 
 from tinuilight import TinUILight
 from tinuidark import TinUIDark

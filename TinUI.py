@@ -9,7 +9,7 @@ from tkinter import ttk
 from tkinter import font as tkfont
 from webbrowser import open as webopen
 import time
-import threading
+from threading import Timer
 from typing import Union
 import xml.etree.ElementTree  as ET
 import sys
@@ -817,11 +817,15 @@ class BasicTinUI(Canvas):
             pickbox.attributes('-alpha',0)
             pickbox.deiconify()
             pickbox.focus_set()
+            it = 0
             for i in (0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1):
-                pickbox.attributes('-alpha',i)
-                pickbox.update_idletasks()
-                time.sleep(0.02)
-            pickbox.bind('<FocusOut>',unshow)
+                pickbox.after(it*20, lambda alpha=i : __show(alpha))
+                it += 1
+        def __show(alpha):
+            pickbox.attributes('-alpha',alpha)
+            pickbox.update_idletasks()
+            if alpha == 1:
+                pickbox.bind('<FocusOut>',unshow)
         def unshow(event):
             nonlocal drop
             drop=False
@@ -1338,11 +1342,15 @@ class BasicTinUI(Canvas):
             menu.attributes('-alpha',0)
             menu.deiconify()
             menu.focus_set()
+            it = 0
             for i in (0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1):
-                menu.attributes('-alpha',i)
-                menu.update_idletasks()
-                time.sleep(0.02)
-            menu.bind('<FocusOut>',unshow)
+                menu.after(it*20, lambda alpha=i : __show(alpha))
+                it += 1
+        def __show(alpha):
+            menu.attributes('-alpha',alpha)
+            menu.update_idletasks()
+            if alpha == 1:
+                menu.bind('<FocusOut>',unshow)
         self.tag_bind(cid,bind,show)
         menu=Toplevel(self)
         menu.withdraw()
@@ -1401,7 +1409,7 @@ class BasicTinUI(Canvas):
                 first_create()
             if delay!=0 and flag:
                 if timethread==None:#重复利用计时器，避免占用资源
-                    timethread=threading.Timer(delay,show_toti,[event,None])
+                    timethread=Timer(delay,show_toti,[event,None])
                     timethread.start()
                 else:
                     timethread.finished.clear()#恢复上一次计时标记
@@ -3267,29 +3275,29 @@ class BasicTinUI(Canvas):
         self.__auto_anchor(uid,pos,anchor)
         return button,back,outline,funcs,uid
     
-    def add_swipecontrol(self,pos:tuple,text:str='',height=50,width=400,fg='#1a1a1a',bg='#f3f3f3',line='#fbfbfb',data:dict={'left':({'text':'✔️\nok','fg':'#202020','bg':'#bcbcbc','command':print},),'right':({'text':'❌\nclose'},)},font=('微软雅黑',12),anchor='nw'):#绘制滑动控件
+    def add_swipecontrol(self,pos:tuple,text:str='',height=50,width=400,fg='#1a1a1a',bg='#f3f3f3',line='#fbfbfb',data:dict={'left':({'text':'OK','fg':'#202020','bg':'#bcbcbc','command':print},),'right':({'text':'CLOSE'},)},font=('微软雅黑',12),anchor='nw'):#绘制滑动控件
         def _animation(side):#移动动画
+            it = 0
             if side=='left':
-                for i in range(0,rightw+5,5):
-                    back.move('cont',-5,0)
-                    time.sleep(0.001)
-                    back.update_idletasks()
+                for _ in range(0,rightw+5,5):
+                    back.after(it*5, lambda: __animate(-5))
+                    it += 1
             elif side=='right':
-                for i in range(0,leftw+5,5):
-                    back.move('cont',5,0)
-                    time.sleep(0.001)
-                    back.update_idletasks()
+                for _ in range(0,leftw+5,5):
+                    back.after(it*5, lambda: __animate(5))
+                    it += 1
             elif side=='center':
                 if nowmode==right:
-                    for i in range(0,rightw+5,5):
-                        back.move('cont',5,0)
-                        time.sleep(0.001)
-                        back.update_idletasks()
+                    for _ in range(0,rightw+5,5):
+                        back.after(it*5, lambda: __animate(5))
+                        it += 1
                 elif nowmode==left:
-                    for i in range(0,leftw+5,5):
-                        back.move('cont',-5,0)
-                        time.sleep(0.001)
-                        back.update_idletasks()
+                    for _ in range(0,leftw+5,5):
+                        back.after(it*5, lambda: __animate(-5))
+                        it += 1
+        def __animate(movex):
+            back.move('cont',movex,0)
+            back.update_idletasks()
         def move(event):#滚动响应
             nonlocal nowmode
             back.unbind('<MouseWheel>')
@@ -3317,7 +3325,6 @@ class BasicTinUI(Canvas):
             back.bind('<MouseWheel>',move)
         def _docommand(func):
             nonlocal nowmode
-            time.sleep(0.01)
             _animation('center')
             nowmode=center
             if func!=None:
@@ -3452,11 +3459,15 @@ class BasicTinUI(Canvas):
             picker.attributes('-alpha',0)
             picker.deiconify()
             picker.focus_set()
+            it = 0
             for i in (0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1):
-                picker.attributes('-alpha',i)
-                picker.update_idletasks()
-                time.sleep(0.02)
-            picker.bind('<FocusOut>',unshow)
+                picker.after(it*20, lambda alpha=i : __show(alpha))
+                it += 1
+        def __show(alpha):
+            picker.attributes('-alpha',alpha)
+            picker.update_idletasks()
+            if alpha == 1:
+                picker.bind('<FocusOut>',unshow)
         def unshow(event):
             picker.withdraw()
             picker.unbind('<FocusOut>')
@@ -3600,11 +3611,15 @@ class BasicTinUI(Canvas):
             menu.attributes('-alpha',0)
             menu.deiconify()
             menu.focus_set()
+            it = 0
             for i in (0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1):
-                menu.attributes('-alpha',i)
-                menu.update_idletasks()
-                time.sleep(0.02)
-            menu.bind('<FocusOut>',unshow)
+                menu.after(it*20, lambda alpha=i : __show(alpha))
+                it += 1
+        def __show(alpha):
+            menu.attributes('-alpha',alpha)
+            menu.update_idletasks()
+            if alpha == 1:
+                menu.bind('<FocusOut>',unshow)
         def disable(fg='#9d9d9d',bg='#f5f5f5'):
             self.itemconfig(uid+'button',state='disable',fill=fg)
             self.itemconfig(back,state='disable',disabledfill=bg)
@@ -4110,10 +4125,11 @@ def test2(event):
     ok1()
 def test3(event):
     ok2()
+def __test4(prog):
+    progressgoto(prog)
 def test4(event):
     for i in range(1,101):
-        time.sleep(0.02)
-        progressgoto(i)
+        a.after(i*20, lambda i=i: __test4(i))
 def test5(result):
     b.itemconfig(scale_text,text='当前选值：'+str(result))
 def test6():

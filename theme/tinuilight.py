@@ -1,7 +1,5 @@
 from typing import Union
-import sys
-sys.path.append('../')
-from TinUI import TinUI, BasicTinUI, TinUITheme
+from tinui import TinUI, BasicTinUI, TinUITheme
 
 class TinUILight(TinUITheme):
     '''

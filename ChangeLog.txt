@@ -9,7 +9,7 @@
 ==========5.30==========
 2025-
 1. 修复spinbox样式问题
-*2. 动画效果全改由after方法实现
+2. 动画效果全改由after方法实现
 3. notebook滑动块仅在栏目数大于标签栏时出现
 4. treeview滚动条仅在元素超出视图时显示
 5. treeview, listbox, listview销毁后清理内部数据对象

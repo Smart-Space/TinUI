@@ -1781,35 +1781,6 @@ class TinUITheme:
 
 ---
 
-# Class: TinUIWidget
-
-创建一个含单个元素控件的BasicTinUI组件。
-
-```python
-class TinUIWidget(BasicTinUI):
-    '''提供含单个元素控件的TinUI控件，用来在普通tkinter组件中使用'''
-
-    def __init__(self,master,widget_name='ui',**kw):
-        BasicTinUI.__init__(self,master,**kw)
-        self.func=eval('self.add_'+widget_name)
-        self.width=None
-        self.height=None
-```
-
-## get_size()
-
-获取元素控件尺寸。
-
-## load(*args,**kw)
-
-根据初始化的 `widget_name`，创建元素控件。
-
-## reupdate()
-
-更新尺寸信息，但不会更改控件大小。
-
----
-
 # Class: TinUIXml
 
 使用xml语言来绘制TinUI组件，当然，也包括BasicTinUI。

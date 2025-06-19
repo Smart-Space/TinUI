@@ -8,10 +8,9 @@ from tkinter import Tk, Toplevel, Canvas, Entry, Text, Scrollbar, Frame, PhotoIm
 from tkinter import ttk
 from tkinter import font as tkfont
 from webbrowser import open as webopen
-import time
 from threading import Timer
 from typing import Union
-import xml.etree.ElementTree  as ET
+from xml.etree import ElementTree  as ET
 import sys
 import os
 import shutil
@@ -138,35 +137,6 @@ class TinUIFont:
             return False
 
 
-class TinUIEvent:
-    '''BasicTinUI与TinUI控件元素事件管理器testing...
-    可以综合管理每一个画布中所有元素绑定事件的函数
-    '''
-
-    def __init__(self,ui):
-        self.ui=ui
-        self.uiddict=dict()#{uid:{event:func,...},...}
-
-    def go_func(self,uid,eventname,*event):
-        #运行一个元素对应事件的所有函数
-        for func in self.uiddict[uid][eventname]:
-            func(event)
-
-    def bind(self,uid,*event_func):
-        #每一个新绑定的事件，首次绑定操作，可以同时绑定多个一一对应的事件和函数
-        #event_func: (event1,func1),(event2,func2)...
-        self.uiddict[uid]=dict()
-        for i in event_func:
-            self.uiddict[uid][i[0]]=[(i[1])]
-            self.ui.tag_bind(uid,i[0],lambda event,uid=uid,name=i[0]:self.go_func(uid,name,event))
-
-    def newbind(self,uid,event_name,func):#新增同事件函数
-        self.uiddict[uid][event_name].append(func)
-
-    def cancelbind(self,uid,eventname,func):#删除同事件函数
-        self.uiddict[uid][eventname].remove(func)
-
-
 class BasicTinUI(Canvas):
     """基于tkinter的高级窗口绘制组件
     uid参数为每一个组件（除个别）的整体tag_name"""
@@ -181,7 +151,6 @@ class BasicTinUI(Canvas):
     def init(self):
         self.images=[]
         self.title_size={0:20,1:18,2:16,3:14,4:12}
-        # self.pen=TinUIPen(self)
         self.windows=[]#浮出控件的子窗口，需要开发者手动释放
 
     
@@ -3851,39 +3820,39 @@ class TinUI(BasicTinUI):
             self.after(self.update_time,self.update__)
 
 
-class TinUIWidget(BasicTinUI):
-    '''提供含单个元素控件的TinUI控件，用来在普通tkinter组件中使用'''
+# class TinUIWidget(BasicTinUI):
+#     '''提供含单个元素控件的TinUI控件，用来在普通tkinter组件中使用'''
 
-    def __init__(self,master,widget_name='ui',**kw):
-        BasicTinUI.__init__(self,master,**kw)
-        self.func=eval('self.add_'+widget_name)
-        self.width=None
-        self.height=None
+#     def __init__(self,master,widget_name='ui',**kw):
+#         BasicTinUI.__init__(self,master,**kw)
+#         self.func=eval('self.add_'+widget_name)
+#         self.width=None
+#         self.height=None
 
-    def get_size(self):#获取尺寸大小
-        return self.width,self.height
+#     def get_size(self):#获取尺寸大小
+#         return self.width,self.height
 
-    def load(self,*args,**kw):#载入控件
-        self.uids=self.func(*args,**kw)
-        self.reupdate()
-        return self.uids
+#     def load(self,*args,**kw):#载入控件
+#         self.uids=self.func(*args,**kw)
+#         self.reupdate()
+#         return self.uids
 
-    def reupdate(self):#调整滚动范围
-        state_l=list()
-        ids=self.find_withtag(self.uids[-1])
-        for i in ids:
-            state_l.append(self.itemcget(i,'state'))
-            self.itemconfig(i,state='normal')
-        for i,s in zip(ids,state_l):
-            self.itemconfig(i,state=s)
-        bbox=list(self.bbox('all'))
-        bbox[0]-=1
-        bbox[1]-=1
-        bbox[2]+=1
-        bbox[3]+=1
-        self['width']=self.width=bbox[2]-bbox[0]
-        self['height']=self.height=bbox[3]-bbox[1]
-        self.config(scrollregion=bbox)
+#     def reupdate(self):#调整滚动范围
+#         state_l=list()
+#         ids=self.find_withtag(self.uids[-1])
+#         for i in ids:
+#             state_l.append(self.itemcget(i,'state'))
+#             self.itemconfig(i,state='normal')
+#         for i,s in zip(ids,state_l):
+#             self.itemconfig(i,state=s)
+#         bbox=list(self.bbox('all'))
+#         bbox[0]-=1
+#         bbox[1]-=1
+#         bbox[2]+=1
+#         bbox[3]+=1
+#         self['width']=self.width=bbox[2]-bbox[0]
+#         self['height']=self.height=bbox[3]-bbox[1]
+#         self.config(scrollregion=bbox)
 
 
 class TinUIXmlFunc:
@@ -4185,15 +4154,6 @@ if __name__=='__main__':
     a.iconbitmap('LOGO.ico')
     a.title('TinUI控件展示')
 
-    # if platform.system()=='Windows':
-    #     import ctypes
-    #     try:
-    #         ctypes.windll.shcore.SetProcessDpiAwareness(1)
-    #     except:
-    #         ctypes.windll.user32.SetProcessDPIAware()
-    #     # ScaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0)
-    #     # a.tk.call('tk', 'scaling', ScaleFactor/75)
-
     b=TinUI(a,bg='white')
     b.pack(fill='both',expand=True)
 
@@ -4327,11 +4287,7 @@ if __name__=='__main__':
     <line><button2 text='关闭浮出UI控件' command="self.funcs['flyhide']"></button2>
     </line></tinui>''')
 
-    uevent=TinUIEvent(b)
-    #uevent.bind('a',('<as>','as'),('<as>','as'),('<as>','as'))
-    # bw=TinUIWidget(a,'button2',bg='black')暂停开发单个控件
-    # bw.load((5,5),text='tinui widget')
-    # bw.pack()
+    # uevent=TinUIEvent(b)
 
     b.bind('<Destroy>',lambda e:b.clean_windows())
 

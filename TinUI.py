@@ -2653,6 +2653,9 @@ class BasicTinUI(Canvas):
                 self.__auto_anchor(button,textpos,'s')
             if text=='':#有图标的时候，如果无文本，则隐藏文本元素
                 self.itemconfig(button,state='hidden')
+        if text == '':# 无文本时，删除文本元素
+            self.delete(button)
+            button = None
         x1,y1,x2,y2=self.bbox(buttonuid)
         linew-=1
         #判断宽度的极限，分为最大化和最小化

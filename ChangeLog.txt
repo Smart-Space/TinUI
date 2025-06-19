@@ -13,6 +13,7 @@
 3. notebook滑动块仅在栏目数大于标签栏时出现
 4. treeview滚动条仅在元素超出视图时显示
 5. treeview, listbox, listview销毁后清理内部数据对象
+6. button2在text为空时，删除文本元素，返回button为None
 !!! 弃用TinUIEvent类，暂停提供TinUIWidget类
 
 ==========5.29==========

@@ -6,4 +6,9 @@ TinUI是一个轻量化的tkinter现代样式控件库，不同于直接对tkint
 
 - [快速开始](./start)
 - [TinUI控件](./controls)
+- [TinUI对话框](./dialogs)
+- [TinUI拓展](./extension)
+- [TinUI样式](./uitheme)
+- [TinUIXml](./uixml)
+- [TinUI开发](./develop)
 

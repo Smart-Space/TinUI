@@ -46,5 +46,13 @@ TinUI中的大部分控件均是通过`tkinter.Canvas`创建的，并且能够�
 
 TinUI有如下几类控件：
 
-- [文本类](./text)
-- [按钮类](./button)
+- [文本类](./1.text)
+- [按钮类](./2.button)
+- [输入类](./3.input)
+- [选择类](./4.select)
+- [框架类](./5.frame)
+- [图像类](./6.image)
+- [菜单类](./7.menu)
+- [功能类](./8.function)
+
+> 一般地，`tinui.add_<control-name>(...)`的最后一个返回值为该控件整体在画布中的ID。

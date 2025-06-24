@@ -1,0 +1,14 @@
+title: TinUI
+lang: zh-cn
+description: 轻量的tkinter现代样式控件
+
+remote_theme: rundocs/jekyll-rtd-theme
+
+readme_index:
+  with_frontmatter: true
+
+exclude:
+  - Makefile
+  - CNAME
+  - Gemfile
+  - Gemfile.lock

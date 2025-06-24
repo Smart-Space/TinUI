@@ -75,7 +75,9 @@ class TinUIDark(TinUITheme):
     def add_combobox(self,pos,*arg,**kw):
         return self.ui.add_combobox(pos,
                fg='#cfcfcf',bg='#2d2d2d',outline='#303030',
-               activefg='#ffffff',activebg='#393939',
+               activefg='#ffffff',activebg='#323232',activeline='#303030',
+               onfg='#cecece',onbg='#272727',online='#303030',
+               listactivebg='#383838',
                scrollbg='#2c2c2c',scrollcolor='#9f9f9f',scrollon='#a0a0a0',
                                     *arg,**kw)
 
@@ -92,6 +94,8 @@ class TinUIDark(TinUITheme):
     def add_onoff(self,pos,*arg,**kw):
         return self.ui.add_onoff(pos,
                 fg='#cccccc',bg='#1d1d1d',
+                activefg='#cfcfcf',activebg='#2a2a2a',
+                onactivefg='#000000',onactivebg='#8e93c2',
                 onfg='#000000',onbg='#b2b8f2',
                                  *arg,**kw)
 
@@ -109,7 +113,7 @@ class TinUIDark(TinUITheme):
 
     def add_scalebar(self,pos,*arg,**kw):
         return self.ui.add_scalebar(pos,
-                fg='#b2b8f2',bg='#9a9a9a',activefg='#b2b8f2',
+                fg='#b2b8f2',bg='#9a9a9a',activefg='#8e93c2',
                 buttonbg='#454545',buttonoutline='#303030',
                                     *arg,**kw)
 

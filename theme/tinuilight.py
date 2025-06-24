@@ -75,7 +75,9 @@ class TinUILight(TinUITheme):
     def add_combobox(self,pos,*arg,**kw):
         return self.ui.add_combobox(pos,
                fg='#1a1a1a',bg='#fbfbfb',outline='#c8c8c8',
-               activefg='#1a1a1a',activebg='#ededee',
+               activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',
+               onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',
+               listactivebg='#f0f0f0',
                scrollbg='#f9f9f9',scrollcolor='#999999',scrollon='#89898b',
                                     *arg,**kw)
 
@@ -92,7 +94,9 @@ class TinUILight(TinUITheme):
     def add_onoff(self,pos,*arg,**kw):
         return self.ui.add_onoff(pos,
                 fg='#5a5a5a',bg='#ededed',
-                onfg='#ffffff',onbg='#4453db',
+                activefg='#575757',activebg='#e5e5e5',
+                onactivefg='#ffffff',onactivebg='#1975c5',
+                onfg='#FFFFFF',onbg='#0067c0',
                                  *arg,**kw)
 
     def add_spinbox(self,pos,*arg,**kw):

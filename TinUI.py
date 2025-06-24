@@ -689,7 +689,7 @@ class BasicTinUI(Canvas):
         back=self.create_line((pos[0],pos[1]+5,pos[0]+width+5,pos[1]+5),fill=fg,width=1,capstyle='round')
         uid='waitbar2-'+str(back)
         self.itemconfig(back,tags=uid)
-        dx,dy=self.__auto_anchor(uid,pos,anchor)
+        self.__auto_anchor(uid,pos,anchor)
         balls=[]
         for _ in range(5):
             ball=self.create_text(pos,text='\uF127',fill=fg,state='hidden',font='{Segoe Fluent Icons} 4',tags=uid)
@@ -697,24 +697,34 @@ class BasicTinUI(Canvas):
         start()
         return back,balls,stop,uid
 
-    def add_combobox(self,pos:tuple,width:int=200,height:int=200,text='',content:tuple=(),fg='#1a1a1a',bg='#f8f8f8',outline='#c8c8c8',activefg='#191919',activebg='#f1f1f1',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',tran='#01FF11',font=('微软雅黑',12),anchor='nw',command=None):#绘制组合/下拉框
+    def add_combobox(self,pos:tuple,width:int=200,height:int=200,text='',content:tuple=(),fg='#1a1a1a',bg='#f8f8f8',outline='#c8c8c8',activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',listactivebg='#f0f0f0',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',tran='#01FF11',font=('微软雅黑',12),anchor='nw',command=None):#绘制组合/下拉框
         def open_box(event):
+            mouseout(None)
+            self.move(button, 0, -1)
             if not drop:#未展开
                 self.itemconfig(button,text='\uE70E')
                 show(event)
             else:
                 unshow(None)
                 self.itemconfig(button,text='\uE70D')
+        def move_box(event):
+            self.itemconfig(back, fill=onbg, outline=onbg)
+            self.itemconfig(main, fill=onfg)
+            self.itemconfig(button, fill=onfg)
+            self.itemconfig(oline, fill=online, outline=online)
+            self.move(button, 0, 1)
         def mousein(e):
             #鼠标进入
             self.itemconfig(back,fill=activebg,outline=activebg)
             self.itemconfig(main,fill=activefg)
             self.itemconfig(button,fill=activefg)
+            self.itemconfig(oline, fill=activeline, outline=activeline)
         def mouseout(e):
             #鼠标离开
             self.itemconfig(back,fill=bg,outline=bg)
             self.itemconfig(main,fill=fg)
             self.itemconfig(button,fill=fg)
+            self.itemconfig(oline, fill=outline, outline=outline)
         def readyshow():#计算显示位置
             allpos=bar.bbox('all')
             #菜单尺寸
@@ -794,11 +804,12 @@ class BasicTinUI(Canvas):
         backpos=(x1+1,y1+1,x2-1,y1+1,x2-1,y2-1,x1+1,y2-1)
         outlinepos=(x1,y1,x2,y1,x2,y2,x1,y2)
         back=self.create_polygon(backpos,fill=bg,outline=bg,width=9,tags=uid)
-        self.create_polygon(outlinepos,fill=outline,outline=outline,width=9,tags=uid)
+        oline=self.create_polygon(outlinepos,fill=outline,outline=outline,width=9,tags=uid)
         self.tkraise(back)
         self.tkraise(main)
         self.tkraise(button)
-        self.tag_bind(uid,'<Button-1>',open_box)
+        self.tag_bind(uid,'<Button-1>',move_box)
+        self.tag_bind(uid,'<ButtonRelease-1>',open_box)
         self.tag_bind(uid,'<Enter>',mousein)
         self.tag_bind(uid,'<Leave>',mouseout)
         pickbox=Toplevel(self)#浮出窗口
@@ -813,7 +824,7 @@ class BasicTinUI(Canvas):
         bar.pack(fill='both',expand=True)
         bar.create_polygon((13,13,x2-x1-4,13,x2-x1-4,height-12,13,height-12),fill=bg,outline=bg,width=17)
         bar.lower(bar.create_polygon((12,12,x2-x1-3,12,x2-x1-3,height-11,12,height-11),fill=outline,outline=outline,width=17))
-        boxback = bar.add_listbox((7,7),x2-x1-15,height-23,bg=bg,fg=fg,data=content,activebg=activebg,sel=activebg,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)[1]
+        boxback = bar.add_listbox((7,7),x2-x1-15,height-23,bg=bg,fg=fg,data=content,activebg=listactivebg,sel=listactivebg,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)[1]
         bar.delete(boxback)
         self.__auto_anchor(uid,pos,anchor)
         readyshow()
@@ -935,7 +946,7 @@ class BasicTinUI(Canvas):
         self.__auto_anchor(uid,pos,anchor)
         return uid
 
-    def add_onoff(self,pos:tuple,fg='#575757',bg='#e5e5e5',onfg='#FFFFFF',onbg='#3041d8',anchor='nw',bd:int=40,command=None):#绘制开关控件
+    def add_onoff(self,pos:tuple,fg='#5a5a5a',bg='#ededed',activefg='#575757',activebg='#e5e5e5',onactivefg='#ffffff',onactivebg='#1975c5',onfg='#FFFFFF',onbg='#3041d8',anchor='nw',bd:int=40,command=None):#绘制开关控件
         def __on():
             nonlocal nowstate
             nowstate='on'
@@ -967,6 +978,24 @@ class BasicTinUI(Canvas):
                 self.itemconfig(back,fill=bg)
                 self.itemconfig(outline,fill=fg)
                 __off()
+        def mouse_in(event):
+            if nowstate == 'on':
+                self.itemconfig(state, fill=onactivefg)
+                self.itemconfig(back, fill=onactivebg)
+                self.itemconfig(outline, fill=onactivebg)
+            else:
+                self.itemconfig(state, fill=activefg)
+                self.itemconfig(back, fill=activebg)
+                self.itemconfig(outline, fill=activefg)
+        def mouse_out(event):
+            if nowstate == 'on':
+                self.itemconfig(state, fill=onfg)
+                self.itemconfig(back, fill=onbg)
+                self.itemconfig(outline, fill=onbg)
+            else:
+                self.itemconfig(state, fill=fg)
+                self.itemconfig(back, fill=bg)
+                self.itemconfig(outline, fill=fg)
         def on():#开启
             if nowstate=='off':
                 self.itemconfig(state,fill=onfg)
@@ -1005,6 +1034,8 @@ class BasicTinUI(Canvas):
         bbox=self.bbox(outline)
         state=self.create_text((bbox[0]+(bd/10*3)+1,(bbox[1]+bbox[3])/2-1),text='\uF127',font='{Segoe Fluent Icons} '+str(int(bd/4)),fill=fg,tags=uid,anchor='center')
         self.tag_bind(uid,'<Button-1>',__on_click)
+        self.tag_bind(uid,'<Enter>',mouse_in)
+        self.tag_bind(uid,'<Leave>',mouse_out)
         funcs=FuncList(4)
         funcs.on=on
         funcs.off=off

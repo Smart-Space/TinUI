@@ -18,7 +18,7 @@ TinUI基于tkinter的画布（Canvas），可以作为整个窗口的唯一控�
 
 ## 依赖
 
-无。
+目前，TinUI没有依赖项目。
 
 ## 开源协议
 
@@ -96,18 +96,6 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 ### clean_windows()
 
 清除浮出控件的子窗口，需要开发者手动释放子窗口。
-
----
-
-### show_location(state=True,color='red',command=None)
-
-state::是否显示十字坐标确定线
-
-color::线条颜色
-
-command::反馈函数，应当接受两个参数，`x`, `y`
-
-启用十字定位并反馈鼠标所在位置的坐标。
 
 ---
 
@@ -436,7 +424,7 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 
 ---
 
-### add_combobox(self,pos:tuple,width:int=200,height:int=200,text='',content:tuple=(),fg='#1a1a1a',bg='#f8f8f8',outline='#c8c8c8',activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',listactivebg='#f0f0f0',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',tran='#01FF11',font=('微软雅黑',12),anchor='nw',command=None)
+### add_combobox(self,pos:tuple,width:int=200,height:int=200,text='',content:tuple=(),fg='#1a1a1a',bg='#f8f8f8',outline='#c8c8c8',activefg='#191919',activebg='#f1f1f1',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',tran='#01FF11',font=('微软雅黑',12),anchor='nw',command=None)
 
 - pos::位置
 - width::组合框显示区宽度
@@ -446,13 +434,8 @@ command::反馈函数，应当接受两个参数，`x`, `y`
 - fg::组合框文本、边框颜色
 - bg::组合框背景色
 - outline::下拉框边框颜色
-- activefg::组合框选定时文本、边框颜色，鼠标进入时文本颜色
-- activebg::鼠标进入时背景颜色
-- activeline::鼠标进入时边框颜色
-- onfg::鼠标点击时文本颜色
-- onbg::鼠标点击时背景颜色
-- online::鼠标点击时边框颜色
-- listactivebg::选定背景色
+- activefg::组合框选定时文本、边框颜色
+- activebg::组合框选定时文本、边框背景色
 - scrollbg::滚动条背景色
 - scrollcolor::滚动条颜色
 - scrollon::滚动条标识颜色

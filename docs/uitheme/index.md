@@ -1,5 +1,6 @@
 ---
-sort: 5
+title: TinUI样式
+nav_order: 5
 ---
 # TinUI样式
 

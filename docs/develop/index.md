@@ -1,5 +1,6 @@
 ---
-sort: 7
+title: TinUI开发
+nav_order: 7
 ---
 # TinUI开发
 

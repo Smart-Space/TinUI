@@ -1,5 +1,6 @@
 ---
-sort: 2
+title: TinUI控件
+nav_order: 2
 ---
 # TinUI控件
 

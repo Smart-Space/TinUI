@@ -1,5 +1,6 @@
 ---
-sort: 3
+title: TinUI对话框
+nav_order: 3
 ---
 # TinUI对话框
 

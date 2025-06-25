@@ -1,5 +1,6 @@
 ---
-sort: 6
+title: TinUIXml
+nav_order: 6
 ---
 # TinUIXml
 `TinUIXml`允许通过xml语言来绘制TinUI组件。

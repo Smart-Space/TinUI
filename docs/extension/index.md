@@ -1,5 +1,6 @@
 ---
-sort: 4
+title: TinUI拓展
+nav_order: 4
 ---
 # TinUI拓展
 

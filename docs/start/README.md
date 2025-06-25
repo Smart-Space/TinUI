@@ -1,5 +1,6 @@
 ---
-sort: 1
+title: Quick Start
+nav_order: 1
 ---
 # 快速开始
 

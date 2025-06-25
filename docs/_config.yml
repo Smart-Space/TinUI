@@ -2,10 +2,11 @@ title: TinUI
 lang: zh-cn
 description: 轻量的tkinter现代样式控件
 remote_theme: just-the-docs/just-the-docs
+favicon_ico: "./LOGO.ico"
 
 site_author: Smart-Space
 aux_links:
-  Template Repository: "https://github.com/smart-space/tinui"
+  TinUI Repository: "https://github.com/smart-space/tinui"
 
 exclude:
   - Makefile

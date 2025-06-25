@@ -1,7 +1,7 @@
 title: TinUI
 lang: zh-cn
 description: 轻量的tkinter现代样式控件
-remote_theme: just-the-docs
+remote_theme: just-the-docs/just-the-docs
 
 site_author: Smart-Space
 aux_links:

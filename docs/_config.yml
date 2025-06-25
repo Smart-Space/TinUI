@@ -1,8 +1,11 @@
 title: TinUI
 lang: zh-cn
 description: 轻量的tkinter现代样式控件
-
 remote_theme: clearpathrobotics/jekyll-rtd-theme
+
+site_author: Smart-Space
+repo_url: "https://github.com/smart-space/tinui"
+search_enabled: true
 
 readme_index:
   with_frontmatter: true

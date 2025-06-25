@@ -18,7 +18,7 @@ TinUI使用GPLv3作为开源协议。
 
 ## 更新日志
 
-[TinUI更新日志](https://tinui.smart-space.com.cn/changelog/ChangeLog.txt)。
+[TinUI更新日志](https://tinui.smart-space.com.cn/develop/ChangeLog.txt)。
 
 ## 新想法
 

@@ -12,6 +12,6 @@ u=a.u
 u.add_button((2,5),'选定第三个值',command=select)
 u.add_button((150,5),'禁用',command=disable)
 u.add_button((220,5),'启用',command=active)
-_,_,_,funcs,_=u.add_combobox((2,50),text='test combobox',content=('1','2','3','4','5'))
+_,_,_,funcs,_=u.add_combobox((2,50),text='test combobox',height=180,content=('1','2','3','4','5'))
 
 a.go()

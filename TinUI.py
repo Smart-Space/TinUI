@@ -824,7 +824,7 @@ class BasicTinUI(Canvas):
         bar.pack(fill='both',expand=True)
         bar.create_polygon((13,13,x2-x1-4,13,x2-x1-4,height-12,13,height-12),fill=bg,outline=bg,width=17)
         bar.lower(bar.create_polygon((12,12,x2-x1-3,12,x2-x1-3,height-11,12,height-11),fill=outline,outline=outline,width=17))
-        boxback = bar.add_listbox((7,7),x2-x1-15,height-23,bg=bg,fg=fg,data=content,activebg=listactivebg,sel=listactivebg,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)[1]
+        boxback = bar.add_listbox((7,7),x2-x1-7,height-15,bg=bg,fg=fg,data=content,activebg=listactivebg,sel=listactivebg,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)[1]
         bar.delete(boxback)
         self.__auto_anchor(uid,pos,anchor)
         readyshow()
@@ -1681,7 +1681,7 @@ class BasicTinUI(Canvas):
         def repaint_back():
             for v in choices.values():
                 bbox=box.coords(v[2])
-                box.coords(v[2],3,bbox[1],5+maxwidth+2,bbox[3])
+                box.coords(v[2],3,bbox[1],maxwidth+1,bbox[3])
         def in_mouse(t):
             if choices[t][-1]==True:#已被选中
                 return
@@ -1706,7 +1706,7 @@ class BasicTinUI(Canvas):
                 result.index=index
                 command(result)
         def _add(item:str='new item'):#添加元素
-            load_data({item})
+            load_data({item,})
             #return choices
         def _delete(index:int=0):#删除元素，默认第一个
             nonlocal maxwidth
@@ -1715,13 +1715,13 @@ class BasicTinUI(Canvas):
                 return
             key=all_keys[index]
             bbox=box.bbox(choices[key][2])#获取背景尺寸
-            height=bbox[3]-bbox[1]#高度 元素之间差7 "end+7"
+            item_height=bbox[3]-bbox[1]#高度 元素之间差7 "end+7"
             for cid in choices[key][1:3]:#[1],[2]
                 box.delete(cid)
             if index+1!=total:#往下所有元素上移
                 for keyid in all_keys[index+1:]:
-                    box.move(choices[keyid][1],0,-height-2)
-                    box.move(choices[keyid][2],0,-height-2)
+                    box.move(choices[keyid][1],0,-item_height-2)
+                    box.move(choices[keyid][2],0,-item_height-2)
             del choices[key]
             del all_keys[index]
             tbbox=box.bbox('textcid')
@@ -1732,6 +1732,18 @@ class BasicTinUI(Canvas):
             bbox=box.bbox('all')
             if bbox == None:
                 bbox = (0, 0, 0, 0)
+            if bbox[2]-bbox[0] > width:
+                self.itemconfig(cavui, height=height-8)
+                self.itemconfig(vscroll, state='normal')
+            else:
+                self.itemconfig(cavui, height=height)
+                self.itemconfig(vscroll, state='hidden')
+            if bbox[3]-bbox[1] > height:
+                self.itemconfig(cavui, width=width-8)
+                self.itemconfig(hscroll, state='normal')
+            else:
+                self.itemconfig(cavui, width=width)
+                self.itemconfig(hscroll, state='hidden')
             box.config(scrollregion=bbox)
         def _clear():#清空元素
             nonlocal maxwidth
@@ -1741,6 +1753,10 @@ class BasicTinUI(Canvas):
             choices.clear()
             all_keys.clear()
             maxwidth=0
+            self.itemconfig(cavui, height=height)
+            self.itemconfig(vscroll, state='hidden')
+            self.itemconfig(cavui, width=width)
+            self.itemconfig(hscroll, state='hidden')
             box.config(scrollregion=(0,0,width,height))
         def load_data(datas):#导入元素
             nonlocal maxwidth
@@ -1765,7 +1781,19 @@ class BasicTinUI(Canvas):
             if maxwidth<width:
                 maxwidth=width
             repaint_back()
-            bbox=box.bbox('all')
+            bbox = box.bbox('all')
+            if bbox[2]-bbox[0] > width:
+                self.itemconfig(cavui, height=height-8)
+                self.itemconfig(vscroll, state='normal')
+            else:
+                self.itemconfig(cavui, height=height)
+                self.itemconfig(vscroll, state='hidden')
+            if bbox[3]-bbox[1] > height:
+                self.itemconfig(cavui, width=width-8)
+                self.itemconfig(hscroll, state='normal')
+            else:
+                self.itemconfig(cavui, width=width)
+                self.itemconfig(hscroll, state='hidden')
             box.config(scrollregion=bbox)
         def set_y_view(event):
             box.yview_scroll(int(-1*(event.delta/120)), "units")
@@ -1784,8 +1812,8 @@ class BasicTinUI(Canvas):
         cavui=self.create_window(pos,window=box,width=width,height=height,anchor='nw')
         uid='listbox'+str(cavui)
         self.addtag_withtag(uid,cavui)
-        hscroll = self.add_scrollbar((pos[0]+width,pos[1]),widget=box,height=height,bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]#纵向
-        vscroll = self.add_scrollbar((pos[0],pos[1]+height),widget=box,height=width,direction='x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]#横向
+        hscroll = self.add_scrollbar((pos[0]+width-8,pos[1]),widget=box,height=height,bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]#纵向
+        vscroll = self.add_scrollbar((pos[0],pos[1]+height-8),widget=box,height=width,direction='x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]#横向
         self.addtag_withtag(uid, hscroll)
         self.addtag_withtag(uid, vscroll)
         x1, y1, x2, y2 = self.bbox(uid)
@@ -2887,13 +2915,13 @@ class BasicTinUI(Canvas):
                 self.itemconfig(cavui, height=height)
                 self.itemconfig(vscroll, state='hidden')
             else:
-                self.itemconfig(cavui, height=height-5)
+                self.itemconfig(cavui, height=height-8)
                 self.itemconfig(vscroll, state='normal')
             if bbox[3]-bbox[1] <= height:
                 self.itemconfig(cavui, width=width)
                 self.itemconfig(hscroll, state='hidden')
             else:
-                self.itemconfig(cavui, width=width-5)
+                self.itemconfig(cavui, width=width-8)
                 self.itemconfig(hscroll, state='normal')
             box.config(scrollregion=bbox)
         def close_view(sign,cid):#闭合
@@ -2926,13 +2954,13 @@ class BasicTinUI(Canvas):
                 self.itemconfig(cavui, height=height)
                 self.itemconfig(vscroll, state='hidden')
             else:
-                self.itemconfig(cavui, height=height-5)
+                self.itemconfig(cavui, height=height-8)
                 self.itemconfig(vscroll, state='normal')
             if bbox[3]-bbox[1] <= height:
                 self.itemconfig(cavui, width=width)
                 self.itemconfig(hscroll, state='hidden')
             else:
-                self.itemconfig(cavui, width=width-5)
+                self.itemconfig(cavui, width=width-8)
                 self.itemconfig(hscroll, state='normal')
             box.config(scrollregion=bbox)
         def bindview(event):
@@ -2953,8 +2981,8 @@ class BasicTinUI(Canvas):
         cavui=self.create_window(pos,window=box,width=width,height=height,anchor='nw')
         uid='treeview'+str(cavui)
         self.addtag_withtag(uid,cavui)
-        hscroll = self.add_scrollbar((pos[0]+width-6,pos[1]),widget=box,height=height,bg=bg,color=signcolor,oncolor=signcolor)[-1]#纵向
-        vscroll = self.add_scrollbar((pos[0],pos[1]+height-6),widget=box,height=width,direction='x',bg=bg,color=signcolor,oncolor=signcolor)[-1]#横向
+        hscroll = self.add_scrollbar((pos[0]+width-8,pos[1]),widget=box,height=height,bg=bg,color=signcolor,oncolor=signcolor)[-1]#纵向
+        vscroll = self.add_scrollbar((pos[0],pos[1]+height-8),widget=box,height=width,direction='x',bg=bg,color=signcolor,oncolor=signcolor)[-1]#横向
         self.addtag_withtag(uid, hscroll)
         self.addtag_withtag(uid, vscroll)
         #id为back的uid
@@ -2977,13 +3005,13 @@ class BasicTinUI(Canvas):
             self.itemconfig(cavui, height=height)
             self.itemconfig(vscroll, state='hidden')
         else:
-            self.itemconfig(cavui, height=height-5)
+            self.itemconfig(cavui, height=height-8)
             self.itemconfig(vscroll, state='normal')
         if bbox[3]-bbox[1] <= height:
             self.itemconfig(cavui, width=width)
             self.itemconfig(hscroll, state='hidden')
         else:
-            self.itemconfig(cavui, width=width-5)
+            self.itemconfig(cavui, width=width-8)
             self.itemconfig(hscroll, state='normal')
         box.config(scrollregion=bbox)
         box.move(line,0,-linew-height)

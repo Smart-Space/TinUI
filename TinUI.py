@@ -3690,7 +3690,7 @@ class BasicTinUI(Canvas):
         self.__auto_anchor(uid,pos,anchor)
         return outline,back,buttons,uid
 
-    def add_flyout(self, fid, width:int=250, height:int=150, bind='<Button-1>', line='#dcdcdc', bg='#f9f9f9', anchor='n', pos=None):# 绘制一个浮出ui控件
+    def add_flyout(self, fid, width:int=250, height:int=150, bind='<Button-1>', line='#dcdcdc', bg='#f9f9f9', anchor='n', offset:tuple[int,int]=(0,0), pos=None):# 绘制一个浮出ui控件
         # 注意，默认布局在fid正上方
         def show(e):
             self.tag_unbind(fid, bind)# 避免接下来绑定self <button-1>事件时同步触发
@@ -3778,6 +3778,8 @@ class BasicTinUI(Canvas):
             y = (bbox[1] + bbox[3]) / 2
             _anchor = 'center'
             dxy = (1, 1)
+        x += offset[0]
+        y += offset[1]
         uid = self.create_window(x, y, width=width, height=height, window=ui, anchor=_anchor)
         self.itemconfig(uid, state='hidden')
         self.tag_bind(fid, bind, show)
@@ -3933,7 +3935,7 @@ class TinUIXml():#TinUI的xml渲染方式
             self.realui = ui
         self.noload=('','menubar','tooltip')#当前不解析的标签
         self.intargs=('width','linew','bd','r','minwidth','maxwidth','start','padx','pady','info_width','height','num','delay',)#需要转为数字的参数
-        self.dataargs=('command','choices','widgets','content','percentage','data','cont','scrollbar','widget',)#需要转为数据结构的参数
+        self.dataargs=('command','choices','widgets','content','percentage','data','cont','scrollbar','widget','offset',)#需要转为数据结构的参数
         self.funcs=TinUIXmlFuncDict()# 内部调用方法集合
         self.datas={}#内部数据结构集合
         self.tags={}#内部组件tag集合
@@ -4300,7 +4302,7 @@ if __name__=='__main__':
     b.add_menubutton((1500,50),'menubutton',cont=(('command',print),('menu',test1),'-',('TinUI文本移动',test)))
     b.add_barbutton((1500,150))
     flylabel = b.add_label((1500,500),text='点击展开浮出UI')[-1]
-    _, flyxml, flyhide, _ = b.add_flyout(flylabel)
+    _, flyxml, flyhide, _ = b.add_flyout(flylabel, offset=(-20, 0))
     flyxml.funcs['flyhide']=flyhide
     flyxml.loadxml('''<tinui><line><paragraph text='浮出UI'></paragraph></line>
     <line><paragraph text='add_flyout(fid, anchor="...")'></paragraph></line>

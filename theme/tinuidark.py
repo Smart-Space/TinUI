@@ -77,7 +77,8 @@ class TinUIDark(TinUITheme):
                fg='#cfcfcf',bg='#2d2d2d',outline='#303030',
                activefg='#ffffff',activebg='#323232',activeline='#303030',
                onfg='#cecece',onbg='#272727',online='#303030',
-               listactivebg='#383838',
+               listfg='#ffffff',listactivefg='#ffffff',listactivebg='#373737',
+               listonfg='#ffffff',listonbg='#333333',listsel='#465097',
                scrollbg='#2c2c2c',scrollcolor='#9f9f9f',scrollon='#a0a0a0',
                                     *arg,**kw)
 
@@ -149,7 +150,9 @@ class TinUIDark(TinUITheme):
 
     def add_listbox(self,pos,*arg,**kw):
         return self.ui.add_listbox(pos,
-                bg='#2b2b2b',fg='white',activebg='#b4bbea',sel='#465097',
+                bg='#2b2b2b',fg='white',
+                activefg='#ffffff',activebg='#373737',
+                onfg='#ffffff',onbg='#333333',sel='#465097',
                 scrollbg='#2e2e2e',scrollcolor='#9f9f9f',scrollon='#a0a0a0',
                                    *arg,**kw)
 

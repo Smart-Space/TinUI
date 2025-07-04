@@ -697,7 +697,7 @@ class BasicTinUI(Canvas):
         start()
         return back,balls,stop,uid
 
-    def add_combobox(self,pos:tuple,width:int=200,height:int=200,text='',content:tuple=(),fg='#1a1a1a',bg='#f8f8f8',outline='#c8c8c8',activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',listactivebg='#f0f0f0',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',tran='#01FF11',font=('微软雅黑',12),anchor='nw',command=None):#绘制组合/下拉框
+    def add_combobox(self,pos:tuple,width:int=200,height:int=200,text='',content:tuple=(),fg='#1a1a1a',bg='#f8f8f8',outline='#c8c8c8',activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',listfg='#1a1a1a',listactivefg='#191919',listactivebg='#e9e9e9',listonfg='#191919',listonbg='#ececec',listsel='#b4bbea',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',tran='#01FF11',font=('微软雅黑',12),anchor='nw',command=None):#绘制组合/下拉框
         def open_box(event):
             mouseout(None)
             self.move(button, 0, -1)
@@ -824,7 +824,7 @@ class BasicTinUI(Canvas):
         bar.pack(fill='both',expand=True)
         bar.create_polygon((13,13,x2-x1-4,13,x2-x1-4,height-12,13,height-12),fill=bg,outline=bg,width=17)
         bar.lower(bar.create_polygon((12,12,x2-x1-3,12,x2-x1-3,height-11,12,height-11),fill=outline,outline=outline,width=17))
-        boxback = bar.add_listbox((7,7),x2-x1-7,height-15,bg=bg,fg=fg,data=content,activebg=listactivebg,sel=listactivebg,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)[1]
+        boxback = bar.add_listbox((7,7),x2-x1-7,height-15,bg=bg,fg=listfg,data=content,activefg=listactivefg,activebg=listactivebg,onfg=listonfg,onbg=listonbg,sel=listsel,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)[1]
         bar.delete(boxback)
         self.__auto_anchor(uid,pos,anchor)
         readyshow()
@@ -1677,7 +1677,7 @@ class BasicTinUI(Canvas):
         self.tag_bind(back,'<Button-1>',backmove)
         return top,bottom,back,sc,uid
 
-    def add_listbox(self,pos:tuple,width:int=200,height:int=200,font='微软雅黑 12',data=('a','b','c'),bg='#f2f2f2',fg='black',activebg='#e9e9e9',sel='#b4bbea',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',anchor='nw',command=None):#绘制列表框
+    def add_listbox(self,pos:tuple,width:int=200,height:int=200,font='微软雅黑 12',data=('a','b','c'),fg='#1a1a1a',bg='#f2f2f2',activefg='#191919',activebg='#e9e9e9',onfg='#191919',onbg='#ececec',sel='#b4bbea',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',anchor='nw',command=None):#绘制列表框
         def repaint_back():
             for v in choices.values():
                 bbox=box.coords(v[2])
@@ -1685,14 +1685,23 @@ class BasicTinUI(Canvas):
         def in_mouse(t):
             if choices[t][-1]==True:#已被选中
                 return
-            box.itemconfig(choices[t][2],fill=activebg)
+            box.itemconfig(choices[t][1], fill=activefg)
+            box.itemconfig(choices[t][2], fill=activebg)
         def out_mouse(t):
             if choices[t][-1]==True:#已被选中
-                box.itemconfig(choices[t][2],fill=sel)
+                box.itemconfig(choices[t][1], fill=onfg)
+                box.itemconfig(choices[t][2], fill=sel)
             else:
-                box.itemconfig(choices[t][2],fill=bg)
+                box.itemconfig(choices[t][1], fill=fg)
+                box.itemconfig(choices[t][2], fill=bg)
+        def mouse_click(t):
+            if choices[t][-1]==True:#已被选中
+                return
+            box.itemconfig(choices[t][1], fill=onfg)
+            box.itemconfig(choices[t][2], fill=onbg)
         def sel_it(t):
-            box.itemconfig(choices[t][2],fill=sel)
+            box.itemconfig(choices[t][1], fill=onfg)
+            box.itemconfig(choices[t][2], fill=sel)
             choices[t][-1]=True
             for i in choices.keys():
                 if i==t:
@@ -1772,7 +1781,8 @@ class BasicTinUI(Canvas):
                 for item_id in (text, back):
                     box.tag_bind(item_id, '<Enter>', lambda event,text=text : in_mouse(text))
                     box.tag_bind(item_id, '<Leave>', lambda event,text=text : out_mouse(text))
-                    box.tag_bind(item_id, '<Button-1>', lambda event,text=text : sel_it(text))
+                    box.tag_bind(item_id, '<Button-1>', lambda event,text=text : mouse_click(text))
+                    box.tag_bind(item_id, '<ButtonRelease-1>', lambda event,text=text : sel_it(text))
             tbbox=box.bbox('textcid')
             if tbbox==None:
                 return
@@ -3475,7 +3485,6 @@ class BasicTinUI(Canvas):
                 back=box.create_rectangle((3,bbox[1]-4,3+mw,bbox[3]+4),width=0,fill=bg)
                 box.tkraise(text)
                 box.choices[text]=[i,text,back,False]#用文本id代表键，避免选项文本重复带来的逻辑错误
-                #box.all_keys.append(text)
                 for item_id in (text, back):
                     box.tag_bind(item_id,'<Enter>',lambda event,text=text : pick_in_mouse(event,text))
                     box.tag_bind(item_id,'<Leave>',lambda event,text=text : pick_out_mouse(event,text))

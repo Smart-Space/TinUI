@@ -1,8 +1,11 @@
 from window import win
 
+index=-1
 def additem(e):
     uixml = funcs.add()[-2]
     uixml.loadxml(onexml)
+def deleteitemthis(e):
+    funcs.delete(index)
 def add10(e):
     for i in range(0,10):
         additem(e)
@@ -13,6 +16,8 @@ def deleteitem1(e):
 def deleteall(e):
     funcs.clear()
 def print__(name):
+    global index
+    index=name
     print(name)
 
 a=win()
@@ -52,6 +57,7 @@ for i in range(0,5):
     </tinui>''')
 
 u.add_button((5,320),'添加元素',command=additem)
+u.add_button((5,370),'删除元素',command=deleteitemthis)
 u.add_button((120,320),'删除第一个元素',command=deleteitem1)
 u.add_button((120,370),'删除第二个元素',command=deleteitem)
 u.add_button((120,420),'清空元素',command=deleteall)

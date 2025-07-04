@@ -1882,14 +1882,16 @@ class BasicTinUI(Canvas):
             return items[index]
         def delete(index):#删除 add_ui uid
             nonlocal endy, nowon
-            if index>len(items)-1:
+            if index >= len(items):
                 return
-            if index==nowon:
+            if index == nowon:
                 ui.move(line,0,-linew-height)
-            elif index>nowon:
-                pass
-            elif index<nowon:
-                nowon-=1
+                print(ui.bbox(line))
+                nowon = -1
+                ui.moveto(line, 1, -linew)
+                print(ui.bbox(line))
+            elif index < nowon:
+                nowon -= 1
                 ui.move(line, 0, -linew-2)
             endy-=linew+2
             subui=items[index]

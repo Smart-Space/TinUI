@@ -10,6 +10,7 @@
 2025-
 1. 修复listview删除元素后标识线错位的问题
 2. combobox, listbox添加过渡色
+3. tooltip计时使用tcl/tk原生after方法
 
 ==========5.32==========
 2025-6-29

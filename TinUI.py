@@ -8,7 +8,6 @@ from tkinter import Tk, Toplevel, Canvas, Entry, Text, Scrollbar, Frame, PhotoIm
 from tkinter import ttk
 from tkinter import font as tkfont
 from webbrowser import open as webopen
-from threading import Timer
 from typing import Union
 from xml.etree import ElementTree  as ET
 import sys
@@ -1367,13 +1366,7 @@ class BasicTinUI(Canvas):
                 first=False
                 first_create()
             if delay!=0 and flag:
-                if timethread==None:#重复利用计时器，避免占用资源
-                    timethread=Timer(delay,show_toti,[event,None])
-                    timethread.start()
-                else:
-                    timethread.finished.clear()#恢复上一次计时标记
-                    timethread.args=[event,None]
-                    timethread.run()
+                timethread = self.after(delay*1000, show_toti, event, None)
                 return
             sx,sy=event.x_root,event.y_root
             if sx+width>maxx:
@@ -1388,7 +1381,7 @@ class BasicTinUI(Canvas):
             toti.deiconify()
         def hide_toti(event):
             if delay!=0:
-                timethread.cancel()
+                self.after_cancel(timethread)
             toti.withdraw()
         def first_create():#首次使用时创建
             nonlocal toti, bar, bbox, width, height

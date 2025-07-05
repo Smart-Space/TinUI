@@ -23,13 +23,11 @@ import uuid
 语言：Python
 技术基础：tkinter（tcl/tk）
 开源平台：pypi、GitHub、csdn
-开源协议：GPLv3
-贡献者：（暂无）
-使用条款简述：注明TinUI的开发者，修改后必须开源本文件，且同样使用GPL协议。商业软件需要为TinUI提供开源许可，并声明开发者版权所有
+开源协议：GPLv3, LGPLv3
 '''
 
 
-class TinUIStructure:#数据载体，作者学习阶段的历史遗留产物
+class TinUIStructure:
     pass
 
 
@@ -4314,15 +4312,6 @@ if __name__=='__main__':
     <line><button2 text='关闭浮出UI控件' command="self.funcs['flyhide']"></button2>
     </line></tinui>''')
 
-    # uevent=TinUIEvent(b)
-
     b.bind('<Destroy>',lambda e:b.clean_windows())
-
-    # if platform.system()=='Windows':
-    #     import ctypes
-    #     ctypes.windll.shcore.SetProcessDpiAwareness(1)
-    #     factor=ctypes.windll.shcore.GetScaleFactorForDevice(0)
-    #     a.tk.call('tk', 'scaling', 96/72)
-    #     b.scale('all', 0, 0, 96/72, 96/72)
 
     a.mainloop()

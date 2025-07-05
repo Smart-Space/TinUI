@@ -1886,11 +1886,8 @@ class BasicTinUI(Canvas):
             if index >= len(items):
                 return
             if index == nowon:
-                ui.move(line,0,-linew-height)
-                print(ui.bbox(line))
                 nowon = -1
                 ui.moveto(line, 1, -linew)
-                print(ui.bbox(line))
             elif index < nowon:
                 nowon -= 1
                 ui.move(line, 0, -linew-2)
@@ -3920,6 +3917,9 @@ class TinUIXmlFuncDict:
         for key, value in other.items():
             self[key] = value
     
+    def clear(self):
+        self.data.clear()
+    
     def __repr__(self):
         return f'{type(self).__name__}({self.data})'
 
@@ -4101,6 +4101,11 @@ class TinUIXml():#TinUI的xml渲染方式
     def clean(self):#清空TinUI
         self.realui.delete('all')
         self.realui.clean_windows()
+        self.funcs.clear()
+        self.datas.clear()
+        self.tags.clear()
+        self.xendx,self.xendy=5,5#横向最宽原点
+        self.yendx,self.yendy=5,5#纵向最低原点
 
 
 tinui_dir=os.path.dirname(os.path.abspath(__file__))

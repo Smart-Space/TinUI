@@ -430,6 +430,7 @@ class BasicTinUI(Canvas):
         entry.bind('<Enter>', mouse_enter)
         entry.bind('<Leave>', mouse_leave)
         funce=self.create_window(pos,window=entry,width=width,anchor='nw')#输入框画布对象
+        self.windows.append(entry)
         uid='entry'+str(funce)
         self.itemconfig(funce,tags=uid)
         bbox=self.bbox(funce)
@@ -1098,6 +1099,7 @@ class BasicTinUI(Canvas):
             now=data[0]
         wentry.insert(0,now)
         entry=self.create_window(pos,window=wentry,width=width,anchor='nw')
+        self.windows.append(wentry)
         uid='spinbox'+str(entry)
         self.itemconfig(entry,tags=uid)
         _font=tkfont.Font(font=font)
@@ -1499,6 +1501,7 @@ class BasicTinUI(Canvas):
             textbox.config(**kw)
         textbox=Text(self,font=font,fg=fg,bg=bg,highlightthickness=linew,highlightbackground=outline,highlightcolor=onoutline,relief='flat')
         cavui=self.create_window(pos,window=textbox,width=width,height=height,anchor=anchor)
+        self.windows.append(textbox)
         uid='textbox'+str(cavui)
         self.addtag_withtag(uid,cavui)
         textbox.insert(1.0,text)
@@ -1811,6 +1814,7 @@ class BasicTinUI(Canvas):
         box=BasicTinUI(self,bg=bg,width=width,height=height)#显示选择内容
         box.place(x=12,y=12)
         cavui=self.create_window(pos,window=box,width=width,height=height,anchor='nw')
+        self.windows.append(box)
         uid='listbox'+str(cavui)
         self.addtag_withtag(uid,cavui)
         hscroll = self.add_scrollbar((pos[0]+width-8,pos[1]),widget=box,height=height,bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]#纵向
@@ -1937,6 +1941,7 @@ class BasicTinUI(Canvas):
         nowon=-1
         ui=BasicTinUI(self,bg=bg)
         view=self.create_window(pos,window=ui,height=height,width=width,anchor=anchor)
+        self.windows.append(ui)
         uid='listview'+str(view)
         self.addtag_withtag(uid,view)
         bbox=self.bbox(view)
@@ -1970,6 +1975,7 @@ class BasicTinUI(Canvas):
             canvas.config(scrollregion=canvas.bbox('all'))
         canvas=Canvas(self,bg=bg,highlightthickness=linew,highlightbackground=outline,highlightcolor=outline,relief='flat')
         cavui=self.create_window(pos,window=canvas,width=width,height=height,anchor=anchor)
+        self.windows.append(canvas)
         uid='canvas'+str(cavui)
         self.addtag_withtag(uid,cavui)
         if scrollbar==True:
@@ -1992,6 +1998,7 @@ class BasicTinUI(Canvas):
             ui.config(scrollregion=ui.bbox('all'))
         ui=BasicTinUI(self,bg=bg)
         cavui=self.create_window(pos,window=ui,width=width,height=height,anchor=anchor)
+        self.windows.append(ui)
         uid='ui'+str(cavui)
         self.addtag_withtag(uid,cavui)
         if scrollbar==True:
@@ -2101,12 +2108,14 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(uid,rightbutton)
         bar=Canvas(self,bg=bg,highlightthickness=0,relief='flat')#导航栏
         self.create_window((startx,doty),window=bar,width=width,height=11,anchor='nw',tags=uid)
+        self.windows.append(bar)
         dotx=3
         for _ in range(0,num):
             ui=BasicTinUI(self,bg=bg)
             tinuixml=TinUIXml(ui)
             ui.bind('<Destroy>', lambda event, uixml=tinuixml: self.__delete_uixml(uixml))
             uiid=self.create_window((startx,pos[1]),window=ui,width=width,height=height,state='hidden',anchor='nw',tags=uid)
+            self.windows.append(ui)
             uilist.append((uiid,ui,tinuixml))
             dot=bar.create_text((dotx+2,5.5),text='•',fill=fg,font=('微软雅黑',8),anchor='center')
             dotlist.append(dot)
@@ -2175,9 +2184,11 @@ class BasicTinUI(Canvas):
             if scrollbar:
                 page=TinUI(self,True,bg=self['background'])
                 uiid=self.create_window(viewpos,window=page.frame,width=width+1,height=height-3,anchor='nw',state='hidden')
+                self.windows.append(page.frame)
             elif scrollbar==False:
                 page=BasicTinUI(self,bg=self['background'])
                 uiid=self.create_window(viewpos,window=page,width=width+1,height=height-3,anchor='nw',state='hidden')
+                self.windows.append(page)
             uixml=TinUIXml(page)
             page.bind('<Destroy>', lambda event: self.__delete_uixml(uixml))
             bbox=tbu.bbox('all')
@@ -2290,6 +2301,7 @@ class BasicTinUI(Canvas):
             tbu.config(scrollregion=bbox)
         tbu=BasicTinUI(self,bg=color)
         tbuid=self.create_window((pos[0]+2,pos[1]+2),window=tbu,width=width,height=30,anchor='nw')
+        self.windows.append(tbu)
         uid='notebook'+str(tbuid)
         labeluid='notebooklabel'#标签元素名称
         movename='movetags'#更改标题时整体移动的临时名称
@@ -2744,8 +2756,10 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(contentid,button[-1])
         if not scrollbar:#不使用滚动条，BasicTinUI
             ui=BasicTinUI(self,bg=bg)
+            self.windows.append(ui)
         elif scrollbar:#使用TinUI
             ui=TinUI(self,bg=bg)
+            self.windows.append(ui.frame)
         ux=TinUIXml(ui)
         ui.bind('<Destroy>', lambda event: self.__delete_uixml(ux))
         content=self.create_window((tx1-3,ty2+10),window=ui,anchor='nw',width=width+6,height=height,tags=(uid,contentid),state='hidden')#便笺内容
@@ -2792,6 +2806,7 @@ class BasicTinUI(Canvas):
             wait=False
         frame=BasicTinUI(self,width=width,height=height,bg=bg)
         frameid=self.create_window(pos,window=frame,width=width,height=height,anchor=anchor)
+        self.windows.append(frame)
         uid='waitframe'+str(frameid)
         self.addtag_withtag(uid,frameid)
         itemfg=frame.create_polygon((0,0,width,0,width,height,0,height),outline=fg,fill=fg,width=17)
@@ -2990,6 +3005,7 @@ class BasicTinUI(Canvas):
         box=BasicTinUI(self,bg=bg,width=width,height=height)#显示选择内容
         box.place(x=12,y=12)
         cavui=self.create_window(pos,window=box,width=width,height=height,anchor='nw')
+        self.windows.append(box)
         uid='treeview'+str(cavui)
         self.addtag_withtag(uid,cavui)
         hscroll = self.add_scrollbar((pos[0]+width-8,pos[1]),widget=box,height=height,bg=bg,color=signcolor,oncolor=signcolor)[-1]#纵向
@@ -3105,6 +3121,7 @@ class BasicTinUI(Canvas):
         entry.bind('<Enter>', mouse_enter)
         entry.bind('<Leave>', mouse_leave)
         funce=self.create_window(pos,window=entry,width=width,anchor=anchor)#输入框画布对象
+        self.windows.append(entry)
         uid='entry'+str(funce)
         self.itemconfig(funce,tags=uid)
         bbox=self.bbox(funce)
@@ -3337,6 +3354,7 @@ class BasicTinUI(Canvas):
         itemw=width//6#背景元素宽度。软限制为6个，多出内容没有意义
         back=BasicTinUI(self,bg=line)#背景容器
         backitem=self.create_window(pos,width=width+2,height=height+2,anchor='nw',window=back)
+        self.windows.append(back)
         uid='swipecontrol'+str(backitem)
         self.addtag_withtag(uid,backitem)
         right,left='rights','lefts'#背景元素位置
@@ -3739,6 +3757,7 @@ class BasicTinUI(Canvas):
                 # 仅当i=19并且是收缩时有效
                 self.itemconfig(uid, state='hidden')
         ui = BasicTinUI(self, bg=bg, highlightbackground=line, highlightthickness=1, relief='flat')
+        self.windows.append(ui)
         uixml = TinUIXml(ui)
         ui.bind('<Destroy>', lambda event: self.__delete_uixml(uixml))
         # 围绕fid进行布局

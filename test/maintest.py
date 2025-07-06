@@ -21,6 +21,7 @@ def loadcontrol(controlname):
     cfile=open("testpage/"+controlname+".xml",mode='r',encoding='utf-8')
     cxml=cfile.read()
     cfile.close()
+    displayui.delete('all')
     duixml.clean()
 
     duixml.funcs["opentutest"] = opentutest

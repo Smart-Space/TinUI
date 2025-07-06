@@ -474,7 +474,7 @@ class BasicTinUI(Canvas):
             maxl=pos[0]+width
             nowl=pos[0]
             count=1
-            for i in range(pos[0],maxl,5):
+            for _ in range(pos[0],maxl,5):
                 nowl+=5
                 self.after(count*5,lambda x=nowl,y=pos[1] :action(x,y))
                 count+=1

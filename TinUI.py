@@ -198,7 +198,7 @@ class BasicTinUI(Canvas):
 
     def __delete_uixml(self, uixml):
         # 删除伴随TinUIXml
-        del uixml
+        uixml.clean()
     
     def clean_windows(self):
         #清除浮出控件子窗口
@@ -1859,8 +1859,7 @@ class BasicTinUI(Canvas):
         def bindyview(event):
             ui.yview_scroll(int(-1*(event.delta/120)), "units")
         def clean(event):
-            nonlocal items
-            del items
+            items.clear()
         def _load_item(num):
             nonlocal endy
             for _ in range(0,num):
@@ -1913,7 +1912,7 @@ class BasicTinUI(Canvas):
             num = len(items)
             if num == 0:
                 return
-            ui.move(line, 0, -linew*num-height)
+            ui.moveto(line, 1, -linew)
             endy = 0
             nowon = -1
             for subui in items:
@@ -1925,6 +1924,16 @@ class BasicTinUI(Canvas):
         def add():#增加 add_ui uid 到底部，并获取返回值
             _load_item(1)
             return items[-1]
+        def getsel():# 获取选中项
+            return nowon
+        def select(index):# 选中项，不会触发回调函数
+            nonlocal nowon
+            if index >= len(items) or index < 0 or index == nowon:
+                return
+            items[nowon][0]['background'] = bg
+            nowon = index
+            items[nowon][0]['background'] = activebg
+            ui.coords(line,1,index*(linew+2)+lineheight,1,index*(linew+2)+lineheight*2)
         nowon=-1
         ui=BasicTinUI(self,bg=bg)
         view=self.create_window(pos,window=ui,height=height,width=width,anchor=anchor)
@@ -1946,12 +1955,14 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(uid,allback)
         ui.bind('<MouseWheel>',bindyview)
         ui.bind('<Destroy>', clean)
-        funcs=FuncList(5)
+        funcs=FuncList(7)
         funcs.getitems=getitems
         funcs.getui=getui
         funcs.add=add
         funcs.delete=delete
         funcs.clear=clear
+        funcs.getsel=getsel
+        funcs.select=select
         return ui,scro,items,funcs,uid
 
     def add_canvas(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',linew=1,scrollbar=False,anchor='nw'):#绘制画布
@@ -3842,41 +3853,6 @@ class TinUI(BasicTinUI):
             self.after(self.update_time,self.update__)
 
 
-# class TinUIWidget(BasicTinUI):
-#     '''提供含单个元素控件的TinUI控件，用来在普通tkinter组件中使用'''
-
-#     def __init__(self,master,widget_name='ui',**kw):
-#         BasicTinUI.__init__(self,master,**kw)
-#         self.func=eval('self.add_'+widget_name)
-#         self.width=None
-#         self.height=None
-
-#     def get_size(self):#获取尺寸大小
-#         return self.width,self.height
-
-#     def load(self,*args,**kw):#载入控件
-#         self.uids=self.func(*args,**kw)
-#         self.reupdate()
-#         return self.uids
-
-#     def reupdate(self):#调整滚动范围
-#         state_l=list()
-#         ids=self.find_withtag(self.uids[-1])
-#         for i in ids:
-#             state_l.append(self.itemcget(i,'state'))
-#             self.itemconfig(i,state='normal')
-#         for i,s in zip(ids,state_l):
-#             self.itemconfig(i,state=s)
-#         bbox=list(self.bbox('all'))
-#         bbox[0]-=1
-#         bbox[1]-=1
-#         bbox[2]+=1
-#         bbox[3]+=1
-#         self['width']=self.width=bbox[2]-bbox[0]
-#         self['height']=self.height=bbox[3]-bbox[1]
-#         self.config(scrollregion=bbox)
-
-
 class TinUIXmlFunc:
 
     def __init__(self, function):
@@ -4099,7 +4075,6 @@ class TinUIXml():#TinUI的xml渲染方式
         self.datas=self.datas|dict_item
 
     def clean(self):#清空TinUI
-        self.realui.delete('all')
         self.realui.clean_windows()
         self.funcs.clear()
         self.datas.clear()
@@ -4190,8 +4165,6 @@ if __name__=='__main__':
     m=b.add_title((600,0),'TinUI is a modern way to show tkinter widget in your application, as they are drawn by tkinter canvas')
     m1=b.add_title((0,680),'test TinUI scrolled',size=2,angle=24)
     b.add_paragraph((2000,5),'location')
-    b.add_paragraph((20,290),'''     TinUI是基于tkinter画布开发的界面UI布局方案，作为tkinter拓展和TinEngine的拓展而存在。目前，TinUI已可应用于项目。''',
-    angle=-18)
     b.add_paragraph((20,100),'下面的段落是测试画布的非平行字体显示效果，也是TinUI的简单介绍')
     b.add_button((250,450),'测试按钮',activefg='white',activebg='red',command=test,anchor='center',maxwidth=100)
     b.add_checkbutton((60,430),'允许TinUI测试',command=test1,anchor='w')

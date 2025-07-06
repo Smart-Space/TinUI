@@ -1930,7 +1930,7 @@ class BasicTinUI(Canvas):
             return items[-1]
         def getsel():# 获取选中项
             return nowon
-        def select(index):# 选中项，不会触发回调函数
+        def select(index:int):# 选中项，不会触发回调函数
             nonlocal nowon
             if index >= len(items) or index < 0 or index == nowon:
                 return
@@ -1938,6 +1938,8 @@ class BasicTinUI(Canvas):
             nowon = index
             items[nowon][0]['background'] = activebg
             ui.coords(line,1,index*(linew+2)+lineheight,1,index*(linew+2)+lineheight*2)
+            index = max(index-1,0)
+            ui.yview_moveto(index/items.__len__())
         nowon=-1
         ui=BasicTinUI(self,bg=bg)
         view=self.create_window(pos,window=ui,height=height,width=width,anchor=anchor)
@@ -2097,9 +2099,9 @@ class BasicTinUI(Canvas):
                     bar.xview_moveto(lsrate)
                     bar.xview_scroll(-3,'unit')
         startx=pos[0]+20#按钮与主窗口间隔
-        uilist=list()#[(uiid-1,BasicTinUI-1,TinUIXml-1),(uiid-2,BasicTinUI-2,TinUIXml-2),...]
+        uilist=[]#[(uiid-1,BasicTinUI-1,TinUIXml-1),(uiid-2,BasicTinUI-2,TinUIXml-2),...]
         doty=pos[1]+height+5#控制点的起始纵坐标
-        dotlist=list()#[dot1,dot2,...]
+        dotlist=[]#[dot1,dot2,...]
         nowui=0#当前显示界面序号
         leftbutton=self.add_button2((startx-1,pos[1]+width/2),'','\n\uedd9\n',font='{Segoe Fluent Icons} 7',fg=buttonfg,bg=buttonbg,line=buttonbg,linew=0,activefg=activefg,activebg=activebg,activeline=activebg,onbg=buttononbg,onfg=buttononfg,online=buttononbg,command=move_left,anchor='e')[-1]
         rightbutton=self.add_button2((startx+width,pos[1]+width/2),'','\n\uedda\n',font='{Segoe Fluent Icons} 7',fg=buttonfg,bg=buttonbg,line=buttonbg,linew=0,activefg=activefg,activebg=activebg,activeline=activebg,onbg=buttononbg,onfg=buttononfg,online=buttononbg,command=move_right,anchor='w')[-1]
@@ -2317,9 +2319,9 @@ class BasicTinUI(Canvas):
         self.tkraise(scro[-1])
         viewpos=(pos[0]+2,barheight+2)
         nowpage=''
-        vdict=dict()#ui,uixml,uiid
-        tbdict=dict()#title,cb,pyo
-        flaglist=list()
+        vdict={}#ui,uixml,uiid
+        tbdict={}#title,cb,pyo
+        flaglist=[]
         font='微软雅黑 12'
         #新页面按钮（默认不显示）
         npx=3
@@ -3013,8 +3015,8 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(uid, hscroll)
         self.addtag_withtag(uid, vscroll)
         #id为back的uid
-        items=dict()#元素对象{id:(text,back,[sign]),...}
-        items_dict=dict()#链接关系（下一级）{id:(id1,id2,id3,...),id2:(id2-1,id2-2,...),id-new:(...)...}
+        items={}#元素对象{id:(text,back,[sign]),...}
+        items_dict={}#链接关系（下一级）{id:(id1,id2,id3,...),id2:(id2-1,id2-2,...),id-new:(...)...}
         box.add_back((0,0,0,0),linew=0)
         add_item(5,content)
         #重绘宽度
@@ -3698,7 +3700,7 @@ class BasicTinUI(Canvas):
         buttons_id=uid+'button'
         back=self.create_polygon(*pos,*pos,width=9,fill=bg,outline=bg,tags=uid)
         #左侧纵轴线对齐，anchor=w
-        buttons=list()
+        buttons=[]
         for i in content:
             if i=='':
                 position=new_pos()
@@ -3814,9 +3816,9 @@ class BasicTinUI(Canvas):
         self.tag_bind(fid, bind, show)
         return ui, uixml, hide, uid
 
-    def add_flyoutwindow(self, fid, width:int=250, height:int=150, bind='<Button-1>', line='#dcdcdc', bg='#f9f9f9', anchor='n', pos=None):# 悬浮窗口
-        # 注意，默认布局在fid正上方
-        ...
+    # def add_flyoutwindow(self, fid, width:int=250, height:int=150, bind='<Button-1>', line='#dcdcdc', bg='#f9f9f9', anchor='n', pos=None):# 悬浮窗口
+    #     # 注意，默认布局在fid正上方
+    #     ...
 
 
 class TinUI(BasicTinUI):

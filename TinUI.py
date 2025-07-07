@@ -357,18 +357,20 @@ class BasicTinUI(Canvas):
     def add_entry(self,pos:tuple,width:int,text:str='',fg='#1b1b1b',bg='#fbfbfb',activefg='#1a1a1a',activebg='#f6f6f6',onfg='#000000',onbg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#000000',font=('微软雅黑',12),outline='#868686',onoutline='#3041d8',icon='>',anchor='nw',call='→',command=None):#绘制单行输入框
         #这是一个半绘制组件
         def if_empty(event):
+            nonlocal empty_flag
             ch=entry.get()
             if ch=='':
+                empty_flag = True
                 self.tag_unbind(funcw,'<Leave>')
                 self.tag_unbind(funcw,'<Enter>')
                 self.tag_unbind(funcw,'<Button-1>')
                 self.itemconfig(funcw,text=icon,fill=fg)
-            else:
-                if self.itemcget(funcw,'text')==icon:
-                    self.itemconfig(funcw,text='×')
-                    self.tag_bind(funcw,'<Enter>',lambda event:self.itemconfig(funcw,fill=onoutline))
-                    self.tag_bind(funcw,'<Leave>',lambda event:self.itemconfig(funcw,fill=fg))
-                    self.tag_bind(funcw,'<Button-1>',lambda event:(entry.delete(0,'end'),if_empty(None)))
+            elif empty_flag:
+                empty_flag = False
+                self.itemconfig(funcw,text='×')
+                self.tag_bind(funcw,'<Enter>',lambda event:self.itemconfig(funcw,fill=onoutline))
+                self.tag_bind(funcw,'<Leave>',lambda event:self.itemconfig(funcw,fill=fg))
+                self.tag_bind(funcw,'<Button-1>',lambda event:(entry.delete(0,'end'),if_empty(None)))
         def call_command(event):
             text=entry.get()
             command(text)
@@ -421,10 +423,13 @@ class BasicTinUI(Canvas):
             entry['state']='disable'
             self.itemconfig(back,fill='#f0f0f0',outline='#f0f0f0')
             self.itemconfig(bottomline,fill=outline)
+        empty_flag = True
         var = StringVar()#变量
         entry = Entry(self, fg=fg, bg=bg, font=font, relief='flat', bd=0, insertbackground=insert, textvariable=var)
         entry.var = var
-        entry.insert(0, text)
+        if text != '':
+            empty_flag = False
+            entry.insert(0, text)
         entry.bind('<FocusIn>',focus_in)
         entry.bind('<FocusOut>',focus_out)
         entry.bind('<Enter>', mouse_enter)
@@ -589,17 +594,16 @@ class BasicTinUI(Canvas):
         bbox=self.bbox(link)
         back=self.create_polygon((bbox[0]+1,bbox[1]+1,bbox[2]-1,bbox[1]+1,bbox[2]-1,bbox[3]-1,bbox[0]+1,bbox[3]-1),width=9,tags=uid,fill='',outline='')
         self.tkraise(link)
-        for item_id in (link, back):
-            self.tag_bind(item_id,'<Enter>',turn_red)
-            self.tag_bind(item_id,'<Leave>',turn_back)
-            self.tag_bind(item_id,'<Button-1>',go_url)
+        self.tag_bind(uid,'<Enter>',turn_red)
+        self.tag_bind(uid,'<Leave>',turn_back)
+        self.tag_bind(uid,'<Button-1>',go_url)
         if type(url)==str:#为网址，显示提示框
             self.add_tooltip(uid,text=url,fg=fg,bg=self['background'],font=font,outline=activebg)
         self.__auto_anchor(uid,pos,anchor)
         funcs=FuncList(2)
         funcs.disable=funcs[0]=disable
         funcs.active=funcs[1]=active
-        return link,funcs,uid
+        return link,back,funcs,uid
 
     def add_waitbar1(self,pos:tuple,fg='#0078D7',bg='',okfg='lightgreen',okbg='',bd=5,r=20,anchor='nw'):#绘制圆形等待组件
         def __start(i):
@@ -1309,7 +1313,7 @@ class BasicTinUI(Canvas):
             menu.update_idletasks()
             if alpha == 1:
                 menu.bind('<FocusOut>',unshow)
-        self.tag_bind(cid,bind,show)
+        self.tag_bind(cid,bind,show,True)
         menu=Toplevel(self)
         menu.withdraw()
         self.windows.append(menu)
@@ -1419,8 +1423,8 @@ class BasicTinUI(Canvas):
         maxy=self.winfo_screenheight()
         #绑定事件
         first=True
-        self.tag_bind(uid,'<Enter>',show_toti)
-        self.tag_bind(uid,'<Leave>',hide_toti)
+        self.tag_bind(uid,'<Enter>',show_toti,True)
+        self.tag_bind(uid,'<Leave>',hide_toti,True)
         timethread=None#延时计时器
         return get_return
 
@@ -3813,7 +3817,7 @@ class BasicTinUI(Canvas):
         y += offset[1]
         uid = self.create_window(x, y, width=width, height=height, window=ui, anchor=_anchor)
         self.itemconfig(uid, state='hidden')
-        self.tag_bind(fid, bind, show)
+        self.tag_bind(fid, bind, show, True)
         return ui, uixml, hide, uid
 
     # def add_flyoutwindow(self, fid, width:int=250, height:int=150, bind='<Button-1>', line='#dcdcdc', bg='#f9f9f9', anchor='n', pos=None):# 悬浮窗口

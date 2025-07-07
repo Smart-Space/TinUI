@@ -34,6 +34,7 @@ class Dialog(Toplevel):
             self.background = '#f3f3f3'
             self.fg = '#000000'
             self.barback = '#f3f3f3'
+            self.selback = '#1a1a1a'
             self.buttonargs = {
                 'fg':'#1b1b1b',
                 'bg':'#fbfbfb',
@@ -59,10 +60,13 @@ class Dialog(Toplevel):
                 'onoutline':'#3041d8',
             }
             self.listargs = {
-                'fg':'#000000',
+                'fg':'#1a1a1a',
                 'bg':'#f2f2f2',
+                'activefg':'#191919',
                 'activebg':'#e9e9e9',
-                'sel':'#b4b4b4',
+                'onfg':'#191919',
+                'onbg':'#ececec',
+                'sel':'#b4bbea',
                 'scrollbg':'#f9f9f9',
                 'scrollcolor':'#8d8d8d',
                 'scrollon':'#8a8a8a'
@@ -81,6 +85,7 @@ class Dialog(Toplevel):
             self.background = '#202020'
             self.fg = '#ffffff'
             self.barback = '#202020'
+            self.selback = '#ffffff'
             self.buttonargs = {
                 'fg':'#ffffff',
                 'bg':'#2d2d2d',
@@ -108,7 +113,10 @@ class Dialog(Toplevel):
             self.listargs = {
                 'bg':'#2d2d2d',
                 'fg':'#ffffff',
-                'activebg':'#b4bbea',
+                'activefg':'#ffffff',
+                'activebg':'#373737',
+                'onfg':'#ffffff',
+                'onbg':'#333333',
                 'sel':'#465097',
                 'scrollbg':'#2e2e2e',
                 'scrollcolor':'#9f9f9f',
@@ -179,9 +187,38 @@ class Dialog(Toplevel):
         button_width=btn_width-10 if btn_width>110 else 100
         button_endy=self._endy()+15
         yesbutton_uid=self.tinui.add_button2(((content_bbox[0]+content_bbox[2])/2-5,button_endy),text=YES,minwidth=button_width,command=lambda e:self.return_msg(True),anchor='ne',**self.buttonargs)[-1]
+        yb_coords = self.tinui.coords(yesbutton_uid)
         nobutton_uid=self.tinui.add_button2(((content_bbox[0]+content_bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:self.return_msg(False),anchor='nw',**self.buttonargs)[-1]
+        nb_coords = self.tinui.coords(nobutton_uid)
         self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.barback,fg=self.barback,linew=9)
 
+        def return_focus(event):
+            if now_focus == 'yes':
+                self.return_msg(True)
+            else:
+                self.return_msg(False)
+        def focus_left(event):
+            nonlocal now_focus
+            if now_focus == 'yes':
+                return
+            now_focus = 'yes'
+            self.tinui.coords(focus_button, yb_coords)
+        def focus_right(event):
+            nonlocal now_focus
+            if now_focus == 'no':
+                return
+            now_focus = 'no'
+            self.tinui.coords(focus_button, nb_coords)
+
+        focus_button = self.tinui.create_polygon(yb_coords, width=11, fill=self.barback, outline=self.selback)
+        self.tinui.lower(focus_button, yesbutton_uid)
+        now_focus = 'yes'
+        self.bind('<Return>', return_focus)
+        self.bind('<space>', return_focus)
+        self.bind('<Left>', focus_left)
+        self.bind('<Right>', focus_right)
+
+        self.entryw = None
         return self.load_window()
     
     def return_msg(self,val):
@@ -206,15 +243,20 @@ class Dialog(Toplevel):
         content_bbox=self.tinui.bbox('all')
         entry_width=content_bbox[2]-content_bbox[0]
         width=entry_width if entry_width>200 else 200
-        self.entry=self.tinui.add_entry((5,self._endy()+5),width=width,**self.entryargs)[-2]# tinui entry widget, funcs
+        self.entryw, self.entry=self.tinui.add_entry((5,self._endy()+5),width=width,**self.entryargs)[:-1]# tinui entry widget, funcs
         self.entry.insert(0,str(text))
         bbox=self.tinui.bbox('all')
         btn_width=(bbox[2]-bbox[0])/2
         button_width=btn_width-10 if btn_width>110 else 100
         button_endy=self._endy()+15
         yesbutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2-5,button_endy),text=YES,minwidth=button_width,command=lambda e:self.return_input(self.entry.get()),anchor='ne',**self.buttonargs)[-1]
+        yb_coords = self.tinui.coords(yesbutton_uid)
         nobutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:self.return_input(None),anchor='nw',**self.buttonargs)[-1]
         self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.barback,fg=self.barback,linew=9)
+
+        focus_button = self.tinui.create_polygon(yb_coords, width=11, fill=self.barback, outline=self.selback)
+        self.tinui.lower(focus_button, yesbutton_uid)
+        self.bind('<Return>', lambda e:self.return_input(self.entry.get()))
 
         return self.load_window()
 
@@ -263,9 +305,38 @@ class Dialog(Toplevel):
         button_width=btn_width-10 if btn_width>110 else 100
         button_endy=self._endy()+15
         yesbutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2-5,button_endy),text=YES,minwidth=button_width,command=lambda e:self.return_choice(True),anchor='ne',**self.buttonargs)[-1]
+        yb_coords = self.tinui.coords(yesbutton_uid)
         nobutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:self.return_choice(None),anchor='nw',**self.buttonargs)[-1]
+        nb_coords = self.tinui.coords(nobutton_uid)
         self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.background,fg=self.background,linew=9)
 
+        def return_focus(event):
+            if now_focus == 'yes':
+                self.return_choice(True)
+            else:
+                self.return_choice(None)
+        def focus_left(event):
+            nonlocal now_focus
+            if now_focus == 'yes':
+                return
+            now_focus = 'yes'
+            self.tinui.coords(focus_button, yb_coords)
+        def focus_right(event):
+            nonlocal now_focus
+            if now_focus == 'no':
+                return
+            now_focus = 'no'
+            self.tinui.coords(focus_button, nb_coords)
+
+        focus_button = self.tinui.create_polygon(yb_coords, width=11, fill=self.barback, outline=self.selback)
+        self.tinui.lower(focus_button, yesbutton_uid)
+        now_focus = 'yes'
+        self.bind('<Return>', return_focus)
+        self.bind('<space>', return_focus)
+        self.bind('<Left>', focus_left)
+        self.bind('<Right>', focus_right)
+
+        self.entryw = None
         return self.load_window()
     
     def return_choice(self,val):
@@ -295,6 +366,8 @@ class Dialog(Toplevel):
         self.tinui.config(scrollregion=bboxall)
 
         self.focus_set()
+        if self.entryw:
+            self.entryw.focus_set()
         self.wait_visibility()
         self.grab_set()
         self.wait_window(self)
@@ -375,7 +448,6 @@ def ask_choice(master,title,content,choices,yestext='OK',notext='Cancel',theme='
 
 
 
-#test
 if __name__=='__main__':
     root=Tk()
     root.iconbitmap('LOGO.ico')
@@ -384,12 +456,12 @@ if __name__=='__main__':
     show_info(root,'test','show information\nhello world!',theme='dark')
     show_success(root,'test','Success!\nhello world! hello world! hello world! hello world!',theme='dark')
     show_warning(root,'test','this is a warning\nhello world!',theme='dark')
-    show_error(root,'test','something is wrong\nhello world! hello world! hello world! hello world!',theme='dark')
-    show_question(root,'test','Do you want to continue?',theme='dark')
-    b=ask_string(root,'test','input something input something input something input something',theme='light')
-    ask_integer(root,'test','input integer',theme='dark')
-    ask_float(root,'test','input float',theme='dark')
+    show_error(root,'test','something is wrong\nhello world! hello world! hello world! hello world!')
+    show_question(root,'test','Do you want to continue?')
+    b=ask_string(root,'test','input something input something input something input something')
     print(b)
+    ask_integer(root,'test','input integer')
+    ask_float(root,'test','input float')
     c=ask_choice(root,'test','choose one',('a','b','c'),theme='dark')
     print(c)
     root.mainloop()

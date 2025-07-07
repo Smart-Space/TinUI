@@ -51,3 +51,9 @@ def show_msg(master,title,content,yestext='OK',notext='Cancel',theme='light'):
 - 对于输入对话框，“取消按钮”和关闭窗口均返回 `None`。
 
 ![](https://github.com/Smart-Space/TinUI/raw/main/image/TinUI信息提示对话框.gif)
+
+> TinUI-5.35版本开始，对话框可通过键盘按键交互：
+>
+> - 左右选择按钮
+> - 空格或回车触发按钮
+> - **注意**，输入类对话框只有回车确定功能

@@ -2164,7 +2164,7 @@ class BasicTinUI(Canvas):
         def __onnpclick(e):
             if newfunction!=None:
                 newfunction()
-        def addpage(title:str,flag=None,scrollbar=False,cancancel:bool=True):#创建页面
+        def addpage(title:str,flag=None,scrollbar:bool=False,cancancel:bool=True):#创建页面
             nonlocal npx
             if tbu.bbox(labeluid)==None:
                 endx=3
@@ -2191,7 +2191,7 @@ class BasicTinUI(Canvas):
                 page=TinUI(self,True,bg=self['background'])
                 uiid=self.create_window(viewpos,window=page.frame,width=width+1,height=height-3,anchor='nw',state='hidden')
                 self.windows.append(page.frame)
-            elif scrollbar==False:
+            else:
                 page=BasicTinUI(self,bg=self['background'])
                 uiid=self.create_window(viewpos,window=page,width=width+1,height=height-3,anchor='nw',state='hidden')
                 self.windows.append(page)

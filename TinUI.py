@@ -200,47 +200,6 @@ class BasicTinUI(Canvas):
         # 删除伴随TinUIXml
         uixml.clean()
     
-    def show_location(self,state:bool=True,color='red',command=None):
-        #在设计时反馈鼠标所在的绝对位置
-        if state==False:
-            self.unbind('<Enter>')
-            self.unbind('<Motion>')
-            self.unbind('<Leave>')
-            return
-        self.locx=None
-        self.locy=None
-        def entercall(e):
-            bbox=self.bbox('all')
-            width=self.winfo_width()
-            height=self.winfo_height()
-            if bbox==None:
-                _width=0
-                _height=0
-            else:
-                _width=bbox[2]-bbox[0]
-                _height=bbox[3]-bbox[1]
-            if _width>width:
-                width=_width
-            if _height>height:
-                height=_height
-            self.loclx=self.create_line((0,0,width,0),width=2,dash=(5,5),fill=color)
-            self.locly=self.create_line((0,0,0,height),width=2,dash=(5,5),fill=color)
-        def motioncall(e):#鼠标在界面中滑动
-            if self.loclx!=None:
-                x=self.canvasx(e.x)
-                y=self.canvasy(e.y)
-                self.moveto(self.loclx,0,y)
-                self.moveto(self.locly,x,0)
-                if command!=None:command(x,y)
-        def leavecall(e):
-            self.delete(self.loclx)
-            self.delete(self.locly)
-            self.loclx=None
-            self.locly=None
-        self.bind('<Enter>',entercall)
-        self.bind('<Motion>',motioncall)
-        self.bind('<Leave>',leavecall)
-    
     def clean_windows(self):
         #清除浮出控件子窗口
         for i in self.windows:

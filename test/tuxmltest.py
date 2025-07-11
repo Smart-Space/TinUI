@@ -18,16 +18,57 @@ import idlelib.colorizer as idc
 import idlelib.percolator as idp
 
 
+def show_location(state:bool=True,color='red',command=None):
+    #在设计时反馈鼠标所在的绝对位置
+    if not state:
+        displayui.unbind('<Enter>')
+        displayui.unbind('<Motion>')
+        displayui.unbind('<Leave>')
+        return
+    displayui.locx=None
+    displayui.locy=None
+    def entercall(e):
+        bbox=displayui.bbox('all')
+        width=displayui.winfo_width()
+        height=displayui.winfo_height()
+        if bbox==None:
+            _width=0
+            _height=0
+        else:
+            _width=bbox[2]-bbox[0]
+            _height=bbox[3]-bbox[1]
+        if _width>width:
+            width=_width
+        if _height>height:
+            height=_height
+        displayui.loclx=displayui.create_line((0,0,width,0),width=2,dash=(5,5),fill=color)
+        displayui.locly=displayui.create_line((0,0,0,height),width=2,dash=(5,5),fill=color)
+    def motioncall(e):#鼠标在界面中滑动
+        if displayui.loclx!=None:
+            x=displayui.canvasx(e.x)
+            y=displayui.canvasy(e.y)
+            displayui.moveto(displayui.loclx,0,y)
+            displayui.moveto(displayui.locly,x,0)
+            if command!=None:command(x,y)
+    def leavecall(e):
+        displayui.delete(displayui.loclx)
+        displayui.delete(displayui.locly)
+        displayui.loclx=None
+        displayui.locly=None
+    displayui.bind('<Enter>',entercall)
+    displayui.bind('<Motion>',motioncall)
+    displayui.bind('<Leave>',leavecall)
+
 loclines=False#坐标十字线是否存在
 def if_location(e):#是否显示坐标十字线
     global loclines
     loclines=e
     if loclines:
         tinui.itemconfig(loctext,state='normal')
-        displayui.show_location(command=getloc)
+        show_location(command=getloc)
     else:
         tinui.itemconfig(loctext,text='x:? y:?',state='hidden')
-        displayui.show_location(False)
+        show_location(False)
 
 def getloc(x,y):
     tinui.itemconfig(loctext,text=f'x:{x} y:{y}')

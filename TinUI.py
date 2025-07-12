@@ -756,7 +756,6 @@ class BasicTinUI(Canvas):
             pickbox.geometry(f'{winw+15}x{winh+15}+{x-4}+{y}')
             pickbox.attributes('-alpha',0)
             pickbox.deiconify()
-            pickbox.focus_set()
             it = 0
             for i in (0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1):
                 pickbox.after(it*20, lambda alpha=i : __show(alpha))
@@ -765,6 +764,7 @@ class BasicTinUI(Canvas):
             pickbox.attributes('-alpha',alpha)
             pickbox.update_idletasks()
             if alpha == 1:
+                pickbox.focus_set()
                 pickbox.bind('<FocusOut>',unshow)
         def unshow(event):
             nonlocal drop
@@ -1303,7 +1303,6 @@ class BasicTinUI(Canvas):
             menu.geometry(f'{winw+30}x{winh+20}+{x}+{y}')
             menu.attributes('-alpha',0)
             menu.deiconify()
-            menu.focus_set()
             it = 0
             for i in (0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1):
                 menu.after(it*20, lambda alpha=i : __show(alpha))
@@ -1312,6 +1311,7 @@ class BasicTinUI(Canvas):
             menu.attributes('-alpha',alpha)
             menu.update_idletasks()
             if alpha == 1:
+                menu.focus_set()
                 menu.bind('<FocusOut>',unshow)
         self.tag_bind(cid,bind,show,True)
         menu=Toplevel(self)
@@ -1358,7 +1358,6 @@ class BasicTinUI(Canvas):
         bar.lower(mback)
         bar.lower(mline)
         bar.move('all',12,5)
-        menu.bind('<FocusOut>',unshow)
         menu.attributes('-transparent',tran)
         menu.wind=wind#给menubutton用
         return menu,bar,funcs
@@ -3483,7 +3482,6 @@ class BasicTinUI(Canvas):
             picker.geometry(f'{winw+15}x{winh+15}+{x-3}+{y}')
             picker.attributes('-alpha',0)
             picker.deiconify()
-            picker.focus_set()
             it = 0
             for i in (0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1):
                 picker.after(it*20, lambda alpha=i : __show(alpha))
@@ -3492,6 +3490,7 @@ class BasicTinUI(Canvas):
             picker.attributes('-alpha',alpha)
             picker.update_idletasks()
             if alpha == 1:
+                picker.focus_set()
                 picker.bind('<FocusOut>',unshow)
         def unshow(event):
             picker.withdraw()
@@ -3634,7 +3633,6 @@ class BasicTinUI(Canvas):
             menu.geometry(f'{winw+10}x{winh+10}+{x}+{y}')
             menu.attributes('-alpha',0)
             menu.deiconify()
-            menu.focus_set()
             it = 0
             for i in (0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1):
                 menu.after(it*20, lambda alpha=i : __show(alpha))
@@ -3643,6 +3641,7 @@ class BasicTinUI(Canvas):
             menu.attributes('-alpha',alpha)
             menu.update_idletasks()
             if alpha == 1:
+                menu.focus_set()
                 menu.bind('<FocusOut>',unshow)
         def disable(fg='#9d9d9d',bg='#f5f5f5'):
             self.itemconfig(uid+'button',state='disable',fill=fg)

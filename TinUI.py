@@ -1246,7 +1246,7 @@ class BasicTinUI(Canvas):
         self.__auto_anchor(uid,pos,anchor)
         return text,back,uid
 
-    def add_menubar(self,cid='all',bind='<Button-3>',font='微软雅黑 12',fg='#1b1b1b',bg='#fbfbfc',line='#cccccc',activefg='#191919',activebg='#f0f0f0',activeline='#f0f0f0',cont=(('command',print),'-'),tran='#01FF11'):#绘制菜单
+    def add_menubar(self,cid='all',bind='<Button-3>',font='微软雅黑 12',fg='#1b1b1b',bg='#fbfbfc',line='#cccccc',activefg='#191919',activebg='#f0f0f0',activeline='#f0f0f0',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',cont=(('command',print),'-'),tran='#01FF11'):#绘制菜单
         '''cont格式
         (('名称',绑定的函数（至少接受event参数）),#常规格式
         '-',#分割线
@@ -1274,7 +1274,7 @@ class BasicTinUI(Canvas):
                     # sign=bar.gettags(back[0])[-1]
             for sep in seps:
                 pos=bar.bbox(sep)
-                bar.coords(sep,(5,pos[1],5+maxwidth,pos[1]))
+                bar.coords(sep,(1,pos[1],5+maxwidth,pos[1]))
         def readyshow():#计算显示位置
             allpos=bar.bbox('all')
             #菜单尺寸
@@ -1332,14 +1332,14 @@ class BasicTinUI(Canvas):
                 seps.append(sep)
             elif type(i[1]) in (list,tuple):
                 #嵌套菜单，只接受列表或元组，不接受集合等
-                button=bar.add_menubutton((5,endy()-5),i[0],'x',fg,bg,line,3,activefg,activebg,activeline,font,cont=i[1],tran=tran)
+                button=bar.add_menubutton((5,endy()-5),i[0],'x',fg,bg,line,3,activefg,activebg,activeline,onfg,onbg,online,font=font,cont=i[1],tran=tran)
                 backs.append((button[0],button[1],button[2]))
                 funcs.append(button[3])
                 pos=bar.bbox(button[1])
                 width=pos[2]-pos[0]
                 widths.append(width)
             elif callable(i[1]):
-                button=bar.add_button2((0,endy()-13),i[0],None,'',fg,bg,bg,3,activefg,activebg,activeline,font=font,command=lambda event,i=i:(menu.withdraw(),i[1](event)))
+                button=bar.add_button2((0,endy()-13),i[0],None,'',fg,bg,bg,3,activefg,activebg,activeline,onfg,onbg,online,font=font,command=lambda event,i=i:(menu.withdraw(),i[1](event)))
                 backs.append((button[1],button[2]))
                 funcs.append(button[3])
                 pos=bar.bbox(button[1])
@@ -1351,9 +1351,9 @@ class BasicTinUI(Canvas):
         bbox=bar.bbox('all')
         x1=bbox[0]
         x2=bbox[0]+max(widths)+8
-        gomap=((x1+5,bbox[1]+5),(x2-5,bbox[1]+5),(x2-5,bbox[3]-5),(x1+5,bbox[3]-5))
+        gomap=((x1+9,bbox[1]+5),(x2-5,bbox[1]+5),(x2-5,bbox[3]-5),(x1+9,bbox[3]-5))
         mback=bar.create_polygon(gomap,fill=bg,outline=bg,width=17)
-        gomap=((x1+4,bbox[1]+4),(x2-4,bbox[1]+4),(x2-4,bbox[3]-4),(x1+4,bbox[3]-4))
+        gomap=((x1+8,bbox[1]+4),(x2-4,bbox[1]+4),(x2-4,bbox[3]-4),(x1+8,bbox[3]-4))
         mline=bar.create_polygon(gomap,fill=bg,outline=line,width=17)
         bar.lower(mback)
         bar.lower(mline)
@@ -3402,7 +3402,7 @@ class BasicTinUI(Canvas):
         self.__auto_anchor(uid,pos,anchor)
         return back,backitem
 
-    def add_picker(self,pos:tuple,height=250,fg='#1b1b1b',bg='#fbfbfb',outline='#ececec',activefg='#1b1b1b',activebg='#f6f6f6',onfg='#eaecfb',onbg='#3748d9',buttonfg='#1a1a1a',buttonbg='#f9f9f9',buttonactivefg='#1a1a1a',buttonactivebg='#f3f3f3',font=('微软雅黑',10),text=(('year',60),('season',100),),data=(('2022','2023','2024'),('spring','summer','autumn','winter')),tran='#01FF11',anchor='nw',command=None):#绘制滚动选值框
+    def add_picker(self,pos:tuple,height=250,fg='#1b1b1b',bg='#fbfbfb',outline='#ececec',activefg='#1b1b1b',activebg='#f6f6f6',onfg='#eaecfb',onbg='#3748d9',buttonfg='#1a1a1a',buttonbg='#f9f9f9',buttonactivefg='#1a1a1a',buttonactivebg='#f3f3f3',buttononfg='#5d5d5d',buttononbg='#f5f5f5',font=('微软雅黑',10),text=(('year',60),('season',100),),data=(('2022','2023','2024'),('spring','summer','autumn','winter')),tran='#01FF11',anchor='nw',command=None):#绘制滚动选值框
         def _mouseenter(event):
             self.itemconfig(back,fill=activebg,outline=activebg)
             for i in texts:
@@ -3579,12 +3579,12 @@ class BasicTinUI(Canvas):
         del __count
         #ok button
         okpos=((5+(width-9)/2)/2,height-22)
-        ok=bar.add_button2(okpos,text='\uE73E',font='{Segoe Fluent Icons} 12',fg=buttonfg,bg=buttonbg,line='',activefg=buttonactivefg,activebg=buttonactivebg,activeline=outline,anchor='center',command=set_it)
+        ok=bar.add_button2(okpos,text='\uE73E',font='{Segoe Fluent Icons} 12',fg=buttonfg,bg=buttonbg,line='',activefg=buttonactivefg,activebg=buttonactivebg,activeline=outline,onfg=buttononfg,onbg=buttononbg,online=buttononbg,anchor='center',command=set_it)
         bar.coords(ok[1],(9,height-35,(width-9)/2-5,height-35,(width-9)/2-5,height-9,9,height-9))
         bar.coords(ok[2],(8,height-34,(width-9)/2-4,height-34,(width-9)/2-4,height-8,8,height-8))
         #cancel button
         nopos=(((width-9)/2+width-4)/2,height-22)
-        no=bar.add_button2(nopos,text='\uE711',font='{Segoe Fluent Icons} 12',fg=buttonfg,bg=buttonbg,line='',activefg=buttonactivefg,activebg=buttonactivebg,activeline=outline,anchor='center',command=cancel)
+        no=bar.add_button2(nopos,text='\uE711',font='{Segoe Fluent Icons} 12',fg=buttonfg,bg=buttonbg,line='',activefg=buttonactivefg,activebg=buttonactivebg,activeline=outline,onfg=buttononfg,onbg=buttononbg,online=buttononbg,anchor='center',command=cancel)
         bar.coords(no[1],((width-9)/2+5,height-35,width-9,height-35,width-9,height-9,(width-9)/2+5,height-9))
         bar.coords(no[2],((width-9)/2+4,height-34,width-8,height-34,width-8,height-8,((width-9)/2+4,height-8)))
         readyshow()
@@ -3671,7 +3671,7 @@ class BasicTinUI(Canvas):
         back_t=(x1+1,y1+1,x2-1,y1+1,x2-1,y2-1,x1+1,y2-1)
         back=self.create_polygon(back_t,width=9,tags=uid,fill=bg,outline=bg)
         #创建菜单
-        menu=self.add_menubar(uid,'<Button-1>',font=font,fg=fg,bg=bg,line=line,activefg=menuonfg,activebg=menuonbg,activeline=menuonline,cont=cont,tran=tran)[0]
+        menu=self.add_menubar(uid,'<Button-1>',font=font,fg=fg,bg=bg,line=line,activefg=menuonfg,activebg=menuonbg,activeline=menuonline,onfg=onfg,onbg=onbg,online=online,cont=cont,tran=tran)[0]
         self.tag_unbind(uid,'<Button-1>')
         #重新绑定事件
         for item_id in (uid+'button', back, outline):

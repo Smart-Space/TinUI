@@ -86,7 +86,7 @@ def inxml(e):#注入xml界面
             duixml.funcs[i[1]]=None
         elif i[0]=='datas':
             duixml.datas[i[1]]=(None,None)
-    duixml.yendy=5
+    displayui.delete('all')
     duixml.clean()
     duixml.loadxml(xml)
     rescroll()

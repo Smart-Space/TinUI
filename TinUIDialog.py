@@ -226,64 +226,6 @@ class Dialog(Toplevel):
         self.result=val
         self.destroy()
         self.master.focus_set()
-    
-    def initial_xml_load(self,title,xml,funcdict:dict=None,data:dict=None,yestext='OK',notext='Cancel'):
-        """
-        自定义XML内容
-        """
-        YES=yestext
-        NO=notext
-
-        self.tinuixml = TinUIXml(self.tinui)
-        self.tinuixml.funcs.update(funcdict)
-        self.tinuixml.datas.update(data)
-
-        self.title(title)
-        self.protocol('WM_DELETE_WINDOW',lambda:self.return_msg(None))
-
-        self.tinui['bg'] = self.background
-        self.tinuixml.loadxml(xml)
-
-        content_bbox=self.tinui.bbox('all')
-        btn_width=(content_bbox[2]-content_bbox[0])/2
-        button_width=btn_width-10 if btn_width>110 else 100
-        button_endy=self._endy()+15
-        yesbutton_uid=self.tinui.add_button2(((content_bbox[0]+content_bbox[2])/2-5,button_endy),text=YES,minwidth=button_width,command=lambda e:self.return_msg(True),anchor='ne',**self.buttonargs)[-1]
-        yb_coords = self.tinui.coords(yesbutton_uid)
-        nobutton_uid=self.tinui.add_button2(((content_bbox[0]+content_bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:self.return_msg(False),anchor='nw',**self.buttonargs)[-1]
-        nb_coords = self.tinui.coords(nobutton_uid)
-        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.barback,fg=self.barback,linew=9)
-
-        def return_focus(event):
-            if now_focus == 'yes':
-                self.return_msg(True)
-            else:
-                self.return_msg(False)
-        def focus_left(event):
-            nonlocal now_focus
-            if now_focus == 'yes':
-                return
-            now_focus = 'yes'
-            self.tinui.coords(focus_button, yb_coords)
-        def focus_right(event):
-            nonlocal now_focus
-            if now_focus == 'no':
-                return
-            now_focus = 'no'
-            self.tinui.coords(focus_button, nb_coords)
-
-        focus_button = self.tinui.create_polygon(yb_coords, width=11, fill=self.barback, outline=self.selback)
-        self.tinui.lower(focus_button, yesbutton_uid)
-        now_focus = 'yes'
-        self.bind('<Return>', return_focus)
-        self.bind('<space>', return_focus)
-        self.bind('<Left>', focus_left)
-        self.bind('<Right>', focus_right)
-
-        self.entryw = None
-
-    def initial_xml_init(self):
-        return self.load_window()
 
     def initial_input(self,title,content,text,yestext='OK',notext='Cancel'):
         """
@@ -431,6 +373,70 @@ class Dialog(Toplevel):
         self.wait_window(self)
 
         return self.result
+    
+    def initial_xml_load(self,title,xml,funcdict:dict={},data:dict={},yestext='OK',notext='Cancel',yescallback=None,nocallback=None,nonecallback=None,tinuitheme=None):
+        """
+        自定义XML内容
+        """
+        YES=yestext
+        NO=notext
+        self.tinui['bg'] = self.background
+
+        if tinuitheme:
+            self.tinuitheme = tinuitheme(self.tinui)
+            self.tinuixml = TinUIXml(self.tinuitheme)
+        else:
+            self.tinuixml = TinUIXml(self.tinui)
+        self.tinuixml.funcs.update(funcdict)
+        self.tinuixml.datas.update(data)
+
+        self.title(title)
+        self.protocol('WM_DELETE_WINDOW',lambda:(nonecallback() ,self.return_msg(None)))
+
+        self.tinuixml.loadxml(xml)
+
+        content_bbox=self.tinui.bbox('all')
+        btn_width=(content_bbox[2]-content_bbox[0])/2
+        button_width=btn_width-10 if btn_width>110 else 100
+        button_endy=self._endy()+15
+        yesbutton_uid=self.tinui.add_button2(((content_bbox[0]+content_bbox[2])/2-5,button_endy),text=YES,minwidth=button_width,command=lambda e:(yescallback() ,self.return_msg(True)),anchor='ne',**self.buttonargs)[-1]
+        yb_coords = self.tinui.coords(yesbutton_uid)
+        nobutton_uid=self.tinui.add_button2(((content_bbox[0]+content_bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:(nocallback() ,self.return_msg(False)),anchor='nw',**self.buttonargs)[-1]
+        nb_coords = self.tinui.coords(nobutton_uid)
+        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.barback,fg=self.barback,linew=9)
+
+        def return_focus(event):
+            if now_focus == 'yes':
+                yescallback()
+                self.return_msg(True)
+            else:
+                nocallback()
+                self.return_msg(False)
+        def focus_left(event):
+            nonlocal now_focus
+            if now_focus == 'yes':
+                return
+            now_focus = 'yes'
+            self.tinui.coords(focus_button, yb_coords)
+        def focus_right(event):
+            nonlocal now_focus
+            if now_focus == 'no':
+                return
+            now_focus = 'no'
+            self.tinui.coords(focus_button, nb_coords)
+
+        focus_button = self.tinui.create_polygon(yb_coords, width=11, fill=self.barback, outline=self.selback)
+        self.tinui.lower(focus_button, yesbutton_uid)
+        now_focus = 'yes'
+        self.bind('<Return>', return_focus)
+        self.bind('<space>', return_focus)
+        self.bind('<Left>', focus_left)
+        self.bind('<Right>', focus_right)
+
+        self.entryw = None
+
+    def initial_xml_init(self):
+        return self.load_window()
 
 
 
@@ -522,4 +528,21 @@ if __name__=='__main__':
     ask_float(root,'test','input float')
     c=ask_choice(root,'test','choose one',('a','b','c'),theme='dark')
     print(c)
+    xml_data = 0
+    def xml_func(e):
+        global xml_data
+        xml_data = 1
+    func_dict = {'func':xml_func}
+    d=Dialog(root,'xml')
+    d.initial_xml_load('test xml dialog','<tinui><line>'
+    '<button text="click to change data value" command="self.funcs[\'func\']"></button>'
+    '</line></tinui>',
+    funcdict=func_dict,yescallback=lambda:print('yes'),nocallback=lambda:print('no'),nonecallback=lambda:print('none'))
+    dr=d.initial_xml_init()
+    if dr:
+        print(f'yes with {xml_data}')
+    elif dr==False:
+        print(f'no with {xml_data}')
+    elif dr==None:
+        print(f'none with {xml_data}')
     root.mainloop()

@@ -3824,11 +3824,11 @@ class TinUI(BasicTinUI):
         for m in methods:
             if m[0] != '_' and m != 'config' and m != 'configure':
                 setattr(self, m, getattr(self.frame, m))
-        self.bind('<MouseWheel>',self.set_y_view)
-        self.bind('<Configure>',lambda event:self.update__())
+        self.bind('<MouseWheel>',self.set_y_view,True)
+        config_bind=self.bind('<Configure>',lambda event:self.update__(),True)
         self.update_time=update_time
         if update==False:
-            self.unbind("<Configure>")
+            self.unbind("<Configure>",config_bind)
 
     def set_y_view(self,event):
         if event.state==0:#纵向滚动
@@ -4023,7 +4023,10 @@ class TinUIXml():#TinUI的xml渲染方式
             return last_y, xendx
         xcenter = (bbox[0]+bbox[2])/2
         ycenter = (bbox[1]+bbox[3])/2
-        if lineanchor == 'nw':
+        if lineanchor == '':
+            dx = 0
+            dy = 0
+        elif lineanchor == 'nw':
             dx = x - bbox[0]
             dy = y - bbox[1]
         elif lineanchor == 'n':
@@ -4051,8 +4054,7 @@ class TinUIXml():#TinUI的xml渲染方式
             dx = x - xcenter
             dy = y - ycenter
         else:
-            dx = 0
-            dy = 0
+            raise ValueError(f'Invalid lineanchor value: {lineanchor}')
         self.realui.move(ftag, dx, dy)
         bbox = self.realui.bbox(ftag)
         xendx = bbox[2] + padx

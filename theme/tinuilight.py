@@ -347,3 +347,9 @@ class TinUILight(TinUITheme):
             **{
                 'fg':'#f3f3f3','bg':'#f3f3f3',
             },**kw})
+    
+    def add_breadcrumb(self,pos,*arg,**kw):
+        return self.ui.add_breadcrumb(pos,*arg,**{
+            **{
+                'fg':'#1a1a1a','bg':'#f3f3f3','activefg':'#5c5c5c'
+            },**kw})

@@ -138,6 +138,9 @@ def test(theme):
     #flyout
     flylabel = du.add_label(end(),text='Flyout控件(左键单击)')[-1]
     du.add_flyout(flylabel,anchor='ne')
+    bdf = du.add_breadcrumb(end(),flylabel)[-2]
+    for i in range(1,4):
+        bdf.add(f'item{i}')
 
 w = Tk()
 w.geometry('500x500+500+100')

@@ -10,6 +10,7 @@ from tkinter import font as tkfont
 from webbrowser import open as webopen
 from typing import Union
 from xml.etree import ElementTree  as ET
+import collections
 import sys
 import os
 import shutil
@@ -1229,9 +1230,9 @@ class BasicTinUI(Canvas):
         uid='info'+str(text)
         self.itemconfig(text,tags=uid)
         bbox=self.bbox(text)
-        font_size=str(int(self.__get_text_size(text)))#字体大小
-        info=self.create_text((bbox[2],(bbox[1]+bbox[3])/2),anchor='w',text='\uF167',fill=bg,font='{Segoe Fluent Icons} '+font_size,tags=uid)
-        infoback=self.create_text((bbox[2],(bbox[1]+bbox[3])/2),anchor='w',text='\uE946',fill=fg,font='{Segoe Fluent Icons} '+font_size,tags=uid)
+        font_size=self.__get_text_size(text)#字体大小
+        info=self.create_text((bbox[2],(bbox[1]+bbox[3])/2),anchor='w',text='\uF167',fill=bg,font='{Segoe Fluent Icons}'+font_size,tags=uid)
+        infoback=self.create_text((bbox[2],(bbox[1]+bbox[3])/2),anchor='w',text='\uE946',fill=fg,font='{Segoe Fluent Icons}'+font_size,tags=uid)
         bbox=self.bbox(uid)
         back=self.create_rectangle((bbox[0]-2,bbox[1]-2,bbox[2]+2,bbox[3]+2),fill=bg,outline=fg,width=2,tags=uid)
         self.tkraise(text)
@@ -2722,8 +2723,8 @@ class BasicTinUI(Canvas):
         if tx2-tx1<width:#判读当前文本宽度
             tx2=tx1+width
         topback=self.__ui_polygon(((tx1,ty1),(tx2,ty2)),outline=tbg,fill=tbg,width=17,tags=(uid,contentid))#标题背景
-        font_size=str(int(self.__get_text_size(toptext)))#字体大小
-        button=self.add_button2((tx2+5,(ty1+ty2)/2),anchor='e',text='',icon='\uE70D',font='{Segoe Fluent Icons} '+font_size,fg=buttonfg,bg=buttonbg,line=buttonline,activeline=activeline,activefg=activefg,activebg=activebg,onfg=onfg,onbg=onbg,online=online,command=do_expand)
+        font_size=self.__get_text_size(toptext)#字体大小
+        button=self.add_button2((tx2+5,(ty1+ty2)/2),anchor='e',text='',icon='\uE70D',font='{Segoe Fluent Icons}'+font_size,fg=buttonfg,bg=buttonbg,line=buttonline,activeline=activeline,activefg=activefg,activebg=activebg,onfg=onfg,onbg=onbg,online=online,command=do_expand)
         self.addtag_withtag(uid,button[-1])
         self.addtag_withtag(contentid,button[-1])
         if not scrollbar:#不使用滚动条，BasicTinUI
@@ -3759,9 +3760,89 @@ class BasicTinUI(Canvas):
         self.tag_bind(fid, bind, show, True)
         return ui, uixml, hide, uid
 
-    def add_breadcrumb(self,pos:tuple,font='微软雅黑 12'):
+    def add_breadcrumb(self,pos:tuple,font='微软雅黑 12',fg='#000000',bg='#ffffff',activefg='#5c5c5c',root='HOME',command=None,anchor='nw'):
         # 绘制面包屑导航组件
-        pass
+        def click(cid):
+            if command == None:
+                return
+            res = []
+            for i in stack:
+                res.append(i)
+                if i == cid:
+                    break
+            command(res)
+        def in_button(cid):
+            self.itemconfig(cid, fill=activefg)
+        def out_button(cid):
+            self.itemconfig(cid, fill=fg)
+        def get():
+            # 获取当前路径元素
+            return list(stack)
+        def add(text):
+            # 添加一个路径元素
+            nonlocal endx
+            sym = self.create_text((endx+2,center_line), text='\uE76C', font=segeo_font, fill=fg, anchor='w', tags=(uid,uid_button))
+            symstack.append(sym)
+            endx = self.bbox(sym)[2]
+            t = self.create_text((endx+2,center_line), text=text, font=font, fill=fg, anchor='w', tags=(uid,uid_button))
+            lt = stack[-1]
+            stack.append(t)
+            bbox = self.bbox(uid_button)
+            self.coords(back, (bbox[0]+2,bbox[1]+2,bbox[2]-2,bbox[1]+2,bbox[2]-2,bbox[3]-2,bbox[0]+2,bbox[3]-2))
+            self.__auto_anchor(uid,pos,anchor)
+            endx = self.bbox(t)[2]
+            self.tag_bind(lt, '<Button-1>', lambda e: click(lt))
+            self.tag_bind(lt, '<Enter>', lambda e: in_button(lt))
+            self.tag_bind(lt, '<Leave>', lambda e: out_button(lt))
+            return t
+        def delete():
+            # 删除最后一个路径元素
+            nonlocal endx
+            if stack.__len__() > 1:
+                self.delete(stack.pop())
+                self.delete(symstack.pop())
+                bbox = self.bbox(uid_button)
+                self.coords(back, (bbox[0]+2,bbox[1]+2,bbox[2]-2,bbox[1]+2,bbox[2]-2,bbox[3]-2,bbox[0]+2,bbox[3]-2))
+                self.__auto_anchor(uid,pos,anchor)
+                lt = stack[-1]
+                endx = self.bbox(lt)[2]
+                self.tag_unbind(lt, '<Button-1>')
+                self.tag_unbind(lt, '<Enter>')
+                self.tag_unbind(lt, '<Leave>')
+        def delete_to(cid):
+            nonlocal endx
+            while stack.__len__() > 1 and stack[-1] != cid:
+                self.delete(stack.pop())
+                self.delete(symstack.pop())
+            bbox = self.bbox(uid_button)
+            self.coords(back, (bbox[0]+2,bbox[1]+2,bbox[2]-2,bbox[1]+2,bbox[2]-2,bbox[3]-2,bbox[0]+2,bbox[3]-2))
+            self.__auto_anchor(uid,pos,anchor)
+            lt = stack[-1]
+            endx = self.bbox(lt)[2]
+            self.tag_unbind(lt, '<Button-1>')
+            self.tag_unbind(lt, '<Enter>')
+            self.tag_unbind(lt, '<Leave>')
+        root = self.create_text(pos, text=root, font=font, fill=fg, anchor='w')
+        font_size = self.__get_text_size(root)
+        segeo_font = '{Segoe Fluent Icons}' + font_size
+        uid = 'breadcrumb' + str(root)
+        uid_button = uid + 'button'
+        self.itemconfig(root, tags=(uid,uid_button))
+        bbox = self.bbox(root)
+        back = self.__ui_polygon(((bbox[0]+2,bbox[1]+2),(bbox[2]-2,bbox[3]-2)),fill=bg,outline=bg,width=9,tags=uid)
+        self.tkraise(root)
+        stack = collections.deque()
+        stack.append(root)
+        symstack = collections.deque()
+        _, dy = self.__auto_anchor(uid, pos, anchor)
+        endx = self.bbox(root)[2]
+        center_line = pos[1] + dy
+        funcs = FuncList(4)
+        funcs.get = get
+        funcs.add = add
+        funcs.delete = delete
+        funcs.delete_to = delete_to
+        return root, back, funcs, uid
 
 
 class TinUI(BasicTinUI):
@@ -4059,12 +4140,6 @@ def test(event):
     a.title('TinUI Test')
     b.add_paragraph((50,150),'这是TinUI按钮触达的事件函数回显，此外，窗口标题也被改变、首行标题缩进减小')#,font='{A019-Sounso Quality} 12')
     b.coords(m,100,5)
-def test1(word):
-    print(word)
-def test2(event):
-    ok1()
-def test3(event):
-    ok2()
 def __test4(prog):
     progressgoto(prog)
 def test4(event):
@@ -4133,22 +4208,22 @@ if __name__=='__main__':
     b.add_paragraph((2000,5),'location')
     b.add_paragraph((20,100),'下面的段落是测试画布的非平行字体显示效果，也是TinUI的简单介绍')
     b.add_button((250,450),'测试按钮',activefg='white',activebg='red',command=test,anchor='center',maxwidth=100)
-    b.add_checkbutton((60,430),'允许TinUI测试',command=test1,anchor='w')
+    b.add_checkbutton((60,430),'允许TinUI测试',command=print,anchor='w')
     b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
     uientry = b.add_entry((250, 330), 350, '', command=print, anchor='w')[0]
     uientry.insert(0, '请输入内容')
     b.add_button((20,170),'创建分割线',command=lambda event:b.add_separate((20,200),600),minwidth=200)
-    b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=test1)
+    b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=print)
     b.add_link((400,500),'TinGroup知识库','https://tinhome.bk-free02.com',anchor='nw')
     b.add_link((400,530),'执行print函数',print)
     b.add_link((400,560),'执行print目标函数','https://smart-space.com.cn/',command=lambda url:print('open> '+url))
     _,ok1,_=b.add_waitbar1((500,220),bg='#CCCCCC')
-    b.add_button((500,270),'停止等待动画',activefg='cyan',activebg='black',command=test2)
-    bu1=b.add_button((700,200),'停止点状滚动条',activefg='white',activebg='black',command=test3)[1]
+    _,_,ok2,_=b.add_waitbar2((600,400))
+    b.add_button((500,270),'停止等待动画',activefg='cyan',activebg='black',command=lambda e: ok1())
+    bu1=b.add_button((700,200),'停止点状滚动条',activefg='white',activebg='black',command=lambda e: ok2())[1]
     bu2=b.add_button((700,250),'nothing button 2')[1]
     bu3=b.add_button((700,300),'nothing button 3')[1]
     b.add_labelframe((bu1,bu2,bu3),'')
-    _,_,ok2,_=b.add_waitbar2((600,400))
     b.add_combobox((600,550),text='你有多大可能去珠穆朗玛峰',width=230,content=('20%','40%','60%','80%','100%','1000%'))
     b.add_button((600,480),text='测试进度条（无事件版本）',command=test4)
     _,_,_,progressgoto,_,_=b.add_progressbar((600,510))
@@ -4160,7 +4235,7 @@ if __name__=='__main__':
     scale_text,_,_=b.add_label((890,50),text='当前选值：2')
     b.add_info((710,140),info_text='this is info widget in TinUI, using TinUI\'s tooltip widget with its own style.',anchor='n')
     mtb=b.add_paragraph((0,720),'测试菜单（右键单击）')
-    b.add_menubar(mtb,cont=(('command',print),('menu',test1),'-',('TinUI文本移动',test)))
+    b.add_menubar(mtb,cont=(('command',print),('menu',print),'-',('TinUI文本移动',test)))
     ttb=b.add_paragraph((10,800),'TinUI能做些什么？')
     b.add_tooltip(ttb,'很多很多',delay=1)
     b.add_back(pos=(0,0),uids=(ttb,),bg='cyan',fg='cyan')
@@ -4245,7 +4320,7 @@ if __name__=='__main__':
     b.add_passwordbox((250,1400),350)
     b.add_picker((1400,230),command=print)
     # b.add_menubutton((1500,50),'menubutton',widget=False,cont=(('command',print),('menu',(('cmd1',print),('cmd2',test1))),'-',('TinUI文本移动',test)))
-    b.add_menubutton((1500,50),'menubutton',cont=(('command',print),('menu',test1),'-',('TinUI文本移动',test)))
+    b.add_menubutton((1500,50),'menubutton',cont=(('command',print),('menu',print),'-',('TinUI文本移动',test)))
     b.add_barbutton((1500,150))
     flylabel = b.add_label((1500,500),text='点击展开浮出UI')[-1]
     _, flyxml, flyhide, _ = b.add_flyout(flylabel, offset=(-20, 0))
@@ -4255,6 +4330,9 @@ if __name__=='__main__':
     <line><paragraph text='使用hide关闭'></paragraph></line>
     <line><button2 text='关闭浮出UI控件' command="self.funcs['flyhide']"></button2>
     </line></tinui>''')
+    bc = b.add_breadcrumb((1500,350),anchor='n',command=print)[-2]
+    for i in range(1,4):
+        bc.add(f'item{i}')
 
     b.bind('<Destroy>',lambda e:b.clean_windows())
 

@@ -345,3 +345,9 @@ class TinUIDark(TinUITheme):
             **{
                 'fg':'#202020','bg':'#202020',
             },**kw})
+    
+    def add_breadcrumb(self,pos,*arg,**kw):
+        return self.ui.add_breadcrumb(pos,*arg,**{
+            **{
+                'fg':'#ffffff','bg':'#202020','activefg':'#cccccc'
+            },**kw})

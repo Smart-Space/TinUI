@@ -191,6 +191,10 @@ class BasicTinUI(Canvas):
         dx,dy=self.__anchor_dict[anchor](bbox,pos)
         self.move(uid,dx,dy)
         return dx,dy
+    
+    def __ui_polygon(self,point2,fill='white',outline='black',width=1,tags=None):
+        points = (*point2[0], point2[1][0], point2[0][1], *point2[1], point2[0][0], point2[1][1])
+        return self.create_polygon(points,fill=fill,outline=outline,width=width,tags=tags)
 
     def __delete_uixml(self, uixml):
         # 删除伴随TinUIXml
@@ -443,12 +447,10 @@ class BasicTinUI(Canvas):
             self.tag_bind(button,'<Button-1>',call_command)
             entry.bind('<Return>',call_command)
             bubbox=self.bbox(button)
-        backpos=(bbox[0]+2,bbox[1]+2,bubbox[2]-2,bbox[1]+2,bubbox[2]-2,bbox[3]-2,bbox[0]+2,bbox[3]-2)
         bottomlinepos=(bbox[0]+2,bbox[3]-1,bubbox[2]-2,bbox[3]-1)
-        outlinepos=(bbox[0]+1,bbox[1]+1,bubbox[2]-1,bbox[1]+1,bubbox[2]-1,bbox[3]-1,bbox[0]+1,bbox[3]-1)
         bottomline=self.create_line(bottomlinepos,fill=outline,width=9,capstyle='round',tags=uid)#bottomline
-        back=self.create_polygon(backpos,fill=bg,outline=bg,width=9,tags=uid)#back
-        outl=self.create_polygon(outlinepos,fill=line,outline=line,width=9,tags=uid)#outline
+        back=self.__ui_polygon(((bbox[0]+2,bbox[1]+2),(bubbox[2]-2,bbox[3]-2)),fill=bg,outline=bg,width=9,tags=uid)#back
+        outl=self.__ui_polygon(((bbox[0]+1,bbox[1]+1),(bubbox[2]-1,bbox[3]-1)),fill=line,outline=line,width=9,tags=uid)#outline
         self.lower(outl,bottomline)
         if command!=None:
             self.tkraise(button)
@@ -587,7 +589,7 @@ class BasicTinUI(Canvas):
         font=self.itemcget(link,'font')+' underline'
         self.itemconfig(link,font=font)
         bbox=self.bbox(link)
-        back=self.create_polygon((bbox[0]+1,bbox[1]+1,bbox[2]-1,bbox[1]+1,bbox[2]-1,bbox[3]-1,bbox[0]+1,bbox[3]-1),width=9,tags=uid,fill='',outline='')
+        back=self.__ui_polygon(((bbox[0]+1,bbox[1]+1),(bbox[2]-1,bbox[3]-1)),width=9,tags=uid,fill='',outline='')
         self.tkraise(link)
         self.tag_bind(uid,'<Enter>',turn_red)
         self.tag_bind(uid,'<Leave>',turn_back)
@@ -638,11 +640,11 @@ class BasicTinUI(Canvas):
             ex=nex if nex>ex else ex
             ey=ney if ney>ey else ey
         bg=self['background'] if bg=='' else bg
-        back=self.create_polygon((sx+3,sy-9,ex-3,sy-9,ex-3,ey-3,sx+3,ey-3),fill=bg,outline=bg,width=17)
+        back=self.__ui_polygon(((sx+3,sy-9),(ex-3,ey-3)),fill=bg,outline=bg,width=17)
         uid='labelframe-'+str(back)
         self.itemconfig(back,tags=uid)
         self.lower(back)
-        outline=self.create_polygon((sx+2,sy-10,ex-2,sy-10,ex-2,ey-2,sx+2,ey-2),fill=fg,outline=fg,width=17,tags=uid)
+        outline=self.__ui_polygon(((sx+2,sy-10),(ex-2,ey-2)),fill=fg,outline=fg,width=17,tags=uid)
         self.lower(outline)
         if title:
             label=self.create_text(((sx+ex)//2,sy-20),font=font,text=title,fill=fg,anchor='center',tags=uid)
@@ -799,10 +801,8 @@ class BasicTinUI(Canvas):
         font_size=str(iconfont.cget('size'))
         button=self.create_text((x2-1,(y1+y2)/2),text='\uE70D',fill=fg,font='{Segoe Fluent Icons} '+font_size,tags=uid,anchor='w')#按钮
         x1,y1,x2,y2=self.bbox(uid)#文本与按钮区域
-        backpos=(x1+1,y1+1,x2-1,y1+1,x2-1,y2-1,x1+1,y2-1)
-        outlinepos=(x1,y1,x2,y1,x2,y2,x1,y2)
-        back=self.create_polygon(backpos,fill=bg,outline=bg,width=9,tags=uid)
-        oline=self.create_polygon(outlinepos,fill=outline,outline=outline,width=9,tags=uid)
+        back=self.__ui_polygon(((x1+1,y1+1),(x2-1,y2-1)),fill=bg,outline=bg,width=9,tags=uid)
+        oline=self.__ui_polygon(((x1,y1),(x2,y2)),fill=outline,outline=outline,width=9,tags=uid)
         self.tkraise(back)
         self.tkraise(main)
         self.tkraise(button)
@@ -821,8 +821,8 @@ class BasicTinUI(Canvas):
         wind=TinUINum()#记录数据
         bar=BasicTinUI(pickbox,bg=tran)
         bar.pack(fill='both',expand=True)
-        bar.create_polygon((13,13,x2-x1-4,13,x2-x1-4,height-12,13,height-12),fill=bg,outline=bg,width=17)
-        bar.lower(bar.create_polygon((12,12,x2-x1-3,12,x2-x1-3,height-11,12,height-11),fill=outline,outline=outline,width=17))
+        bar.__ui_polygon(((13,13),(x2-x1-4,height-12)),fill=bg,outline=bg,width=17)
+        bar.lower(bar.__ui_polygon(((12,12),(x2-x1-3,height-11)),fill=outline,outline=outline,width=17))
         boxback = bar.add_listbox((7,7),x2-x1-7,height-15,bg=bg,fg=listfg,data=content,activefg=listactivefg,activebg=listactivebg,onfg=listonfg,onbg=listonbg,sel=listsel,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)[1]
         bar.delete(boxback)
         self.__auto_anchor(uid,pos,anchor)
@@ -936,9 +936,9 @@ class BasicTinUI(Canvas):
         self.delete(last_line)#删除最后一行水平分割线
         for i in ti_list[1:]:#竖直分割线
             self.create_line((i[1]-1,pos[1],i[1]-1,end_y),fill=outline,tags=uid)
-        all_back=self.create_polygon((pos[0],pos[1],end_x-1,pos[1],end_x-1,end_y-1,pos[0],end_y-1),width=9,outline=headbg,fill=headbg,tags=uid)
-        outline_back=self.create_polygon((pos[0]-1,pos[1]-1,end_x,pos[1]-1,end_x,end_y,pos[0]-1,end_y),width=9,outline=outline,fill=outline,tags=uid)
-        value_back=self.create_polygon((v_endx,v_endy,end_x-1,v_endy,end_x-1,end_y-1,pos[0],end_y-1),width=9,outline=bg,fill=bg,tags=uid)
+        all_back=self.__ui_polygon((pos,(end_x-1,end_y-1)),width=9,outline=headbg,fill=headbg,tags=uid)
+        outline_back=self.__ui_polygon(((pos[0]-1,pos[1]-1),(end_x,end_y)),width=9,outline=outline,fill=outline,tags=uid)
+        value_back=self.__ui_polygon(((v_endx,v_endy),(end_x-1,end_y-1)),width=9,outline=bg,fill=bg,tags=uid)
         self.lower(value_back)
         self.lower(all_back)
         self.lower(outline_back)
@@ -1110,10 +1110,8 @@ class BasicTinUI(Canvas):
         button = self.add_button2((pos[0]+width,(y1+y2)/2),anchor='w',text='\uEC8F',linew=1,line='',activeline='',online='',fg=fg,bg='',activefg=activefg,activebg='',onfg=onfg,onbg='',font='{Segoe Fluent Icons} '+font_size,command=_change_data)
         self.addtag_withtag(uid, button[-1])
         backbbox=self.bbox(uid)
-        backpos=(backbbox[0]+2,backbbox[1]+4,backbbox[2]-3,backbbox[1]+4,backbbox[2]-3,backbbox[3]-5,backbbox[0]+2,backbbox[3]-5)
-        linepos=(backbbox[0]+1,backbbox[1]+3,backbbox[2]-2,backbbox[1]+3,backbbox[2]-2,backbbox[3]-4,backbbox[0]+1,backbbox[3]-4)
-        back=self.create_polygon(backpos,fill=bg,outline=bg,width=9,tags=uid)
-        outline=self.create_polygon(linepos,fil=line,outline=line,width=9,tags=uid)
+        back=self.__ui_polygon(((backbbox[0]+2,backbbox[1]+4),(backbbox[2]-3,backbbox[3]-5)),fill=bg,outline=bg,width=9,tags=uid)
+        outline=self.__ui_polygon(((backbbox[0]+1,backbbox[1]+3),(backbbox[2]-2,backbbox[3]-4)),fill=line,outline=line,width=9,tags=uid)
         # 隐藏的调节按钮
         cui = uid + '_cui'
         button1=self.add_button2((pos[0]+width+2,(y1+y2)/2),anchor='sw',text='\uE70E',linew=1,line=boxbg,activeline=boxactivebg,fg=boxfg,bg=boxbg,activefg=boxactivefg,activebg=boxactivebg,onfg=onfg,onbg=onbg,online=onbg,font='{Segoe Fluent Icons} '+font_size,command=updata)
@@ -1345,10 +1343,8 @@ class BasicTinUI(Canvas):
         bbox=bar.bbox('all')
         x1=bbox[0]
         x2=bbox[0]+max(widths)+8
-        gomap=((x1+9,bbox[1]+5),(x2-5,bbox[1]+5),(x2-5,bbox[3]-5),(x1+9,bbox[3]-5))
-        mback=bar.create_polygon(gomap,fill=bg,outline=bg,width=17)
-        gomap=((x1+8,bbox[1]+4),(x2-4,bbox[1]+4),(x2-4,bbox[3]-4),(x1+8,bbox[3]-4))
-        mline=bar.create_polygon(gomap,fill=bg,outline=line,width=17)
+        mback=bar.__ui_polygon(((x1+9,bbox[1]+5),(x2-5,bbox[3]-5)),fill=bg,outline=bg,width=17)
+        mline=bar.__ui_polygon(((x1+8,bbox[1]+4),(x2-4,bbox[3]-4)),fill=bg,outline=line,width=17)
         bar.lower(mback)
         bar.lower(mline)
         bar.move('all',12,5)
@@ -1396,11 +1392,8 @@ class BasicTinUI(Canvas):
             bbox[1]+=5
             bbox[2]-=5
             bbox[3]-=5
-            #绘制圆角边框
-            tlinemap=((bbox[0]-1,bbox[1]-1),(bbox[2]+1,bbox[1]-1),(bbox[2]+1,bbox[3]+1),(bbox[0]-1,bbox[3]+1))
-            bar.create_polygon(tlinemap,fill=outline,outline=outline,width=17,splinesteps=32)# tline
-            gomap=((bbox[0],bbox[1]),(bbox[2],bbox[1]),(bbox[2],bbox[3]),(bbox[0],bbox[3]))
-            bar.create_polygon(gomap,fill=bg,outline=bg,width=17,splinesteps=32)# back
+            bar.__ui_polygon(((bbox[0]-1,bbox[1]-1),(bbox[2]+1,bbox[3]+1)),fill=outline,outline=outline,width=17)# tline
+            bar.__ui_polygon(((bbox[0],bbox[1]),(bbox[2],bbox[3])),fill=bg,outline=bg,width=17)# back
             bar.tkraise(info)
             toti.attributes('-transparent',tran)
             toti.attributes('-alpha',0.9)#透明度90%
@@ -1437,12 +1430,7 @@ class BasicTinUI(Canvas):
                         if old==None or p>old:#最终位置
                             cpos[count]=p
                     count+=1
-            cpos[0]-=2
-            cpos[1]-=2
-            cpos[2]+=2
-            cpos[3]+=2
-            bbox=(cpos[0]+4,cpos[1]+4,cpos[2]-4,cpos[1]+4,cpos[2]-4,cpos[3]-4,cpos[0]+4,cpos[3]-4)
-            back=self.create_polygon(bbox,fill=bg,outline=fg,width=9+linew,splinesteps=32)
+            back=self.__ui_polygon(((cpos[0]+2,cpos[1]+2),(cpos[2]-2,cpos[3]-2)),fill=bg,outline=fg,width=9+linew)
         self.lower(back)
         return back
 
@@ -1817,7 +1805,7 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(uid, hscroll)
         self.addtag_withtag(uid, vscroll)
         x1, y1, x2, y2 = self.bbox(uid)
-        allback = self.create_polygon((x1, y1, x2, y1, x2, y2, x1, y2), width=9, outline=bg, fill=bg, tags=uid)
+        allback = self.__ui_polygon(((x1, y1), (x2, y2)), width=9, outline=bg, fill=bg, tags=uid)
         self.lower(allback)
         #choices不返回，避免编写者直接操作选项
         all_keys=[]#[a-id,b-id,...]
@@ -2169,8 +2157,7 @@ class BasicTinUI(Canvas):
             tbbbox=tbu.bbox(titleu)
             if cancancel==False:
                 tbu.itemconfig(cb,state='hidden')
-            bux=(endx+2,tbbbox[1],cbx+13,tbbbox[1],cbx+13,tbbbox[3],endx+2,tbbbox[3])
-            bu=tbu.create_polygon(bux,fill=bg,outline=bg,width=9,tags=(labeluid))
+            bu=tbu.__ui_polygon(((endx+2,tbbbox[1]),(cbx+13,tbbbox[3])),fill=bg,outline=bg,width=9,tags=(labeluid))
             tbu.lower(bu)
             #移动newpageuid
             npmovex=cbx+15+5.5-npx
@@ -2306,10 +2293,8 @@ class BasicTinUI(Canvas):
         scro=self.add_scrollbar((pos[0]+5,pos[1]+32),tbu,height=width-5,direction='x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)
         self.addtag_withtag(uid,scro[-1])
         barheight=self.bbox(scro[-1])[3]
-        # backpos=(pos[0]+5,pos[1]+3,pos[0]+width,pos[1]+3,pos[0]+width,barheight+height-3,pos[0]+5,barheight+height-3,pos[0]+5,pos[1]+5)
         #新的backpos横纵坐标集向内缩小3单位
-        backpos=(pos[0]+8,pos[1]+6,pos[0]+width-3,pos[1]+6,pos[0]+width-3,barheight+height-3,pos[0]+8,barheight+height-3)
-        back=self.create_polygon(backpos,outline=color,fill=color,width=17,tags=uid)
+        back=self.__ui_polygon(((pos[0]+8,pos[1]+6),(pos[0]+width-3,barheight+height-3)),outline=color,fill=color,width=17,tags=uid)
         self.tkraise(tbuid)
         self.tkraise(scro[-1])
         viewpos=(pos[0]+2,barheight+2)
@@ -2324,8 +2309,7 @@ class BasicTinUI(Canvas):
         newpagetext=tbu.create_text((npx,5),text='\uf8aa',font='{Segoe Fluent Icons} 12',fill=fg,anchor='nw',tags=newpageuid)
         nptbbox=tbu.bbox(newpagetext)
         #newpageback
-        npb=(nptbbox[0]+2,nptbbox[1]+2,nptbbox[2]-2,nptbbox[1]+2,nptbbox[2]-2,nptbbox[3]-2,nptbbox[0]+2,nptbbox[3]-2)
-        newpageback=tbu.create_polygon(npb,fill=bg,outline=bg,width=9,tags=newpageuid)
+        newpageback=tbu.__ui_polygon(((nptbbox[0]+2,nptbbox[1]+2),(nptbbox[2]-2,nptbbox[3]-2)),fill=bg,outline=bg,width=9,tags=newpageuid)
         tbu.tkraise(newpagetext)
         tbu.itemconfig(newpageuid,state='hidden')
         newfunction=None#触发函数
@@ -2364,17 +2348,13 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(uid,toptext)
         tx1,ty1,tx2,ty2=self.bbox(toptext)
         tx2 = max(tx1 + width, tx2)
-        topback=self.create_polygon((tx1,ty1,tx2,ty1,tx2,ty2,tx1,ty2),outline=tbg,fill=tbg,width=17,tags=uid)
+        topback=self.__ui_polygon(((tx1,ty1),(tx2,ty2)),outline=tbg,fill=tbg,width=17,tags=uid)
         content=self.create_text((tx1,ty2+18),text=text,font=font,fill=fg,width=width,anchor='nw',tags=uid)#便笺内容
         cx1,cy1,cx2,cy2=self.bbox(content)
         cx2 = max(cx1 + width, cx2)
-        contentback=self.create_polygon((cx1,cy1,cx2,cy1,cx2,cy2,cx1,cy2),outline=bg,fill=bg,width=17,tags=uid)
+        contentback=self.__ui_polygon(((cx1,cy1),(cx2,cy2)),outline=bg,fill=bg,width=17,tags=uid)
         ax1,ay1,ax2,ay2=self.bbox(uid)#大背景
-        ax1+=8
-        ay1+=8
-        ax2-=8
-        ay2-=8
-        self.create_polygon((ax1,ay1,ax2,ay1,ax2,ay2,ax1,ay2),outline=sep,fill=sep,width=17,tags=uid)
+        self.__ui_polygon(((ax1+8,ay1+8),(ax2-8,ay2-8)),outline=sep,fill=sep,width=17,tags=uid)
         #调整元素层级关系
         self.tkraise(topback)
         self.tkraise(toptext)
@@ -2538,7 +2518,6 @@ class BasicTinUI(Canvas):
         #标识符内部宽度width和边框宽度line
         back_width=18
         back_line=2#16+2*2=20
-        #active... = back...
         boxes=[]#[(sign_back_id,sign_id,text_id,back_id),...]，换行为(None,'\n',None)
         nowx,nowy=pos#x坐标为左上角插入坐标，y坐标为底部坐标
         uid='radiobox'+str(id(pos))
@@ -2705,10 +2684,8 @@ class BasicTinUI(Canvas):
             dx=minwidth-nowwidth
             x2+=dx/2
             x1-=dx/2
-        outline_t=(x1-linew,y1-linew,x2+linew,y1-linew,x2+linew,y2+linew,x1-linew,y2+linew)
-        outline=self.create_polygon(outline_t,width=9,tags=uid,fill=line,outline=line)
-        back_t=(x1+1,y1+1,x2-1,y1+1,x2-1,y2-1,x1+1,y2-1)
-        back=self.create_polygon(back_t,width=9,tags=uid,fill=bg,outline=bg)
+        outline=self.__ui_polygon(((x1-linew,y1-linew),(x2+linew,y2+linew)),width=9,tags=uid,fill=line,outline=line)
+        back=self.__ui_polygon(((x1+1,y1+1),(x2-1,y2-1)),width=9,tags=uid,fill=bg,outline=bg)
         self.tag_bind(uid, '<Button-1>', on_click)
         self.tag_bind(uid, '<ButtonRelease-1>', out_click)
         self.tag_bind(uid, '<Enter>', in_button)
@@ -2744,7 +2721,7 @@ class BasicTinUI(Canvas):
         tx1,ty1,tx2,ty2=self.bbox(toptext)
         if tx2-tx1<width:#判读当前文本宽度
             tx2=tx1+width
-        topback=self.create_polygon((tx1,ty1,tx2,ty1,tx2,ty2,tx1,ty2),outline=tbg,fill=tbg,width=17,tags=(uid,contentid))#标题背景
+        topback=self.__ui_polygon(((tx1,ty1),(tx2,ty2)),outline=tbg,fill=tbg,width=17,tags=(uid,contentid))#标题背景
         font_size=str(int(self.__get_text_size(toptext)))#字体大小
         button=self.add_button2((tx2+5,(ty1+ty2)/2),anchor='e',text='',icon='\uE70D',font='{Segoe Fluent Icons} '+font_size,fg=buttonfg,bg=buttonbg,line=buttonline,activeline=activeline,activefg=activefg,activebg=activebg,onfg=onfg,onbg=onbg,online=online,command=do_expand)
         self.addtag_withtag(uid,button[-1])
@@ -2759,11 +2736,7 @@ class BasicTinUI(Canvas):
         ui.bind('<Destroy>', lambda event: self.__delete_uixml(ux))
         content=self.create_window((tx1-3,ty2+10),window=ui,anchor='nw',width=width+6,height=height,tags=(uid,contentid),state='hidden')#便笺内容
         ax1,ay1,ax2,ay2=self.bbox(uid)#大背景
-        ax1+=8
-        ay1+=8
-        ax2-=8
-        ay2-=3
-        allback=self.create_polygon((ax1,ay1,ax2,ay1,ax2,ay2,ax1,ay2),outline=sep,fill=sep,width=17,tags=uid)
+        allback=self.__ui_polygon(((ax1+8,ay1+8),(ax2-8,ay2-3)),outline=sep,fill=sep,width=17,tags=uid)
         expand=False#当前还没有扩展
         #调整元素层级关系
         self.tkraise(topback)
@@ -2804,8 +2777,8 @@ class BasicTinUI(Canvas):
         self.windows.append(frame)
         uid='waitframe'+str(frameid)
         self.addtag_withtag(uid,frameid)
-        itemfg=frame.create_polygon((0,0,width,0,width,height,0,height),outline=fg,fill=fg,width=17)
-        itembg=frame.create_polygon((0,0,width,0,width,height,0,height),outline=bg,fill=bg,width=17)
+        itemfg=frame.__ui_polygon(((0,0),(width,height)),outline=fg,fill=fg,width=17)
+        itembg=frame.__ui_polygon(((0,0),(width,height)),outline=bg,fill=bg,width=17)
         frame.move(itemfg,-width,-height)
         mx=width/40
         my=height/40
@@ -3017,8 +2990,7 @@ class BasicTinUI(Canvas):
         linew=bbox[3]-bbox[1]
         line=box.create_line((1,linew/3,1,linew*2/3),fill=oncolor,width=3,capstyle='round')
         x1, y1, x2, y2 = self.bbox(uid)
-        backpos = (x1, y1, x2, y1, x2, y2, x1, y2)
-        self.create_polygon(backpos, outline=bg, fill=bg, width=9, tags=uid)# allback
+        self.__ui_polygon(((x1, y1), (x2, y2)), outline=bg, fill=bg, width=9, tags=uid)# allback
         self.lift(cavui)
         self.lift(hscroll)
         self.lift(vscroll)
@@ -3124,12 +3096,10 @@ class BasicTinUI(Canvas):
         font_size=str(_font.cget('size'))
         funcw=self.create_text((bbox[0]+width,(bbox[1]+bbox[3])/2),text='\uF78D',fill=fg,font='{Segoe Fluent Icons} '+font_size,anchor='w',tags=uid)
         bubbox=self.bbox(funcw)
-        backpos=(bbox[0]+2,bbox[1]+2,bubbox[2]-2,bbox[1]+2,bubbox[2]-2,bbox[3]-2,bbox[0]+2,bbox[3]-2)
         bottomlinepos=(bbox[0]+2,bbox[3]-1,bubbox[2]-2,bbox[3]-1)
-        outlinepos=(bbox[0]+1,bbox[1]+1,bubbox[2]-1,bbox[1]+1,bubbox[2]-1,bbox[3]-1,bbox[0]+1,bbox[3]-1)
         bottomline=self.create_line(bottomlinepos,fill=outline,width=9,capstyle='round',tags=uid)#bottomline
-        back=self.create_polygon(backpos,fill=bg,outline=bg,width=9,tags=uid)#back
-        outl=self.create_polygon(outlinepos,fill=line,outline=line,width=9,tags=uid)#out
+        back=self.__ui_polygon(((bbox[0]+2,bbox[1]+2),(bubbox[2]-2,bbox[3]-2)),fill=bg,outline=bg,width=9,tags=uid)#back
+        outl=self.__ui_polygon(((bbox[0]+1,bbox[1]+1),(bubbox[2]-1,bbox[3]-1)),fill=line,outline=line,width=9,tags=uid)#out
         self.lower(outl,bottomline)
         self.tkraise(funcw)
         if_empty(None)
@@ -3171,9 +3141,6 @@ class BasicTinUI(Canvas):
             self.itemconfig(img,image=self.images[-1])
         self.__auto_anchor(img,pos,anchor)
         return img
-
-    #def add_gif(self):#绘制动图
-    #    ...
 
     def add_togglebutton(self,pos:tuple,text:str,fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#f3f4fd',activebg='#3041d8',activeline='#5360de',font=('微软雅黑',12),command=None,anchor='nw'):#绘制状态开关按钮
         #状态开关按钮当前不再对鼠标进入和离开进行响应
@@ -3258,10 +3225,8 @@ class BasicTinUI(Canvas):
         self.itemconfig(button,tags=uid)
         x1,y1,x2,y2=self.bbox(button)
         linew-=1
-        outline_t=(x1-linew,y1-linew,x2+linew,y1-linew,x2+linew,y2+linew,x1-linew,y2+linew)
-        outline=self.create_polygon(outline_t,width=9,tags=uid,fill=line,outline=line)
-        back_t=(x1+1,y1+1,x2-1,y1+1,x2-1,y2-1,x1+1,y2-1)
-        back=self.create_polygon(back_t,width=9,tags=uid,fill=bg,outline=bg)
+        outline=self.__ui_polygon(((x1-linew,y1-linew),(x2+linew,y2+linew)),width=9,tags=uid,fill=line,outline=line)
+        back=self.__ui_polygon(((x1+1,y1+1),(x2-1,y2-1)),width=9,tags=uid,fill=bg,outline=bg)
         self.tag_bind(button,'<Button-1>',on_click)
         self.tag_bind(back,'<Button-1>',on_click)
         self.tkraise(button)
@@ -3536,8 +3501,8 @@ class BasicTinUI(Canvas):
         wind=TinUINum()#记录数据
         bar=BasicTinUI(picker,bg=tran)
         bar.pack(fill='both',expand=True)
-        bar.create_polygon((13,13,width-13,13,width-13,height-11,13,height-11),fill=bg,outline=bg,width=17)
-        bar.lower(bar.create_polygon((12,12,width-12,12,width-12,height-10,12,height-10),fill=outline,outline=outline,width=17))
+        bar.__ui_polygon(((13,13),(width-13,height-11)),fill=bg,outline=bg,width=17)
+        bar.lower(bar.__ui_polygon(((12,12),(width-12,height-10)),fill=outline,outline=outline,width=17))
         __count=0
         end_x=8
         y=9
@@ -3644,10 +3609,8 @@ class BasicTinUI(Canvas):
             self.dtag(uid+'widget')
         x1,y1,x2,y2=self.bbox(uid+'button')
         linew-=1
-        outline_t=(x1-linew,y1-linew,x2+linew,y1-linew,x2+linew,y2+linew,x1-linew,y2+linew)
-        outline=self.create_polygon(outline_t,width=9,tags=uid,fill=line,outline=line)
-        back_t=(x1+1,y1+1,x2-1,y1+1,x2-1,y2-1,x1+1,y2-1)
-        back=self.create_polygon(back_t,width=9,tags=uid,fill=bg,outline=bg)
+        outline=self.__ui_polygon(((x1-linew,y1-linew),(x2+linew,y2+linew)),width=9,tags=uid,fill=line,outline=line)
+        back=self.__ui_polygon(((x1+1,y1+1),(x2-1,y2-1)),width=9,tags=uid,fill=bg,outline=bg)
         #创建菜单
         menu=self.add_menubar(uid,'<Button-1>',font=font,fg=fg,bg=bg,line=line,activefg=menuonfg,activebg=menuonbg,activeline=menuonline,onfg=onfg,onbg=onbg,online=online,cont=cont,tran=tran)[0]
         self.tag_unbind(uid,'<Button-1>')
@@ -3796,9 +3759,9 @@ class BasicTinUI(Canvas):
         self.tag_bind(fid, bind, show, True)
         return ui, uixml, hide, uid
 
-    # def add_flyoutwindow(self, fid, width:int=250, height:int=150, bind='<Button-1>', line='#dcdcdc', bg='#f9f9f9', anchor='n', pos=None):# 悬浮窗口
-    #     # 注意，默认布局在fid正上方
-    #     ...
+    def add_breadcrumb(self,pos:tuple,font='微软雅黑 12'):
+        # 绘制面包屑导航组件
+        pass
 
 
 class TinUI(BasicTinUI):

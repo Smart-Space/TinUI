@@ -76,10 +76,11 @@ class TinUIDark(TinUITheme):
             },**kw})
 
     def add_waitbar1(self,pos,*arg,**kw):
-        return self.ui.add_waitbar1(pos,*arg,**{
-            **{
-                'fg':'#b2b8f2','bg':'#202020','okfg':'#b2b8f2','bd':5,
-            },**kw})
+        # return self.ui.add_waitbar1(pos,*arg,**{
+        #     **{
+        #         'fg':'#b2b8f2','bg':'#202020','okfg':'#b2b8f2','bd':5,
+        #     },**kw})
+        ...
 
     def add_labelframe(self,uids:tuple,*arg,**kw):
         return self.ui.add_labelframe(uids,*arg,**{
@@ -88,10 +89,11 @@ class TinUIDark(TinUITheme):
             },**kw})
 
     def add_waitbar2(self,pos,*arg,**kw):
-        return self.ui.add_waitbar2(pos,*arg,**{
-            **{
-                'fg':'#b2b8f2','bg':'#202020','okcolor':'#6ccb5f',
-            },**kw})
+        # return self.ui.add_waitbar2(pos,*arg,**{
+        #     **{
+        #         'fg':'#b2b8f2','bg':'#202020','okcolor':'#6ccb5f',
+        #     },**kw})
+        ...
 
     def add_combobox(self,pos,*arg,**kw):
         return self.ui.add_combobox(pos,*arg,**{
@@ -297,12 +299,13 @@ class TinUIDark(TinUITheme):
             },**kw})
     
     def add_swipecontrol(self,pos,*arg,**kw):
-        return self.ui.add_swipecontrol(pos,*arg,**{
-            **{
-                'fg':'#ffffff','bg':'#202020','line':'#2d2d2d',
-                'data':{'left':({'text':'✔️\nok','fg':'#000000','bg':'#a9a9a9','command':print},),
-                'right':({'text':'❌\nclose'},)},
-            },**kw})
+        # return self.ui.add_swipecontrol(pos,*arg,**{
+        #     **{
+        #         'fg':'#ffffff','bg':'#202020','line':'#2d2d2d',
+        #         'data':{'left':({'text':'✔️\nok','fg':'#000000','bg':'#a9a9a9','command':print},),
+        #         'right':({'text':'❌\nclose'},)},
+        #     },**kw})
+        ...
 
     def add_picker(self,pos,*arg,**kw):
         return self.ui.add_picker(pos,*arg,**{

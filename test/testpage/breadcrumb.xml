@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='back'></title>
+    </line>
+    <line>
+        <paragraph text='面包屑导航栏。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line anchor='w'>
+        <breadcrumb>bc</breadcrumb>
+    </line>
+</line>
+</tinui>

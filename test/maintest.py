@@ -48,6 +48,10 @@ def loadcontrol(controlname):
     elif controlname=='waitframe':
         waitframe=duixml.tags['waitframe'][-2]
         waitframe.start()
+    elif controlname=='breadcrumb':
+        bc=duixml.tags['bc'][-2]
+        for i in range(1,5):
+            bc.add('test'+str(i))
     elif controlname=='TinUIXml':#严格来说，这不是控件，而是TinUI框架的一部分
         pass
 
@@ -59,13 +63,6 @@ xmlf.close()
 
 window = Tk()
 
-# if platform.system()=='Windows':
-#     import ctypes
-#     try:
-#         ctpyes.windll.shcore.SetProcessDpiAwareness(1)
-#     except:
-#         ctypes.windll.user32.SetProcessDPIAware()
-
 window.resizable(False,False)
 window.iconbitmap('../LOGO.ico')
 window.title("TinUI main test")
@@ -74,7 +71,7 @@ ui=BasicTinUI(window, bg='#f3f3f3')
 uix=TinUIXml(ui)
 
 uix.funcs['loadcontrol']=loadcontrol
-uix.datas['controls']=['back', 'barbutton', 'button', 'button2', 'canvas', 'checkbutton', 
+uix.datas['controls']=['back', 'barbutton', 'breadcrumb', 'button', 'button2', 'canvas', 'checkbutton', 
  'combobox', 'entry', 'expander', 'flyout', 'image', 'info', 'label', 'labelframe',
  'link', 'listbox', 'listview', 'menubar', 'menubutton', 'notebook', 'notecard', 
  'onoff', 'paragraph', 'passwordbox', 'picker', 'pipspager', 'pivot', 'progressbar', 

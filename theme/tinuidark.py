@@ -149,10 +149,11 @@ class TinUIDark(TinUITheme):
             },**kw})
 
     def add_info(self,pos,*arg,**kw):
-        return self.ui.add_info(pos,*arg,**{
-            **{
-                'fg':'#b2b8f2','bg':'#2d2d2d','info_fg':'#ffffff',
-            },**kw})
+        # return self.ui.add_info(pos,*arg,**{
+        #     **{
+        #         'fg':'#b2b8f2','bg':'#2d2d2d','info_fg':'#ffffff',
+        #     },**kw})
+        ...
 
     def add_menubar(self,uid,*arg,**kw):
         return self.ui.add_menubar(uid,*arg,**{

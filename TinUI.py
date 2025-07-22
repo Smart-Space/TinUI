@@ -1644,6 +1644,10 @@ class BasicTinUI(Canvas):
             cid=self.add_scrollbar((bbox[2]+5,bbox[1]),textbox,bbox[3]-bbox[1],'y',bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
             self.addtag_withtag(uid,cid)
             del bbox
+        dx,dy=self.__auto_anchor(uid,pos,anchor)
+        if scrollbar:
+            cid.move(dx,dy,height)
+        del dx,dy
         funcs=FuncList(3)
         funcs.get=get
         funcs.delete=delete
@@ -1754,7 +1758,7 @@ class BasicTinUI(Canvas):
                 startp=(bbox[0]-start)/canmove
                 widget.xview('moveto',startp)
         def __move(dx,dy,size):
-            nonlocal start,end,canmove, height
+            nonlocal start,end,canmove,height
             pos[0]+=dx
             pos[1]+=dy
             if mode=='y':
@@ -1768,8 +1772,8 @@ class BasicTinUI(Canvas):
                 self.coords(back,coord)
             elif mode=='x':
                 start+=dx
-                end=start+size-25
-                canmove=size-25
+                end=start+size-30
+                canmove=size-40
                 self.move(bottom,size-height,0)
                 coord=self.coords(back)
                 coord[2] += size-height
@@ -1866,6 +1870,23 @@ class BasicTinUI(Canvas):
                 result=TinUIString(name)
                 result.index=index
                 command(result)
+        def __re_scroll():
+            bbox=box.bbox('all')
+            if bbox == None:
+                bbox = (0, 0, 0, 0)
+            if bbox[2]-bbox[0] > width:
+                self.itemconfig(cavui, height=height-8)
+                self.itemconfig(vscroll, state='normal')
+            else:
+                self.itemconfig(cavui, height=height)
+                self.itemconfig(vscroll, state='hidden')
+            if bbox[3]-bbox[1] > height:
+                self.itemconfig(cavui, width=width-8)
+                self.itemconfig(hscroll, state='normal')
+            else:
+                self.itemconfig(cavui, width=width)
+                self.itemconfig(hscroll, state='hidden')
+            box.config(scrollregion=bbox)
         def _add(item:str='new item'):#添加元素
             load_data({item,})
         def _delete(index:int=0):#删除元素，默认第一个
@@ -1889,22 +1910,7 @@ class BasicTinUI(Canvas):
             if maxwidth<width:
                 maxwidth=width
             repaint_back()
-            bbox=box.bbox('all')
-            if bbox == None:
-                bbox = (0, 0, 0, 0)
-            if bbox[2]-bbox[0] > width:
-                self.itemconfig(cavui, height=height-8)
-                self.itemconfig(vscroll, state='normal')
-            else:
-                self.itemconfig(cavui, height=height)
-                self.itemconfig(vscroll, state='hidden')
-            if bbox[3]-bbox[1] > height:
-                self.itemconfig(cavui, width=width-8)
-                self.itemconfig(hscroll, state='normal')
-            else:
-                self.itemconfig(cavui, width=width)
-                self.itemconfig(hscroll, state='hidden')
-            box.config(scrollregion=bbox)
+            __re_scroll()
         def _clear():#清空元素
             nonlocal maxwidth
             for key in choices.keys():
@@ -1938,30 +1944,37 @@ class BasicTinUI(Canvas):
             if tbbox==None:
                 return
             twidth=tbbox[2]-tbbox[0]
-            maxwidth=twidth if twidth>maxwidth else maxwidth
+            maxwidth=twidth
             if maxwidth<width:
                 maxwidth=width
             repaint_back()
-            bbox = box.bbox('all')
-            if bbox[2]-bbox[0] > width:
-                self.itemconfig(cavui, height=height-8)
-                self.itemconfig(vscroll, state='normal')
-            else:
-                self.itemconfig(cavui, height=height)
-                self.itemconfig(vscroll, state='hidden')
-            if bbox[3]-bbox[1] > height:
-                self.itemconfig(cavui, width=width-8)
-                self.itemconfig(hscroll, state='normal')
-            else:
-                self.itemconfig(cavui, width=width)
-                self.itemconfig(hscroll, state='hidden')
-            box.config(scrollregion=bbox)
+            __re_scroll()
         def set_y_view(event):
             box.yview_scroll(int(-1*(event.delta/120)), "units")
         def __layout(x1,y1,x2,y2,expand=False):
             nonlocal width,height
             if not expand:
                 dx,dy=self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
+                hscroll.move(dx,dy,height)
+                vscroll.move(dx,dy,width)
+            else:
+                dx,dy=self.__auto_layout(uid,(x1,y1,x2,y2),'nw')
+                width2=x2-x1-9
+                dw=width2-width
+                height2=y2-y1-9
+                dh=height2-height
+                width=width2
+                height=height2
+                self.move(hscroll,dw,0)
+                hscroll.move(dx+dw,dy,height)
+                self.move(vscroll,0,dh)
+                vscroll.move(dx,dy+dh,width)
+                coord=self.coords(allback)
+                coord[2]=coord[4]=x2-4
+                coord[5]=coord[7]=y2-4
+                self.coords(allback,coord)
+                self.itemconfig(cavui,width=width,height=height)
+                load_data({})
         def clean(event):
             nonlocal all_keys, choices
             del all_keys
@@ -1971,12 +1984,11 @@ class BasicTinUI(Canvas):
                 return None
             key = choices[index]
             sel_it(key)
-        # frame=BasicTinUI(self,bg=bg)#主显示框，显示滚动条
         box=BasicTinUI(self,bg=bg,width=width,height=height)#显示选择内容
         box.place(x=12,y=12)
         cavui=self.create_window(pos,window=box,width=width,height=height,anchor='nw')
         self.windows.append(box)
-        uid=f'listbox-{cavui}'
+        uid=TinUIString(f'listbox-{cavui}')
         self.addtag_withtag(uid,cavui)
         hscroll = self.add_scrollbar((pos[0]+width-8,pos[1]),widget=box,height=height,bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]#纵向
         vscroll = self.add_scrollbar((pos[0],pos[1]+height-8),widget=box,height=width,direction='x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]#横向
@@ -1984,7 +1996,7 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(uid, vscroll)
         x1, y1, x2, y2 = self.bbox(uid)
         allback = self.__ui_polygon(((x1, y1), (x2, y2)), width=9, outline=bg, fill=bg, tags=uid)
-        self.lower(allback)
+        self.lower(allback,cavui)
         #choices不返回，避免编写者直接操作选项
         all_keys=[]#[a-id,b-id,...]
         choices={}#'a-id':[a,a_text,a_back,is_sel:bool]
@@ -1992,11 +2004,17 @@ class BasicTinUI(Canvas):
         load_data(data)#重复使用元素添加
         box.bind('<MouseWheel>',set_y_view)
         box.bind("<Destroy>", clean)
+        del x1,y1,x2,y2
+        dx,dy=self.__auto_anchor(uid,pos,anchor)
+        hscroll.move(dx,dy,height)
+        vscroll.move(dx,dy,width)
+        del dx,dy
         funcs=FuncList(4)
         funcs.add=_add
         funcs.delete=_delete
         funcs.clear=_clear
         funcs.select=select
+        uid.layout=__layout
         return box,allback,funcs,uid
 
     def add_listview(self,pos:tuple,width=300,height=300,linew=80,bg='#f3f3f3',activebg='#eaeaea',oncolor='#3041d8',scrobg='#f8f8f8',scroc='#999999',scrooc='#89898b',num=5,anchor='nw',command=None):#绘制列表视图,function:add_list
@@ -2041,6 +2059,27 @@ class BasicTinUI(Canvas):
                 bbox = list(bbox)
                 bbox[0] -= 3
                 ui.config(scrollregion=bbox)
+        def __layout(x1,y1,x2,y2,expand=False):
+            nonlocal width,height
+            if not expand:
+                dx,dy=self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
+                scro[-1].move(dx,dy,height)
+            else:
+                dx,dy=self.__auto_layout(uid,(x1,y1,x2,y2),'nw')
+                width2=x2-x1-18
+                dw=width2-width
+                height2=y2-y1-16
+                width=width2
+                height=height2
+                self.move(scroitem,dw,0)
+                scroitem.move(dx+dw,dy,height)
+                coord=self.coords(allback)
+                coord[2]=coord[4]=x2-4
+                coord[5]=coord[7]=y2-4
+                self.coords(allback,coord)
+                self.itemconfig(view,width=width,height=height)
+                for i in items:
+                    ui.itemconfig(i[-1],width=width-3)
         def getitems():#获取items
             return items
         def getui(index):#获取 add_ui uid
@@ -2103,14 +2142,15 @@ class BasicTinUI(Canvas):
             ui.yview_moveto(index/items.__len__())
         nowon=-1
         ui=BasicTinUI(self,bg=bg)
-        view=self.create_window(pos,window=ui,height=height,width=width,anchor=anchor)
+        view=self.create_window(pos,window=ui,height=height,width=width,anchor='nw')
         self.windows.append(ui)
-        uid=f'listview-{view}'
+        uid=TinUIString(f'listview-{view}')
         self.addtag_withtag(uid,view)
         bbox=self.bbox(view)
         pos=list(pos)
         pos[0],pos[1]=bbox[0],bbox[1]
         scro=self.add_scrollbar((pos[0]+width+2,pos[1]),ui,height=height,bg=scrobg,color=scroc,oncolor=scrooc)
+        scroitem=scro[-1]
         self.addtag_withtag(uid,scro[-1])
         items=[]#使用列表作为存储类型，以后可能动态修改列表视图元素
         endy=0
@@ -2120,9 +2160,14 @@ class BasicTinUI(Canvas):
         ui.config(scrollregion=ui.bbox('all'))
         ui.move(line,0,-linew-height)
         allback=self.add_back((),(view,scro[-1]),fg=bg,bg=bg,linew=8)
+        self.lower(allback,view)
         self.addtag_withtag(uid,allback)
         ui.bind('<MouseWheel>',bindyview)
         ui.bind('<Destroy>', clean)
+        del bbox
+        dx,dy=self.__auto_anchor(uid,pos,anchor)
+        scroitem.move(dx,dy,height)
+        del dx,dy
         funcs=FuncList(7)
         funcs.getitems=getitems
         funcs.getui=getui
@@ -2131,51 +2176,78 @@ class BasicTinUI(Canvas):
         funcs.clear=clear
         funcs.getsel=getsel
         funcs.select=select
+        uid.layout=__layout
         return ui,scro,items,funcs,uid
 
-    def add_canvas(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',linew=1,scrollbar=False,anchor='nw'):#绘制画布
-        def re_scrollregion():#更新滚动范围
-            canvas.config(scrollregion=canvas.bbox('all'))
-        canvas=Canvas(self,bg=bg,highlightthickness=linew,highlightbackground=outline,highlightcolor=outline,relief='flat')
-        cavui=self.create_window(pos,window=canvas,width=width,height=height,anchor=anchor)
-        self.windows.append(canvas)
-        uid=f'canvas-{cavui}'
-        self.addtag_withtag(uid,cavui)
-        if scrollbar==True:
-            bbox=self.bbox(uid)
-            cid2=self.add_scrollbar((bbox[0],bbox[3]+5),canvas,bbox[2]-bbox[0],'x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
-            cid1=self.add_scrollbar((bbox[2]+5,bbox[1]),canvas,bbox[3]-bbox[1],bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
-            self.addtag_withtag(uid,cid1)
-            self.addtag_withtag(uid,cid2)
-        return canvas,re_scrollregion,uid
+    # def add_canvas(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',linew=1,scrollbar=False,anchor='nw'):#绘制画布
+    #     def re_scrollregion():#更新滚动范围
+    #         canvas.config(scrollregion=canvas.bbox('all'))
+    #     canvas=Canvas(self,bg=bg,highlightthickness=linew,highlightbackground=outline,highlightcolor=outline,relief='flat')
+    #     cavui=self.create_window(pos,window=canvas,width=width,height=height,anchor=anchor)
+    #     self.windows.append(canvas)
+    #     uid=f'canvas-{cavui}'
+    #     self.addtag_withtag(uid,cavui)
+    #     if scrollbar==True:
+    #         bbox=self.bbox(uid)
+    #         cid2=self.add_scrollbar((bbox[0],bbox[3]+5),canvas,bbox[2]-bbox[0],'x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
+    #         cid1=self.add_scrollbar((bbox[2]+5,bbox[1]),canvas,bbox[3]-bbox[1],bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
+    #         self.addtag_withtag(uid,cid1)
+    #         self.addtag_withtag(uid,cid2)
+    #     return canvas,re_scrollregion,uid
 
     def add_ui(self,pos:tuple,width:int=200,height:int=200,bg='white',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',scrollbar=False,region='man',anchor='nw'):#绘制BasicTinUI
         def __update():#更新宽高
-            try:
-                re_scrollregion()
-            except:
-                pass
-            else:
-                ui.after(1000,__update)
+            re_scrollregion()
+            ui.after(1000,__update)
         def re_scrollregion():#更新滚动范围
-            ui.config(scrollregion=ui.bbox('all'))
+            bbox=ui.bbox('all')
+            if bbox!=None:
+                ui.config(scrollregion=bbox)
+        def __layout(x1,y1,x2,y2,expand=False):
+            nonlocal width,height
+            if not expand:
+                dx,dy=self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
+                if scrollbar:
+                    cid1.move(dx,dy,height)
+                    cid2.move(dx,dy,width)
+            else:
+                dx,dy=self.__auto_layout(uid,(x1,y1,x2,y2),'nw')
+                if scrollbar:
+                    width2=x2-x1-12
+                    dw=width2-width
+                    height2=y2-y1-12
+                    dh=height2-height
+                    width=width2
+                    height=height2
+                    self.move(cid1,dw,0)
+                    cid1.move(dx+dw,dy,height)
+                    self.move(cid2,0,dh)
+                    cid2.move(dx,dy+dh,width)
+                else:
+                    width=x2-x1
+                    height=y2-y1
+                self.itemconfig(cavui,width=width,height=height)
         ui=BasicTinUI(self,bg=bg)
-        cavui=self.create_window(pos,window=ui,width=width,height=height,anchor=anchor)
+        cavui=self.create_window(pos,window=ui,width=width,height=height,anchor='nw')
         self.windows.append(ui)
-        uid=f'ui-{cavui}'
+        uid=TinUIString(f'ui-{cavui}')
         self.addtag_withtag(uid,cavui)
-        if scrollbar==True:
+        if scrollbar:
             bbox=self.bbox(uid)
             cid1=self.add_scrollbar((bbox[2]+5,bbox[1]),ui,bbox[3]-bbox[1],bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
             cid2=self.add_scrollbar((bbox[0],bbox[3]+5),ui,bbox[2]-bbox[0],'x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
             self.addtag_withtag(uid,cid1)
             self.addtag_withtag(uid,cid2)
-        if region=='man':#手动调节
-            pass
-        elif region=='auto':#自动调节
-            __update()
+            del bbox
+            if region=='auto':#自动调节
+                __update()
         ui_xml=TinUIXml(ui)
         ui.bind('<Destroy>', lambda event: self.__delete_uixml(ui_xml))
+        dx,dy=self.__auto_anchor(uid,pos,anchor)
+        if scrollbar:
+            cid1.move(dx,dy,height)
+            cid2.move(dx,dy,width)
+        uid.layout=__layout
         return ui,re_scrollregion,ui_xml,uid
 
     def add_pipspager(self,pos:tuple,width:int=200,height:int=200,bg='#f3f3f3',fg='#898989',buttonfg='#8a8a8a',buttonbg='#f9f9f9',activefg='#5f5f5f',activebg='#f9f9f9',buttononfg='#5f5f5f',buttononbg='#f9f9f9',num:int=2,anchor='nw'):#绘制翻页视图
@@ -2197,31 +2269,30 @@ class BasicTinUI(Canvas):
             nonlocal nowui
             oldone=nowui
             def animate(startwidth,times):#展开动画
-                if mode == 'left':
-                    self.itemconfig(uilist[oldone][0],width=width-startwidth-inchx)
-                else:
+                if mode == 'right':
                     self.itemconfig(newui,width=startwidth+inchx)
+                    self.move(newui,-inchx,0)
+                else:
+                    self.itemconfig(oldui,width=width-startwidth-inchx)
+                    self.move(oldui,inchx,0)
                 self.update_idletasks()
                 if times<19:
                     self.after(10,lambda:animate(startwidth+inchx,times+1))
                 else:
                     self.itemconfig(newui,width=width)
-                    self.itemconfig(uilist[oldone][0],state='hidden')
+                    self.itemconfig(oldui,state='hidden')
             inchx=width/20#翻页动画参数
             newui=uilist[number][0]
+            oldui=uilist[oldone][0]
             mode=None
             if number>=nowui:#向右翻页
-                self.moveto(newui,startx+width+2,pos[1])
-                self.itemconfig(newui,anchor='ne')
+                self.moveto(newui,startx+width,pos[1])
                 mode='right'
             else:#向左翻页
-                self.moveto(newui,startx+2,pos[1])
-                self.itemconfig(newui,anchor='nw')
-                self.itemconfig(uilist[oldone][0],anchor='ne')
-                self.moveto(uilist[oldone][0],startx,pos[1])
+                self.moveto(newui,startx,pos[1])
+                self.moveto(oldui,startx,pos[1])
                 mode='left'
             self.itemconfig(newui,state='normal')
-            self.lift(newui)
             animate(0,0)
             nowui=number#新标志
         def move_to(number):
@@ -2259,6 +2330,29 @@ class BasicTinUI(Canvas):
                 elif lsrate<nowrate[0]:
                     bar.xview_moveto(lsrate)
                     bar.xview_scroll(-3,'unit')
+        def __layout(x1,y1,x2,y2,expand=False):
+            nonlocal width,height,startx
+            if not expand:
+                dx,dy=self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
+                startx+=dx
+                pos[1]+=dy
+            else:
+                width2=x2-x1-40
+                height2=y2-y1-16
+                dx,dy=self.__auto_layout(uid,(x1,y1,x2,y2),'nw')
+                startx=x1+22
+                pos[1]=y1
+                self.itemconfig(barid,width=width2)
+                for i in uilist:
+                    self.itemconfig(i[0],width=width2,height=height2)
+                dh=(height2-height)/2
+                dw=width2-width
+                self.move(leftbutton,0,dh)
+                self.move(rightbutton,dw,dh)
+                self.move(barid,0,dh*2)
+                width=width2
+                height=height2
+        pos=list(pos)
         startx=pos[0]+20#按钮与主窗口间隔
         uilist=[]#[(uiid-1,BasicTinUI-1,TinUIXml-1),(uiid-2,BasicTinUI-2,TinUIXml-2),...]
         doty=pos[1]+height+5#控制点的起始纵坐标
@@ -2266,11 +2360,11 @@ class BasicTinUI(Canvas):
         nowui=0#当前显示界面序号
         leftbutton=self.add_button2((startx-1,pos[1]+width/2),'','\n\uedd9\n',font='{Segoe Fluent Icons} 7',fg=buttonfg,bg=buttonbg,line=buttonbg,linew=0,activefg=activefg,activebg=activebg,activeline=activebg,onbg=buttononbg,onfg=buttononfg,online=buttononbg,command=move_left,anchor='e')[-1]
         rightbutton=self.add_button2((startx+width,pos[1]+width/2),'','\n\uedda\n',font='{Segoe Fluent Icons} 7',fg=buttonfg,bg=buttonbg,line=buttonbg,linew=0,activefg=activefg,activebg=activebg,activeline=activebg,onbg=buttononbg,onfg=buttononfg,online=buttononbg,command=move_right,anchor='w')[-1]
-        uid=f'pipspager-{leftbutton}'
+        uid=TinUIString(f'pipspager-{leftbutton}')
         self.addtag_withtag(uid,leftbutton)
         self.addtag_withtag(uid,rightbutton)
         bar=Canvas(self,bg=bg,highlightthickness=0,relief='flat')#导航栏
-        self.create_window((startx,doty),window=bar,width=width,height=11,anchor='nw',tags=uid)
+        barid=self.create_window((startx,doty),window=bar,width=width,height=11,anchor='nw',tags=uid)
         self.windows.append(bar)
         dotx=3
         for _ in range(0,num):
@@ -2289,10 +2383,14 @@ class BasicTinUI(Canvas):
         self.itemconfig(uilist[nowui][0], state='normal')
         self.lift(uilist[nowui][0])
         bar.config(scrollregion=bar.bbox('all'))
-        self.__auto_anchor(uid,pos,anchor)
+        del doty,dotx
+        dx,_=self.__auto_anchor(uid,pos,anchor)
+        startx+=dx
+        del dx
+        uid.layout=__layout
         return uilist,dotlist,move_to,uid
 
-    def add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f3f3f3',fg='#5d5d5d',bg='#f3f3f3',activefg='#595959',activebg='#e9e9e9',onfg='#1a1a1a',onbg='#f9f9f9',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',anchor=None):#绘制标签栏视图
+    def add_notebook(self,pos:tuple,width:int=400,height:int=400,color='#f3f3f3',fg='#5d5d5d',bg='#f3f3f3',activefg='#595959',activebg='#e9e9e9',onfg='#1a1a1a',onbg='#f9f9f9',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',anchor='nw'):#绘制标签栏视图
         def __onenter(flag):
             if flag==nowpage:
                 return
@@ -2327,7 +2425,7 @@ class BasicTinUI(Canvas):
                 endx=3
             else:
                 endx=tbu.bbox(labeluid)[2]+3
-            titleu=tbu.create_text((endx,4),text=title,fill=fg,font=font,anchor='nw',tags=labeluid)#标题
+            titleu=tbu.create_text((endx,6),text=title,fill=fg,font=font,anchor='nw',tags=labeluid)#标题
             tbubbox=tbu.bbox(titleu)
             cby=(tbubbox[1]+tbubbox[3])//2
             cbx=tbubbox[2]+10
@@ -2345,11 +2443,11 @@ class BasicTinUI(Canvas):
                 flag='flag'+str(titleu)
             if scrollbar:
                 page=TinUI(self,True,bg=self['background'])
-                uiid=self.create_window(viewpos,window=page.frame,width=width+1,height=height-3,anchor='nw',state='hidden')
+                uiid=self.create_window(viewpos,window=page.frame,width=width+4,height=height-3,anchor='nw',state='hidden',tags=uid)
                 self.windows.append(page.frame)
             else:
                 page=BasicTinUI(self,bg=self['background'])
-                uiid=self.create_window(viewpos,window=page,width=width+1,height=height-3,anchor='nw',state='hidden')
+                uiid=self.create_window(viewpos,window=page,width=width+4,height=height-3,anchor='nw',state='hidden',tags=uid)
                 self.windows.append(page)
             uixml=TinUIXml(page)
             page.bind('<Destroy>', lambda event: self.__delete_uixml(uixml))
@@ -2461,21 +2559,47 @@ class BasicTinUI(Canvas):
             else:
                 self.itemconfig(scro[-1], state='hidden')
             tbu.config(scrollregion=bbox)
+        def __layout(x1,y1,x2,y2,expand=False):
+            nonlocal width,height
+            if not expand:
+                dx,dy=self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
+                scroitem.move(dx,dy,width)
+            else:
+                dx,dy=self.__auto_layout(uid,(x1,y1,x2,y2),'nw')
+                width=x2-x1-12
+                height=y2-y1-50
+                scroitem.move(dx,dy,width)
+                self.itemconfig(tbuid,width=width)
+                for i in vdict.values():
+                    self.itemconfig(i[-1],width=width+4,height=height)
+                coord=self.coords(back)
+                coord[2]=coord[4]=x2-8
+                coord[5]=coord[7]=y2-8
+                self.coords(back,coord)
+                bbox=tbu.bbox('all')
+                if bbox and bbox[2]-bbox[0] > width:
+                    self.itemconfig(scro[-1], state='normal')
+                else:
+                    self.itemconfig(scro[-1], state='hidden')
+                tbu.config(scrollregion=bbox)
+            viewpos[0]+=dx
+            viewpos[1]+=dy
         tbu=BasicTinUI(self,bg=color)
         tbuid=self.create_window((pos[0]+2,pos[1]+2),window=tbu,width=width,height=30,anchor='nw')
         self.windows.append(tbu)
-        uid=f'notebook-{tbuid}'
+        uid=TinUIString(f'notebook-{tbuid}')
         labeluid='notebooklabel'#标签元素名称
         movename='movetags'#更改标题时整体移动的临时名称
         self.addtag_withtag(uid,tbuid)
-        scro=self.add_scrollbar((pos[0]+5,pos[1]+32),tbu,height=width-5,direction='x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)
-        self.addtag_withtag(uid,scro[-1])
-        barheight=self.bbox(scro[-1])[3]
+        scro=self.add_scrollbar((pos[0]+5,pos[1]+32),tbu,height=width-10,direction='x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)
+        scroitem=scro[-1]
+        self.addtag_withtag(uid,scroitem)
+        barheight=self.bbox(scroitem)[3]
         #新的backpos横纵坐标集向内缩小3单位
-        back=self.__ui_polygon(((pos[0]+8,pos[1]+6),(pos[0]+width-3,barheight+height-3)),outline=color,fill=color,width=17,tags=uid)
+        back=self.__ui_polygon(((pos[0]+8,pos[1]+6),(pos[0]+width,barheight+height-3)),outline=color,fill=color,width=17,tags=uid)
         self.tkraise(tbuid)
-        self.tkraise(scro[-1])
-        viewpos=(pos[0]+2,barheight+2)
+        self.tkraise(scroitem)
+        viewpos=[pos[0]+2,barheight+2]
         nowpage=''
         vdict={}#ui,uixml,uiid
         tbdict={}#title,cb,pyo
@@ -2484,7 +2608,7 @@ class BasicTinUI(Canvas):
         #新页面按钮（默认不显示）
         npx=3
         newpageuid=f'notebooknew{tbuid}'
-        newpagetext=tbu.create_text((npx,5),text='\uf8aa',font='{Segoe Fluent Icons} 12',fill=fg,anchor='nw',tags=newpageuid)
+        newpagetext=tbu.create_text((npx,9),text='\uf8aa',font='{Segoe Fluent Icons} 12',fill=fg,anchor='nw',tags=newpageuid)
         nptbbox=tbu.bbox(newpagetext)
         #newpageback
         newpageback=tbu.__ui_polygon(((nptbbox[0]+2,nptbbox[1]+2),(nptbbox[2]-2,nptbbox[3]-2)),fill=bg,outline=bg,width=9,tags=newpageuid)
@@ -2496,6 +2620,12 @@ class BasicTinUI(Canvas):
         tbu.tag_bind(newpagetext,'<Button-1>',__onnpclick)
         bbox=tbu.bbox('all')
         tbu.config(scrollregion=bbox)
+        del nptbbox,bbox
+        dx,dy=self.__auto_anchor(uid,pos,anchor)
+        scroitem.move(dx,dy,width)
+        viewpos[0]+=dx
+        viewpos[1]+=dy
+        del dx,dy
         #新页面按钮完成创建
         notebook=TinUINum
         notebook.addpage=addpage
@@ -2507,6 +2637,7 @@ class BasicTinUI(Canvas):
         notebook.gettbdict=gettbdict
         notebook.cannew=cannew
         notebook.newtitle=newtitle
+        uid.layout=__layout
         return tbu,scro,back,notebook,uid
 
     def add_notecard(self,pos:tuple,title='note',text='note text\nmain content',tfg='black',tbg='#fbfbfb',fg='black',bg='#f4f4f4',sep='#e5e5e5',width=200,font='微软雅黑 12',anchor=None):#绘制便笺
@@ -2598,12 +2729,13 @@ class BasicTinUI(Canvas):
         line_num=1#行数量
         center_x=pos[0]+5
         center_y=pos[1]+5
-        uid=f'ratinbar-{uuid.uuid1().hex}'
+        uid=TinUIString(f'ratinbar-{uuid.uuid1().hex}')
+        starid=f'{uid}star'
         bbox=None
         for i in range(0,num):
             bar=TinUINum(i)
-            bar.fill=self.create_text((center_x,center_y),text='\ue735',font='{Segoe Fluent Icons} '+str(size),anchor='nw',fill=bg,tags=uid)
-            bar.line=self.create_text((center_x,center_y),text='\ue734',font='{Segoe Fluent Icons} '+str(size),anchor='nw',fill=fg,tags=uid)
+            bar.fill=self.create_text((center_x,center_y),text='\ue735',font='{Segoe Fluent Icons} '+str(size),anchor='nw',fill=bg,tags=(uid,starid))
+            bar.line=self.create_text((center_x,center_y),text='\ue734',font='{Segoe Fluent Icons} '+str(size),anchor='nw',fill=fg,tags=(uid,starid))
             bars.append(bar)
             for item_id in (bar.fill, bar.line):
                 self.tag_bind(item_id, '<Enter>', lambda event,b=bar:onin(b))
@@ -2627,12 +2759,14 @@ class BasicTinUI(Canvas):
         start[2]+=5
         start[3]+=5
         back=self.create_rectangle(start,fill=bg,outline=fg,width=1,tags=uid)
-        self.lower(back)
+        self.lower(back,starid)
         self.tag_bind(back,'<Leave>',leaveback)
         self.tag_bind(back,'<Button>',__ontemp)
+        del start,starid,item_num,line_num,bbox,center_x,center_y
         funcs = FuncList(1)
         funcs.setrate = setrate
         self.__auto_anchor(uid,pos,anchor)
+        uid.layout=lambda x1,y1,x2,y2,expand=False:self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
         return bars, back, funcs, uid
 
     def add_radiobox(self,pos:tuple,fontfg='black',font='微软雅黑 12',fg='#8b8b8b',bg='#ededed',activefg='#898989',activebg='#e5e5e5',onfg='#3041d8',onbg='#ffffff',content:tuple=('1','','2'),padx=15,pady=10,anchor='nw',command=None):#绘制单选组控件
@@ -4554,64 +4688,6 @@ TinUIFont.init_font_manager()
 TinUIFont.load_font(tinui_dir+"/Segoe Fluent Icons.ttf")
 
 
-#==========test follow==========
-def test(event):
-    a.title('TinUI Test')
-    b.add_paragraph((50,150),'这是TinUI按钮触达的事件函数回显，此外，窗口标题也被改变、首行标题缩进减小')#,font='{A019-Sounso Quality} 12')
-    b.coords(m,100,5)
-def __test4(prog):
-    progressgoto(prog)
-def test4(event):
-    for i in range(1,101):
-        a.after(i*20, lambda i=i: __test4(i))
-def test5(result):
-    b.itemconfig(scale_text,text='当前选值：'+str(result))
-def test6():
-    for i in range(0,5):
-        num=i
-        xml=f'''
-<tinui><line x='{num*10+5}'><label text='这是第{num}个BasicTinUI组件'></label></line>
-<line><button text='功能按钮' command='lambda event:print("第{i}个功能按钮")'></button>
-<combobox width='80' text='可选测试' content='("{i}","其它")'></combobox></line></tinui>'''
-        ppgl[i][2].loadxml(xml)
-def test7():
-    ntvdict=ntb.getvdict()
-    num=1
-    for i in ntvdict:
-        uxml=ntvdict[i][1]#tinuixml
-        xml=f'''
-<tinui><line><button text='这是第{num}个BasicTinUI组件' command='print'></button></line>
-<line><label text='TinUI的标签栏视图'></label><label text='每个都是单独页面'></label></line>
-</tinui>'''
-        uxml.loadxml(xml)
-        num+=1
-def test8(rbtext):
-    print(f'单选组控件选值=>{rbtext}')
-def test9():
-    def new_title(*e):
-        ntb.newtitle(newnotepage,'一个崭新的标题')
-    newnotepage=ntb.addpage('newpage')
-    uxml=ntb.getvdict()[newnotepage][1]#tinuixml
-    uxml.funcs['newtitle']=new_title
-    uxml.loadxml('''<tinui><line><button text='这是一个新的标题栏窗口' command='self.funcs["newtitle"]'></button></line>
-<line><label text='TinUI的标签栏视图'></label><label text='每个都是单独页面'></label></line>
-</tinui>''')
-def test10(tag):
-    b.itemconfig(pivott,text='pivot text: '+tag)
-def test11_1(e):
-    wffunc.start()
-def test11_2(e):
-    wffunc.end()
-def test12(cid):
-    for i in cid:
-        print(trvbox.itemcget(trvl[i][0],'text')+'/',end='')
-    print('')
-def test13(state):
-    if state:
-        b.itemconfig(tgbutton,text='状态开关按钮：开启')
-    else:
-        b.itemconfig(tgbutton,text='状态开关按钮：关闭')
-
 
 if __name__=='__main__':
     # panel test
@@ -4626,16 +4702,16 @@ if __name__=='__main__':
     rp.set_child(hp)
 
 
-    v1=ExpandPanel(b)
-    # v1=VerticalPanel(b)
+    # v1=ExpandPanel(b)
+    v1=VerticalPanel(b)
 
-    hp.add_child(v1,size=150,weight=1)
-    # hp.add_child(v1,size=150)
+    # hp.add_child(v1,size=150,weight=1)
+    hp.add_child(v1,size=150)
 
-    ct=b.add_textbox((20,20),scrollbar=True,anchor='center')[-1]
-    
-    v1.set_child(ct)
-    # hp.add_child(ct,size=80,weight=1)
+    ct=b.add_ratingbar((20,20),anchor='n')[-1]
+
+    # v1.set_child(ct)
+    hp.add_child(ct,size=80,weight=1)
 
     v2=VerticalPanel(b)
     hp.add_child(v2,size=150)
@@ -4646,6 +4722,63 @@ if __name__=='__main__':
     a.mainloop()
 
 elif __name__=='__main__1':
+    def test(event):
+        a.title('TinUI Test')
+        b.add_paragraph((50,150),'这是TinUI按钮触达的事件函数回显，此外，窗口标题也被改变、首行标题缩进减小')#,font='{A019-Sounso Quality} 12')
+        b.coords(m,100,5)
+    def __test4(prog):
+        progressgoto(prog)
+    def test4(event):
+        for i in range(1,101):
+            a.after(i*20, lambda i=i: __test4(i))
+    def test5(result):
+        b.itemconfig(scale_text,text='当前选值：'+str(result))
+    def test6():
+        for i in range(0,5):
+            num=i
+            xml=f'''
+    <tinui><line x='{num*10+5}'><label text='这是第{num}个BasicTinUI组件'></label></line>
+    <line><button text='功能按钮' command='lambda event:print("第{i}个功能按钮")'></button>
+    <combobox width='80' text='可选测试' content='("{i}","其它")'></combobox></line></tinui>'''
+            ppgl[i][2].loadxml(xml)
+    def test7():
+        ntvdict=ntb.getvdict()
+        num=1
+        for i in ntvdict:
+            uxml=ntvdict[i][1]#tinuixml
+            xml=f'''
+    <tinui><line><button text='这是第{num}个BasicTinUI组件' command='print'></button></line>
+    <line><label text='TinUI的标签栏视图'></label><label text='每个都是单独页面'></label></line>
+    </tinui>'''
+            uxml.loadxml(xml)
+            num+=1
+    def test8(rbtext):
+        print(f'单选组控件选值=>{rbtext}')
+    def test9():
+        def new_title(*e):
+            ntb.newtitle(newnotepage,'一个崭新的标题')
+        newnotepage=ntb.addpage('newpage')
+        uxml=ntb.getvdict()[newnotepage][1]#tinuixml
+        uxml.funcs['newtitle']=new_title
+        uxml.loadxml('''<tinui><line><button text='这是一个新的标题栏窗口' command='self.funcs["newtitle"]'></button></line>
+    <line><label text='TinUI的标签栏视图'></label><label text='每个都是单独页面'></label></line>
+    </tinui>''')
+    def test10(tag):
+        b.itemconfig(pivott,text='pivot text: '+tag)
+    def test11_1(e):
+        wffunc.start()
+    def test11_2(e):
+        wffunc.end()
+    def test12(cid):
+        for i in cid:
+            print(trvbox.itemcget(trvl[i][0],'text')+'/',end='')
+        print('')
+    def test13(state):
+        if state:
+            b.itemconfig(tgbutton,text='状态开关按钮：开启')
+        else:
+            b.itemconfig(tgbutton,text='状态开关按钮：关闭')
+
     a=Tk()
     a.geometry('700x700+5+5')
     a.iconbitmap('LOGO.ico')
@@ -4698,10 +4831,6 @@ elif __name__=='__main__1':
     b.add_scrollbar((890,305),textbox,direction='x')
     b.add_listbox((890,430),data=('item1','item2','item3','item4\n item4.1\n item4.2\n item4.3\n itme4.4\n item4.5','item5 and item5.1 and item5.2 and item5.3'),
     command=print)
-    cav,cavf,_=b.add_canvas((890,670),scrollbar=True)
-    for i in range(1,15):
-        cav.create_text((5,i*40),text='画布对象：'+str(i)*i,font='微软雅黑 12',anchor='nw')
-    cavf()
     uixml,add_ui_id=b.add_ui((150,890),scrollbar=True,region='auto')[-2:]
     uixml.loadxml('''<tinui><line>
     <button text='button in child tinui'></button>

@@ -85,10 +85,6 @@ def test(theme):
     du.add_listbox(end(),data=('first','second','third',
     'some thing between three and four called bleem','forth','fifth',
     'some thins behind five\nwhich we can not find it\nfor-\never'))
-    #inkcanvas
-    canvas=du.add_canvas(end())[0]
-    canvas.create_text((100,20),text='TinUI canvas',font='微软雅黑 12')
-    canvas.create_line((20,50,180,50),fill='#f3f3f3',width=5)
     #pipspager
     du.add_pipspager(end(),num=5)
     #tabview

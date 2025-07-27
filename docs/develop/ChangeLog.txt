@@ -41,6 +41,11 @@ ui expand, v/h
 pipspager expand, v/h
 notebook expand, v/h
 ratingbar v/h
+radiobox v/h
+pivot v/h
+button2 expand, v/h
+waitframe expand, v/h
+treeview expand, v/h
 
 ==========5.38==========
 2025-7-19

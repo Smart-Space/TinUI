@@ -2068,9 +2068,8 @@ class BasicTinUI(Canvas):
                 dx,dy=self.__auto_layout(uid,(x1,y1,x2,y2),'nw')
                 width2=x2-x1-18
                 dw=width2-width
-                height2=y2-y1-16
                 width=width2
-                height=height2
+                height=y2-y1-16
                 self.move(scroitem,dw,0)
                 scroitem.move(dx+dw,dy,height)
                 coord=self.coords(allback)
@@ -2832,7 +2831,7 @@ class BasicTinUI(Canvas):
         back_line=2#16+2*2=20
         boxes=[]#[(sign_back_id,sign_id,text_id,back_id),...]，换行为(None,'\n',None)
         nowx,nowy=pos#x坐标为左上角插入坐标，y坐标为底部坐标
-        uid=f'radiobox-{uuid.uuid1().hex}'
+        uid=TinUIString(f'radiobox-{uuid.uuid1().hex}')
         select=-1#当前选定
         count=-1
         t_bbox=None
@@ -2866,6 +2865,7 @@ class BasicTinUI(Canvas):
         funcs.active=active
         funcs.disable=disable
         funcs.select=_select
+        uid.layout=lambda x1,y1,x2,y2,expand=False:self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
         return boxes,funcs,uid
 
     def add_pivot(self,pos:tuple,fg='#959595',bg='',activefg='#525252',activecolor='#5969e0',content=(('a-title','tag1'),('b-title','tag2'),'',('c-title','tag3')),font='微软雅黑 16',padx=10,pady=10,anchor='nw',command=None):#绘制支点标题
@@ -2896,7 +2896,7 @@ class BasicTinUI(Canvas):
         select=-1#当前选定
         t_bbox=None
         nowx,nowy=pos#x坐标为左上角插入坐标，y坐标为底部坐标
-        uid=f'pivot-{uuid.uuid1().hex}'
+        uid=TinUIString(f'pivot-{uuid.uuid1().hex}')
         line=self.create_line((pos[0],pos[1],pos[0]+5,pos[1]),fill=activecolor,width=3,capstyle='round',tags=uid)
         for i in content:
             count+=1#计数
@@ -2920,6 +2920,7 @@ class BasicTinUI(Canvas):
         sel_it(0,texts[0][2],texts[0][1],False)
         funcs = FuncList(1)
         funcs.select = _select
+        uid.layout=lambda x1,y1,x2,y2,expand=False:self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
         return texts, funcs, uid
 
     def add_button2(self,pos:tuple,text:str,icon=None,compound='left',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',font=('微软雅黑',12),minwidth=0,maxwidth=0,command=None,anchor='nw'):#绘制圆角按钮
@@ -2958,11 +2959,18 @@ class BasicTinUI(Canvas):
             self.itemconfig(back,state='normal')
             self.itemconfig(outline,state='normal')
             out_button(None)
+        def __layout(x1,y1,x2,y2,expand=False):
+            if not expand:
+                self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
+            else:
+                self.__auto_anchor(buttonuid,((x1+x2)/2,(y1+y2)/2),'center')
+                self.coords(back,x1+5,y1+5,x2-5,y1+5,x2-5,y2-5,x1+5,y2-5)
+                self.coords(outline,x1+4,y1+4,x2-4,y1+4,x2-4,y2-4,x1+4,y2-4)
         font=tkfont.Font(font=font)
         font_size=str(font.cget(option='size'))
         mouse_in = False# 鼠标是否在按钮上
         button=self.create_text(pos,text=text,fill=fg,font=font)
-        uid=f'button2-{button}'
+        uid=TinUIString(f'button2-{button}')
         buttonuid=uid+'button'
         self.itemconfig(button,tags=(uid,buttonuid))
         if icon:#Fluent Icons编码图标
@@ -2983,6 +2991,7 @@ class BasicTinUI(Canvas):
             if text=='':#有图标的时候，如果无文本，则隐藏文本元素
                 self.delete(button)
                 button = None
+            del iconbbox
         x1,y1,x2,y2=self.bbox(buttonuid)
         linew-=1
         #判断宽度的极限，分为最大化和最小化
@@ -2992,6 +3001,7 @@ class BasicTinUI(Canvas):
             bbox=self.bbox(button)
             x1,y1,x2,y2=bbox[0],bbox[1],bbox[2],bbox[3]
             nowwidth=x2-x1
+            del bbox
         if nowwidth<minwidth:
             dx=minwidth-nowwidth
             x2+=dx/2
@@ -3008,6 +3018,7 @@ class BasicTinUI(Canvas):
         funcs.change_command=change_command
         funcs.disable=disable
         funcs.active=active
+        uid.layout=__layout
         return button,back,outline,funcs,uid
 
     def add_expander(self,pos:tuple,title='expand content',tfg='black',tbg='#fbfbfb',bg='#f4f4f4',sep='#e5e5e5',buttonfg='#1b1b1b',buttonbg='#fbfbfb',buttonline='#fbfbfb',activefg='#1a1a1a',activebg='#f2f2f2',activeline='#f2f2f2',onfg='#1a1a1a',onbg='#f5f5f5',online='#f5f5f5',width=200,height=200,scrollbar=False,font='微软雅黑 12',anchor=None):#绘制一个可拓展UI
@@ -3058,22 +3069,20 @@ class BasicTinUI(Canvas):
 
     def add_waitframe(self,pos:tuple,width=300,height=300,fg='#e0e0e0',bg='#ececee',anchor='nw'):#元素等待框
         def __start():
-            nonlocal nowx,nowmove
+            nonlocal nowx,nowmove,animate
             if wait:
                 if nowx>=width:#移动到位
                     nowx=0
+                    frame.lower(nowmove)
+                    frame.moveto(nowmove,0,0)
                     #切换移动元素，重新调整层级
                     if nowmove==itemfg:
-                        frame.lower(itemfg)
-                        frame.move(itembg,-width,-height)
                         nowmove=itembg
                     else:
-                        frame.lower(itembg)
-                        frame.move(itemfg,-width,-height)
                         nowmove=itemfg
                 frame.move(nowmove,mx,my)
                 nowx+=mx
-                frame.after(25,__start)
+                animate=frame.after(25,__start)
             else:
                 self.itemconfig(uid,state='hidden')
         def start():
@@ -3084,10 +3093,31 @@ class BasicTinUI(Canvas):
         def end():
             nonlocal wait
             wait=False
+        def __layout(x1,y1,x2,y2,expand=False):
+            nonlocal mx,my,width,height
+            if not expand:
+                self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
+            else:
+                flag = False
+                if wait:
+                    frame.after_cancel(animate)
+                    end()
+                    flag = True
+                width=x2-x1
+                height=y2-y1
+                self.itemconfig(uid,anchor='nw',width=width,height=height)
+                self.moveto(uid,x1,y1)
+                coord=(0,0,width,0,width,height,0,height)
+                frame.coords(itemfg,coord)
+                frame.coords(itembg,coord)
+                mx=width/40
+                my=height/40
+                if flag:
+                    start()
         frame=BasicTinUI(self,width=width,height=height,bg=bg)
         frameid=self.create_window(pos,window=frame,width=width,height=height,anchor=anchor)
         self.windows.append(frame)
-        uid=f'waitframe-{frameid}'
+        uid=TinUIString(f'waitframe-{frameid}')
         self.addtag_withtag(uid,frameid)
         itemfg=frame.__ui_polygon(((0,0),(width,height)),outline=fg,fill=fg,width=17)
         itembg=frame.__ui_polygon(((0,0),(width,height)),outline=bg,fill=bg,width=17)
@@ -3097,11 +3127,12 @@ class BasicTinUI(Canvas):
         nowmove=itemfg#当前移动元素
         nowx=0#当前移动元素的横向移动量
         wait=False
+        animate=None#动画ID
         funcs=FuncList(2)
         funcs.start=start
         funcs.end=end
         self.itemconfig(uid,state='hidden')
-        #start()
+        uid.layout=__layout
         return frame,itemfg,itembg,funcs,uid
 
     def add_treeview(self,pos:tuple,fg='#1a1a1a',bg='#f3f3f3',onfg='#1a1a1a',onbg='#eaeaea',oncolor='#3041d8',signcolor='#8a8a8a',width=200,height=300,font='微软雅黑 12',content=(('one',('1','2','3')),'two',('three',('a',('b',('b1','b2','b3')),'c')),'four'),anchor=None,command=None):#树状图
@@ -3216,20 +3247,7 @@ class BasicTinUI(Canvas):
                 click(nowid)#单级输出
                 posi=box.bbox(nowid)[1]
                 box.moveto(line,1,posi+linew/5)
-            bbox = box.bbox('all')
-            if bbox[2]-bbox[0] <= width:
-                self.itemconfig(cavui, height=height)
-                self.itemconfig(vscroll, state='hidden')
-            else:
-                self.itemconfig(cavui, height=height-8)
-                self.itemconfig(vscroll, state='normal')
-            if bbox[3]-bbox[1] <= height:
-                self.itemconfig(cavui, width=width)
-                self.itemconfig(hscroll, state='hidden')
-            else:
-                self.itemconfig(cavui, width=width-8)
-                self.itemconfig(hscroll, state='normal')
-            box.config(scrollregion=bbox)
+            checkscroll()
         def close_view(sign,cid):#闭合
             if box.itemcget(sign,'text')=='\uE970':
                 return
@@ -3255,6 +3273,19 @@ class BasicTinUI(Canvas):
                 box.itemconfig(line,state='hidden')
             elif nowid is not None:
                 click(nowid)#重新绘制位置
+            checkscroll()
+        def bindview(event):
+            if event.state==0:
+                box.yview_scroll(int(-1*(event.delta/120)), "units")
+            elif event.state==1:
+                box.xview_scroll(int(-1*(event.delta/120)), "units")
+        def clean(event):
+            # 销毁对象
+            nonlocal fln, items, items_dict
+            del fln
+            del items
+            del items_dict
+        def checkscroll():
             bbox = box.bbox('all')
             if bbox[2]-bbox[0] <= width:
                 self.itemconfig(cavui, height=height)
@@ -3269,24 +3300,37 @@ class BasicTinUI(Canvas):
                 self.itemconfig(cavui, width=width-8)
                 self.itemconfig(hscroll, state='normal')
             box.config(scrollregion=bbox)
-        def bindview(event):
-            if event.state==0:
-                box.yview_scroll(int(-1*(event.delta/120)), "units")
-            elif event.state==1:
-                box.xview_scroll(int(-1*(event.delta/120)), "units")
-        def clean(event):
-            # 销毁对象
-            nonlocal fln, items, items_dict
-            del fln
-            del items
-            del items_dict
+        def __layout(x1,y1,x2,y2,expand=False):
+            nonlocal width,height
+            if not expand:
+                dx,dy=self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
+                hscroll.move(dx,dy,height)
+                vscroll.move(dx,dy,width)
+            else:
+                dx,dy=self.__auto_layout(uid,(x1,y1,x2,y2),'nw')
+                width2=x2-x1-9
+                dw=width2-width
+                width=width2
+                height2=y2-y1-9
+                dh=height2-height
+                height=height2
+                self.move(hscroll,dw,0)
+                hscroll.move(dx+dw,dy,height)
+                self.move(vscroll,0,dh)
+                vscroll.move(dx,dy+dh,width)
+                coord=self.coords(allback)
+                coord[2]=coord[4]=x2-4
+                coord[5]=coord[7]=y2-4
+                self.coords(allback,coord)
+                self.itemconfig(cavui,width=width,height=height)
+                checkscroll()
         nowid=None
         fln=TinUINum()#用于寻找父级关系，目前效率比较低，之后考虑优化
         box=BasicTinUI(self,bg=bg,width=width,height=height)#显示选择内容
         box.place(x=12,y=12)
         cavui=self.create_window(pos,window=box,width=width,height=height,anchor='nw')
         self.windows.append(box)
-        uid=f'treeview-{cavui}'
+        uid=TinUIString(f'treeview-{cavui}')
         self.addtag_withtag(uid,cavui)
         hscroll = self.add_scrollbar((pos[0]+width-8,pos[1]),widget=box,height=height,bg=bg,color=signcolor,oncolor=signcolor)[-1]#纵向
         vscroll = self.add_scrollbar((pos[0],pos[1]+height-8),widget=box,height=width,direction='x',bg=bg,color=signcolor,oncolor=signcolor)[-1]#横向
@@ -3302,28 +3346,20 @@ class BasicTinUI(Canvas):
         linew=bbox[3]-bbox[1]
         line=box.create_line((1,linew/3,1,linew*2/3),fill=oncolor,width=3,capstyle='round')
         x1, y1, x2, y2 = self.bbox(uid)
-        self.__ui_polygon(((x1, y1), (x2, y2)), outline=bg, fill=bg, width=9, tags=uid)# allback
+        allback=self.__ui_polygon(((x1, y1), (x2, y2)), outline=bg, fill=bg, width=9, tags=uid)# allback
         self.lift(cavui)
         self.lift(hscroll)
         self.lift(vscroll)
-        bbox = box.bbox('all')
-        if bbox[2]-bbox[0] <= width:
-            self.itemconfig(cavui, height=height)
-            self.itemconfig(vscroll, state='hidden')
-        else:
-            self.itemconfig(cavui, height=height-8)
-            self.itemconfig(vscroll, state='normal')
-        if bbox[3]-bbox[1] <= height:
-            self.itemconfig(cavui, width=width)
-            self.itemconfig(hscroll, state='hidden')
-        else:
-            self.itemconfig(cavui, width=width-8)
-            self.itemconfig(hscroll, state='normal')
-        box.config(scrollregion=bbox)
-        box.move(line,0,-linew-height)
+        checkscroll()
+        box.moveto(line,0,-linew-height)
         box.itemconfig(line,state='hidden')
         box.bind('<MouseWheel>',bindview)
         box.bind('<Destroy>', clean)
+        dx,dy=self.__auto_anchor(uid,pos,anchor)
+        hscroll.move(dx,dy,height)
+        vscroll.move(dx,dy,width)
+        del bbox,x1,y1,x2,y2,dx,dy
+        uid.layout=__layout
         return items,items_dict,box,uid
 
     def add_passwordbox(self,pos:tuple,width:int,fg='#1b1b1b',bg='#fbfbfb',activefg='#1a1a1a',activebg='#f6f6f6',onfg='#000000',onbg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#000000',font=('微软雅黑',12),outline='#868686',onoutline='#3041d8',anchor='nw',command=None):#绘制密码输入框
@@ -4708,7 +4744,7 @@ if __name__=='__main__':
     # hp.add_child(v1,size=150,weight=1)
     hp.add_child(v1,size=150)
 
-    ct=b.add_ratingbar((20,20),anchor='n')[-1]
+    ct=b.add_treeview((20,20),content=(('one', ('1', '2', '3')), 'two', ('three', ('a', ('b', ('b1', 'b2ajdfksnfkdbgkfdgjnkhngfhnjkfnhnf', 'b3')), 'c')), 'four'),anchor='n')[-1]
 
     # v1.set_child(ct)
     hp.add_child(ct,size=80,weight=1)

@@ -11,7 +11,7 @@
 1. 简化uid创建
 2. picker选项响应鼠标进入颜色改为同按钮背景色
 3. 弃用waitbar1, waitbar2, swipecontrol, info, canvas，但未删除
-4. listview, notebook支持对齐方式
+4. listview, notebook, treeview支持对齐方式
 *5. 控件创建函数删除不必要的变量
 *6. 支持版面布局Panel:
 - ExpandPanel: one widget/Panel，响应窗口缩放
@@ -46,6 +46,9 @@ pivot v/h
 button2 expand, v/h
 waitframe expand, v/h
 treeview expand, v/h
+passwordbox expand, v/h
+image v/h
+togglebutton v/h
 
 ==========5.38==========
 2025-7-19

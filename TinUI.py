@@ -3839,7 +3839,7 @@ class BasicTinUI(Canvas):
             box.config(scrollregion=bbox)
             box.bind('<MouseWheel>',__set_y_view)
         out_line=self.create_polygon((*pos,*pos),fill=outline,outline=outline,width=9)
-        uid=f'picker-{out_line}'
+        uid=TinUIString(f'picker-{out_line}')
         self.addtag_withtag(uid,out_line)
         back=self.create_polygon((*pos,*pos),fill=bg,outline=bg,width=9,tags=uid)
         end_x=pos[0]+9
@@ -3901,7 +3901,6 @@ class BasicTinUI(Canvas):
             pickerbars.append(pickbar)
             __count+=1
             end_x+=barw+3
-        del __count
         #ok button
         okpos=((5+(width-9)/2)/2,height-22)
         ok=bar.add_button2(okpos,text='\uE73E',font='{Segoe Fluent Icons} 12',fg=buttonfg,bg=buttonbg,line='',activefg=buttonactivefg,activebg=buttonactivebg,activeline=outline,onfg=buttononfg,onbg=buttononbg,online=buttononbg,anchor='center',command=set_it)
@@ -3913,7 +3912,9 @@ class BasicTinUI(Canvas):
         bar.coords(no[1],((width-9)/2+5,height-35,width-9,height-35,width-9,height-9,(width-9)/2+5,height-9))
         bar.coords(no[2],((width-9)/2+4,height-34,width-8,height-34,width-8,height-8,((width-9)/2+4,height-8)))
         readyshow()
+        del end_x,y,coords,__count,okpos,nopos
         self.__auto_anchor(uid,pos,anchor)
+        uid.layout=lambda x1,y1,x2,y2,expand=False:self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
         return picker,bar,texts,pickerbars,uid
     
     def add_menubutton(self,pos:tuple,text:str,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',menuonfg='#191919',menuonbg='#f0f0f0',menuonline='#f0f0f0',font=('微软雅黑',12),cont=(('command',print),'-'),widget=True,tran='#01FF11',anchor='nw'):#绘制按钮展开菜单
@@ -3979,7 +3980,7 @@ class BasicTinUI(Canvas):
             self.itemconfig(outline,state='normal')
             out_button(None)
         button=self.create_text(pos,text=text,fill=fg,font=font,anchor='nw')
-        uid=f'menubutton-{button}'
+        uid=TinUIString(f'menubutton-{button}')
         self.itemconfig(button,tags=(uid,uid+'button'))
         x1,y1,x2,y2=self.bbox(uid)
         if side=='y':
@@ -4003,9 +4004,11 @@ class BasicTinUI(Canvas):
             self.tag_bind(item_id,'<Leave>',out_button)
         self.tkraise(uid+'button')
         self.__auto_anchor(uid,pos,anchor)
+        del x1,y1,x2,y2,linew
         funcs=FuncList(2)
         funcs.disable=disable
         funcs.active=active
+        uid.layout=lambda x1,y1,x2,y2,expand=False:self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
         return uid+'button',back,outline,funcs,uid
     
     def add_barbutton(self,pos:tuple,font='微软雅黑 12',fg='#636363',bg='#f3f3f3',line='#f3f3f3',linew=0,activefg='#191919',activebg='#eaeaea',activeline='#eaeaea',onfg='#5a5a5a',onbg='#ededed',online='#ededed',sepcolor='#e4e4e4',content=(('保存','\uE74E',None),('','\uE792',None),'',('','\uE74D',None)),anchor='nw'):#绘制一个工具栏按钮组件
@@ -4020,7 +4023,7 @@ class BasicTinUI(Canvas):
         font=tkfont.Font(font=font)
         pixel=font.metrics('linespace')
         outline=self.create_polygon(*pos,*pos,width=9,fill=line,outline=line)
-        uid=f'barbutton-{outline}'
+        uid=TinUIString(f'barbutton-{outline}')
         self.itemconfig(outline,tags=uid)
         buttons_id=f'{uid}button'
         back=self.create_polygon(*pos,*pos,width=9,fill=bg,outline=bg,tags=uid)
@@ -4042,7 +4045,9 @@ class BasicTinUI(Canvas):
         self.coords(back,bbox)
         bbox=(bbox[0],bbox[1],bbox[2],bbox[1],bbox[2],bbox[3],bbox[0],bbox[3])
         self.coords(outline,bbox)
+        del bbox
         self.__auto_anchor(uid,pos,anchor)
+        uid.layout=lambda x1,y1,x2,y2,expand=False:self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
         return outline,back,buttons,uid
 
     def add_flyout(self, fid, width:int=250, height:int=150, bind='<Button-1>', line='#dcdcdc', bg='#f9f9f9', anchor='n', offset:tuple[int,int]=(0,0), pos=None):# 绘制一个浮出ui控件
@@ -4203,10 +4208,18 @@ class BasicTinUI(Canvas):
             self.tag_unbind(lt, '<Button-1>')
             self.tag_unbind(lt, '<Enter>')
             self.tag_unbind(lt, '<Leave>')
+        def __layout(x1,y1,x2,y2,expand=False):
+            nonlocal endx,center_line
+            dx,dy=self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
+            pos[0]+=dx
+            pos[1]+=dy
+            endx+=dx
+            center_line+=dy
+        pos = list(pos)
         root = self.create_text(pos, text=root, font=font, fill=fg, anchor='w')
         font_size = self.__get_text_size(root)
         segeo_font = '{Segoe Fluent Icons}' + font_size
-        uid = f'breadcrumb-{root}'
+        uid = TinUIString(f'breadcrumb-{root}')
         uid_button = uid + 'button'
         self.itemconfig(root, tags=(uid,uid_button))
         bbox = self.bbox(root)
@@ -4218,11 +4231,13 @@ class BasicTinUI(Canvas):
         _, dy = self.__auto_anchor(uid, pos, anchor)
         endx = self.bbox(root)[2]
         center_line = pos[1] + dy
+        del dy,bbox
         funcs = FuncList(4)
         funcs.get = get
         funcs.add = add
         funcs.delete = delete
         funcs.delete_to = delete_to
+        uid.layout = __layout
         return root, back, funcs, uid
 
 
@@ -4230,19 +4245,16 @@ class BasePanel:
     """面板的基类"""
     def __init__(self, canvas):
         self.canvas = canvas
-        self.bg_rect = None
-        self.id = f"{self.__class__.__name__}_{id(self)}"
+        # self.bg_rect = None
+        # self.id = f"{self.__class__.__name__}_{id(self)}"
     
-    def create_bg(self, fill_color, outline_color):
-        if not self.bg_rect:
-            self.bg_rect = self.canvas.create_rectangle(
-                0, 0, 0, 0, 
-                fill=fill_color, outline=outline_color, 
-                tags=self.id
-            )
-    
-    # def update_layout(self, x1, y1, x2, y2):
-    #     pass
+    # def create_bg(self, fill_color, outline_color):
+    #     if not self.bg_rect:
+    #         self.bg_rect = self.canvas.create_rectangle(
+    #             0, 0, 0, 0, 
+    #             fill=fill_color, outline=outline_color, 
+    #             tags=self.id
+    #         )
 
 
 class ExpandablePanel(BasePanel):
@@ -4281,7 +4293,7 @@ class ExpandPanel(BasePanel):
         self.padding = padding
         self.min_width = min_width
         self.min_height = min_height
-        self.create_bg("#e0f7fa", "#00838f")
+        # self.create_bg("#e0f7fa", "#00838f")
     
     def set_padding(self, padding):
         self.padding = padding
@@ -4308,7 +4320,7 @@ class ExpandPanel(BasePanel):
         content_y2 = content_y1 + content_height
         
         # 更新背景位置
-        self.canvas.coords(self.bg_rect, x1, y1, x2, y2)
+        # self.canvas.coords(self.bg_rect, x1, y1, x2, y2)
         
         # 更新子元素位置
         if self.child:
@@ -4323,24 +4335,22 @@ class VerticalPanel(ExpandablePanel):
     def __init__(self, canvas, padding=(0, 0, 0, 0), spacing=0, min_width=0, min_height=0):
         super().__init__(canvas, padding, min_width, min_height)
         self.spacing = spacing
-        self.create_bg("#f1f8e9", "#558b2f")
+        # self.create_bg("#f1f8e9", "#558b2f")
     
     def update_layout(self, x1, y1, x2, y2):
-        # 应用内边距
         top, right, bottom, left = self.padding
         content_x1 = x1 + left
         content_y1 = y1 + top
         content_x2 = x2 - right
         content_y2 = y2 - bottom
         
-        # 确保内容区域不小于最小尺寸
         content_width = max(content_x2 - content_x1, self.min_width)
         content_height = max(content_y2 - content_y1, self.min_height)
         content_x2 = content_x1 + content_width
         content_y2 = content_y1 + content_height
         
         # 更新背景位置
-        self.canvas.coords(self.bg_rect, x1, y1, x2, y2)
+        # self.canvas.coords(self.bg_rect, x1, y1, x2, y2)
         
         # 计算总权重和固定尺寸
         total_weight = 0
@@ -4397,72 +4407,50 @@ class HorizonPanel(ExpandablePanel):
     def __init__(self, canvas, padding=(0, 0, 0, 0), spacing=0, min_width=0, min_height=0):
         super().__init__(canvas, padding, min_width, min_height)
         self.spacing = spacing
-        self.create_bg("#fff3e0", "#f57c00")
+        # self.create_bg("#fff3e0", "#f57c00")
     
     def update_layout(self, x1, y1, x2, y2):
-        # 应用内边距
         top, right, bottom, left = self.padding
         content_x1 = x1 + left
         content_y1 = y1 + top
         content_x2 = x2 - right
         content_y2 = y2 - bottom
-        
-        # 确保内容区域不小于最小尺寸
         content_width = max(content_x2 - content_x1, self.min_width)
         content_height = max(content_y2 - content_y1, self.min_height)
         content_x2 = content_x1 + content_width
         content_y2 = content_y1 + content_height
         
         # 更新背景位置
-        self.canvas.coords(self.bg_rect, x1, y1, x2, y2)
+        # self.canvas.coords(self.bg_rect, x1, y1, x2, y2)
         
-        # 计算总权重和固定尺寸
         total_weight = 0
         fixed_size = 0
-        
         for i, (child, width, min_width, weight) in enumerate(self.children):
-            # 计算间距（最后一个元素不加间距）
             spacing = self.spacing if i < len(self.children) - 1 else 0
-            
             if weight > 0:
                 total_weight += weight
             else:
                 actual_width = max(width, min_width)
                 fixed_size += actual_width + spacing
-        
-        # 计算剩余空间
         remaining_width = max(0, content_width - fixed_size)
-        
         current_x = content_x1
         total_children = len(self.children)
-        
         for i, (child, width, min_width, weight) in enumerate(self.children):
-            # 计算间距（最后一个元素不加间距）
             spacing = self.spacing if i < total_children - 1 else 0
-            
-            # 计算元素宽度
             if weight > 0:
-                # 按权重分配剩余空间
                 proportional_width = remaining_width * weight / total_weight
                 actual_width = max(proportional_width, min_width)
             else:
                 actual_width = max(width, min_width)
-            
             child_x2 = current_x + actual_width
-            
-            # 确保不会超出面板范围
             if child_x2 > content_x2:
                 child_x2 = content_x2
-                
-            # 更新子元素位置
             if issubclass(child.__class__, BasePanel):
                 child.update_layout(current_x, content_y1, child_x2, content_y2)
             elif isinstance(child, TinUIString):
                 child.layout(current_x, content_y1, child_x2, content_y2)
                 # self.canvas.coords(child, current_x, content_y1, child_x2, content_y2)
-                
             current_x += actual_width + spacing
-            # 如果已经超出面板右侧，停止布局
             if current_x >= content_x2:
                 break
 
@@ -4770,14 +4758,13 @@ if __name__=='__main__':
     hp=HorizonPanel(b)
     rp.set_child(hp)
 
-
     # v1=ExpandPanel(b)
     v1=VerticalPanel(b)
 
     # hp.add_child(v1,size=150,weight=1)
     hp.add_child(v1,size=150)
 
-    ct=b.add_togglebutton((20,20),text='toggle',anchor='n')[-1]
+    funcs,ct=b.add_breadcrumb((20,20),anchor='n')[-2:]
 
     # v1.set_child(ct)
     hp.add_child(ct,size=80,weight=1)

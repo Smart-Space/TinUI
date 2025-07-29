@@ -56,33 +56,45 @@ def loadcontrol(controlname):
         pass
 
 
-
-xmlf=open(os.path.dirname(__file__)+r'\testpage\main.xml','r')
-xml=xmlf.read()
-xmlf.close()
-
 window = Tk()
 
-window.resizable(False,False)
 window.iconbitmap('../LOGO.ico')
 window.title("TinUI main test")
 window.geometry("850x600+5+5")
 ui=BasicTinUI(window, bg='#f3f3f3')
-uix=TinUIXml(ui)
 
-uix.funcs['loadcontrol']=loadcontrol
-uix.datas['controls']=['back', 'barbutton', 'breadcrumb', 'button', 'button2', 'canvas', 'checkbutton', 
+ui.pack(fill='both',expand=True)
+
+root=ExpandPanel(ui)
+hp=HorizonPanel(ui,spacing=5)
+root.set_child(hp)
+
+vp=VerticalPanel(ui,spacing=5)
+hp.add_child(vp,200)
+
+t=ui.add_title((0,0),text='TinUI Gallery',anchor='n')
+img=ui.add_image((0,0),imgfile='LOGO.png',width=200,height=200,anchor='n')
+listbox=ui.add_listbox((0,0),height=340,bg='#f0f0f0',data=('back', 'barbutton', 'breadcrumb', 'button', 'button2', 'canvas', 'checkbutton', 
  'combobox', 'entry', 'expander', 'flyout', 'image', 'info', 'label', 'labelframe',
  'link', 'listbox', 'listview', 'menubar', 'menubutton', 'notebook', 'notecard', 
  'onoff', 'paragraph', 'passwordbox', 'picker', 'pipspager', 'pivot', 'progressbar', 
  'radiobox', 'radiobutton', 'ratingbar', 'scalebar', 'scrollbar', 'separate', 
  'spinbox', 'swipecontrol', 'table', 'textbox', 'title', 'togglebutton', 'tooltip', 
- 'treeview', 'ui', 'waitbar', 'waitframe','TinUIXml']
-uix.loadxml(xml)
-displayui,_,duixml,_=uix.tags['displayui']
+ 'treeview', 'ui', 'waitbar', 'waitframe','TinUIXml'),command=loadcontrol)[-1]
+vp.add_child(t,50)
+vp.add_child(img,200)
+ep1=ExpandPanel(ui)
+ep1.set_child(listbox)
+vp.add_child(ep1,200,weight=1)
+ 
+displayui,_,duixml,uid=ui.add_ui((0,0),bg='#f3f3f3',width=610,height=575,scrollbar="True",region='auto')
+ep=ExpandPanel(ui)
+ep.set_child(uid)
+hp.add_child(ep,500,weight=1)
 
-ui.pack(fill='both',expand=True)
-
+def update(e):
+    root.update_layout(5,5,e.width-5,e.height-5)
+ui.bind('<Configure>',update)
 
 def maintest():
     window.mainloop()

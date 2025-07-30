@@ -906,7 +906,7 @@ class BasicTinUI(Canvas):
         bar.pack(fill='both',expand=True)
         bar.__ui_polygon(((13,13),(x2-x1-4,height-12)),fill=bg,outline=bg,width=17)
         bar.lower(bar.__ui_polygon(((12,12),(x2-x1-3,height-11)),fill=outline,outline=outline,width=17))
-        boxback = bar.add_listbox((7,7),x2-x1-7,height-15,bg=bg,fg=listfg,data=content,activefg=listactivefg,activebg=listactivebg,onfg=listonfg,onbg=listonbg,sel=listsel,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)[1]
+        boxback = bar.add_listbox((2,2),x2-x1-7,height-15,bg=bg,fg=listfg,data=content,activefg=listactivefg,activebg=listactivebg,onfg=listonfg,onbg=listonbg,sel=listsel,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)[1]
         bar.delete(boxback)
         self.__auto_anchor(uid,pos,anchor)
         readyshow()
@@ -3136,7 +3136,7 @@ class BasicTinUI(Canvas):
         uid.layout=__layout
         return frame,itemfg,itembg,funcs,uid
 
-    def add_treeview(self,pos:tuple,fg='#1a1a1a',bg='#f3f3f3',onfg='#1a1a1a',onbg='#eaeaea',oncolor='#3041d8',signcolor='#8a8a8a',width=200,height=300,font='微软雅黑 12',content=(('one',('1','2','3')),'two',('three',('a',('b',('b1','b2','b3')),'c')),'four'),anchor=None,command=None):#树状图
+    def add_treeview(self,pos:tuple,fg='#1a1a1a',bg='#f3f3f3',onfg='#1a1a1a',onbg='#eaeaea',oncolor='#3041d8',signcolor='#8a8a8a',width=200,height=300,font='微软雅黑 12',content=(('one',('1','2','3')),'two',('three',('a',('b',('b1','b2','b3')),'c')),'four'),anchor='nw',command=None):#树状图
         '''
         content=(
         a,
@@ -4746,7 +4746,7 @@ TinUIFont.load_font(tinui_dir+"/Segoe Fluent Icons.ttf")
 
 
 
-if __name__=='__main__':
+if __name__=='__main__1':
     # panel test
     a=Tk()
     a.geometry('500x500+5+5')
@@ -4777,7 +4777,7 @@ if __name__=='__main__':
     b.bind('<Configure>',update)
     a.mainloop()
 
-elif __name__=='__main__1':
+elif __name__=='__main__':
     def test(event):
         a.title('TinUI Test')
         b.add_paragraph((50,150),'这是TinUI按钮触达的事件函数回显，此外，窗口标题也被改变、首行标题缩进减小')#,font='{A019-Sounso Quality} 12')

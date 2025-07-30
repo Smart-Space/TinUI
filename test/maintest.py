@@ -27,15 +27,7 @@ def loadcontrol(controlname):
     duixml.funcs["opentutest"] = opentutest
     
     duixml.loadxml(cxml)
-    if controlname=='canvas':
-        canvas=duixml.tags['canvas'][0]
-        canvas.create_text((5,5),text='画布对象：文字。\n需要获取add_canvas的第一个返回值',font='微软雅黑 12',anchor='nw')
-    elif controlname=='menubar':
-        #if not load_menubar:
-        #    print('ok')
-        #    label=duixml.tags['label'][-1]
-        #    displayui.add_menubar(label)
-        #load_menubar=True
+    if controlname=='menubar':
         label=duixml.tags['label'][-1]
         displayui.add_menubar(label)
     elif controlname=='notebook':
@@ -74,12 +66,12 @@ hp.add_child(vp,200)
 
 t=ui.add_title((0,0),text='TinUI Gallery',anchor='n')
 img=ui.add_image((0,0),imgfile='LOGO.png',width=200,height=200,anchor='n')
-listbox=ui.add_listbox((0,0),height=340,bg='#f0f0f0',data=('back', 'barbutton', 'breadcrumb', 'button', 'button2', 'canvas', 'checkbutton', 
- 'combobox', 'entry', 'expander', 'flyout', 'image', 'info', 'label', 'labelframe',
+listbox=ui.add_listbox((0,0),height=340,bg='#f0f0f0',data=('back', 'barbutton', 'breadcrumb', 'button', 'button2', 'checkbutton', 
+ 'combobox', 'entry', 'expander', 'flyout', 'image', 'label', 'labelframe',
  'link', 'listbox', 'listview', 'menubar', 'menubutton', 'notebook', 'notecard', 
  'onoff', 'paragraph', 'passwordbox', 'picker', 'pipspager', 'pivot', 'progressbar', 
  'radiobox', 'radiobutton', 'ratingbar', 'scalebar', 'scrollbar', 'separate', 
- 'spinbox', 'swipecontrol', 'table', 'textbox', 'title', 'togglebutton', 'tooltip', 
+ 'spinbox', 'table', 'textbox', 'title', 'togglebutton', 'tooltip', 
  'treeview', 'ui', 'waitbar', 'waitframe','TinUIXml'),command=loadcontrol)[-1]
 vp.add_child(t,50)
 vp.add_child(img,200)

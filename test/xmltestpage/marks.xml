@@ -6,7 +6,7 @@
     <button2 text='删除标记点' command='self.funcs["del_mark"]'></button2>
 </line>
 <line>
-    <listbox data='("TinUIXml编辑器标记点",)' width="365" height="535" command='self.funcs["sel_mark"]'>listbox</listbox>
+    <listbox data='("TinUIXml编辑器标记点",)' width="370" height="535" command='self.funcs["sel_mark"]'>listbox</listbox>
 </line>
 </tinui>
 

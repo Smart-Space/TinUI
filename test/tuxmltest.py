@@ -67,7 +67,7 @@ def if_location(e):#是否显示坐标十字线
         tinui.itemconfig(loctext,state='normal')
         show_location(command=getloc)
     else:
-        tinui.itemconfig(loctext,text='x:? y:?',state='hidden')
+        tinui.itemconfig(loctext,text='x:? y:?')
         show_location(False)
 
 def getloc(x,y):
@@ -199,9 +199,8 @@ def reset_marks():#重新绘制标记点
 root=Tk()
 
 
-root.geometry('1300x700+5+5')
+root.geometry('1200x700')
 root.title('TinUIXml设计测试')
-root.resizable(False,False)
 
 initial_xml='''<!--TinUIXml编辑-->
 <tinui>
@@ -222,24 +221,55 @@ initial_xml='''<!--TinUIXml编辑-->
     </line>
 </line>
 </tinui>'''
-textui=BasicTinUI(root)
-textui.place(x=0,y=0,width=400,height=700)
-text=textui.add_textbox((0,0),382,700,font='微软雅黑 13',scrollbar=True)[0]
-text.insert(1.0,initial_xml)
 tinui=BasicTinUI(root,bg='#f3f3f3')
-tinui.place(x=401,y=0,width=899,height=700)
-x=TinUIXml(tinui)
-x.environment(globals())
+tinui.pack(expand=True,fill='both')
 
-xmlf=open(os.path.dirname(__file__)+r'\xmltestpage\main.xml','r',encoding='utf-8')
-xml=xmlf.read()
-xmlf.close()
+textids=tinui.add_textbox((0,0),400,700,font='微软雅黑 13',scrollbar=True)
+text=textids[0]
+textid=textids[-1]
+text.insert(1.0,initial_xml)
 
-x.loadxml(xml)
-displayui,rescroll,duixml,_=x.tags['xmlui']
-loctext=x.tags['loctext']
-tinui.itemconfig(loctext,state='hidden')
-tinui.bind('<Enter>',lambda e:tinui.focus())
+rp=ExpandPanel(tinui)
+hp=HorizonPanel(tinui,spacing=5)
+rp.set_child(hp)
+
+vp=VerticalPanel(tinui)
+hp.add_child(vp,400)
+ep1=ExpandPanel(tinui)
+vp.add_child(ep1,700,weight=1)
+ep1.set_child(textid)
+
+ep=ExpandPanel(tinui)
+hp.add_child(ep,weight=1)
+
+vp2=VerticalPanel(tinui)
+ep.set_child(vp2)
+
+top=HorizonPanel(tinui,spacing=5)
+vp2.add_child(top,50)
+btn=tinui.add_button2((0,0),text='导入xml',command=inxml,anchor='w')[-1]
+top.add_child(btn,70)
+btn=tinui.add_button2((0,0),text='python代码',command=pycode,anchor='w')[-1]
+top.add_child(btn,100)
+ctk=tinui.add_checkbutton((0,0),text='启用十字线定位',command=if_location,anchor='w')[-1]
+top.add_child(ctk,150)
+loctext=tinui.add_paragraph((0,0),text='x: y:',anchor='w')
+top.add_child(loctext)
+
+top.add_child(ExpandPanel(tinui),weight=1)
+
+btn=tinui.add_button2((0,0),text='打开标记点管理窗口',command=open_markw,anchor='e')[-1]
+top.add_child(btn,300)
+
+uiep=ExpandPanel(tinui)
+vp2.add_child(uiep,weight=1)
+
+displayui,rescroll,duixml,uiid=tinui.add_ui((0,0),width=870,height=630,scrollbar='True')
+uiep.set_child(uiid)
+
+def update(e):
+    rp.update_layout(5,5,e.width-5,e.height-5)
+tinui.bind('<Configure>',update)
 
 
 #Python代码弹窗窗口

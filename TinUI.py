@@ -4312,16 +4312,13 @@ class ExpandPanel(BasePanel):
         content_y1 = y1 + top
         content_x2 = x2 - right
         content_y2 = y2 - bottom
-        
         # 确保内容区域不小于最小尺寸
         content_width = max(content_x2 - content_x1, self.min_width)
         content_height = max(content_y2 - content_y1, self.min_height)
         content_x2 = content_x1 + content_width
         content_y2 = content_y1 + content_height
-        
         # 更新背景位置
         # self.canvas.coords(self.bg_rect, x1, y1, x2, y2)
-        
         # 更新子元素位置
         if self.child:
             if issubclass(self.child.__class__, BasePanel):
@@ -4343,19 +4340,15 @@ class VerticalPanel(ExpandablePanel):
         content_y1 = y1 + top
         content_x2 = x2 - right
         content_y2 = y2 - bottom
-        
         content_width = max(content_x2 - content_x1, self.min_width)
         content_height = max(content_y2 - content_y1, self.min_height)
         content_x2 = content_x1 + content_width
         content_y2 = content_y1 + content_height
-        
         # 更新背景位置
         # self.canvas.coords(self.bg_rect, x1, y1, x2, y2)
-        
         # 计算总权重和固定尺寸
         total_weight = 0
         fixed_size = 0
-        
         for i, (child, height, min_height, weight) in enumerate(self.children):
             # 计算间距（最后一个元素不加间距）
             spacing = self.spacing if i < len(self.children) - 1 else 0
@@ -4365,17 +4358,13 @@ class VerticalPanel(ExpandablePanel):
             else:
                 actual_height = max(height, min_height)
                 fixed_size += actual_height + spacing
-        
         # 计算剩余空间
         remaining_height = max(0, content_height - fixed_size)
-        
         current_y = content_y1
         total_children = len(self.children)
-        
         for i, (child, height, min_height, weight) in enumerate(self.children):
             # 计算间距（最后一个元素不加间距）
             spacing = self.spacing if i < total_children - 1 else 0
-            
             # 计算元素高度
             if weight > 0:
                 # 按权重分配剩余空间
@@ -4383,20 +4372,16 @@ class VerticalPanel(ExpandablePanel):
                 actual_height = max(proportional_height, min_height)
             else:
                 actual_height = max(height, min_height)
-            
             child_y2 = current_y + actual_height
-            
             # 确保不会超出面板范围
             if child_y2 > content_y2:
                 child_y2 = content_y2
-                
             # 更新子元素位置
             if issubclass(child.__class__, BasePanel):
                 child.update_layout(content_x1, current_y, content_x2, child_y2)
             elif isinstance(child, TinUIString):
                 child.layout(content_x1, current_y, content_x2, child_y2)
                 # self.canvas.coords(child, content_x1, current_y, content_x2, child_y2)
-                
             current_y += actual_height + spacing
             # 如果已经超出面板底部，停止布局
             if current_y >= content_y2:

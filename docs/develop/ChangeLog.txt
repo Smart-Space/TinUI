@@ -7,7 +7,7 @@
 
 
 ==========6.0==========
-2025-??-??
+2025-8-2
 1. 简化uid创建
 2. picker选项响应鼠标进入颜色改为同按钮背景色
 3. 弃用waitbar1, waitbar2, swipecontrol, info, canvas，但未删除

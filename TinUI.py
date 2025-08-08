@@ -3183,12 +3183,12 @@ class BasicTinUI(Canvas):
             for text in texts:
                 y=endy()+3
                 if type(text)==str:#单极
-                    te=box.create_text((padx+15,y),text=text,font=font,fill=fg,anchor='nw')
+                    te=box.create_text((padx+15,y),text=text,font=font,fill=fg,tags='item',anchor='nw')
                     back=box.add_back((),tuple([te]),fg=bg,bg=bg,linew=0)
                     items[back]=(te,back)
                 else:#存在子级
                     sign=box.create_text((padx-1,y+3),text='\uE96E',font='{Segoe Fluent Icons} 12',fill=signcolor,anchor='nw')
-                    te=box.create_text((padx+15,y),text=text[0],font=font,fill=fg,anchor='nw')
+                    te=box.create_text((padx+15,y),text=text[0],font=font,fill=fg,tags='item',anchor='nw')
                     back=box.add_back((),tuple((sign,te)),fg=bg,bg=bg,linew=0)
                     items[back]=(te,back,sign)
                     add_item(padx+15,text[1],back)
@@ -3301,6 +3301,14 @@ class BasicTinUI(Canvas):
                 self.itemconfig(cavui, width=width-8)
                 self.itemconfig(hscroll, state='normal')
             box.config(scrollregion=bbox)
+        def repaintback():
+            bbox=box.bbox('item')
+            widgetwidth=bbox[2]
+            widgetwidth=max(width,widgetwidth)-9
+            for back in items:
+                old_coords = box.coords(back)
+                old_coords[2] = old_coords[4] = widgetwidth
+                box.coords(back, old_coords)
         def __layout(x1,y1,x2,y2,expand=False):
             nonlocal width,height
             if not expand:
@@ -3324,6 +3332,7 @@ class BasicTinUI(Canvas):
                 coord[5]=coord[7]=y2-4
                 self.coords(allback,coord)
                 self.itemconfig(cavui,width=width,height=height)
+                repaintback()
                 checkscroll()
         nowid=None
         fln=TinUINum()#用于寻找父级关系，目前效率比较低，之后考虑优化
@@ -4731,7 +4740,7 @@ TinUIFont.load_font(tinui_dir+"/Segoe Fluent Icons.ttf")
 
 
 
-if __name__=='__main__1':
+if __name__=='__main__':
     # panel test
     a=Tk()
     a.geometry('500x500+5+5')
@@ -4743,16 +4752,16 @@ if __name__=='__main__1':
     hp=HorizonPanel(b)
     rp.set_child(hp)
 
-    # v1=ExpandPanel(b)
-    v1=VerticalPanel(b)
+    v1=ExpandPanel(b)
+    # v1=VerticalPanel(b)
 
-    # hp.add_child(v1,size=150,weight=1)
-    hp.add_child(v1,size=150)
+    hp.add_child(v1,size=150,weight=1)
+    # hp.add_child(v1,size=150)
 
-    funcs,ct=b.add_breadcrumb((20,20),anchor='n')[-2:]
+    ct=b.add_treeview((20,20),anchor='n')[-1]
 
-    # v1.set_child(ct)
-    hp.add_child(ct,size=80,weight=1)
+    v1.set_child(ct)
+    # hp.add_child(ct,size=80,weight=1)
 
     v2=VerticalPanel(b)
     hp.add_child(v2,size=150)
@@ -4762,7 +4771,7 @@ if __name__=='__main__1':
     b.bind('<Configure>',update)
     a.mainloop()
 
-elif __name__=='__main__':
+elif __name__=='__main__1':
     def test(event):
         a.title('TinUI Test')
         b.add_paragraph((50,150),'这是TinUI按钮触达的事件函数回显，此外，窗口标题也被改变、首行标题缩进减小')#,font='{A019-Sounso Quality} 12')

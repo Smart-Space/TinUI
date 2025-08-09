@@ -4292,7 +4292,7 @@ class ExpandablePanel(BasePanel):
         min_size: 元素最小尺寸
         weight: 权重（用于分配剩余空间）
         """
-        self.children.append((child, size, min_size, weight))
+        ...
 
 
 class ExpandPanel(BasePanel):
@@ -4342,6 +4342,15 @@ class VerticalPanel(ExpandablePanel):
         super().__init__(canvas, padding, min_width, min_height)
         self.spacing = spacing
         # self.create_bg("#f1f8e9", "#558b2f")
+    
+    def add_child(self, child, size=None, min_size=0, weight=0):
+        if not size:
+            if isinstance(child, TinUIString):
+                bbox = self.canvas.bbox(child)
+                size = bbox[3] - bbox[1]
+            else:
+                size = 100
+        self.children.append((child, size, min_size, weight))
     
     def update_layout(self, x1, y1, x2, y2):
         top, right, bottom, left = self.padding
@@ -4402,6 +4411,15 @@ class HorizonPanel(ExpandablePanel):
         super().__init__(canvas, padding, min_width, min_height)
         self.spacing = spacing
         # self.create_bg("#fff3e0", "#f57c00")
+    
+    def add_child(self, child, size=None, min_size=0, weight=0):
+        if not size:
+            if isinstance(child, TinUIString):
+                bbox = self.canvas.bbox(child)
+                size = bbox[2] - bbox[0]
+            else:
+                size = 100
+        self.children.append((child, size, min_size, weight))
     
     def update_layout(self, x1, y1, x2, y2):
         top, right, bottom, left = self.padding
@@ -4752,16 +4770,16 @@ if __name__=='__main__':
     hp=HorizonPanel(b)
     rp.set_child(hp)
 
-    v1=ExpandPanel(b)
-    # v1=VerticalPanel(b)
+    # v1=ExpandPanel(b)
+    v1=VerticalPanel(b)
 
-    hp.add_child(v1,size=150,weight=1)
-    # hp.add_child(v1,size=150)
+    # hp.add_child(v1,size=150,weight=1)
+    hp.add_child(v1,size=150)
 
-    ct=b.add_treeview((20,20),anchor='n')[-1]
+    ct=b.add_button2((20,20),text='测试按钮',anchor='n')[-1]
 
-    v1.set_child(ct)
-    # hp.add_child(ct,size=80,weight=1)
+    # v1.set_child(ct)
+    hp.add_child(ct,size=80,weight=1)
 
     v2=VerticalPanel(b)
     hp.add_child(v2,size=150)

@@ -5,7 +5,7 @@ nav_order: 6
 # TinUIXml
 `TinUIXml`允许通过xml语言来绘制TinUI组件。
 
-> 当前，`menubar`,`tooltip`等组件不支持使用xml布局。
+> `menubar`不支持使用xml布局。
 
 ```python
 class TinUIXml():#TinUI的xml渲染方式

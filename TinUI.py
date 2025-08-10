@@ -1468,7 +1468,7 @@ class BasicTinUI(Canvas):
         menu.wind=wind#给menubutton用
         return menu,bar,funcs
 
-    def add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',outline='#3b3b3b',font='微软雅黑 12',tran='#01FF11',delay=0,width=400):#绘制窗口提示框
+    def add_tooltip(self,uid,text='',fg='#3b3b3b',bg='#e7e7e7',outline='#3b3b3b',font='微软雅黑 12',tran='#01FF11',delay=0,width=400,pos=None,anchor=None):#绘制窗口提示框
         def show_toti(event,flag=True):
             nonlocal timethread,first
             if first:
@@ -4578,7 +4578,7 @@ class TinUIXml():#TinUI的xml渲染方式
             self.realui = ui.ui
         else:
             self.realui = ui
-        self.noload=('','menubar','tooltip')#当前不解析的标签
+        self.noload=('','menubar')#当前不解析的标签
         self.intargs=('width','linew','bd','r','minwidth','maxwidth','start','padx','pady','info_width','height','num','delay',)#需要转为数字的参数
         self.dataargs=('command','choices','widgets','content','percentage','data','cont','scrollbar','widget','offset',)#需要转为数据结构的参数
         self.funcs=TinUIXmlFuncDict()# 内部调用方法集合
@@ -4647,6 +4647,9 @@ class TinUIXml():#TinUI的xml渲染方式
             elif i.tag == 'flyout':
                 if 'fid' in i.attrib:
                     i.attrib['fid'] = self.__tags2uid(i.attrib['fid'])
+            elif i.tag == 'tooltip':
+                if 'uid' in i.attrib:
+                    i.attrib['uid'] = self.__tags2uid(i.attrib['uid'])
             #调整内部参数=====
             xendy=y#重新获取本行起始纵坐标
             if linex!=None:#存在纵块
@@ -4662,16 +4665,14 @@ class TinUIXml():#TinUI的xml渲染方式
             for each_ftag in ftags:
                 self.realui.addtag_withtag(each_ftag,bboxtag)
             bbox=self.realui.bbox(bboxtag)
+            if not bbox:
+                continue
             xendx=bbox[2]+padx#获取当前最大x坐标
             last_y = max(last_y, bbox[3] + pady)  # 更新当前最低y坐标
             #==========
             #进行特定控件内部xml布局
-            if i.tag == 'ui':
+            if i.tag in ('ui', 'expander'):
                 # 判断i是否存在子元素
-                if len(i) != 0:
-                    # 存在子元素，递归渲染
-                    tagall[-2].__load_line(i, ignorecmd=True)
-            elif i.tag == 'expander':
                 if len(i) != 0:
                     # 存在子元素，递归渲染
                     tagall[-2].__load_line(i, ignorecmd=True)

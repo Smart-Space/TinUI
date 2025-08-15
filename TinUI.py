@@ -2020,12 +2020,20 @@ class BasicTinUI(Canvas):
 
     def add_listview(self,pos:tuple,width=300,height=300,linew=80,bg='#f3f3f3',activebg='#eaeaea',oncolor='#3041d8',scrobg='#f8f8f8',scroc='#999999',scrooc='#89898b',num=5,anchor='nw',command=None):#绘制列表视图,function:add_list
         def buttonin(itui):
-            itui[0]['background']=activebg
+            tinui=itui[0]
+            bbox=tinui.bbox(tinui.background)
+            if not bbox:
+                # 防止被删除
+                back=tinui.__ui_polygon(((4,4),(width-8,linew-5)),bg,bg,9)
+                tinui.background=back
+            tinui.lower(tinui.background)
+            tinui.itemconfig(tinui.background,fill=activebg,outline=activebg)
         def buttonout(itui):
             if itui not in items:
                 return
             if items.index(itui)!=nowon:
-                itui[0]['background']=bg
+                tinui=itui[0]
+                tinui.itemconfig(tinui.background,fill='',outline='')
         def click(itui, send=True):
             nonlocal nowon
             if itui not in items:
@@ -2034,9 +2042,11 @@ class BasicTinUI(Canvas):
                 return
             index=items.index(itui)
             if nowon <= len(items)-1:
-                items[nowon][0]['background']=bg
+                tinui=items[nowon][0]
+                tinui.itemconfig(tinui.background,fill='',outline='')
             nowon=index
-            items[nowon][0]['background']=activebg
+            tinui=itui[0]
+            tinui.itemconfig(tinui.background,fill=activebg,outline=activebg)
             ui.coords(line,1,index*(linew+2)+lineheight,1,index*(linew+2)+lineheight*2)
             if command!=None and send:
                 command(nowon)
@@ -2051,10 +2061,13 @@ class BasicTinUI(Canvas):
                 items.append(item)
                 ui.addtag_withtag('item',item[-1])
                 endy+=linew+2
-                item[0].bind('<Enter>',lambda event,item=item:buttonin(item))
-                item[0].bind('<Button-1>',lambda event,item=item:click(item))
-                item[0].bind('<Leave>',lambda event,item=item:buttonout(item))
-                item[0].bind('<MouseWheel>',bindyview)
+                tinui=item[0]
+                back=tinui.__ui_polygon(((4,4),(width-8,linew-5)),'','',9)
+                tinui.background=back
+                tinui.bind('<Enter>',lambda event,item=item:buttonin(item))
+                tinui.bind('<Button-1>',lambda event,item=item:click(item))
+                tinui.bind('<Leave>',lambda event,item=item:buttonout(item))
+                tinui.bind('<MouseWheel>',bindyview)
             bbox = ui.bbox('item')
             if bbox != None:
                 bbox = list(bbox)
@@ -2079,7 +2092,9 @@ class BasicTinUI(Canvas):
                 self.coords(allback,coord)
                 self.itemconfig(view,width=width,height=height)
                 for i in items:
+                    tinui=i[0]
                     ui.itemconfig(i[-1],width=width-3)
+                    tinui.coords(tinui.background,4,4,width-11,4,width-11,linew-6,4,linew-6)
         def getitems():#获取items
             return items
         def getui(index):#获取 add_ui uid
@@ -2134,9 +2149,11 @@ class BasicTinUI(Canvas):
             nonlocal nowon
             if index >= len(items) or index < 0 or index == nowon:
                 return
-            items[nowon][0]['background'] = bg
+            tinui=items[nowon][0]
+            tinui.itemconfig(tinui.background,fill='',outline='')
             nowon = index
-            items[nowon][0]['background'] = activebg
+            tinui=items[nowon][0]
+            tinui.itemconfig(tinui.background,fill=activebg,outline=activebg)
             ui.coords(line,1,index*(linew+2)+lineheight,1,index*(linew+2)+lineheight*2)
             index = max(index-1,0)
             ui.yview_moveto(index/items.__len__())
@@ -4758,231 +4775,234 @@ TinUIFont.init_font_manager()
 TinUIFont.load_font(tinui_dir+"/Segoe Fluent Icons.ttf")
 
 
-
 if __name__=='__main__':
-    # panel test
-    a=Tk()
-    a.geometry('500x500+5+5')
-    a.title('TinUIPanel')
-    a.iconbitmap('LOGO.ico')
-    b=BasicTinUI(a,bg='white')
-    b.pack(fill='both',expand=True)
-    rp=ExpandPanel(b)
-    hp=HorizonPanel(b)
-    rp.set_child(hp)
+    testmode=1
 
-    # v1=ExpandPanel(b)
-    v1=VerticalPanel(b)
+    if testmode==1:
+        # panel test
+        a=Tk()
+        a.geometry('500x500+5+5')
+        a.title('TinUIPanel')
+        a.iconbitmap('LOGO.ico')
+        b=BasicTinUI(a,bg='white')
+        b.pack(fill='both',expand=True)
+        rp=ExpandPanel(b)
+        hp=HorizonPanel(b)
+        rp.set_child(hp)
 
-    # hp.add_child(v1,size=150,weight=1)
-    hp.add_child(v1,size=150)
+        v1=ExpandPanel(b)
+        # v1=VerticalPanel(b)
 
-    ct=b.add_button2((20,20),text='测试按钮',anchor='n')[-1]
+        hp.add_child(v1,size=150,weight=1)
+        # hp.add_child(v1,size=150)
 
-    # v1.set_child(ct)
-    hp.add_child(ct,size=80,weight=1)
+        # ct=b.add_button2((20,20),text='测试按钮',anchor='n')[-1]
+        ct=b.add_listview((20,20))[-1]
 
-    v2=VerticalPanel(b)
-    hp.add_child(v2,size=150)
+        v1.set_child(ct)
+        # hp.add_child(ct,size=80,weight=1)
 
-    def update(e):
-        rp.update_layout(5,5,e.width-5,e.height-5)
-    b.bind('<Configure>',update)
-    a.mainloop()
+        v2=VerticalPanel(b)
+        hp.add_child(v2,size=150)
 
-elif __name__=='__main__1':
-    def test(event):
-        a.title('TinUI Test')
-        b.add_paragraph((50,150),'这是TinUI按钮触达的事件函数回显，此外，窗口标题也被改变、首行标题缩进减小')#,font='{A019-Sounso Quality} 12')
-        b.coords(m,100,5)
-    def __test4(prog):
-        progressgoto(prog)
-    def test4(event):
-        for i in range(1,101):
-            a.after(i*20, lambda i=i: __test4(i))
-    def test5(result):
-        b.itemconfig(scale_text,text='当前选值：'+str(result))
-    def test6():
-        for i in range(0,5):
-            num=i
-            xml=f'''
-    <tinui><line x='{num*10+5}'><label text='这是第{num}个BasicTinUI组件'></label></line>
-    <line><button text='功能按钮' command='lambda event:print("第{i}个功能按钮")'></button>
-    <combobox width='80' text='可选测试' content='("{i}","其它")'></combobox></line></tinui>'''
-            ppgl[i][2].loadxml(xml)
-    def test7():
-        ntvdict=ntb.getvdict()
-        num=1
-        for i in ntvdict:
-            uxml=ntvdict[i][1]#tinuixml
-            xml=f'''
-    <tinui><line><button text='这是第{num}个BasicTinUI组件' command='print'></button></line>
-    <line><label text='TinUI的标签栏视图'></label><label text='每个都是单独页面'></label></line>
-    </tinui>'''
-            uxml.loadxml(xml)
-            num+=1
-    def test8(rbtext):
-        print(f'单选组控件选值=>{rbtext}')
-    def test9():
-        def new_title(*e):
-            ntb.newtitle(newnotepage,'一个崭新的标题')
-        newnotepage=ntb.addpage('newpage')
-        uxml=ntb.getvdict()[newnotepage][1]#tinuixml
-        uxml.funcs['newtitle']=new_title
-        uxml.loadxml('''<tinui><line><button text='这是一个新的标题栏窗口' command='self.funcs["newtitle"]'></button></line>
-    <line><label text='TinUI的标签栏视图'></label><label text='每个都是单独页面'></label></line>
-    </tinui>''')
-    def test10(tag):
-        b.itemconfig(pivott,text='pivot text: '+tag)
-    def test11_1(e):
-        wffunc.start()
-    def test11_2(e):
-        wffunc.end()
-    def test12(cid):
-        for i in cid:
-            print(trvbox.itemcget(trvl[i][0],'text')+'/',end='')
-        print('')
-    def test13(state):
-        if state:
-            b.itemconfig(tgbutton,text='状态开关按钮：开启')
-        else:
-            b.itemconfig(tgbutton,text='状态开关按钮：关闭')
+        def update(e):
+            rp.update_layout(5,5,e.width-5,e.height-5)
+        b.bind('<Configure>',update)
+        a.mainloop()
 
-    a=Tk()
-    a.geometry('700x700+5+5')
-    a.iconbitmap('LOGO.ico')
-    a.title('TinUI控件展示')
-
-    b=TinUI(a,bg='white')
-    b.pack(fill='both',expand=True)
-
-    m=b.add_title((600,0),'TinUI is a modern way to show tkinter widget in your application, as they are drawn by tkinter canvas')
-    m1=b.add_title((0,680),'test TinUI scrolled',size=2,angle=24)
-    b.add_paragraph((2000,5),'location')
-    b.add_paragraph((20,100),'下面的段落是测试画布的非平行字体显示效果，也是TinUI的简单介绍')
-    b.add_button((250,450),'测试按钮',activefg='white',activebg='red',command=test,anchor='center',maxwidth=100)
-    b.add_checkbutton((60,430),'允许TinUI测试',command=print,anchor='w')
-    b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
-    uientry = b.add_entry((250, 330), 350, '', command=print, anchor='w')[0]
-    uientry.insert(0, '请输入内容')
-    b.add_button((20,170),'创建分割线',command=lambda event:b.add_separate((20,200),600),minwidth=200)
-    b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=print)
-    b.add_link((400,500),'TinGroup知识库','https://tinhome.bk-free02.com',anchor='nw')
-    b.add_link((400,530),'执行print函数',print)
-    b.add_link((400,560),'执行print目标函数','https://smart-space.com.cn/',command=lambda url:print('open> '+url))
-    # _,ok1,_=b.add_waitbar1((500,220),bg='#CCCCCC')
-    # _,_,ok2,_=b.add_waitbar2((600,400))
-    # b.add_button((500,270),'停止等待动画',activefg='cyan',activebg='black',command=lambda e: ok1())
-    # bu1=b.add_button((700,200),'停止点状滚动条',activefg='white',activebg='black',command=lambda e: ok2())[1]
-    bu2=b.add_button((700,250),'nothing button 2')[1]
-    bu3=b.add_button((700,300),'nothing button 3')[1]
-    b.add_labelframe((bu2,bu3),'')
-    b.add_combobox((600,550),text='你有多大可能去珠穆朗玛峰',width=230,content=('20%','40%','60%','80%','100%','1000%'))
-    b.add_button((600,480),text='测试进度条（无事件版本）',command=test4)
-    _,_,_,progressgoto,_,_=b.add_progressbar((600,510))
-    b.add_table((180,630),data=(('a','space fans over the\nworld','c'),('you\ncan','2','3'),('I','II','have a dream, then try your best to get it!')))
-    b.add_paragraph((300,850),text='上面是一个表格')
-    b.add_onoff((600,100),anchor='se')
-    b.add_spinbox((680,100),command=lambda string:print(f'{string.num}: {string}'))
-    b.add_scalebar((680,50),command=test5)
-    scale_text,_,_=b.add_label((890,50),text='当前选值：2')
-    # b.add_info((710,140),info_text='this is info widget in TinUI, using TinUI\'s tooltip widget with its own style.',anchor='n')
-    mtb=b.add_paragraph((0,720),'测试菜单（右键单击）')
-    b.add_menubar(mtb,cont=(('command',print),('menu',print),'-',('TinUI文本移动',test)))
-    ttb=b.add_paragraph((10,800),'TinUI能做些什么？')
-    b.add_tooltip(ttb,'很多很多',delay=1)
-    b.add_back(pos=(0,0),uids=(ttb,),bg='cyan',fg='cyan')
-    _,_,ok3,_=b.add_waitbar3((600,800),width=240)
-    b.add_button((600,750),text='停止带状等待框',command=lambda event:ok3())
-    textbox=b.add_textbox((890,100),text='这是文本输入框，当然，无法在textbox的参数中绑定横向滚动'+'\n换行'*30)[0]
-    textbox['wrap']='none'
-    b.add_scrollbar((1095,100),textbox)
-    b.add_scrollbar((890,305),textbox,direction='x')
-    b.add_listbox((890,430),data=('item1','item2','item3','item4\n item4.1\n item4.2\n item4.3\n itme4.4\n item4.5','item5 and item5.1 and item5.2 and item5.3'),
-    command=print)
-    uixml,add_ui_id=b.add_ui((150,890),scrollbar=True,region='auto')[-2:]
-    uixml.loadxml('''<tinui><line>
-    <button text='button in child tinui'></button>
-    <label text='you can use BasicTinUI in a father TinUI&#x000A;by using&#x000A;tinui.add_ui(...)'></label>
-    </line><line>
-    <label text='you can use&#x000A;manual function re-region&#x000A;also can use&#x000A;auto function&#x000A;just one&#x000A;like&#x000A;this'>
-    </label>
-    </line></tinui>''')
-    ppgl=b.add_pipspager((400,890),num=25)[0]
-    test6()
-    ntb=b.add_notebook((800,900))[-2]
-    for i in range(1,11):
-        if i==5:#第五个不可删除:
-            ntb.addpage('test'+str(i),'t'+str(i),cancancel=False)
-        else:
-            ntb.addpage('test'+str(i),'t'+str(i))
-    ntb.showpage('t1')
-    ntb.cannew(True,test9)
-    test7()
-    b.add_ratingbar((0,1150),num=28,command=print)
-    radiofuncs = b.add_radiobox((320,1150),content=('1','2','3','','新一行内容','','单选','组','控件'),command=test8)[-2]
-    radiofuncs.select(0)
-    b.add_notecard((1200,50))
-    pivott=b.create_text((1200,400),text='pivot text',anchor='nw',font='微软雅黑 12')
-    b.add_pivot((1200,300),command=test10)
-    b.add_button2((1200,180),text='圆角按钮',icon='\uF093',compound='top',minwidth=200)
-    exux=b.add_expander((1200,500))[2]
-    exux.loadxml('''<tinui><line>
-    <button2 text='拓展UI框架的按钮'></button2></line>
-    <line>
-    <paragraph text='拓展UI框架可以节省布局位置，能够使用TinUIXml为可拓展UI框架编写界面布局。' width='190'></paragraph>
-    </line>
-    <line><paragraph text='感觉如何？' width='190'></paragraph></line><line><ratingbar></ratingbar>
-    </line></tinui>
-    ''')
-    b.add_button((1220,650),text='获取TinUI相关信息',command=test11_1)
-    wf,_,_,wffunc,_=b.add_waitframe((1220,700),height=250)
-    wf.add_paragraph((150,100),text='Loading . . .',anchor='n')
-    wf.add_button2((150,150),text='取消等待❌',anchor='n',command=test11_2)
-    lvitems=b.add_listview((1220,980))[2]
-    lvcontent=(
-    ('BasicTinUI','TinUI框架渲染核心','https://tinui.smart-space.com.cn'),
-    ('TinUI','基于tkinter的现代元素控件框架','https://smart-space.com.cn/project/TinUI/index.html'),
-    ('CSDN','中文IT技术交流平台','https://www.csdn.net/'),
-    ('TinText','新版TinML实现平台','https://tintext.smart-space.com.cn/'),
-    ('Smart-Space','个人开发者名称','https://smart-space.com.cn')
-    )
-    for i in range(0,5):
-        lvitems[i][2].loadxml(f'''<tinui>
-        <line>
-        <line>
-        <title text='{lvcontent[i][0]}'></title>
-        <link text='相关链接' url='{lvcontent[i][2]}'></link>
-        </line>
-        <line>
-        <label text='{lvcontent[i][1]}'></label>
-        </line>
-        </line>
+    else:
+        def test(event):
+            a.title('TinUI Test')
+            b.add_paragraph((50,150),'这是TinUI按钮触达的事件函数回显，此外，窗口标题也被改变、首行标题缩进减小')#,font='{A019-Sounso Quality} 12')
+            b.coords(m,100,5)
+        def __test4(prog):
+            progressgoto(prog)
+        def test4(event):
+            for i in range(1,101):
+                a.after(i*20, lambda i=i: __test4(i))
+        def test5(result):
+            b.itemconfig(scale_text,text='当前选值：'+str(result))
+        def test6():
+            for i in range(0,5):
+                num=i
+                xml=f'''
+        <tinui><line x='{num*10+5}'><label text='这是第{num}个BasicTinUI组件'></label></line>
+        <line><button text='功能按钮' command='lambda event:print("第{i}个功能按钮")'></button>
+        <combobox width='80' text='可选测试' content='("{i}","其它")'></combobox></line></tinui>'''
+                ppgl[i][2].loadxml(xml)
+        def test7():
+            ntvdict=ntb.getvdict()
+            num=1
+            for i in ntvdict:
+                uxml=ntvdict[i][1]#tinuixml
+                xml=f'''
+        <tinui><line><button text='这是第{num}个BasicTinUI组件' command='print'></button></line>
+        <line><label text='TinUI的标签栏视图'></label><label text='每个都是单独页面'></label></line>
+        </tinui>'''
+                uxml.loadxml(xml)
+                num+=1
+        def test8(rbtext):
+            print(f'单选组控件选值=>{rbtext}')
+        def test9():
+            def new_title(*e):
+                ntb.newtitle(newnotepage,'一个崭新的标题')
+            newnotepage=ntb.addpage('newpage')
+            uxml=ntb.getvdict()[newnotepage][1]#tinuixml
+            uxml.funcs['newtitle']=new_title
+            uxml.loadxml('''<tinui><line><button text='这是一个新的标题栏窗口' command='self.funcs["newtitle"]'></button></line>
+        <line><label text='TinUI的标签栏视图'></label><label text='每个都是单独页面'></label></line>
         </tinui>''')
-    trvl,_,trvbox,_=b.add_treeview((1220,1300),command=test12)
-    try:
-        b.add_image((10,1300),200,250,imgfile=__file__[:-8]+'image/LOGO.png')#仅测试
-    except Exception as err:
-        print(err)
-    tgbutton=b.add_togglebutton((1200,230),text='状态开关按钮：关闭',command=test13)[0]
-    # b.add_swipecontrol((320,1300),'swipe control')
-    b.add_passwordbox((250,1400),350)
-    b.add_picker((1400,230),command=print)
-    # b.add_menubutton((1500,50),'menubutton',widget=False,cont=(('command',print),('menu',(('cmd1',print),('cmd2',test1))),'-',('TinUI文本移动',test)))
-    b.add_menubutton((1500,50),'menubutton',cont=(('command',print),('menu',print),'-',('TinUI文本移动',test)))
-    b.add_barbutton((1500,150))
-    flylabel = b.add_label((1500,500),text='点击展开浮出UI')[-1]
-    _, flyxml, flyhide, _ = b.add_flyout(flylabel, offset=(-20, 0))
-    flyxml.funcs['flyhide']=flyhide
-    flyxml.loadxml('''<tinui><line><paragraph text='浮出UI'></paragraph></line>
-    <line><paragraph text='add_flyout(fid, anchor="...")'></paragraph></line>
-    <line><paragraph text='使用hide关闭'></paragraph></line>
-    <line><button2 text='关闭浮出UI控件' command="self.funcs['flyhide']"></button2>
-    </line></tinui>''')
-    bc = b.add_breadcrumb((1500,350),anchor='n',command=print)[-2]
-    for i in range(1,4):
-        bc.add(f'item{i}')
+        def test10(tag):
+            b.itemconfig(pivott,text='pivot text: '+tag)
+        def test11_1(e):
+            wffunc.start()
+        def test11_2(e):
+            wffunc.end()
+        def test12(cid):
+            for i in cid:
+                print(trvbox.itemcget(trvl[i][0],'text')+'/',end='')
+            print('')
+        def test13(state):
+            if state:
+                b.itemconfig(tgbutton,text='状态开关按钮：开启')
+            else:
+                b.itemconfig(tgbutton,text='状态开关按钮：关闭')
 
-    b.bind('<Destroy>',lambda e:b.clean_windows())
+        a=Tk()
+        a.geometry('700x700+5+5')
+        a.iconbitmap('LOGO.ico')
+        a.title('TinUI控件展示')
 
-    a.mainloop()
+        b=TinUI(a,bg='white')
+        b.pack(fill='both',expand=True)
+
+        m=b.add_title((600,0),'TinUI is a modern way to show tkinter widget in your application, as they are drawn by tkinter canvas')
+        m1=b.add_title((0,680),'test TinUI scrolled',size=2,angle=24)
+        b.add_paragraph((2000,5),'location')
+        b.add_paragraph((20,100),'下面的段落是测试画布的非平行字体显示效果，也是TinUI的简单介绍')
+        b.add_button((250,450),'测试按钮',activefg='white',activebg='red',command=test,anchor='center',maxwidth=100)
+        b.add_checkbutton((60,430),'允许TinUI测试',command=print,anchor='w')
+        b.add_label((10,220),'这是由画布TinUI绘制的Label组件')
+        uientry = b.add_entry((250, 330), 350, '', command=print, anchor='w')[0]
+        uientry.insert(0, '请输入内容')
+        b.add_button((20,170),'创建分割线',command=lambda event:b.add_separate((20,200),600),minwidth=200)
+        b.add_radiobutton((50,480),300,'sky is blue, water is blue, too. So, what is your heart',('red','blue','black'),command=print)
+        b.add_link((400,500),'TinGroup知识库','https://tinhome.bk-free02.com',anchor='nw')
+        b.add_link((400,530),'执行print函数',print)
+        b.add_link((400,560),'执行print目标函数','https://smart-space.com.cn/',command=lambda url:print('open> '+url))
+        # _,ok1,_=b.add_waitbar1((500,220),bg='#CCCCCC')
+        # _,_,ok2,_=b.add_waitbar2((600,400))
+        # b.add_button((500,270),'停止等待动画',activefg='cyan',activebg='black',command=lambda e: ok1())
+        # bu1=b.add_button((700,200),'停止点状滚动条',activefg='white',activebg='black',command=lambda e: ok2())[1]
+        bu2=b.add_button((700,250),'nothing button 2')[1]
+        bu3=b.add_button((700,300),'nothing button 3')[1]
+        b.add_labelframe((bu2,bu3),'')
+        b.add_combobox((600,550),text='你有多大可能去珠穆朗玛峰',width=230,content=('20%','40%','60%','80%','100%','1000%'))
+        b.add_button((600,480),text='测试进度条（无事件版本）',command=test4)
+        _,_,_,progressgoto,_,_=b.add_progressbar((600,510))
+        b.add_table((180,630),data=(('a','space fans over the\nworld','c'),('you\ncan','2','3'),('I','II','have a dream, then try your best to get it!')))
+        b.add_paragraph((300,850),text='上面是一个表格')
+        b.add_onoff((600,100),anchor='se')
+        b.add_spinbox((680,100),command=lambda string:print(f'{string.num}: {string}'))
+        b.add_scalebar((680,50),command=test5)
+        scale_text,_,_=b.add_label((890,50),text='当前选值：2')
+        # b.add_info((710,140),info_text='this is info widget in TinUI, using TinUI\'s tooltip widget with its own style.',anchor='n')
+        mtb=b.add_paragraph((0,720),'测试菜单（右键单击）')
+        b.add_menubar(mtb,cont=(('command',print),('menu',print),'-',('TinUI文本移动',test)))
+        ttb=b.add_paragraph((10,800),'TinUI能做些什么？')
+        b.add_tooltip(ttb,'很多很多',delay=1)
+        b.add_back(pos=(0,0),uids=(ttb,),bg='cyan',fg='cyan')
+        _,_,ok3,_=b.add_waitbar3((600,800),width=240)
+        b.add_button((600,750),text='停止带状等待框',command=lambda event:ok3())
+        textbox=b.add_textbox((890,100),text='这是文本输入框，当然，无法在textbox的参数中绑定横向滚动'+'\n换行'*30)[0]
+        textbox['wrap']='none'
+        b.add_scrollbar((1095,100),textbox)
+        b.add_scrollbar((890,305),textbox,direction='x')
+        b.add_listbox((890,430),data=('item1','item2','item3','item4\n item4.1\n item4.2\n item4.3\n itme4.4\n item4.5','item5 and item5.1 and item5.2 and item5.3'),
+        command=print)
+        uixml,add_ui_id=b.add_ui((150,890),scrollbar=True,region='auto')[-2:]
+        uixml.loadxml('''<tinui><line>
+        <button text='button in child tinui'></button>
+        <label text='you can use BasicTinUI in a father TinUI&#x000A;by using&#x000A;tinui.add_ui(...)'></label>
+        </line><line>
+        <label text='you can use&#x000A;manual function re-region&#x000A;also can use&#x000A;auto function&#x000A;just one&#x000A;like&#x000A;this'>
+        </label>
+        </line></tinui>''')
+        ppgl=b.add_pipspager((400,890),num=25)[0]
+        test6()
+        ntb=b.add_notebook((800,900))[-2]
+        for i in range(1,11):
+            if i==5:#第五个不可删除:
+                ntb.addpage('test'+str(i),'t'+str(i),cancancel=False)
+            else:
+                ntb.addpage('test'+str(i),'t'+str(i))
+        ntb.showpage('t1')
+        ntb.cannew(True,test9)
+        test7()
+        b.add_ratingbar((0,1150),num=28,command=print)
+        radiofuncs = b.add_radiobox((320,1150),content=('1','2','3','','新一行内容','','单选','组','控件'),command=test8)[-2]
+        radiofuncs.select(0)
+        b.add_notecard((1200,50))
+        pivott=b.create_text((1200,400),text='pivot text',anchor='nw',font='微软雅黑 12')
+        b.add_pivot((1200,300),command=test10)
+        b.add_button2((1200,180),text='圆角按钮',icon='\uF093',compound='top',minwidth=200)
+        exux=b.add_expander((1200,500))[2]
+        exux.loadxml('''<tinui><line>
+        <button2 text='拓展UI框架的按钮'></button2></line>
+        <line>
+        <paragraph text='拓展UI框架可以节省布局位置，能够使用TinUIXml为可拓展UI框架编写界面布局。' width='190'></paragraph>
+        </line>
+        <line><paragraph text='感觉如何？' width='190'></paragraph></line><line><ratingbar></ratingbar>
+        </line></tinui>
+        ''')
+        b.add_button((1220,650),text='获取TinUI相关信息',command=test11_1)
+        wf,_,_,wffunc,_=b.add_waitframe((1220,700),height=250)
+        wf.add_paragraph((150,100),text='Loading . . .',anchor='n')
+        wf.add_button2((150,150),text='取消等待❌',anchor='n',command=test11_2)
+        lvitems=b.add_listview((1220,980))[2]
+        lvcontent=(
+        ('BasicTinUI','TinUI框架渲染核心','https://tinui.smart-space.com.cn'),
+        ('TinUI','基于tkinter的现代元素控件框架','https://smart-space.com.cn/project/TinUI/index.html'),
+        ('CSDN','中文IT技术交流平台','https://www.csdn.net/'),
+        ('TinText','新版TinML实现平台','https://tintext.smart-space.com.cn/'),
+        ('Smart-Space','个人开发者名称','https://smart-space.com.cn')
+        )
+        for i in range(0,5):
+            lvitems[i][2].loadxml(f'''<tinui>
+            <line>
+            <line>
+            <title text='{lvcontent[i][0]}'></title>
+            <link text='相关链接' url='{lvcontent[i][2]}'></link>
+            </line>
+            <line>
+            <label text='{lvcontent[i][1]}'></label>
+            </line>
+            </line>
+            </tinui>''')
+        trvl,_,trvbox,_=b.add_treeview((1220,1300),command=test12)
+        try:
+            b.add_image((10,1300),200,250,imgfile=__file__[:-8]+'image/LOGO.png')#仅测试
+        except Exception as err:
+            print(err)
+        tgbutton=b.add_togglebutton((1200,230),text='状态开关按钮：关闭',command=test13)[0]
+        # b.add_swipecontrol((320,1300),'swipe control')
+        b.add_passwordbox((250,1400),350)
+        b.add_picker((1400,230),command=print)
+        # b.add_menubutton((1500,50),'menubutton',widget=False,cont=(('command',print),('menu',(('cmd1',print),('cmd2',test1))),'-',('TinUI文本移动',test)))
+        b.add_menubutton((1500,50),'menubutton',cont=(('command',print),('menu',print),'-',('TinUI文本移动',test)))
+        b.add_barbutton((1500,150))
+        flylabel = b.add_label((1500,500),text='点击展开浮出UI')[-1]
+        _, flyxml, flyhide, _ = b.add_flyout(flylabel, offset=(-20, 0))
+        flyxml.funcs['flyhide']=flyhide
+        flyxml.loadxml('''<tinui><line><paragraph text='浮出UI'></paragraph></line>
+        <line><paragraph text='add_flyout(fid, anchor="...")'></paragraph></line>
+        <line><paragraph text='使用hide关闭'></paragraph></line>
+        <line><button2 text='关闭浮出UI控件' command="self.funcs['flyhide']"></button2>
+        </line></tinui>''')
+        bc = b.add_breadcrumb((1500,350),anchor='n',command=print)[-2]
+        for i in range(1,4):
+            bc.add(f'item{i}')
+
+        b.bind('<Destroy>',lambda e:b.clean_windows())
+
+        a.mainloop()

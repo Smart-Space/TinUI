@@ -47,7 +47,7 @@ class Dialog(Toplevel):
                 'online':'#e5e5e5'
             }
             self.entryargs = {
-                'fg':'#606060',
+                'fg':'#1b1b1b',
                 'bg':'#fbfbfb',
                 'activefg':'#1a1a1a',
                 'activebg':'#f6f6f6',
@@ -57,7 +57,7 @@ class Dialog(Toplevel):
                 'activeline':'#e5e5e5',
                 'insert':'#000000',
                 'outline':'#868686',
-                'onoutline':'#3041d8',
+                'onoutline':'#0067C0',
             }
             self.listargs = {
                 'fg':'#1a1a1a',
@@ -66,7 +66,7 @@ class Dialog(Toplevel):
                 'activebg':'#e9e9e9',
                 'onfg':'#191919',
                 'onbg':'#ececec',
-                'sel':'#b4bbea',
+                'sel':'#91C1E6',
                 'scrollbg':'#f9f9f9',
                 'scrollcolor':'#8d8d8d',
                 'scrollon':'#8a8a8a'
@@ -107,7 +107,7 @@ class Dialog(Toplevel):
                 'line':'#303030',
                 'activeline':'#202020',
                 'outline':'#9a9a9a',
-                'onoutline':'#b2b8f2',
+                'onoutline':'#4CC2FF',
                 'insert':'#e0e0e0',
             }
             self.listargs = {
@@ -117,7 +117,7 @@ class Dialog(Toplevel):
                 'activebg':'#373737',
                 'onfg':'#ffffff',
                 'onbg':'#333333',
-                'sel':'#465097',
+                'sel':'#115990',
                 'scrollbg':'#2e2e2e',
                 'scrollcolor':'#9f9f9f',
                 'scrollon':'#a0a0a0'

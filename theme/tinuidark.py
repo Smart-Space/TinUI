@@ -268,7 +268,7 @@ class TinUIDark(TinUITheme):
                 'fg':'#000000','bg':'#4CC2FF',
                 'activefg':'#000000','activebg':'#47B1E8',
                 'line':'#5AC7FF','linew':1,'activeline':'#2B80CA',
-                'onfg':'#42A1D2','onbg':'#42A1D2','online':'#42A1D2',
+                'onfg':'#215069','onbg':'#42A1D2','online':'#42A1D2',
             },**kw})
     
     def add_toolbutton(self,pos,*arg,**kw):

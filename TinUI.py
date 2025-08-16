@@ -72,6 +72,7 @@ class TinUIFont:
     #添加字体文件，见CustomTkinter
 
     linux_font_path = "~/.fonts/"
+    darwin_font_path = "~/Library/Fonts/"
 
     @classmethod
     def init_font_manager(cls):
@@ -81,8 +82,7 @@ class TinUIFont:
                 if not os.path.isdir(os.path.expanduser(cls.linux_font_path)):
                     os.mkdir(os.path.expanduser(cls.linux_font_path))
                 return True
-            except Exception as err:
-                sys.stderr.write("FontManager error: " + str(err) + "\n")
+            except:
                 return False
 
         # other platforms
@@ -122,11 +122,18 @@ class TinUIFont:
             try:
                 shutil.copy(font_path, os.path.expanduser(cls.linux_font_path))
                 return True
-            except Exception as err:
-                sys.stderr.write("FontManager error: " + str(err) + "\n")
+            except:
+                return False
+            
+        # MacOS
+        elif sys.platform.startswith("darwin"):
+            try:
+                shutil.copy(font_path, os.path.expanduser(cls.darwin_font_path))
+                return True
+            except:
                 return False
 
-        # macOS and others
+        # others
         else:
             return False
 
@@ -620,7 +627,7 @@ class BasicTinUI(Canvas):
             choice=self.create_text((start_x+2,height+2),text=i,fill=fg,font=font,anchor='nw',width=width-4,tags=uid)
             bbox=self.bbox(choice)
             h=bbox[3]-bbox[1]+4
-            back=self.create_rectangle((start_x,height,start_x+width,height+h),outline=bg,fill=bg,tags=uid)
+            back=self.__ui_polygon(((start_x+4,height+4),(start_x+width-4,height+h-4)),outline=bg,fill=bg,tags=uid,width=9)
             self.tkraise(choice)
             height+=h+4
             choices_list.append(choice)
@@ -927,8 +934,9 @@ class BasicTinUI(Canvas):
                 width=x2-x1
                 width2=width*per/100
                 y=(y1+y2)/2
-                self.coords(back,x1,y-7.5,x2,y+7.5)
-                self.coords(progressbar,x1,y-7.5,x1+width2,y+7.5)
+                self.coords(outline,x1+4,y-3.5,x2-4,y-3.5,x2-4,y+3.5,x1+4,y+3.5)
+                self.coords(back,x1+5,y-2.5,x2-5,y-2.5,x2-5,y+2.5,x1+5,y+2.5)
+                self.coords(progressbar,x1+4,y-3.5,x1+4+width2,y-3.5,x1+4+width2,y+3.5,x1+4,y+3.5)
                 self.coords(text,x1+width/2,y)
                 pos[0]=x1
                 pos[1]=y-7.5
@@ -938,7 +946,8 @@ class BasicTinUI(Canvas):
                 return
             per=num
             pw=width*per/100
-            self.coords(progressbar,pos[0],pos[1],pos[0]+pw,pos[1]+15)
+            pw=max(8,pw)
+            self.coords(progressbar,pos[0]+4,pos[1]+4,pos[0]+pw-4,pos[1]+4,pos[0]+pw-4,pos[1]+11,pos[0]+4,pos[1]+11)
             if percentage:
                 self.itemconfig(text,text=str(per)+'%')
             self.update_idletasks()
@@ -956,11 +965,11 @@ class BasicTinUI(Canvas):
             self.itemconfig(progressbar,outline=bg,fill=bg)
         pos=list(pos)
         per=0#当前进度
-        bbox=(pos[0],pos[1],pos[0]+width,pos[1]+15)
-        back=self.create_rectangle((bbox),outline=fg,fill=back)
-        uid=TinUIString(f'progressbar-{back}')
-        self.itemconfig(back,tags=uid)
-        progressbar=self.create_rectangle((pos[0],pos[1],pos[0],pos[1]+15),outline=bg,fill=bg,tags=uid)
+        outline=self.__ui_polygon(((pos[0]+4,pos[1]+4),(pos[0]+width-4,pos[1]+11)),outline=fg,fill=fg,width=9)
+        uid=TinUIString(f'progressbar-{outline}')
+        self.itemconfig(outline,tags=uid)
+        back=self.__ui_polygon(((pos[0]+5,pos[1]+5),(pos[0]+width-5,pos[1]+10)),outline=back,fill=back,width=9,tags=uid)
+        progressbar=self.__ui_polygon(((pos[0]+4,pos[1]+4),(pos[0]+4,pos[1]+11)),outline=bg,fill=bg,width=9,tags=uid)
         pro_tagname='progressbar>'+str(back)
         self.addtag_withtag(progressbar,pro_tagname)
         #是否显示默认文本
@@ -971,13 +980,13 @@ class BasicTinUI(Canvas):
         dx,dy=self.__auto_anchor(uid,pos,anchor)
         pos[0]+=dx
         pos[1]+=dy
-        del bbox,dx,dy
+        del dx,dy
         funcs=FuncList(3)
         funcs.now_running=funcs[0]=now_running
         funcs.now_paused=funcs[1]=now_paused
         funcs.now_error=funcs[2]=now_error
         uid.layout=__layout
-        return back,pro_tagname,text,goto,funcs,uid
+        return outline,back,pro_tagname,text,goto,funcs,uid
 
     def add_table(self,pos:tuple,outline='#E1E1E1',fg='black',bg='white',data=[['1','2','3'],['a','b','c']],minwidth=100,maxwidth=300,font=('微软雅黑',12),headbg='#d9ebf9',anchor='nw'):#绘制表格
         def get_max_height(widths:dict):
@@ -1608,7 +1617,7 @@ class BasicTinUI(Canvas):
         uid.layout=__layout
         return back,bar,stop,uid
 
-    def add_textbox(self,pos:tuple,width:int=200,height:int=200,text:str='',anchor='nw',font='微软雅黑 12',fg='black',bg='white',linew=3,scrollbar=False,outline='#63676b',onoutline='#3041d8',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b'):#绘制文本框
+    def add_textbox(self,pos:tuple,width:int=200,height:int=200,text:str='',anchor='nw',font='微软雅黑 12',fg='black',bg='white',scrollbar=False,outline='#63676b',onoutline='#3041d8',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b'):#绘制文本框
         def __layout(x1,y1,x2,y2,expand=False):
             nonlocal width, height
             if not expand:
@@ -1619,27 +1628,43 @@ class BasicTinUI(Canvas):
                 dx,dy=self.__auto_layout(uid,(x1,y1,x2,y2),'nw')
                 height=y2-y1
                 if scrollbar:
-                    width2=x2-x1-18
+                    width2=x2-x1-20
                     dw=width2-width
                     dx+=dw
                     width=width2
                     self.move(cid,dw,0)
                     cid.move(dx,dy,height)
                 else:
-                    width=x2-x1
-                self.itemconfig(cavui,width=width,height=height)
+                    width=x2-x1-4
+                self.itemconfig(cavui,width=width,height=height-4)
+                coords=self.coords(line)
+                coords[2]=coords[4]=x1+width+1
+                coords[5]=coords[7]=y2-3
+                self.coords(line,coords)
+                coords=self.coords(back)
+                coords[2]=coords[4]=x1+width
+                coords[5]=coords[7]=y2-4
+                self.coords(back,coords)
+        def focus_in(event):
+            self.itemconfig(line,outline=onoutline)
+        def focus_out(event):
+            self.itemconfig(line,outline=outline)
         def get(start='1.0',end='end'):#获取输入
             return textbox.get(start,end)
         def delete(start='1.0',end='end'):#删除
             textbox.delete(start,end)
         def config(**kw):#设置样式
             textbox.config(**kw)
-        textbox=Text(self,font=font,fg=fg,bg=bg,highlightthickness=linew,highlightbackground=outline,highlightcolor=onoutline,relief='flat')
-        cavui=self.create_window(pos,window=textbox,width=width,height=height,anchor='nw')
+        textbox=Text(self,font=font,fg=fg,bg=bg,borderwidth=0,relief='flat')
+        textbox.bind('<FocusIn>',focus_in,True)
+        textbox.bind('<FocusOut>',focus_out,True)
+        cavui=self.create_window(pos,window=textbox,width=width-2,height=height-2,anchor='nw')
         self.windows.append(textbox)
         uid=TinUIString(f'textbox-{cavui}')
         self.addtag_withtag(uid,cavui)
         textbox.insert(1.0,text)
+        line=self.__ui_polygon(((pos[0]+2,pos[1]+2),(pos[0]+width-5,pos[1]+height-5)),fill=outline,outline=outline,width=9,tags=uid)
+        back=self.__ui_polygon(((pos[0]+3,pos[1]+3),(pos[0]+width-6,pos[1]+height-6)),fill=bg,outline=bg,width=9,tags=uid)
         if scrollbar:#不支持横向滚动自动绑定
             bbox=self.bbox(uid)
             cid=self.add_scrollbar((bbox[2]+5,bbox[1]),textbox,bbox[3]-bbox[1],'y',bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
@@ -2155,8 +2180,8 @@ class BasicTinUI(Canvas):
             tinui=items[nowon][0]
             tinui.itemconfig(tinui.background,fill=activebg,outline=activebg)
             ui.coords(line,1,index*(linew+2)+lineheight,1,index*(linew+2)+lineheight*2)
-            index = max(index-1,0)
-            ui.yview_moveto(index/items.__len__())
+            rank = (index+0.5-ui.winfo_height()/2/linew)/items.__len__()
+            ui.yview_moveto(rank)
         nowon=-1
         ui=BasicTinUI(self,bg=bg)
         view=self.create_window(pos,window=ui,height=height,width=width,anchor='nw')
@@ -4266,6 +4291,14 @@ class BasicTinUI(Canvas):
         uid.layout = __layout
         return root, back, funcs, uid
 
+    def add_accentbutton(self,pos:tuple,text:str,**kwargs):# 绘制一个突出提示色按钮
+        # 用于theme
+        return self.add_button2(pos,text,**kwargs)
+
+    def add_toolbutton(self,pos:tuple,text:str,**kwargs):# 绘制一个扁平工具按钮
+        # 用于theme
+        return self.add_button2(pos,text,**kwargs)
+
 
 class BasePanel:
     """面板的基类"""
@@ -4772,11 +4805,11 @@ class TinUIXml():#TinUI的xml渲染方式
 
 tinui_dir=os.path.dirname(os.path.abspath(__file__))
 TinUIFont.init_font_manager()
-TinUIFont.load_font(tinui_dir+"/Segoe Fluent Icons.ttf")
+TinUIFont.load_font(tinui_dir+"\\Segoe Fluent Icons.ttf")
 
 
 if __name__=='__main__':
-    testmode=1
+    testmode=2
 
     if testmode==1:
         # panel test
@@ -4796,8 +4829,7 @@ if __name__=='__main__':
         hp.add_child(v1,size=150,weight=1)
         # hp.add_child(v1,size=150)
 
-        # ct=b.add_button2((20,20),text='测试按钮',anchor='n')[-1]
-        ct=b.add_listview((20,20))[-1]
+        ct=b.add_textbox((0,0))[-1]
 
         v1.set_child(ct)
         # hp.add_child(ct,size=80,weight=1)
@@ -4899,7 +4931,7 @@ if __name__=='__main__':
         b.add_labelframe((bu2,bu3),'')
         b.add_combobox((600,550),text='你有多大可能去珠穆朗玛峰',width=230,content=('20%','40%','60%','80%','100%','1000%'))
         b.add_button((600,480),text='测试进度条（无事件版本）',command=test4)
-        _,_,_,progressgoto,_,_=b.add_progressbar((600,510))
+        _,_,_,_,progressgoto,_,_=b.add_progressbar((600,510))
         b.add_table((180,630),data=(('a','space fans over the\nworld','c'),('you\ncan','2','3'),('I','II','have a dream, then try your best to get it!')))
         b.add_paragraph((300,850),text='上面是一个表格')
         b.add_onoff((600,100),anchor='se')

@@ -29,7 +29,7 @@ def selectnext(e):
 
 a=win()
 u=a.u
-funcs=u.add_listview((10,5),command=print__)[-2]
+funcs=u.add_listview((10,5),height=400,command=print__)[-2]
 
 onexml='''<tinui>
 <line>
@@ -63,13 +63,13 @@ for i in range(0,5):
     </line>
     </tinui>''')
 
-u.add_button((5,320),'添加元素',command=additem)
-u.add_button((5,370),'删除元素',command=deleteitemthis)
-u.add_button((5,420),'获取选中元素',command=getnowon)
-u.add_button((5,470),'选择下一个',command=selectnext)
-u.add_button((120,320),'删除第一个元素',command=deleteitem1)
-u.add_button((120,370),'删除第二个元素',command=deleteitem)
-u.add_button((120,420),'清空元素',command=deleteall)
-u.add_button((120,470),'增加十个',command=add10)
+u.add_button((5,420),'添加元素',command=additem)
+u.add_button((5,470),'删除元素',command=deleteitemthis)
+u.add_button((5,520),'获取选中元素',command=getnowon)
+u.add_button((5,570),'选择下一个',command=selectnext)
+u.add_button((120,420),'删除第一个元素',command=deleteitem1)
+u.add_button((120,470),'删除第二个元素',command=deleteitem)
+u.add_button((120,520),'清空元素',command=deleteall)
+u.add_button((120,570),'增加十个',command=add10)
 
 a.go()

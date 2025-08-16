@@ -11,6 +11,7 @@ from tinuidarkorange import TinUIDarkOrange
 from tinuidarkpurple import TinUIDarkPurple
 from tinuilightcyan import TinUILightCyan
 from tinuilightred import TinUILightRed
+from tinuisteelblue import TinUISteelBlue
 
 
 def test(theme):
@@ -54,7 +55,7 @@ def test(theme):
     #combobox
     du.add_combobox(end(),text='test combobox',content=('1','2','3','4','5'))
     #progressbar
-    du.add_progressbar((end()[0],end()[1]+130))[3](75)
+    du.add_progressbar((end()[0],end()[1]+130))[4](75)
     #treeview
     du.add_table(end(),
     data=[['t1','t2','t3'],['tinui','table','test'],['1','2','3']])
@@ -78,7 +79,7 @@ def test(theme):
     du.add_waitbar3(end())
     #richeditbox
     textx,texty=end()
-    text=du.add_textbox((textx,texty),linew=2)[0]
+    text=du.add_textbox((textx,texty))[0]
     #richtextbox
     du.add_scrollbar((textx+205,texty),text)
     #listbox
@@ -152,5 +153,6 @@ ru.add_button((5,105), text='TinUIDarkOrange theme', command = lambda e : test(T
 ru.add_button((220,105), text='TinUIDarkPurple theme', command = lambda e : test(TinUIDarkPurple))
 ru.add_button((5,155), text='TinUILightCyan theme', command = lambda e : test(TinUILightCyan))
 ru.add_button((220,155), text='TinUILightRed theme', command = lambda e : test(TinUILightRed))
+ru.add_button((5,205), text='TinUISteelBlue theme', command = lambda e : test(TinUISteelBlue))
 
 w.mainloop()

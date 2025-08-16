@@ -33,7 +33,7 @@ class TinUILight(TinUITheme):
             **{
                 'fontfg':'#1a1a1a','fg':'#868686','bg':'#ededed',
                 'activefg':'#868686','activebg':'#e5e5e5',
-                'onfg':'white','onbg':'#334ac0'
+                'onfg':'white','onbg':'#0067C0'
             },**kw})
 
     def add_label(self,pos,*arg,**kw):
@@ -50,7 +50,7 @@ class TinUILight(TinUITheme):
                 'activefg':'#1a1a1a','activebg':'#f6f6f6',
                 'onfg':'#000000','onbg':'#ffffff',
                 'line':'#e5e5e5','activeline':'#e5e5e5',
-                'outline':'#868686','onoutline':'#3041d8','insert':'#000000'
+                'outline':'#868686','onoutline':'#0067C0','insert':'#000000'
             },**kw})
 
     def add_separate(self,pos,*arg,**kw):
@@ -68,8 +68,8 @@ class TinUILight(TinUITheme):
     def add_link(self,pos,*arg,**kw):
         return self.ui.add_link(pos,*arg,**{
             **{
-                'fg':'#4f62ca',
-                'activefg':'red','activebg':'#eaeaea',
+                'fg':'#003E92',
+                'activefg':'#001A68','activebg':'#eaeaea',
             },**kw})
 
     def add_waitbar1(self,pos,*arg,**kw):
@@ -85,7 +85,7 @@ class TinUILight(TinUITheme):
     def add_labelframe(self,uids:tuple,*arg,**kw):
         return self.ui.add_labelframe(uids,*arg,**{
             **{
-                'fg':'#1a1a1a','bg':'#f4f4f4',
+                'fg':'#E5E5E5','bg':'#f4f4f4',
             },**kw})
 
     def add_waitbar2(self,pos,*arg,**kw):
@@ -103,15 +103,15 @@ class TinUILight(TinUITheme):
                 'activefg':'#1a1a1a','activebg':'#f6f6f6',
                 'activeline':'#cccccc',
                 'onfg':'#5d5d5d','onbg':'#f5f5f5','online':'#e5e5e5',
-                'listfg':'#1a1a1a','listactivefg':'#191919','listactivebg':'#e9e9e9',
-                'listonfg':'#191919','listonbg':'#ececec','listsel':'#b4bbea',
+                'listfg':'#1a1a1a','listactivefg':'#191919','listactivebg':'#F0F0F0',
+                'listonfg':'#5C5C5C','listonbg':'#F3F3F3','listsel':'#F0F0F0',
                 'scrollbg':'#f9f9f9','scrollcolor':'#999999','scrollon':'#89898b',
             },**kw})
 
     def add_progressbar(self,pos,*arg,**kw):
         return self.ui.add_progressbar(pos,*arg,**{
             **{
-                'fg':'#868686','bg':'#334ac0','back':'#f3f3f3',
+                'fg':'#868686','bg':'#0067C0','back':'#f3f3f3',
                 'fontc':'#79b8f8',
             },**kw})
 
@@ -147,7 +147,7 @@ class TinUILight(TinUITheme):
     def add_scalebar(self,pos,*arg,**kw):
         return self.ui.add_scalebar(pos,*arg,**{
             **{
-                'fg':'#3b50ba','bg':'#868686','activefg':'#3b50ba',
+                'fg':'#0067C0','bg':'#868686','activefg':'#1A76C6',
                 'buttonbg':'#ffffff','buttonoutline':'#cccccc',
             },**kw})
 
@@ -175,14 +175,14 @@ class TinUILight(TinUITheme):
     def add_waitbar3(self,pos,*arg,**kw):
         return self.ui.add_waitbar3(pos,*arg,**{
             **{
-                'fg':'#3041d8','bg':'#f3f3f3','okcolor':'#3041d8',
+                'fg':'#0067C0','bg':'#f3f3f3','okcolor':'#0067C0',
             },**kw})
 
     def add_textbox(self,pos,*arg,**kw):
         return self.ui.add_textbox(pos,*arg,**{
             **{
                 'fg':'#1a1a1a','bg':'white',
-                'outline':'#868686','onoutline':'#3041d8',
+                'outline':'#868686','onoutline':'#0067C0',
                 'scrollbg':'#f9f9f9','scrollcolor':'#8d8d8d','scrollon':'#8a8a8a',
             },**kw})
 
@@ -198,7 +198,7 @@ class TinUILight(TinUITheme):
             **{
                 'fg':'#1a1a1a','bg':'#f2f2f2',
                 'activefg':'#191919','activebg':'#e9e9e9',
-                'onfg':'#191919','onbg':'#ececec','sel':'#b4bbea',
+                'onfg':'#191919','onbg':'#ececec','sel':'#91C1E6',
                 'scrollbg':'#f9f9f9','scrollcolor':'#8d8d8d','scrollon':'#8a8a8a',
             },**kw})
 
@@ -226,6 +226,13 @@ class TinUILight(TinUITheme):
                 'onfg':'#1a1a1a','onbg':'#f9f9f9',
                 'scrollbg':'#f9f9f9','scrollcolor':'#8d8d8d','scrollon':'#8a8a8a',
             },**kw})
+    
+    def add_ratingbar(self,pos,*arg,**kw):
+        return self.ui.add_ratingbar(pos,*arg,**{
+            **{
+                'fg':'#5d5d5d','bg':'#f3f3f3',
+                'onfg':'#3041d8','onbg':'#3041d8',
+            },**kw})
 
     def add_radiobox(self,pos,*arg,**kw):
         return self.ui.add_radiobox(pos,*arg,**{
@@ -233,13 +240,6 @@ class TinUILight(TinUITheme):
                 'fontfg':'black','fg':'#8b8b8b','bg':'#ededed',
                 'activefg':'#898989','activebg':'#e5e5e5',
                 'onfg':'#3041d8','onbg':'#ffffff',
-            },**kw})
-
-    def add_ratingbar(self,pos,*arg,**kw):
-        return self.ui.add_ratingbar(pos,*arg,**{
-            **{
-                'fg':'#5d5d5d','bg':'#f3f3f3',
-                'onfg':'#3041d8','onbg':'#3041d8',
             },**kw})
 
     def add_notecard(self,pos,*arg,**kw):

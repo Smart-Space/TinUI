@@ -250,7 +250,7 @@ class TinUIDark(TinUITheme):
         return self.ui.add_pivot(pos,*arg,**{
             **{
                 'fg':'#a6a6a6','bg':'',
-                'activefg':'#ffffff','activecolor':'#5969e0',
+                'activefg':'#ffffff','activecolor':'#4CC2FF',
             },**kw})
 
     def add_button2(self,pos,*arg,**kw):
@@ -260,6 +260,24 @@ class TinUIDark(TinUITheme):
                 'activefg':'#ffffff','activebg':'#323232',
                 'line':'#303030','linew':1,'activeline':'#202020',
                 'onfg':'#cecece','onbg':'#272727','online':'#303030',
+            },**kw})
+    
+    def add_accentbutton(self,pos,*arg,**kw):
+        return self.ui.add_accentbutton(pos,*arg,**{
+            **{
+                'fg':'#000000','bg':'#4CC2FF',
+                'activefg':'#000000','activebg':'#47B1E8',
+                'line':'#5AC7FF','linew':1,'activeline':'#2B80CA',
+                'onfg':'#42A1D2','onbg':'#42A1D2','online':'#42A1D2',
+            },**kw})
+    
+    def add_toolbutton(self,pos,*arg,**kw):
+        return self.ui.add_toolbutton(pos,*arg,**{
+            **{
+                'fg':'#FFFFFF','bg':'#202020',
+                'activefg':'#FFFFFF','activebg':'#2D2D2D',
+                'line':'#202020','linew':1,'activeline':'#2D2D2D',
+                'onfg':'#CECECE','onbg':'#292929','online':'#292929',
             },**kw})
 
     def add_expander(self,pos,*arg,**kw):
@@ -281,7 +299,7 @@ class TinUIDark(TinUITheme):
     def add_listview(self,pos,*arg,**kw):
         return self.ui.add_listview(pos,*arg,**{
             **{
-                'bg':'#202020','activebg':'#2d2d2d','oncolor':'#b2b8f2',
+                'bg':'#202020','activebg':'#2d2d2d','oncolor':'#4CC2FF',
                 'scrobg':'#2e2e2e','scroc':'#9a9a9a','scrooc':'#9f9f9f',
             },**kw})
 
@@ -290,14 +308,14 @@ class TinUIDark(TinUITheme):
             **{
                 'fg':'#ffffff','bg':'#202020',
                 'onfg':'#ffffff','onbg':'#2d2d2d',
-                'oncolor':'#b2b8f2','signcolor':'#9f9f9f',
+                'oncolor':'#4CC2FF','signcolor':'#9f9f9f',
             },**kw})
 
     def add_togglebutton(self,pos,*arg,**kw):
         return self.ui.add_togglebutton(pos,*arg,**{
             **{
-                'fg':'#ffffff','bg':'#2d2d2d','line':'#303030',
-                'activefg':'#000000','activebg':'#b2b8f2','activeline':'#b8bef3',
+                'fg':'#ffffff','bg':'#2d2d2d','line':"#303030",
+                'activefg':'#000000','activebg':'#4CC2FF','activeline':'#5AC7FF',
             },**kw})
     
     def add_swipecontrol(self,pos,*arg,**kw):
@@ -314,7 +332,7 @@ class TinUIDark(TinUITheme):
             **{
                 'fg':'#cfcfcf','bg':'#2d2d2d','outline':'#3c3c3c',
                 'activefg':'#ffffff','activebg':'#323232',
-                'onfg':'#000000','onbg':'#a8ade4',
+                'onfg':'#000000','onbg':'#4CC2FF',
                 'buttonfg':'#ffffff','buttonbg':'#2d2d2d',
                 'buttonactivefg':'#ffffff','buttonactivebg':'#383838',
                 'buttononfg':'#ffffff','buttononbg':'#343434',

@@ -7,13 +7,14 @@
 
 
 ==========6.2==========
-2025-
+2025-8-16
 1. listview选项背景改为圆角，注意，使用内部ui绘制背景
 2. 提供Mac下的字体解决建议
 3. listview程序选择时会尽量将选项保持在视图中央
 4. radiobutton选项背景改为圆角
 5. progressbar使用圆角
 6. textbox使用圆角并取消边框宽度参数
+7. 添加button2延申样式accentbutton, toolbutton
 ***破坏性更新***
 从TinUI-6.2版本开始，暗色样式正式匹配WinUI3暗色，亮色样式也将进行完全适配。
 原本的Dark配色改名为淡钢蓝配色(SteelBlue)且不再更新。

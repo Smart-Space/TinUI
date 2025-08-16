@@ -113,6 +113,9 @@ def test(theme):
     du.add_pivot(end())
     #button
     du.add_button2(end(),'button2')
+    du.add_accentbutton(end(),'accentbutton')
+    #appbarbutton
+    du.add_toolbutton(end(),'',icon='\uE90F')
     #expander
     du.add_expander(end())
     #animation interop

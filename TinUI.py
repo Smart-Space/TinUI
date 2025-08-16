@@ -2180,7 +2180,7 @@ class BasicTinUI(Canvas):
             tinui=items[nowon][0]
             tinui.itemconfig(tinui.background,fill=activebg,outline=activebg)
             ui.coords(line,1,index*(linew+2)+lineheight,1,index*(linew+2)+lineheight*2)
-            rank = (index+0.5-ui.winfo_height()/2/linew)/items.__len__()
+            rank = (index+0.5-ui.winfo_height()/(2*(linew+2)))/items.__len__()
             ui.yview_moveto(rank)
         nowon=-1
         ui=BasicTinUI(self,bg=bg)

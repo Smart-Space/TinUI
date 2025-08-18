@@ -60,6 +60,10 @@ class VerticalPanel(ExpandablePanel):
 
 设置元素间间距。
 
+### clear_children()
+
+删除下辖所有元素。
+
 ### add_child(child, size=None, min_size=0, weight=0)
 
 若`size`未指定，当`child`是控件时，获取对应方向上的尺寸，否则为`100`。

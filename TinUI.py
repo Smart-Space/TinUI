@@ -418,7 +418,7 @@ class BasicTinUI(Canvas):
         uid.layout=lambda x1,y1,x2,y2,expand=False: self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
         return checkbutton,check,funcs,uid
 
-    def add_entry(self,pos:tuple,width:int,text:str='',fg='#1b1b1b',bg='#fbfbfb',activefg='#1a1a1a',activebg='#f6f6f6',onfg='#000000',onbg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#000000',font=('微软雅黑',12),outline='#868686',onoutline='#3041d8',icon='>',anchor='nw',call='→',command=None):#绘制单行输入框
+    def add_entry(self,pos:tuple,width:int,text:str='',fg='#1b1b1b',bg='#fbfbfb',activefg='#1a1a1a',activebg='#f6f6f6',onfg='#000000',onbg='#ffffff',line='#e5e5e5',activeline='#e5e5e5',insert='#000000',font=('微软雅黑',12),outline='#868686',onoutline='#3041d8',icon='\uE974',anchor='nw',call='\uEBE7',command=None):#绘制单行输入框
         #这是一个半绘制组件
         def if_empty(event):
             nonlocal empty_flag
@@ -431,7 +431,7 @@ class BasicTinUI(Canvas):
                 self.itemconfig(funcw,text=icon,fill=fg)
             elif empty_flag:
                 empty_flag = False
-                self.itemconfig(funcw,text='×')
+                self.itemconfig(funcw,text='\uE894')
                 self.tag_bind(funcw,'<Enter>',lambda event:self.itemconfig(funcw,fill=onoutline))
                 self.tag_bind(funcw,'<Leave>',lambda event:self.itemconfig(funcw,fill=fg))
                 self.tag_bind(funcw,'<Button-1>',lambda event:(entry.delete(0,'end'),if_empty(None)))
@@ -508,6 +508,8 @@ class BasicTinUI(Canvas):
             self.itemconfig(back,fill='#f0f0f0',outline='#f0f0f0')
             self.itemconfig(bottomline,fill=outline)
         empty_flag = True
+        font = tkfont.Font(font=font)
+        font_size = font.cget('size')
         var = StringVar()#变量
         entry = Entry(self, fg=fg, bg=bg, font=font, relief='flat', bd=0, insertbackground=insert, textvariable=var)
         entry.var = var
@@ -524,10 +526,10 @@ class BasicTinUI(Canvas):
         entrybutton=f'enrtyb-{funce}'
         self.itemconfig(funce,tags=uid)
         bbox=self.bbox(funce)
-        funcw=self.create_text((bbox[0]+width,bbox[1]),text=icon,fill=fg,font=font,anchor='nw',tags=(uid,entrybutton))
+        funcw=self.create_text((bbox[0]+width,(bbox[1]+bbox[3])/2),text=icon,fill=fg,font=f'{{Segoe Fluent Icons}} {font_size}',anchor='w',tags=(uid,entrybutton))
         bubbox=self.bbox(funcw)
         if command!=None:#调用函数的绑定仅当存在command时启动
-            button=self.create_text((bubbox[2]+2,(bbox[1]+bbox[3])/2),text=call,fill=fg,font=font,anchor='w',tags=(uid,entrybutton))
+            button=self.create_text((bubbox[2]+2,(bbox[1]+bbox[3])/2),text=call,fill=fg,font=f'{{Segoe Fluent Icons}} {font_size}',anchor='w',tags=(uid,entrybutton))
             self.tag_bind(button,'<Enter>',lambda event:self.itemconfig(button,fill=onoutline))
             self.tag_bind(button,'<Leave>',lambda event:self.itemconfig(button,fill=fg))
             self.tag_bind(button,'<Button-1>',call_command)
@@ -1456,7 +1458,11 @@ class BasicTinUI(Canvas):
                 width=pos[2]-pos[0]
                 widths.append(width)
             elif callable(i[1]):
-                button=bar.add_button2((0,endy()-13),i[0],None,'',fg,bg,bg,3,activefg,activebg,activeline,onfg,onbg,online,font=font,command=lambda event,i=i:(menu.withdraw(),i[1](event)))
+                if len(i) == 3:
+                    icon=i[2]
+                else:
+                    icon=None
+                button=bar.add_button2((0,endy()-13),i[0],icon,'left',fg,bg,bg,3,activefg,activebg,activeline,onfg,onbg,online,font=font,command=lambda event,i=i:(menu.withdraw(),i[1](event)))
                 backs.append((button[1],button[2]))
                 funcs.append(button[3])
                 pos=bar.bbox(button[1])
@@ -2181,7 +2187,7 @@ class BasicTinUI(Canvas):
             tinui.itemconfig(tinui.background,fill=activebg,outline=activebg)
             ui.coords(line,1,index*(linew+2)+lineheight,1,index*(linew+2)+lineheight*2)
             rank = (index+0.5-ui.winfo_height()/(2*(linew+2)))/items.__len__()
-            ui.yview_moveto(rank)
+            ui.yview_moveto(max(0, rank))
         nowon=-1
         ui=BasicTinUI(self,bg=bg)
         view=self.create_window(pos,window=ui,height=height,width=width,anchor='nw')
@@ -3010,14 +3016,14 @@ class BasicTinUI(Canvas):
                 self.coords(back,x1+5,y1+5,x2-5,y1+5,x2-5,y2-5,x1+5,y2-5)
                 self.coords(outline,x1+4,y1+4,x2-4,y1+4,x2-4,y2-4,x1+4,y2-4)
         font=tkfont.Font(font=font)
-        font_size=str(font.cget(option='size'))
+        font_size=font.cget(option='size')
         mouse_in = False# 鼠标是否在按钮上
         button=self.create_text(pos,text=text,fill=fg,font=font)
         uid=TinUIString(f'button2-{button}')
         buttonuid=uid+'button'
         self.itemconfig(button,tags=(uid,buttonuid))
         if icon:#Fluent Icons编码图标
-            icontext=self.create_text(pos,text=icon,fill=fg,font='{Segoe Fluent Icons} '+font_size,tags=(uid,buttonuid,f'{uid}icon'))
+            icontext=self.create_text(pos,text=icon,fill=fg,font=f'{{Segoe Fluent Icons}} {font_size}',tags=(uid,buttonuid,f'{uid}icon'))
             iconbbox=self.bbox(icontext)
             if compound=='left':
                 textpos=(iconbbox[2]+1,(iconbbox[3]+iconbbox[1])/2)
@@ -3968,7 +3974,7 @@ class BasicTinUI(Canvas):
         uid.layout=lambda x1,y1,x2,y2,expand=False:self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
         return picker,bar,texts,pickerbars,uid
     
-    def add_menubutton(self,pos:tuple,text:str,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',menuonfg='#191919',menuonbg='#f0f0f0',menuonline='#f0f0f0',font=('微软雅黑',12),cont=(('command',print),'-'),widget=True,tran='#01FF11',anchor='nw'):#绘制按钮展开菜单
+    def add_menubutton(self,pos:tuple,text:str,icon=None,side='y',fg='#1b1b1b',bg='#fbfbfb',line='#CCCCCC',linew=1,activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',onfg='#5d5d5d',onbg='#f5f5f5',online='#e5e5e5',menuonfg='#191919',menuonbg='#f0f0f0',menuonline='#f0f0f0',font=('微软雅黑',12),cont=(('command',print),'-'),widget=True,tran='#01FF11',anchor='nw'):#绘制按钮展开菜单
         #Segoe Fluent Icons x右侧展开\uE76B \uE76C，y下方展开\uE70D \uE70E，默认y
         def in_button(event):
             self.itemconfig(outline,outline=activeline,fill=activeline)
@@ -4030,14 +4036,21 @@ class BasicTinUI(Canvas):
             self.itemconfig(back,state='normal')
             self.itemconfig(outline,state='normal')
             out_button(None)
+        font=tkfont.Font(font=font)
+        font_size=font.cget('size')
         button=self.create_text(pos,text=text,fill=fg,font=font,anchor='nw')
         uid=TinUIString(f'menubutton-{button}')
         self.itemconfig(button,tags=(uid,uid+'button'))
         x1,y1,x2,y2=self.bbox(uid)
+        if icon:
+            self.create_text((x1-5,y1+(y2-y1)/2),text=icon,fill=fg,font=f'{{Segoe Fluent Icons}} {font_size}',anchor='e',tags=(uid,uid+'button'))
+            if text=='':
+                self.delete(button)
+                button = None
         if side=='y':
-            self.create_text((x2+5,(y1+y2)/2),text='\uE70D',fill=fg,font='{Segoe Fluent Icons} 12',anchor='w',tags=(uid,uid+'button',uid+'widget'))
+            self.create_text((x2+5,(y1+y2)/2),text='\uE70D',fill=fg,font=f'{{Segoe Fluent Icons}} {font_size}',anchor='w',tags=(uid,uid+'button',uid+'widget'))
         elif side=='x':
-            self.create_text((x2+5,(y1+y2)/2),text='\uE76C',fill=fg,font='{Segoe Fluent Icons} 12',anchor='w',tags=(uid,uid+'button',uid+'widget'))
+            self.create_text((x2+5,(y1+y2)/2),text='\uE76C',fill=fg,font=f'{{Segoe Fluent Icons}} {font_size}',anchor='w',tags=(uid,uid+'button',uid+'widget'))
         if not widget:#如果被指定不显示标识符
             self.delete(uid+'widget')
             self.dtag(uid+'widget')
@@ -4269,7 +4282,7 @@ class BasicTinUI(Canvas):
         pos = list(pos)
         root = self.create_text(pos, text=root, font=font, fill=fg, anchor='w')
         font_size = self.__get_text_size(root)
-        segeo_font = '{Segoe Fluent Icons}' + font_size
+        segeo_font = '{Segoe Fluent Icons} ' + font_size
         uid = TinUIString(f'breadcrumb-{root}')
         uid_button = uid + 'button'
         self.itemconfig(root, tags=(uid,uid_button))
@@ -4335,6 +4348,14 @@ class ExpandablePanel(BasePanel):
         
     def set_spacing(self, spacing):
         self.spacing = spacing
+    
+    def clear_children(self):
+        for child in self.children:
+            if issubclass(child[0].__class__, BasePanel):
+                child[0].clear_children()
+            else:
+                self.canvas.delete(child[0])
+        self.children.clear()
         
     def add_child(self, child, size=100, min_size=0, weight=0):
         """
@@ -4823,16 +4844,16 @@ if __name__=='__main__':
         hp=HorizonPanel(b)
         rp.set_child(hp)
 
-        v1=ExpandPanel(b)
-        # v1=VerticalPanel(b)
+        # v1=ExpandPanel(b)
+        v1=VerticalPanel(b)
 
-        hp.add_child(v1,size=150,weight=1)
-        # hp.add_child(v1,size=150)
+        # hp.add_child(v1,size=150,weight=1)
+        hp.add_child(v1,size=150)
 
-        ct=b.add_textbox((0,0))[-1]
+        ct=b.add_button2((0,0),text='delete',command=lambda e:hp.clear_children())[-1]
 
-        v1.set_child(ct)
-        # hp.add_child(ct,size=80,weight=1)
+        # v1.set_child(ct)
+        hp.add_child(ct,size=80,weight=1)
 
         v2=VerticalPanel(b)
         hp.add_child(v2,size=150)
@@ -4940,7 +4961,7 @@ if __name__=='__main__':
         scale_text,_,_=b.add_label((890,50),text='当前选值：2')
         # b.add_info((710,140),info_text='this is info widget in TinUI, using TinUI\'s tooltip widget with its own style.',anchor='n')
         mtb=b.add_paragraph((0,720),'测试菜单（右键单击）')
-        b.add_menubar(mtb,cont=(('command',print),('menu',print),'-',('TinUI文本移动',test)))
+        b.add_menubar(mtb,font='微软雅黑 16',cont=(('command',print,'\uE756'),('menu',print,'\uEDE3'),'-',('TinUI文本移动',test,'\uE7C2')))
         ttb=b.add_paragraph((10,800),'TinUI能做些什么？')
         b.add_tooltip(ttb,'很多很多',delay=1)
         b.add_back(pos=(0,0),uids=(ttb,),bg='cyan',fg='cyan')
@@ -5021,7 +5042,7 @@ if __name__=='__main__':
         b.add_passwordbox((250,1400),350)
         b.add_picker((1400,230),command=print)
         # b.add_menubutton((1500,50),'menubutton',widget=False,cont=(('command',print),('menu',(('cmd1',print),('cmd2',test1))),'-',('TinUI文本移动',test)))
-        b.add_menubutton((1500,50),'menubutton',cont=(('command',print),('menu',print),'-',('TinUI文本移动',test)))
+        b.add_menubutton((1500,50),'menubutton',icon='\uE700',cont=(('command',print),('menu',print),'-',('TinUI文本移动',test)))
         b.add_barbutton((1500,150))
         flylabel = b.add_label((1500,500),text='点击展开浮出UI')[-1]
         _, flyxml, flyhide, _ = b.add_flyout(flylabel, offset=(-20, 0))

@@ -7,8 +7,12 @@
 
 
 ==========6.3==========
-2025-
+2025-8-18
 1. 优化listview的居中计算，更准确
+2. menubutton支持Segoe图标
+3. menubar支持按钮Segoe图标
+4. HorizonPanel, VerticalPanel添加clear_children方法
+5. entry标识符改为Segoe Fluent Icon字符
 
 ==========6.2==========
 2025-8-16

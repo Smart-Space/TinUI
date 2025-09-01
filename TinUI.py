@@ -234,6 +234,19 @@ class BasicTinUI(Canvas):
         points = (*point2[0], point2[1][0], point2[0][1], *point2[1], point2[0][0], point2[1][1])
         return self.create_polygon(points,fill=fill,outline=outline,width=width,tags=tags)
 
+    def __ui_toplevel(self, width, height, tran, focusout):
+        top = Toplevel(self)
+        top.withdraw()
+        top.bind('<FocusOut>', focusout)
+        self.windows.append(top)
+        top.geometry(f'{width}x{height}')
+        top.overrideredirect(True)
+        top.attributes('-topmost',1)
+        top.attributes('-transparent',tran)
+        bar = BasicTinUI(top,bg=tran)
+        bar.pack(fill='both',expand=True)
+        return top, bar
+
     def __delete_uixml(self, uixml):
         # 删除伴随TinUIXml
         uixml.clean()
@@ -902,17 +915,8 @@ class BasicTinUI(Canvas):
         self.tag_bind(uid,'<ButtonRelease-1>',open_box)
         self.tag_bind(uid,'<Enter>',mousein)
         self.tag_bind(uid,'<Leave>',mouseout)
-        pickbox=Toplevel(self)#浮出窗口
-        pickbox.withdraw()
-        pickbox.bind('<FocusOut>', unshow)
-        self.windows.append(pickbox)
-        pickbox.geometry(f'{width+16}x{height}')
-        pickbox.overrideredirect(True)
-        pickbox.attributes('-topmost',1)
-        pickbox.attributes('-transparent',tran)
         wind=TinUINum()#记录数据
-        bar=BasicTinUI(pickbox,bg=tran)
-        bar.pack(fill='both',expand=True)
+        pickbox, bar = self.__ui_toplevel(width+16,height,tran,unshow)
         bar.__ui_polygon(((13,13),(x2-x1-4,height-12)),fill=bg,outline=bg,width=17)
         bar.lower(bar.__ui_polygon(((12,12),(x2-x1-3,height-11)),fill=outline,outline=outline,width=17))
         boxback = bar.add_listbox((2,2),x2-x1-7,height-15,bg=bg,fg=listfg,data=content,activefg=listactivefg,activebg=listactivebg,onfg=listonfg,onbg=listonbg,sel=listsel,font=font,scrollbg=scrollbg,scrollcolor=scrollcolor,scrollon=scrollon,command=choose_this)[1]
@@ -1426,20 +1430,15 @@ class BasicTinUI(Canvas):
             for i in (0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1):
                 menu.after(it*20, lambda alpha=i : __show(alpha))
                 it += 1
+        def unshow(event):#隐藏菜单
+            menu.withdraw()
         def __show(alpha):
             menu.attributes('-alpha',alpha)
             menu.update_idletasks()
             if alpha == 1:
                 menu.focus_set()
         self.tag_bind(cid,bind,show,True)
-        menu=Toplevel(self)
-        menu.withdraw()
-        menu.bind('<FocusOut>',lambda event:menu.withdraw())
-        self.windows.append(menu)
-        menu.attributes('-topmost',1)
-        menu.overrideredirect(True)
-        bar=BasicTinUI(menu,bg=tran)
-        bar.pack(fill='both',expand=True)
+        menu, bar = self.__ui_toplevel(0, 0, tran, unshow)
         wind=TinUINum()#记录数据
         backs=[]#按钮
         funcs=[]#按钮函数接口
@@ -1479,7 +1478,6 @@ class BasicTinUI(Canvas):
         bar.lower(mback)
         bar.lower(mline)
         bar.move('all',12,5)
-        menu.attributes('-transparent',tran)
         menu.wind=wind#给menubutton用
         return menu,bar,funcs
 
@@ -1509,12 +1507,7 @@ class BasicTinUI(Canvas):
             toti.withdraw()
         def first_create():#首次使用时创建
             nonlocal toti, bar, bbox, width, height
-            toti=Toplevel()
-            toti.withdraw()
-            self.windows.append(toti)
-            toti.overrideredirect(True)
-            bar=BasicTinUI(toti,bg=tran)
-            bar.pack(fill='both',expand=True)
+            toti, bar = self.__ui_toplevel(0, 0, tran, hide_toti)
             info=bar.create_text((10,10),text=text,fill=fg,width=width,font=font,anchor='nw')
             bbox=list(bar.bbox(info))
             width=bbox[2]-bbox[0]+10
@@ -1526,7 +1519,6 @@ class BasicTinUI(Canvas):
             bar.__ui_polygon(((bbox[0]-1,bbox[1]-1),(bbox[2]+1,bbox[3]+1)),fill=outline,outline=outline,width=17)# tline
             bar.__ui_polygon(((bbox[0],bbox[1]),(bbox[2],bbox[3])),fill=bg,outline=bg,width=17)# back
             bar.tkraise(info)
-            toti.attributes('-transparent',tran)
             toti.attributes('-alpha',0.9)#透明度90%
         def get_return():
             return toti,bar
@@ -2212,10 +2204,9 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(uid,allback)
         ui.bind('<MouseWheel>',bindyview)
         ui.bind('<Destroy>', clean)
-        del bbox
         dx,dy=self.__auto_anchor(uid,pos,anchor)
         scroitem.move(dx,dy,height)
-        del dx,dy
+        del dx,dy,bbox
         funcs=FuncList(7)
         funcs.getitems=getitems
         funcs.getui=getui
@@ -3871,6 +3862,8 @@ class BasicTinUI(Canvas):
             for i in (0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1):
                 picker.after(it*20, lambda alpha=i : __show(alpha))
                 it += 1
+        def unshow(event):
+            picker.withdraw()
         def __show(alpha):
             picker.attributes('-alpha',alpha)
             picker.update_idletasks()
@@ -3928,18 +3921,8 @@ class BasicTinUI(Canvas):
         self.tag_bind(uid,'<Enter>',_mouseenter)
         self.tag_bind(uid,'<Leave>',_mouseleave)
         self.tag_bind(uid,'<Button-1>',show)
-        #创建窗口
-        picker=Toplevel(self)
-        picker.withdraw()
-        picker.bind('<FocusOut>',lambda event:picker.withdraw())
-        self.windows.append(picker)
-        picker.geometry(f'{width}x{height}')
-        picker.overrideredirect(True)
-        picker.attributes('-topmost',1)
-        picker.attributes('-transparent',tran)
         wind=TinUINum()#记录数据
-        bar=BasicTinUI(picker,bg=tran)
-        bar.pack(fill='both',expand=True)
+        picker, bar = self.__ui_toplevel(width, height, tran, unshow)
         bar.__ui_polygon(((13,13),(width-13,height-11)),fill=bg,outline=bg,width=17)
         bar.lower(bar.__ui_polygon(((12,12),(width-12,height-10)),fill=outline,outline=outline,width=17))
         __count=0

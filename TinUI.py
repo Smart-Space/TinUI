@@ -524,7 +524,7 @@ class BasicTinUI(Canvas):
         font = tkfont.Font(font=font)
         font_size = font.cget('size')
         var = StringVar()#变量
-        entry = Entry(self, fg=fg, bg=bg, font=font, relief='flat', bd=0, insertbackground=insert, textvariable=var)
+        entry = Entry(self, fg=fg, bg=bg, font=font, relief='flat', bd=0, highlightthickness=0, insertbackground=insert, textvariable=var)
         entry.var = var
         if text != '':
             empty_flag = False
@@ -1144,13 +1144,13 @@ class BasicTinUI(Canvas):
                 self.itemconfig(back,fill=bg)
                 self.itemconfig(outline,fill=fg)
         nowstate=False
-        back=self.create_text(pos,text='\uEC11',font='{Segoe Fluent Icons} '+str(bd),fill=bg,anchor='nw')
+        back=self.create_text(pos,text='\uEC11',font=f'{{Segoe Fluent Icons}} {bd}',fill=bg,anchor='nw')
         uid=TinUIString(f'onoff-{back}')
         self.itemconfig(back,tags=uid)
-        outline=self.create_text(pos,text='\uEC12',font='{Segoe Fluent Icons} '+str(bd),fill=fg,tags=uid,anchor='nw')
+        outline=self.create_text(pos,text='\uEC12',font=f'{{Segoe Fluent Icons}} {bd}',fill=fg,tags=uid,anchor='nw')
         self.__auto_anchor(uid,pos,anchor)
         bbox=self.bbox(outline)
-        state=self.create_text((bbox[0]+(bd/10*3)+1,(bbox[1]+bbox[3])/2-1),text='\uF127',font='{Segoe Fluent Icons} '+str(int(bd/4)),fill=fg,tags=uid,anchor='center')
+        state=self.create_text((bbox[0]+(bd/10*3)+1,(bbox[1]+bbox[3])/2-1),text='\uF127',font='{Segoe Fluent Icons} '+str(int(bd/4)),fill=fg,tags=uid)
         self.tag_bind(uid,'<Button-1>',__on_click)
         self.tag_bind(uid,'<Enter>',mouse_in)
         self.tag_bind(uid,'<Leave>',mouse_out)
@@ -1216,7 +1216,7 @@ class BasicTinUI(Canvas):
                 return False,val
         if bg=='':
             bg=self['background']
-        wentry=Entry(self,font=font,fg=fg,highlightthickness=0,insertwidth=1,bd=1,bg=bg,relief='flat',insertbackground=fg)
+        wentry=Entry(self,font=font,fg=fg,highlightthickness=0,insertwidth=1,bd=0,bg=bg,relief='flat',insertbackground=fg)
         if now=='' or now not in data:
             now=data[0]
         wentry.insert(0,now)
@@ -1653,7 +1653,7 @@ class BasicTinUI(Canvas):
             textbox.delete(start,end)
         def config(**kw):#设置样式
             textbox.config(**kw)
-        textbox=Text(self,font=font,fg=fg,bg=bg,borderwidth=0,relief='flat')
+        textbox=Text(self,font=font,fg=fg,bg=bg,borderwidth=0,highlightthickness=0,relief='flat')
         textbox.bind('<FocusIn>',focus_in,True)
         textbox.bind('<FocusOut>',focus_out,True)
         cavui=self.create_window(pos,window=textbox,width=width-2,height=height-2,anchor='nw')
@@ -3499,7 +3499,7 @@ class BasicTinUI(Canvas):
             self.itemconfig(back,fill='#f0f0f0',outline='#f0f0f0')
             self.itemconfig(bottomline,fill=outline)
         nowstate='hidden'#'shown'
-        entry=Entry(self,fg=fg,bg=bg,font=font,relief='flat',bd=0,show='●',insertbackground=insert)
+        entry=Entry(self,fg=fg,bg=bg,font=font,relief='flat',bd=0,highlightthickness=0,show='●',insertbackground=insert)
         entry.bind('<FocusIn>',focus_in)
         entry.bind('<FocusOut>',focus_out)
         entry.bind('<Enter>', mouse_enter)
@@ -4340,11 +4340,12 @@ class ExpandablePanel(BasePanel):
                 self.canvas.delete(child[0])
         self.children.clear()
         
-    def add_child(self, child, size=100, min_size=0, weight=0):
+    def add_child(self, child, size=100, min_size=0, weight=0, index=-1):
         """
         size: 元素尺寸（宽度或高度）
         min_size: 元素最小尺寸
         weight: 权重（用于分配剩余空间）
+        index: 索引（-1表示添加到最后）
         """
         ...
 
@@ -4397,14 +4398,16 @@ class VerticalPanel(ExpandablePanel):
         self.spacing = spacing
         # self.create_bg("#f1f8e9", "#558b2f")
     
-    def add_child(self, child, size=None, min_size=0, weight=0):
+    def add_child(self, child, size=None, min_size=0, weight=0, index=-1):
         if not size:
             if isinstance(child, TinUIString):
                 bbox = self.canvas.bbox(child)
                 size = bbox[3] - bbox[1]
             else:
                 size = 100
-        self.children.append((child, size, min_size, weight))
+        if index == -1:
+            index = len(self.children)
+        self.children.insert(index, (child, size, min_size, weight))
     
     def update_layout(self, x1, y1, x2, y2):
         top, right, bottom, left = self.padding
@@ -4466,14 +4469,16 @@ class HorizonPanel(ExpandablePanel):
         self.spacing = spacing
         # self.create_bg("#fff3e0", "#f57c00")
     
-    def add_child(self, child, size=None, min_size=0, weight=0):
+    def add_child(self, child, size=None, min_size=0, weight=0, index=-1):
         if not size:
             if isinstance(child, TinUIString):
                 bbox = self.canvas.bbox(child)
                 size = bbox[2] - bbox[0]
             else:
                 size = 100
-        self.children.append((child, size, min_size, weight))
+        if index == -1:
+            index = len(self.children)
+        self.children.insert(index, (child, size, min_size, weight))
     
     def update_layout(self, x1, y1, x2, y2):
         top, right, bottom, left = self.padding
@@ -4813,7 +4818,7 @@ TinUIFont.load_font(tinui_dir+"\\Segoe Fluent Icons.ttf")
 
 
 if __name__=='__main__':
-    testmode=2
+    testmode=1
 
     if testmode==1:
         # panel test
@@ -4833,13 +4838,13 @@ if __name__=='__main__':
         # hp.add_child(v1,size=150,weight=1)
         hp.add_child(v1,size=150)
 
-        ct=b.add_button2((0,0),text='delete',command=lambda e:hp.clear_children())[-1]
+        ct=b.add_button2((0,0),text='delete',anchor='n')[-1]
 
         # v1.set_child(ct)
         hp.add_child(ct,size=80,weight=1)
 
         v2=VerticalPanel(b)
-        hp.add_child(v2,size=150)
+        hp.add_child(v2,size=150,index=1)
 
         def update(e):
             rp.update_layout(5,5,e.width-5,e.height-5)

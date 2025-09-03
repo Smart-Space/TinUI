@@ -64,11 +64,13 @@ class VerticalPanel(ExpandablePanel):
 
 删除下辖所有元素。
 
-### add_child(child, size=None, min_size=0, weight=0)
+### add_child(child, size=None, min_size=0, weight=0, index=-1)
 
 若`size`未指定，当`child`是控件时，获取对应方向上的尺寸，否则为`100`。
 
 当`weight>0`时，该元素的尺寸将根据剩余空间按比例分配，否则其固定尺寸。
+
+使用`index`参数控制控件插入的顺序，默认在末尾插入（除了`-1`，插入逻辑同python列表插入）。
 
 ---
 

@@ -141,6 +141,7 @@ def test(theme):
     bdf = du.add_breadcrumb(end(),flylabel)[-2]
     for i in range(1,4):
         bdf.add(f'item{i}')
+    du.add_segementbutton(end(),content=('tkinter', 'TinUI', 'Others'))
 
 w = Tk()
 w.geometry('500x500+500+100')

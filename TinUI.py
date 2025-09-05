@@ -4295,6 +4295,73 @@ class BasicTinUI(Canvas):
         # 用于theme
         return self.add_button2(pos,text,**kwargs)
 
+    def add_segementbutton(self,pos:tuple,fg='#191919',bg='#EDEDED',activefg='#181818',activebg='#E5E5E5',onbg='#FAFAFA',line='#E5E5E5',sign='#3041d8',font='微软雅黑 12',content=('A','B','C'),command=None,anchor='nw'):# 绘制一个选项按钮
+        def mouse_in(cid):
+            bbox = self.bbox(cid)
+            centerx = (bbox[0]+bbox[2])/2
+            halfwidth = maxwidth/2
+            x1 = centerx-halfwidth
+            x2 = centerx+halfwidth
+            coord = (x1, bbox[1], x2, bbox[1], x2, bbox[3], x1, bbox[3])
+            self.coords(button, coord)
+            self.itemconfig(button, fill=activebg, outline=activebg)
+            self.itemconfig(cid, fill=activefg)
+        def on_leave(e):
+            self.itemconfig(button, fill='', outline='')
+        def __click(cid):
+            nonlocal index
+            if index == -1:
+                self.itemconfig(button2, state='normal')
+                self.itemconfig(line, state='normal')
+            if cid == index:
+                return
+            index = cid
+            bbox = self.bbox(cid)
+            centerx = (bbox[0]+bbox[2])//2
+            halfwidth = maxwidth/2
+            x1 = centerx-halfwidth
+            x2 = centerx+halfwidth
+            coord = (x1, bbox[1], x2, bbox[1], x2, bbox[3], x1, bbox[3])
+            self.coords(button2, coord)
+            self.coords(line, ((bbox[0]+bbox[2])/2-maxwidth/4, bbox[3]+2, (bbox[0]+bbox[2])/2+maxwidth/4, bbox[3]+2))
+            if command:
+                command(self.itemcget(cid, 'text'))
+        index = -1
+        outline = self.__ui_polygon(((0,0),(0,0)),fill=line,outline=line,width=9)
+        uid = TinUIString(f'segementbutton-{outline}')
+        buttonid = f'{uid}-button'
+        self.itemconfig(outline, tags=uid)
+        back = self.__ui_polygon(((0,0),(0,0)),fill=bg,outline=bg,width=9,tags=uid)
+        button = self.__ui_polygon(((0,0),(0,0)),fill='',outline='',width=9,tags=uid)
+        button2 = self.__ui_polygon(((0,0),(0,0)),fill=onbg,outline=onbg,width=9,tags=uid)
+        line = self.create_line((0,0,0,0), fill=sign, width=3, tags=uid, capstyle='round', state='hidden')
+        self.itemconfig(button2, state='hidden')
+        maxwidth = 0
+        texts = []
+        for i in content:
+            text = self.create_text((0,0), text=i, font=font, fill=fg, anchor='n', tags=(uid, buttonid))
+            texts.append(text)
+            bbox = self.bbox(text)
+            maxwidth = max(maxwidth, bbox[2]-bbox[0])
+            self.tag_bind(text, '<Enter>', lambda e, text=text: mouse_in(text))
+            self.tag_bind(text, '<Leave>', lambda e, text=text: self.itemconfig(text, fill=fg))
+            self.tag_bind(text, '<Button-1>', lambda e, text=text: __click(text))
+        endx = maxwidth/2
+        for i in texts:
+            self.coords(i, endx, 0)
+            endx += maxwidth + 10
+        bbox = self.bbox(buttonid)
+        width = (maxwidth+10)*content.__len__()-10
+        coord = (0, bbox[1], width, bbox[1], width, bbox[3], 0, bbox[3])
+        self.coords(back, coord)
+        coord = (-1, bbox[1]-1, width+1, bbox[1]-1, width+1, bbox[3]+1, -1, bbox[3]+1)
+        self.coords(outline, coord)
+        self.tag_bind(uid, '<Leave>', on_leave)
+        self.__auto_anchor(uid,pos,anchor)
+        del texts, endx, coord, bbox
+        uid.layout = lambda x1, y1, x2, y2, expand=False: self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
+        return back, outline, button, button2, line, uid
+
 
 class BasePanel:
     """面板的基类"""
@@ -4818,7 +4885,7 @@ TinUIFont.load_font(tinui_dir+"\\Segoe Fluent Icons.ttf")
 
 
 if __name__=='__main__':
-    testmode=1
+    testmode=2
 
     if testmode==1:
         # panel test
@@ -4832,16 +4899,16 @@ if __name__=='__main__':
         hp=HorizonPanel(b)
         rp.set_child(hp)
 
-        # v1=ExpandPanel(b)
-        v1=VerticalPanel(b)
+        v1=ExpandPanel(b)
+        # v1=VerticalPanel(b)
 
-        # hp.add_child(v1,size=150,weight=1)
-        hp.add_child(v1,size=150)
+        hp.add_child(v1,size=150,weight=1)
+        # hp.add_child(v1,size=150)
 
-        ct=b.add_button2((0,0),text='delete',anchor='n')[-1]
+        ct=b.add_segementbutton((0,0),anchor='n')[-1]
 
-        # v1.set_child(ct)
-        hp.add_child(ct,size=80,weight=1)
+        v1.set_child(ct)
+        # hp.add_child(ct,size=80,weight=1)
 
         v2=VerticalPanel(b)
         hp.add_child(v2,size=150,index=1)
@@ -5043,6 +5110,7 @@ if __name__=='__main__':
         bc = b.add_breadcrumb((1500,350),anchor='n',command=print)[-2]
         for i in range(1,4):
             bc.add(f'item{i}')
+        b.add_segementbutton((1500,450),content=('tkinter','TinUI','Other'),command=print)
 
         b.bind('<Destroy>',lambda e:b.clean_windows())
 

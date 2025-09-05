@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='segmentbutton'></title>
+    </line>
+    <line>
+        <paragraph text='分段按钮控件。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+        <segmentbutton content="('MODE 1','MODE 2','MODE 100')"></segmentbutton>
+    </line>
+</line>
+</tinui>

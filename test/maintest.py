@@ -71,7 +71,7 @@ listbox=ui.add_listbox((0,0),height=340,bg='#f0f0f0',data=('back', 'barbutton', 
  'link', 'listbox', 'listview', 'menubar', 'menubutton', 'notebook', 'notecard', 
  'onoff', 'paragraph', 'passwordbox', 'picker', 'pipspager', 'pivot', 'progressbar', 
  'radiobox', 'radiobutton', 'ratingbar', 'scalebar', 'scrollbar', 'separate', 
- 'spinbox', 'table', 'textbox', 'title', 'togglebutton', 'tooltip', 
+ 'spinbox', 'segmentbutton', 'table', 'textbox', 'title', 'togglebutton', 'tooltip', 
  'treeview', 'ui', 'waitbar', 'waitframe','TinUIXml'),command=loadcontrol)[-1]
 vp.add_child(t,50)
 vp.add_child(img,200)

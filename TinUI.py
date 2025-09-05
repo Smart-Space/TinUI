@@ -4214,7 +4214,7 @@ class BasicTinUI(Canvas):
         def add(text):
             # 添加一个路径元素
             nonlocal endx
-            sym = self.create_text((endx+2,center_line), text='\uE76C', font=segeo_font, fill=fg, anchor='w', tags=(uid,uid_button))
+            sym = self.create_text((endx+2,center_line), text='\uE76C', font=segoe_font, fill=fg, anchor='w', tags=(uid,uid_button))
             symstack.append(sym)
             endx = self.bbox(sym)[2]
             t = self.create_text((endx+2,center_line), text=text, font=font, fill=fg, anchor='w', tags=(uid,uid_button))
@@ -4265,7 +4265,7 @@ class BasicTinUI(Canvas):
         pos = list(pos)
         root = self.create_text(pos, text=root, font=font, fill=fg, anchor='w')
         font_size = self.__get_text_size(root)
-        segeo_font = '{Segoe Fluent Icons} ' + font_size
+        segoe_font = '{Segoe Fluent Icons} ' + font_size
         uid = TinUIString(f'breadcrumb-{root}')
         uid_button = uid + 'button'
         self.itemconfig(root, tags=(uid,uid_button))
@@ -4295,7 +4295,7 @@ class BasicTinUI(Canvas):
         # 用于theme
         return self.add_button2(pos,text,**kwargs)
 
-    def add_segementbutton(self,pos:tuple,fg='#191919',bg='#EDEDED',activefg='#181818',activebg='#E5E5E5',onbg='#FAFAFA',line='#E5E5E5',sign='#3041d8',font='微软雅黑 12',content=('A','B','C'),command=None,anchor='nw'):# 绘制一个选项按钮
+    def add_segmentbutton(self,pos:tuple,fg='#191919',bg='#EDEDED',activefg='#181818',activebg='#E5E5E5',onbg='#FAFAFA',line='#E5E5E5',sign='#3041d8',font='微软雅黑 12',content=('A','B','C'),command=None,anchor='nw'):# 绘制一个选项按钮
         def mouse_in(cid):
             bbox = self.bbox(cid)
             centerx = (bbox[0]+bbox[2])/2
@@ -4326,9 +4326,11 @@ class BasicTinUI(Canvas):
             self.coords(line, ((bbox[0]+bbox[2])/2-maxwidth/4, bbox[3]+2, (bbox[0]+bbox[2])/2+maxwidth/4, bbox[3]+2))
             if command:
                 command(self.itemcget(cid, 'text'))
+        def select(index:int):
+            __click(texts[index])
         index = -1
         outline = self.__ui_polygon(((0,0),(0,0)),fill=line,outline=line,width=9)
-        uid = TinUIString(f'segementbutton-{outline}')
+        uid = TinUIString(f'segmentbutton-{outline}')
         buttonid = f'{uid}-button'
         self.itemconfig(outline, tags=uid)
         back = self.__ui_polygon(((0,0),(0,0)),fill=bg,outline=bg,width=9,tags=uid)
@@ -4358,9 +4360,11 @@ class BasicTinUI(Canvas):
         self.coords(outline, coord)
         self.tag_bind(uid, '<Leave>', on_leave)
         self.__auto_anchor(uid,pos,anchor)
-        del texts, endx, coord, bbox
+        del endx, coord, bbox
         uid.layout = lambda x1, y1, x2, y2, expand=False: self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
-        return back, outline, button, button2, line, uid
+        funcs = FuncList(1)
+        funcs.select = select
+        return back, outline, button, button2, line, texts, funcs, uid
 
 
 class BasePanel:
@@ -4905,7 +4909,7 @@ if __name__=='__main__':
         hp.add_child(v1,size=150,weight=1)
         # hp.add_child(v1,size=150)
 
-        ct=b.add_segementbutton((0,0),anchor='n')[-1]
+        ct=b.add_segmentbutton((0,0),anchor='n')[-1]
 
         v1.set_child(ct)
         # hp.add_child(ct,size=80,weight=1)
@@ -5110,7 +5114,7 @@ if __name__=='__main__':
         bc = b.add_breadcrumb((1500,350),anchor='n',command=print)[-2]
         for i in range(1,4):
             bc.add(f'item{i}')
-        b.add_segementbutton((1500,450),content=('tkinter','TinUI','Other'),command=print)
+        b.add_segmentbutton((1500,450),content=('tkinter','TinUI','Other'),command=print)
 
         b.bind('<Destroy>',lambda e:b.clean_windows())
 

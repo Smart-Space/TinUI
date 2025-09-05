@@ -10,7 +10,7 @@
 2025-9-5
 1. 简化浮出窗口实现
 2. Panel.add_child添加索引参数
-3. 新增segementbutton 分段按钮
+3. 新增segmentbutton 分段按钮
 
 ==========6.3==========
 2025-8-18

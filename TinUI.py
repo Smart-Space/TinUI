@@ -4879,9 +4879,9 @@ class TinUIXml():#TinUI的xml渲染方式
         self.yendx,self.yendy=5,5#纵向最低原点
 
 
-tinui_dir=os.path.dirname(os.path.abspath(__file__))
-TinUIFont.init_font_manager()
-TinUIFont.load_font(tinui_dir+"\\Segoe Fluent Icons.ttf")
+# tinui_dir=os.path.dirname(os.path.abspath(__file__))
+# TinUIFont.init_font_manager()
+# TinUIFont.load_font(tinui_dir+"\\Segoe Fluent Icons.ttf")
 
 
 if __name__=='__main__':

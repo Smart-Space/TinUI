@@ -4410,6 +4410,17 @@ class ExpandablePanel(BasePanel):
             else:
                 self.canvas.delete(child[0])
         self.children.clear()
+    
+    def remove_child(self, index):
+        child = self.children.pop(index)
+        if issubclass(child[0].__class__, BasePanel):
+            child[0].clear_children()
+        else:
+            self.canvas.delete(child[0])
+    
+    def pop_child(self, index):
+        child = self.children.pop(index)
+        return child[0]# 开发者自己应当（可以）直到返回的对象类型
         
     def add_child(self, child, size=100, min_size=0, weight=0, index=-1):
         """

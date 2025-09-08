@@ -72,6 +72,14 @@ class VerticalPanel(ExpandablePanel):
 
 使用`index`参数控制控件插入的顺序，默认在末尾插入（除了`-1`，插入逻辑同python列表插入）。
 
+### remove_child(index)
+
+删除位置在`index`的托管元素。
+
+### pop_child(index)
+
+不再管理位置在`index`的托管元素，并返回这个元素。
+
 ---
 
 ## HorizonPanel

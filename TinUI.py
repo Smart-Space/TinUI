@@ -4523,6 +4523,12 @@ class VerticalPanel(ExpandablePanel):
         for i, (child, height, min_height, weight) in enumerate(self.children):
             # 计算间距（最后一个元素不加间距）
             spacing = self.spacing if i < total_children - 1 else 0
+            if not height:
+                if isinstance(child, TinUIString):
+                    bbox = self.canvas.bbox(child)
+                    height = bbox[3] - bbox[1]
+                else:
+                    height = 100
             # 计算元素高度
             if weight > 0:
                 # 按权重分配剩余空间
@@ -4575,14 +4581,12 @@ class HorizonPanel(ExpandablePanel):
         fixed_size = 0
         for i, (child, width, min_width, weight) in enumerate(self.children):
             spacing = self.spacing if i < len(self.children) - 1 else 0
-            print(width)
             if not width:
                 if isinstance(child, TinUIString):
                     bbox = self.canvas.bbox(child)
                     width = bbox[2] - bbox[0]
                 else:
                     width = 100
-            print(width)
             if weight > 0:
                 total_weight += weight
             else:
@@ -4593,6 +4597,12 @@ class HorizonPanel(ExpandablePanel):
         total_children = len(self.children)
         for i, (child, width, min_width, weight) in enumerate(self.children):
             spacing = self.spacing if i < total_children - 1 else 0
+            if not width:
+                if isinstance(child, TinUIString):
+                    bbox = self.canvas.bbox(child)
+                    width = bbox[2] - bbox[0]
+                else:
+                    width = 100
             if weight > 0:
                 proportional_width = remaining_width * weight / total_weight
                 actual_width = max(proportional_width, min_width)

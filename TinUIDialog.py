@@ -190,7 +190,7 @@ class Dialog(Toplevel):
         yb_coords = self.tinui.coords(yesbutton_uid)
         nobutton_uid=self.tinui.add_button2(((content_bbox[0]+content_bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:self.return_msg(False),anchor='nw',**self.buttonargs)[-1]
         nb_coords = self.tinui.coords(nobutton_uid)
-        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.barback,fg=self.barback,linew=9)
+        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.barback,fg=self.barback,linew=8)
 
         def return_focus(event):
             if now_focus == 'yes':
@@ -252,7 +252,7 @@ class Dialog(Toplevel):
         yesbutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2-5,button_endy),text=YES,minwidth=button_width,command=lambda e:self.return_input(self.entry.get()),anchor='ne',**self.buttonargs)[-1]
         yb_coords = self.tinui.coords(yesbutton_uid)
         nobutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:self.return_input(None),anchor='nw',**self.buttonargs)[-1]
-        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.barback,fg=self.barback,linew=9)
+        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.barback,fg=self.barback,linew=8)
 
         focus_button = self.tinui.create_polygon(yb_coords, width=11, fill=self.barback, outline=self.selback)
         self.tinui.lower(focus_button, yesbutton_uid)
@@ -308,7 +308,7 @@ class Dialog(Toplevel):
         yb_coords = self.tinui.coords(yesbutton_uid)
         nobutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:self.return_choice(None),anchor='nw',**self.buttonargs)[-1]
         nb_coords = self.tinui.coords(nobutton_uid)
-        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.background,fg=self.background,linew=9)
+        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.background,fg=self.background,linew=8)
 
         def return_focus(event):
             if now_focus == 'yes':
@@ -356,7 +356,7 @@ class Dialog(Toplevel):
     def load_window(self):
         #获取窗口内所有控件的bbox，窗口居中布局
         bboxall=self.tinui.bbox('all')
-        w,h=bboxall[2]-bboxall[0],bboxall[3]-bboxall[1]+1
+        w,h=bboxall[2]-bboxall[0],bboxall[3]-bboxall[1]
         screenw=self.winfo_screenwidth()
         screenh=self.winfo_screenheight()
         x,y=(screenw-w)/2,(screenh-h)/2
@@ -403,7 +403,7 @@ class Dialog(Toplevel):
         yb_coords = self.tinui.coords(yesbutton_uid)
         nobutton_uid=self.tinui.add_button2(((content_bbox[0]+content_bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:(nocallback() ,self.return_msg(False)),anchor='nw',**self.buttonargs)[-1]
         nb_coords = self.tinui.coords(nobutton_uid)
-        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.barback,fg=self.barback,linew=9)
+        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.barback,fg=self.barback,linew=8)
 
         def return_focus(event):
             if now_focus == 'yes':

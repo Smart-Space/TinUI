@@ -4481,12 +4481,6 @@ class VerticalPanel(ExpandablePanel):
         # self.create_bg("#f1f8e9", "#558b2f")
     
     def add_child(self, child, size=None, min_size=0, weight=0, index=-1):
-        if not size:
-            if isinstance(child, TinUIString):
-                bbox = self.canvas.bbox(child)
-                size = bbox[3] - bbox[1]
-            else:
-                size = 100
         if index == -1:
             index = len(self.children)
         self.children.insert(index, (child, size, min_size, weight))
@@ -4509,6 +4503,13 @@ class VerticalPanel(ExpandablePanel):
         for i, (child, height, min_height, weight) in enumerate(self.children):
             # 计算间距（最后一个元素不加间距）
             spacing = self.spacing if i < len(self.children) - 1 else 0
+
+            if not height:
+                if isinstance(child, TinUIString):
+                    bbox = self.canvas.bbox(child)
+                    height = bbox[3] - bbox[1]
+                else:
+                    height = 100
             
             if weight > 0:
                 total_weight += weight
@@ -4552,12 +4553,6 @@ class HorizonPanel(ExpandablePanel):
         # self.create_bg("#fff3e0", "#f57c00")
     
     def add_child(self, child, size=None, min_size=0, weight=0, index=-1):
-        if not size:
-            if isinstance(child, TinUIString):
-                bbox = self.canvas.bbox(child)
-                size = bbox[2] - bbox[0]
-            else:
-                size = 100
         if index == -1:
             index = len(self.children)
         self.children.insert(index, (child, size, min_size, weight))
@@ -4580,6 +4575,14 @@ class HorizonPanel(ExpandablePanel):
         fixed_size = 0
         for i, (child, width, min_width, weight) in enumerate(self.children):
             spacing = self.spacing if i < len(self.children) - 1 else 0
+            print(width)
+            if not width:
+                if isinstance(child, TinUIString):
+                    bbox = self.canvas.bbox(child)
+                    width = bbox[2] - bbox[0]
+                else:
+                    width = 100
+            print(width)
             if weight > 0:
                 total_weight += weight
             else:
@@ -4900,7 +4903,7 @@ class TinUIXml():#TinUI的xml渲染方式
 
 
 if __name__=='__main__':
-    testmode=2
+    testmode=1
 
     if testmode==1:
         # panel test
@@ -4914,19 +4917,19 @@ if __name__=='__main__':
         hp=HorizonPanel(b)
         rp.set_child(hp)
 
-        v1=ExpandPanel(b)
-        # v1=VerticalPanel(b)
+        # v1=ExpandPanel(b)
+        v1=VerticalPanel(b)
 
-        hp.add_child(v1,size=150,weight=1)
-        # hp.add_child(v1,size=150)
+        # hp.add_child(v1,size=150,weight=1)
+        hp.add_child(v1,size=150)
 
-        ct=b.add_segmentbutton((0,0),anchor='n')[-1]
+        ct=b.add_entry((0,0),width=100)[-1]
 
-        v1.set_child(ct)
-        # hp.add_child(ct,size=80,weight=1)
+        # v1.set_child(ct)
+        hp.add_child(ct,weight=1)
 
         v2=VerticalPanel(b)
-        hp.add_child(v2,size=150,index=1)
+        hp.add_child(v2,size=150)
 
         def update(e):
             rp.update_layout(5,5,e.width-5,e.height-5)

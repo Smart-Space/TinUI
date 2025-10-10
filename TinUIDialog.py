@@ -512,6 +512,7 @@ def ask_choice(master,title,content,choices,yestext='OK',notext='Cancel',theme='
 
 
 
+# 此行（不含）以下代码不受GPLv3、LGPLv3许可证的限制，可以自由使用、修改、分发等。
 if __name__=='__main__':
     root=Tk()
     root.iconbitmap('LOGO.ico')

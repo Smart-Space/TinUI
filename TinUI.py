@@ -1264,96 +1264,147 @@ class BasicTinUI(Canvas):
         uid.layout=lambda x1,y1,x2,y2,expand=False: self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
         return wentry,button1,button2,back,outline,button,uid
 
-    def add_scalebar(self,pos:tuple,width=200,fg='#4554dc',activefg='#4554dc',bg='#868686',buttonbg='#ffffff',buttonoutline='#cccccc',data=(1,2,3,4,5),start=1,anchor='nw',command=None):#绘制调节框
+    def add_scalebar(self, pos: tuple, width=200, fg='#4554dc', activefg='#4554dc', bg='#868686', buttonbg='#ffffff', buttonoutline='#cccccc', data=(1,2,3,4,5), start=1, direction='x', anchor='nw', command=None):# 绘制调节框        
         def mousedown(event):
-            scale.startx=self.canvasx(event.x)
-            self.itemconfig(button_fore,text='\uECCC')
+            if direction == 'x':
+                scale.startpos = self.canvasx(event.x)
+            else:# y方向
+                scale.startpos = self.canvasy(event.y)
+            self.itemconfig(button_fore, text='\uECCC')
         def drag(event):
-            move=self.canvasx(event.x)-scale.startx
-            if self.canvasx(event.x)<pos[0] or self.canvasx(event.x)>pos[0]+width:
-                return
-            self.move(button,move,0)
-            self.coords(name,pos[0],pos[1]+8,move+scale.startx,pos[1]+8)
-            scale.startx=self.canvasx(event.x)
+            if direction == 'x':
+                current_pos = self.canvasx(event.x)
+                move = current_pos - scale.startpos
+                if current_pos < pos[0] or current_pos > pos[0] + width:
+                    return
+                self.move(button, move, 0)
+                self.coords(name, pos[0], pos[1] + 8, current_pos, pos[1] + 8)
+                scale.startpos = current_pos
+            else:# y方向
+                current_pos = self.canvasy(event.y)
+                move = current_pos - scale.startpos
+                if current_pos < pos[1] or current_pos > pos[1] + width:
+                    return
+                self.move(button, 0, move)
+                self.coords(name, pos[0] + 8, pos[1] + width, pos[0] + 8, current_pos)
+                scale.startpos = current_pos
         def check(event):
-            bbox=self.bbox(button_back)
-            move=self.canvasx(event.x)-10
-            if move>pos[0]+width:
-                move=pos[0]+width-18.
-            if move<pos[0]:
-                move=pos[0]
-            self.move(button,move-bbox[0],0)
-            bbox=self.bbox(button_back)
-            self.itemconfig(button_fore,text='\uE915')#小号圆点
-            end=int(self.canvasx(event.x))
-            if end<pos[0]:end=pos[0]
-            if end>pos[0]+width:end=pos[0]+width
-            rend=min(dash,key=lambda x:abs(x-end))
-            num=dash.index(rend)
-            if command!=None:
+            self.itemconfig(button_fore, text='\uE915')# 小号圆点
+            bbox = self.coords(button)
+            if direction == 'x':
+                move = min(max(bbox[0], pos[0]), pos[0] + width)
+                self.move(button, move - bbox[0], 0)
+            else:# y方向
+                move = min(max(bbox[1], pos[1]), pos[1] + width)
+                self.move(button, 0, move - bbox[1])
+            # 计算最近的刻度位置
+            rend = min(dash, key=lambda x: abs(x - move))
+            num = dash.index(rend)
+            if command is not None:
                 command(data[num])
         def checkval(event):
-            move=self.canvasx(event.x)
-            self.coords(name,pos[0],pos[1]+8,move,pos[1]+8)
+            if direction == 'x':
+                move = self.canvasx(event.x)
+                self.coords(name, pos[0], pos[1] + 8, move, pos[1] + 8)
+            else:# y方向
+                move = self.canvasy(event.y)
+                self.coords(name, pos[0] + 8, pos[1] + width, pos[0] + 8, move)
             check(event)
-        def __layout(x1,y1,x2,y2,expand=False):
+        def __layout(x1, y1, x2, y2, expand=False):
             if not expand:
-                dx,dy=self.__auto_layout(uid,(x1,y1,x2,y2),anchor)
+                dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), anchor)
             else:
-                dx,dy=self.__auto_layout(uid,(x1,y1,x2,y2),'center')
-            pos[0]+=dx
-            pos[1]+=dy
+                dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), 'center')
+            pos[0] += dx
+            pos[1] += dy
+            rewrite_dash(dx, dy)
+        def rewrite_dash(dx, dy):
+            # 重写刻度位置
+            if direction == 'x':
+                for i in range(len(dash)):
+                    dash[i] += dx
+            else:# y方向
+                for i in range(len(dash)):
+                    dash[i] += dy
         def select(num):
-            move=dash[num]-self.bbox(button)[0]-10
-            self.move(button,move,0)
-            self.coords(name,pos[0],pos[1]+8,dash[num],pos[1]+8)
-            if command!=None:
+            if direction == 'x':
+                move = dash[num] - self.coords(button)[0]
+                self.move(button, move, 0)
+                self.coords(name, pos[0], pos[1] + 8, dash[num], pos[1] + 8)
+            else:# y方向
+                move = dash[num] - self.coords(button)[1]
+                self.move(button, 0, move)
+                self.coords(name, pos[0] + 8, pos[1] + width, pos[0] + 8, dash[num])
+            if command:
                 command(data[num])
         def disable():
-            self.itemconfig(button_fore,state='disable',fill='#7a7a7a')
-            self.itemconfig(back,state='disable')
-            self.itemconfig(name,state='disable',fill='#7a7a7a')
-            self.itemconfig(uid,state='disable')
+            self.itemconfig(button_fore, state='disable', fill='#7a7a7a')
+            self.itemconfig(back, state='disable')
+            self.itemconfig(name, state='disable', fill='#7a7a7a')
+            self.itemconfig(uid, state='disable')
         def _active():
-            self.itemconfig(uid,state='normal')
-            self.itemconfig(button_fore,state='normal',fill=fg)
-            self.itemconfig(back,state='normal')
-            self.itemconfig(name,state='normal',fill=fg)
-        scale=TinUINum()#记录数据结构体
-        back=self.create_line((pos[0],pos[1]+8,pos[0]+width,pos[1]+8),fill=bg,width=3,capstyle='round')
-        uid=TinUIString(f'scalebar-{back}')
-        self.itemconfig(back,tags=uid)
-        self.tag_bind(back,'<ButtonRelease-1>',checkval)
-        dash_t=width//(len(data)-1)
-        s=pos[0]#调节线段起点
-        dash=[s]#调节线段的终点位置
-        for _ in data[1:]:
-            s+=dash_t
-            dash.append(s)
-        active=self.create_line((pos[0],pos[1]+8,dash[start],pos[1]+8),fill=fg,width=3,tags=uid,capstyle='round')
-        name='scaleactive'+str(active)
-        self.tag_bind(name,'<ButtonRelease-1>',checkval)
-        self.addtag_withtag(name,active)#为重绘绑定tag名称
-        button=f'scalebutton{back}'
-        button_back=self.create_text((dash[start]+9,pos[1]+9),text='\uF127',font='{Segoe Fluent Icons} 12',fill=buttonbg,tags=(uid,button))
-        self.create_text((dash[start]+9,pos[1]+9),text='\uECCA',font='{Segoe Fluent Icons} 12',fill=buttonoutline,tags=(uid,button))
-        button_fore=self.create_text((dash[start]+9,pos[1]+9),text='\uE915',font='{Segoe Fluent Icons} 12',fill=fg,tags=(uid,button))
-        self.tag_bind(button,'<Enter>',lambda event:self.itemconfig(button_fore,fill=activefg))
-        self.tag_bind(button,'<Leave>',lambda event:self.itemconfig(button_fore,fill=fg))
-        self.tag_bind(button,'<Button-1>',mousedown)
-        self.tag_bind(button,'<B1-Motion>',drag)
-        self.tag_bind(button,'<ButtonRelease-1>',check)#矫正位置
-        dx,dy=self.__auto_anchor(uid,pos,anchor)
-        pos=list(pos)
-        pos[0]+=dx
-        pos[1]+=dy
-        del s,dash_t,dx,dy
-        funcs=FuncList(3)
-        funcs.select=funcs[0]=select
-        funcs.disable=funcs[1]=disable
-        funcs._active=funcs[2]=_active
-        uid.layout=__layout
-        return name,back,button,funcs,uid
+            self.itemconfig(uid, state='normal')
+            self.itemconfig(button_fore, state='normal', fill=fg)
+            self.itemconfig(back, state='normal')
+            self.itemconfig(name, state='normal', fill=fg)
+        scale = TinUINum()# 记录数据结构体
+        # 创建背景线
+        if direction == 'x':
+            back = self.create_line((pos[0], pos[1] + 8, pos[0] + width, pos[1] + 8), fill=bg, width=3, capstyle='round')
+        else:# y方向
+            back = self.create_line((pos[0] + 8, pos[1] + width, pos[0] + 8, pos[1]), fill=bg, width=3, capstyle='round')
+        uid = TinUIString(f'scalebar-{back}')
+        self.itemconfig(back, tags=uid)
+        self.tag_bind(back, '<Button-1>', checkval)
+        # 计算刻度位置
+        dash_t = width / (len(data) - 1)
+        if direction == 'x':
+            s = pos[0]# 调节线段起点
+            dash = [s]# 调节线段的终点位置
+            for _ in data[1:]:
+                s += dash_t
+                dash.append(s)
+        else:# y方向
+            s = pos[1] + width
+            dash = [s]
+            for _ in data[1:]:
+                s -= dash_t
+                dash.append(s)
+        # 创建活动线
+        if direction == 'x':
+            active = self.create_line((pos[0], pos[1] + 8, dash[start], pos[1] + 8), fill=fg, width=3, tags=uid, capstyle='round')
+        else:# y方向
+            active = self.create_line((pos[0] + 8, pos[1] + width, pos[0] + 8, dash[start]), fill=fg, width=3, tags=uid, capstyle='round')
+        name = 'scaleactive' + str(active)
+        self.tag_bind(name, '<Button-1>', checkval)
+        self.addtag_withtag(name, active)
+        # 创建滑块按钮
+        button = f'scalebutton{back}'
+        if direction == 'x':
+            self.create_text((dash[start] + 9, pos[1] + 9), text='\uF127', font='{Segoe Fluent Icons} 12', fill=buttonbg, tags=(uid, button))# backbutton
+            self.create_text((dash[start] + 9, pos[1] + 9), text='\uECCA', font='{Segoe Fluent Icons} 12', fill=buttonoutline, tags=(uid, button))# button outline
+            button_fore = self.create_text((dash[start] + 9, pos[1] + 9), text='\uE915', font='{Segoe Fluent Icons} 12', fill=fg, tags=(uid, button))
+        else:# y方向
+            self.create_text((pos[0] + 8, dash[start] + 9), text='\uF127', font='{Segoe Fluent Icons} 12', fill=buttonbg, tags=(uid, button))
+            self.create_text((pos[0] + 8, dash[start] + 9), text='\uECCA', font='{Segoe Fluent Icons} 12', fill=buttonoutline, tags=(uid, button))
+            button_fore = self.create_text((pos[0] + 8, dash[start] + 9), text='\uE915', font='{Segoe Fluent Icons} 12', fill=fg, tags=(uid, button))
+        self.tag_bind(button, '<Enter>', lambda event: self.itemconfig(button_fore, fill=activefg))
+        self.tag_bind(button, '<Leave>', lambda event: self.itemconfig(button_fore, fill=fg))
+        self.tag_bind(button, '<Button-1>', mousedown)
+        self.tag_bind(button, '<B1-Motion>', drag)
+        self.tag_bind(button, '<ButtonRelease-1>', check)# 矫正位置
+        dx, dy = self.__auto_anchor(uid, pos, anchor)
+        pos = list(pos)
+        pos[0] += dx
+        pos[1] += dy
+        rewrite_dash(dx, dy)
+        del s, dash_t, dx, dy
+        funcs = FuncList(3)
+        funcs.select = funcs[0] = select
+        funcs.disable = funcs[1] = disable
+        funcs._active = funcs[2] = _active
+        uid.layout = __layout
+        return name, back, button, funcs, uid
 
     # def add_info(self,pos:tuple,info='info',font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black',width=400,anchor='nw'):#绘制提示框
     #     text=self.create_text(pos,anchor='nw',text=info,font=font,fill=fg)
@@ -4912,6 +4963,7 @@ class TinUIXml():#TinUI的xml渲染方式
 # TinUIFont.load_font(tinui_dir+"\\Segoe Fluent Icons.ttf")
 
 
+# 此行（不含）以下代码不受GPLv3、LGPLv3许可证的限制，可以自由使用、修改、分发等。
 if __name__=='__main__':
     testmode=1
 
@@ -4933,7 +4985,7 @@ if __name__=='__main__':
         # hp.add_child(v1,size=150,weight=1)
         hp.add_child(v1,size=150)
 
-        ct=b.add_entry((0,0),width=100)[-1]
+        ct=b.add_scalebar((0,0),width=100,command=print)[-1]
 
         # v1.set_child(ct)
         hp.add_child(ct,weight=1)
@@ -5040,7 +5092,7 @@ if __name__=='__main__':
         b.add_paragraph((300,850),text='上面是一个表格')
         b.add_onoff((600,100),anchor='se')
         b.add_spinbox((680,100),command=lambda string:print(f'{string.num}: {string}'))
-        b.add_scalebar((680,50),command=test5)
+        b.add_scalebar((680,50),command=test5,direction='y')
         scale_text,_,_=b.add_label((890,50),text='当前选值：2')
         # b.add_info((710,140),info_text='this is info widget in TinUI, using TinUI\'s tooltip widget with its own style.',anchor='n')
         mtb=b.add_paragraph((0,720),'测试菜单（右键单击）')

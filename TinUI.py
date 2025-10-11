@@ -488,12 +488,12 @@ class BasicTinUI(Canvas):
                 self.itemconfig(funce,width=x2-x1-dwidth-6)
                 bbox1=self.bbox(funce)
                 coord=self.coords(back)
-                coord[0]=coord[6]=bbox1[0]+2
-                coord[2]=coord[4]=bbox1[2]+dwidth-2
+                coord[0]=coord[6]=bbox1[0]+3
+                coord[2]=coord[4]=bbox1[2]+dwidth-3
                 self.coords(back,coord)
                 coord=self.coords(outl)
-                coord[0]=coord[6]=bbox1[0]+1
-                coord[2]=coord[4]=bbox1[2]+dwidth-1
+                coord[0]=coord[6]=bbox1[0]+2
+                coord[2]=coord[4]=bbox1[2]+dwidth-2
                 self.coords(outl,coord)
                 coordl=self.coords(bottomline)
                 coordl[0]=coord[0]
@@ -1289,6 +1289,7 @@ class BasicTinUI(Canvas):
                 self.coords(name, pos[0] + 8, pos[1] + width, pos[0] + 8, current_pos)
                 scale.startpos = current_pos
         def check(event):
+            nonlocal nowselect
             self.itemconfig(button_fore, text='\uE915')# 小号圆点
             bbox = self.coords(button)
             if direction == 'x':
@@ -1299,25 +1300,58 @@ class BasicTinUI(Canvas):
                 self.move(button, 0, move - bbox[1])
             # 计算最近的刻度位置
             rend = min(dash, key=lambda x: abs(x - move))
-            num = dash.index(rend)
+            nowselect = dash.index(rend)
             if command is not None:
-                command(data[num])
+                command(data[nowselect])
         def checkval(event):
+            bbox = self.coords(button)
             if direction == 'x':
                 move = self.canvasx(event.x)
                 self.coords(name, pos[0], pos[1] + 8, move, pos[1] + 8)
+                self.move(button, move - bbox[0], 0)
             else:# y方向
                 move = self.canvasy(event.y)
                 self.coords(name, pos[0] + 8, pos[1] + width, pos[0] + 8, move)
+                self.move(button, 0, move - bbox[1])
             check(event)
         def __layout(x1, y1, x2, y2, expand=False):
+            nonlocal width
             if not expand:
                 dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), anchor)
+                pos[0] += dx
+                pos[1] += dy
             else:
-                dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), 'center')
-            pos[0] += dx
-            pos[1] += dy
-            rewrite_dash(dx, dy)
+                if direction == 'x':
+                    dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), 'w')
+                    pos[0] += dx
+                    pos[1] += dy
+                    width = x2 - x1
+                    dash_t = width / (len(data) - 1)
+                    s = x1
+                    dash.clear()
+                    dash.append(s)
+                    for _ in data[1:]:
+                        s += dash_t
+                        dash.append(s)
+                    self.coords(back, pos[0], pos[1] + 8, pos[0] + width, pos[1] + 8)
+                    self.coords(name, pos[0], pos[1] + 8, dash[nowselect], pos[1] + 8)
+                    select(nowselect, False)
+                    rewrite_dash(dx, dy)
+                else:# y方向
+                    dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), 'n')
+                    pos[0] += dx
+                    pos[1] += dy
+                    width = y2 - y1
+                    dash_t = width / (len(data) - 1)
+                    s = y2
+                    dash.clear()
+                    dash.append(s)
+                    for _ in data[1:]:
+                        s -= dash_t
+                        dash.append(s)
+                    self.coords(back, pos[0] + 8, pos[1], pos[0] + 8, pos[1] + width)
+                    self.coords(name, pos[0] + 8, pos[1], pos[0] + 8, dash[nowselect])
+                    select(nowselect, False)
         def rewrite_dash(dx, dy):
             # 重写刻度位置
             if direction == 'x':
@@ -1326,7 +1360,7 @@ class BasicTinUI(Canvas):
             else:# y方向
                 for i in range(len(dash)):
                     dash[i] += dy
-        def select(num):
+        def select(num, send=True):
             if direction == 'x':
                 move = dash[num] - self.coords(button)[0]
                 self.move(button, move, 0)
@@ -1335,7 +1369,7 @@ class BasicTinUI(Canvas):
                 move = dash[num] - self.coords(button)[1]
                 self.move(button, 0, move)
                 self.coords(name, pos[0] + 8, pos[1] + width, pos[0] + 8, dash[num])
-            if command:
+            if command and send:
                 command(data[num])
         def disable():
             self.itemconfig(button_fore, state='disable', fill='#7a7a7a')
@@ -1371,6 +1405,7 @@ class BasicTinUI(Canvas):
                 s -= dash_t
                 dash.append(s)
         # 创建活动线
+        nowselect = start# 当前选项
         if direction == 'x':
             active = self.create_line((pos[0], pos[1] + 8, dash[start], pos[1] + 8), fill=fg, width=3, tags=uid, capstyle='round')
         else:# y方向
@@ -4979,16 +5014,16 @@ if __name__=='__main__':
         hp=HorizonPanel(b)
         rp.set_child(hp)
 
-        # v1=ExpandPanel(b)
-        v1=VerticalPanel(b)
+        v1=ExpandPanel(b)
+        # v1=VerticalPanel(b)
 
-        # hp.add_child(v1,size=150,weight=1)
-        hp.add_child(v1,size=150)
+        hp.add_child(v1,size=150,weight=1)
+        # hp.add_child(v1,size=150)
 
-        ct=b.add_scalebar((0,0),width=100,command=print)[-1]
+        ct=b.add_scalebar((0,0),width=100,direction='x',command=print)[-1]
 
-        # v1.set_child(ct)
-        hp.add_child(ct,weight=1)
+        v1.set_child(ct)
+        # hp.add_child(ct,weight=1)
 
         v2=VerticalPanel(b)
         hp.add_child(v2,size=150)

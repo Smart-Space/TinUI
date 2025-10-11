@@ -1320,6 +1320,7 @@ class BasicTinUI(Canvas):
                 dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), anchor)
                 pos[0] += dx
                 pos[1] += dy
+                rewrite_dash(dx, dy)
             else:
                 if direction == 'x':
                     dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), 'w')
@@ -1336,7 +1337,6 @@ class BasicTinUI(Canvas):
                     self.coords(back, pos[0], pos[1] + 8, pos[0] + width, pos[1] + 8)
                     self.coords(name, pos[0], pos[1] + 8, dash[nowselect], pos[1] + 8)
                     select(nowselect, False)
-                    rewrite_dash(dx, dy)
                 else:# y方向
                     dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), 'n')
                     pos[0] += dx
@@ -1361,6 +1361,8 @@ class BasicTinUI(Canvas):
                 for i in range(len(dash)):
                     dash[i] += dy
         def select(num, send=True):
+            nonlocal nowselect
+            nowselect = num
             if direction == 'x':
                 move = dash[num] - self.coords(button)[0]
                 self.move(button, move, 0)

@@ -643,15 +643,15 @@ class BasicTinUI(Canvas):
                 self.tag_bind(
                     funcw,
                     "<Enter>",
-                    lambda event: self.itemconfig(funcw, fill=onoutline),
+                    lambda _: self.itemconfig(funcw, fill=onoutline),
                 )
                 self.tag_bind(
-                    funcw, "<Leave>", lambda event: self.itemconfig(funcw, fill=fg)
+                    funcw, "<Leave>", lambda _: self.itemconfig(funcw, fill=fg)
                 )
                 self.tag_bind(
                     funcw,
                     "<Button-1>",
-                    lambda event: (entry.delete(0, "end"), if_empty(None)),
+                    lambda _: (entry.delete(0, "end"), if_empty(None)),
                 )
 
         def call_command(event):
@@ -799,10 +799,10 @@ class BasicTinUI(Canvas):
                 tags=(uid, entrybutton),
             )
             self.tag_bind(
-                button, "<Enter>", lambda event: self.itemconfig(button, fill=onoutline)
+                button, "<Enter>", lambda _: self.itemconfig(button, fill=onoutline)
             )
             self.tag_bind(
-                button, "<Leave>", lambda event: self.itemconfig(button, fill=fg)
+                button, "<Leave>", lambda _: self.itemconfig(button, fill=fg)
             )
             self.tag_bind(button, "<Button-1>", call_command)
             entry.bind("<Return>", call_command)
@@ -968,17 +968,17 @@ class BasicTinUI(Canvas):
                 self.tag_bind(
                     item_id,
                     "<Enter>",
-                    lambda event, back=back, c=choice: button_in(back, c),
+                    lambda _, back=back, c=choice: button_in(back, c),
                 )
                 self.tag_bind(
                     item_id,
                     "<Leave>",
-                    lambda event, back=back, c=choice: button_out(back, c),
+                    lambda _, back=back, c=choice: button_out(back, c),
                 )
                 self.tag_bind(
                     item_id,
                     "<Button>",
-                    lambda event, _text=i, back=back, c=choice: go_func(back, _text, c),
+                    lambda _, _text=i, back=back, c=choice: go_func(back, _text, c),
                 )
         back_list = list(choices_back)
         self.__auto_anchor(uid, pos, anchor)
@@ -2012,7 +2012,7 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(cui, button2[-1])
         self.addtag_withtag(cui, cuiback)
         self.tag_bind(
-            cuiback, "<Leave>", lambda event: self.itemconfig(cui, state="hidden")
+            cuiback, "<Leave>", lambda _: self.itemconfig(cui, state="hidden")
         )
         self.itemconfig(cui, state="hidden")
         self.tkraise(back)
@@ -2277,10 +2277,10 @@ class BasicTinUI(Canvas):
                 tags=(uid, button),
             )
         self.tag_bind(
-            button, "<Enter>", lambda event: self.itemconfig(button_fore, fill=activefg)
+            button, "<Enter>", lambda _: self.itemconfig(button_fore, fill=activefg)
         )
         self.tag_bind(
-            button, "<Leave>", lambda event: self.itemconfig(button_fore, fill=fg)
+            button, "<Leave>", lambda _: self.itemconfig(button_fore, fill=fg)
         )
         self.tag_bind(button, "<Button-1>", mousedown)
         self.tag_bind(button, "<B1-Motion>", drag)
@@ -3259,20 +3259,20 @@ class BasicTinUI(Canvas):
                 all_keys.append(text)
                 for item_id in (text, back):
                     box.tag_bind(
-                        item_id, "<Enter>", lambda event, text=text: in_mouse(text)
+                        item_id, "<Enter>", lambda _, text=text: in_mouse(text)
                     )
                     box.tag_bind(
-                        item_id, "<Leave>", lambda event, text=text: out_mouse(text)
+                        item_id, "<Leave>", lambda _, text=text: out_mouse(text)
                     )
                     box.tag_bind(
                         item_id,
                         "<Button-1>",
-                        lambda event, text=text: mouse_click(text),
+                        lambda _, text=text: mouse_click(text),
                     )
                     box.tag_bind(
                         item_id,
                         "<ButtonRelease-1>",
-                        lambda event, text=text: sel_it(text),
+                        lambda _, text=text: sel_it(text),
                     )
             tbbox = box.bbox("textcid")
             if tbbox == None:
@@ -3447,9 +3447,9 @@ class BasicTinUI(Canvas):
                 tinui = item[0]
                 back = tinui.__ui_polygon(((4, 4), (width - 8, linew - 5)), "", "", 9)
                 tinui.background = back
-                tinui.bind("<Enter>", lambda event, item=item: buttonin(item))
-                tinui.bind("<Button-1>", lambda event, item=item: click(item))
-                tinui.bind("<Leave>", lambda event, item=item: buttonout(item))
+                tinui.bind("<Enter>", lambda _, item=item: buttonin(item))
+                tinui.bind("<Button-1>", lambda _, item=item: click(item))
+                tinui.bind("<Leave>", lambda _, item=item: buttonout(item))
                 tinui.bind("<MouseWheel>", bindyview)
             bbox = ui.bbox("item")
             if bbox != None:
@@ -3711,7 +3711,7 @@ class BasicTinUI(Canvas):
             if region == "auto":  # 自动调节
                 __update()
         ui_xml = TinUIXml(ui)
-        ui.bind("<Destroy>", lambda event: self.__delete_uixml(ui_xml))
+        ui.bind("<Destroy>", lambda _: self.__delete_uixml(ui_xml))
         dx, dy = self.__auto_anchor(uid, pos, anchor)
         if scrollbar:
             cid1.move(dx, dy, height)
@@ -3903,7 +3903,7 @@ class BasicTinUI(Canvas):
             ui = BasicTinUI(self, bg=bg)
             tinuixml = TinUIXml(ui)
             ui.bind(
-                "<Destroy>", lambda event, uixml=tinuixml: self.__delete_uixml(uixml)
+                "<Destroy>", lambda _, uixml=tinuixml: self.__delete_uixml(uixml)
             )
             uiid = self.create_window(
                 (startx, pos[1]),
@@ -3925,9 +3925,9 @@ class BasicTinUI(Canvas):
             )
             dotlist.append(dot)
             dotx += 15
-            bar.tag_bind(dot, "<Enter>", lambda event, dote=dot: __dot_in(dote))
-            bar.tag_bind(dot, "<Leave>", lambda event, dote=dot: __dot_out(dote))
-            bar.tag_bind(dot, "<Button-1>", lambda event, dote=dot: __dot_select(dote))
+            bar.tag_bind(dot, "<Enter>", lambda _, dote=dot: __dot_in(dote))
+            bar.tag_bind(dot, "<Leave>", lambda _, dote=dot: __dot_out(dote))
+            bar.tag_bind(dot, "<Button-1>", lambda _, dote=dot: __dot_select(dote))
         self.itemconfig(uilist[nowui][0], state="normal")
         self.lift(uilist[nowui][0])
         bar.config(scrollregion=bar.bbox("all"))
@@ -4053,7 +4053,7 @@ class BasicTinUI(Canvas):
                 )
                 self.windows.append(page)
             uixml = TinUIXml(page)
-            page.bind("<Destroy>", lambda event: self.__delete_uixml(uixml))
+            page.bind("<Destroy>", lambda _: self.__delete_uixml(uixml))
             bbox = tbu.bbox("all")
             if bbox and bbox[2] - bbox[0] > width:
                 self.itemconfig(scro[-1], state="normal")
@@ -4064,11 +4064,11 @@ class BasicTinUI(Canvas):
             tbdict[flag] = (titleu, cb, bu)
             flaglist.append(flag)
             for item_id in (titleu, cb, bu):
-                tbu.tag_bind(item_id, "<Enter>", lambda event, f=flag: __onenter(f))
-                tbu.tag_bind(item_id, "<Leave>", lambda event, f=flag: __onleave(f))
-            tbu.tag_bind(titleu, "<Button-1>", lambda event: showpage(flag))
-            tbu.tag_bind(bu, "<Button-1>", lambda event: showpage(flag))
-            tbu.tag_bind(cb, "<Button-1>", lambda event: deletepage(flag))
+                tbu.tag_bind(item_id, "<Enter>", lambda _, f=flag: __onenter(f))
+                tbu.tag_bind(item_id, "<Leave>", lambda _, f=flag: __onleave(f))
+            tbu.tag_bind(titleu, "<Button-1>", lambda _: showpage(flag))
+            tbu.tag_bind(bu, "<Button-1>", lambda _: showpage(flag))
+            tbu.tag_bind(cb, "<Button-1>", lambda _: deletepage(flag))
             return flag
 
         def showpage(flag):  # 显示页面
@@ -4464,9 +4464,9 @@ class BasicTinUI(Canvas):
             )
             bars.append(bar)
             for item_id in (bar.fill, bar.line):
-                self.tag_bind(item_id, "<Enter>", lambda event, b=bar: onin(b))
-                self.tag_bind(item_id, "<Leave>", lambda event, b=bar: onleave(b))
-                self.tag_bind(item_id, "<Button-1>", lambda event, b=bar: click(b))
+                self.tag_bind(item_id, "<Enter>", lambda _, b=bar: onin(b))
+                self.tag_bind(item_id, "<Leave>", lambda _, b=bar: onleave(b))
+                self.tag_bind(item_id, "<Button-1>", lambda _, b=bar: click(b))
             if bbox == None:
                 bbox = self.bbox(bar.fill)
             if item_num == num:
@@ -4628,21 +4628,21 @@ class BasicTinUI(Canvas):
             self.tag_bind(
                 back,
                 "<Enter>",
-                lambda event, sel=count, sign=sign, sback=sign_back: button_in(
+                lambda _, sel=count, sign=sign, sback=sign_back: button_in(
                     sel, sign, sback
                 ),
             )
             self.tag_bind(
                 back,
                 "<Leave>",
-                lambda event, sel=count, sign=sign, sback=sign_back: button_out(
+                lambda _, sel=count, sign=sign, sback=sign_back: button_out(
                     sel, sign, sback
                 ),
             )
             self.tag_bind(
                 back,
                 "<Button-1>",
-                lambda event, sel=count, sign=sign, sback=sign_back: sel_it(
+                lambda _, sel=count, sign=sign, sback=sign_back: sel_it(
                     sel, sign, sback
                 ),
             )
@@ -4728,15 +4728,15 @@ class BasicTinUI(Canvas):
             nowx = nowx + width + padx
             texts.append((i[0], i[1], text))
             self.tag_bind(
-                text, "<Enter>", lambda event, num=count, tag=text: button_in(num, tag)
+                text, "<Enter>", lambda _, num=count, tag=text: button_in(num, tag)
             )
             self.tag_bind(
-                text, "<Leave>", lambda event, num=count, tag=text: button_out(num, tag)
+                text, "<Leave>", lambda _, num=count, tag=text: button_out(num, tag)
             )
             self.tag_bind(
                 text,
                 "<Button-1>",
-                lambda event, num=count, tag=text, tagname=i[1]: sel_it(
+                lambda _, num=count, tag=text, tagname=i[1]: sel_it(
                     num, tag, tagname
                 ),
             )
@@ -4990,7 +4990,7 @@ class BasicTinUI(Canvas):
             ui = TinUI(self, bg=bg)
             self.windows.append(ui.frame)
         ux = TinUIXml(ui)
-        ui.bind("<Destroy>", lambda event: self.__delete_uixml(ux))
+        ui.bind("<Destroy>", lambda _: self.__delete_uixml(ux))
         content = self.create_window(
             (tx1 - 3, ty2 + 10),
             window=ui,
@@ -5150,15 +5150,16 @@ class BasicTinUI(Canvas):
                 posi = posi[1]
             box.moveto(line, 1, posi + linew / 5)
             if command != None and send:
-                fln.father_link = [cid]  # 父级关系
-                find_father_link(fln, cid)
-                command(fln.father_link[::-1])  # [父级, 子1级, 子2级...]
+                father_link.clear()
+                father_link.append(cid)
+                find_father_link(cid)
+                command(father_link[::-1])  # [父级, 子1级, 子2级...]
 
-        def find_father_link(fln, cid):  # 获取元素父级关系
-            for i in items_dict:
-                if cid in items_dict[i]:
-                    fln.father_link.append(i)
-                    find_father_link(fln, i)
+        def find_father_link(cid):  # 获取元素父级关系
+            father_id = items[cid][-1]
+            while father_id:
+                father_link.append(father_id)
+                father_id = items[father_id][-1]
 
         def endy():
             return box.bbox("all")[-1]
@@ -5177,7 +5178,7 @@ class BasicTinUI(Canvas):
                         anchor="nw",
                     )
                     back = box.add_back((), tuple([te]), fg=bg, bg=bg, linew=0)
-                    items[back] = (te, back)
+                    items[back] = (te, back, father_id)
                 else:  # 存在子级
                     sign = box.create_text(
                         (padx - 1, y + 3),
@@ -5195,12 +5196,12 @@ class BasicTinUI(Canvas):
                         anchor="nw",
                     )
                     back = box.add_back((), tuple((sign, te)), fg=bg, bg=bg, linew=0)
-                    items[back] = (te, back, sign)
+                    items[back] = (te, back, sign, father_id)
                     add_item(padx + 15, text[1], back)
                     box.tag_bind(
                         sign,
                         "<Button-1>",
-                        lambda event, s=sign, cid=back: close_view(s, cid),
+                        lambda _, s=sign, cid=back: close_view(s, cid),
                     )
                 old_coords = box.coords(back)
                 old_coords[0] = old_coords[6] = 6
@@ -5210,16 +5211,16 @@ class BasicTinUI(Canvas):
                 box.coords(back, old_coords)
                 for item_id in (back, te):
                     box.tag_bind(
-                        item_id, "<Enter>", lambda event, _id=back: buttonin(_id)
+                        item_id, "<Enter>", lambda _, _id=back: buttonin(_id)
                     )
                     box.tag_bind(
-                        item_id, "<Leave>", lambda event, _id=back: buttonout(_id)
+                        item_id, "<Leave>", lambda _, _id=back: buttonout(_id)
                     )
                     box.tag_bind(
-                        item_id, "<Button-1>", lambda event, _id=back: click(_id, True)
+                        item_id, "<Button-1>", lambda _, _id=back: click(_id, True)
                     )
                 child_id.append(back)
-            if father_id != None:  # 存在父级
+            if father_id:  # 存在父级
                 items_dict[father_id] = tuple(child_id)
 
         def get_cids(cid):
@@ -5239,25 +5240,21 @@ class BasicTinUI(Canvas):
         def open_view(sign, cid):  # 展开
             if box.itemcget(sign, "text") == "\ue96e":
                 return
-            box.tag_bind(sign, "<Button-1>", lambda event: close_view(sign, cid))
+            box.tag_bind(sign, "<Button-1>", lambda _: close_view(sign, cid))
             box.itemconfig(sign, text="\ue96e")
             cids = items_dict[cid]
             move = "move" + str(cid)  # 单层管理命名元素
             for i in cids:  # 只展开一层
-                for uid in items[i]:
+                for uid in items[i][:-1]:
                     box.addtag_withtag(move, uid)
             box.itemconfig(move, state="normal")
             bbox = box.bbox(move)
             if bbox == None:
                 return
             index = tuple(items.keys()).index(_get_last_cuid(cid)) + 1
-            if index != items.__len__():
-                moveheight = bbox[3] - bbox[1]  # 获取移动模块高度
-                for i in tuple(items.keys())[index:]:
-                    for uid in items[i]:
-                        box.move(uid, 0, moveheight)
+            __move_index(index, bbox[3]-bbox[1])
             box.dtag(move)
-            if nowid is not None:
+            if nowid:
                 bbox = box.bbox(nowid)
             else:
                 bbox = None
@@ -5272,29 +5269,31 @@ class BasicTinUI(Canvas):
         def close_view(sign, cid):  # 闭合
             if box.itemcget(sign, "text") == "\ue970":
                 return
-            box.tag_bind(sign, "<Button-1>", lambda event: open_view(sign, cid))
+            box.tag_bind(sign, "<Button-1>", lambda _: open_view(sign, cid))
             box.itemconfig(sign, text="\ue970")
             cids = get_cids(cid)
             move = "move" + str(cid)  # 单层管理命名元素
             for i in cids:
-                for uid in items[i]:
+                for uid in items[i][:-1]:
                     box.addtag_withtag(move, uid)
                 if i in items_dict:
-                    close_view(items[i][-1], i)
+                    close_view(items[i][-2], i)
             bbox = box.bbox(move)
             box.itemconfig(move, state="hidden")
             index = tuple(items.keys()).index(cids[-1]) + 1
-            if index != items.__len__():
-                moveheight = bbox[3] - bbox[1]  # 获取移动模块高度
-                for i in tuple(items.keys())[index:]:
-                    for uid in items[i]:
-                        box.move(uid, 0, -moveheight)
+            __move_index(index, bbox[1]-bbox[3])
             box.dtag(move)
             if nowid in cids:  # 标识元素控制
                 box.itemconfig(line, state="hidden")
             elif nowid is not None:
                 click(nowid)  # 重新绘制位置
             checkscroll()
+        
+        def __move_index(index, moveheight):
+            if index != items.__len__():
+                for i in tuple(items.keys())[index:]:
+                    for uid in items[i][:-1]:
+                        box.move(uid, 0, moveheight)
 
         def bindview(event):
             if event.state == 0:
@@ -5304,8 +5303,8 @@ class BasicTinUI(Canvas):
 
         def clean(event):
             # 销毁对象
-            nonlocal fln, items, items_dict
-            del fln
+            nonlocal father_link, items, items_dict
+            del father_link
             del items
             del items_dict
 
@@ -5361,7 +5360,7 @@ class BasicTinUI(Canvas):
                 checkscroll()
 
         nowid = None
-        fln = TinUINum()  # 用于寻找父级关系，目前效率比较低，之后考虑优化
+        father_link = []  # 用于父级关系
         box = BasicTinUI(self, bg=bg, width=width, height=height)  # 显示选择内容
         box.place(x=12, y=12)
         cavui = self.create_window(
@@ -5444,22 +5443,22 @@ class BasicTinUI(Canvas):
                 self.tag_bind(
                     funcw,
                     "<Enter>",
-                    lambda event: self.itemconfig(funcw, fill=onoutline),
+                    lambda _: self.itemconfig(funcw, fill=onoutline),
                 )
                 self.tag_bind(
-                    funcw, "<Leave>", lambda event: self.itemconfig(funcw, fill=fg)
+                    funcw, "<Leave>", lambda _: self.itemconfig(funcw, fill=fg)
                 )
                 self.tag_bind(funcw, "<Button-1>", showkey)
             elif nowstate == "shown":
                 self.tag_bind(
                     funcw,
                     "<Leave>",
-                    lambda event: self.itemconfig(funcw, fill=onoutline),
+                    lambda _: self.itemconfig(funcw, fill=onoutline),
                 )
                 self.tag_bind(
                     funcw,
                     "<Enter>",
-                    lambda event: self.itemconfig(funcw, fill=onoutline),
+                    lambda _: self.itemconfig(funcw, fill=onoutline),
                 )
                 self.tag_bind(funcw, "<Button-1>", hidekey)
 
@@ -6634,7 +6633,7 @@ class BasicTinUI(Canvas):
         )
         self.windows.append(ui)
         uixml = TinUIXml(ui)
-        ui.bind("<Destroy>", lambda event: self.__delete_uixml(uixml))
+        ui.bind("<Destroy>", lambda _: self.__delete_uixml(uixml))
         # 围绕fid进行布局
         bbox = self.bbox(fid)
         if anchor == "nw":
@@ -6762,9 +6761,9 @@ class BasicTinUI(Canvas):
             )
             self.__auto_anchor(uid, pos, anchor)
             endx = self.bbox(t)[2]
-            self.tag_bind(lt, "<Button-1>", lambda e: click(lt))
-            self.tag_bind(lt, "<Enter>", lambda e: in_button(lt))
-            self.tag_bind(lt, "<Leave>", lambda e: out_button(lt))
+            self.tag_bind(lt, "<Button-1>", lambda _: click(lt))
+            self.tag_bind(lt, "<Enter>", lambda _: in_button(lt))
+            self.tag_bind(lt, "<Leave>", lambda _: out_button(lt))
             return t
 
         def delete():
@@ -6955,11 +6954,11 @@ class BasicTinUI(Canvas):
             texts.append(text)
             bbox = self.bbox(text)
             maxwidth = max(maxwidth, bbox[2] - bbox[0])
-            self.tag_bind(text, "<Enter>", lambda e, text=text: mouse_in(text))
+            self.tag_bind(text, "<Enter>", lambda _, text=text: mouse_in(text))
             self.tag_bind(
-                text, "<Leave>", lambda e, text=text: self.itemconfig(text, fill=fg)
+                text, "<Leave>", lambda _, text=text: self.itemconfig(text, fill=fg)
             )
-            self.tag_bind(text, "<Button-1>", lambda e, text=text: __click(text))
+            self.tag_bind(text, "<Button-1>", lambda _, text=text: __click(text))
         endx = maxwidth / 2
         for i in texts:
             self.coords(i, endx, 0)
@@ -7276,7 +7275,7 @@ class TinUI(BasicTinUI):
             if m[0] != "_" and m != "config" and m != "configure":
                 setattr(self, m, getattr(self.frame, m))
         self.bind("<MouseWheel>", self.set_y_view, True)
-        config_bind = self.bind("<Configure>", lambda event: self.update__(), True)
+        config_bind = self.bind("<Configure>", lambda _: self.update__(), True)
         self.update_time = update_time
         if update == False:
             self.unbind("<Configure>", config_bind)

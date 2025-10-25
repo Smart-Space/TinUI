@@ -3642,6 +3642,7 @@ class BasicTinUI(Canvas):
         scrollcolor="#999999",
         scrollon="#89898b",
         scrollbar=False,
+        content=True,
         region="man",
         anchor="nw",
     ):  # 绘制BasicTinUI
@@ -3710,7 +3711,10 @@ class BasicTinUI(Canvas):
             del bbox
             if region == "auto":  # 自动调节
                 __update()
-        ui_xml = TinUIXml(ui)
+        if content:
+            ui_xml = TinUIXml(ui)
+        else:
+            ui_xml = None
         ui.bind("<Destroy>", lambda _: self.__delete_uixml(ui_xml))
         dx, dy = self.__auto_anchor(uid, pos, anchor)
         if scrollbar:

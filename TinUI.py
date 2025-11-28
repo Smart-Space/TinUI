@@ -61,7 +61,7 @@ class TinUIString(str):  # TinUI字符串类
 
 
 class TinUINum(int):  # TinUI数字类
-    def __init__(self, integer: Union[int | float] = 0):
+    def __init__(self, integer: Union[int, float] = 0):
         int.__init__(self)
         self.num = integer
 

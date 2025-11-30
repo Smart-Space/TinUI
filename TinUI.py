@@ -304,7 +304,12 @@ class BasicTinUI(Canvas):
         top.geometry(f"{width}x{height}")
         top.overrideredirect(True)
         top.attributes("-topmost", 1)
-        top.attributes("-transparent", tran)
+        if sys.platform.startswith("win"):
+            top.attributes("-transparent", tran)
+        elif sys.platform.startswith("darwin"):
+            top.attributes("-transparentcolor", tran)
+        else:
+            pass
         bar = BasicTinUI(top, bg=tran)
         bar.pack(fill="both", expand=True)
         return top, bar
@@ -5727,16 +5732,13 @@ class BasicTinUI(Canvas):
 
         def change_color(t, change: int):  # 变化颜色
             # change:: 1=>colors, 2=>re_colors
-            nonlocal nowcolors
             if t <= 25:
-                self.itemconfig(back, fill=nowcolors[1][t], outline=nowcolors[1][t])
-                self.itemconfig(button, fill=nowcolors[0][t])
+                self.itemconfig(back, fill=colors[1][t], outline=colors[1][t])
+                self.itemconfig(button, fill=colors[0][t])
                 self.after(5, lambda: change_color(t + 1, change))
             else:
-                if change == 1:
-                    nowcolors = colors
-                elif change == 2:
-                    nowcolors = re_colors
+                colors[0].reverse()
+                colors[1].reverse()
 
         def change_command(new_func):
             nonlocal command
@@ -5796,8 +5798,7 @@ class BasicTinUI(Canvas):
         back = self.__ui_polygon(
             ((x1 + 1, y1 + 1), (x2 - 1, y2 - 1)), width=9, tags=uid, fill=bg, outline=bg
         )
-        self.tag_bind(button, "<Button-1>", on_click)
-        self.tag_bind(back, "<Button-1>", on_click)
+        self.tag_bind(uid, "<Button-1>", on_click)
         self.tkraise(button)
         funcs = FuncList(5)
         funcs.change_command = change_command
@@ -5808,11 +5809,8 @@ class BasicTinUI(Canvas):
         # 处理渐变色
         colors.append(get_color_change(fg, activefg))  # 文本颜色
         colors.append(get_color_change(bg, activebg))  # 背景颜色
-        # re_colors 反向颜色列表
-        re_colors = [colors[0][::-1], colors[1][::-1]]
-        nowcolors = colors
         self.__auto_anchor(uid, pos, anchor)
-        del x1, y1, x2, y2
+        del x1, y1, x2, y2, linew
         uid.layout = lambda x1, y1, x2, y2, expand=False: self.__auto_layout(
             uid, (x1, y1, x2, y2), anchor
         )

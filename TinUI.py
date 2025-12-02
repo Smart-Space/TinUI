@@ -309,7 +309,7 @@ class BasicTinUI(Canvas):
         elif sys.platform.startswith("darwin"):
             top.attributes("-transparentcolor", tran)
         else:
-            pass
+            tran = 'SystemWindow' # 其他平台不支持透明效果
         bar = BasicTinUI(top, bg=tran)
         bar.pack(fill="both", expand=True)
         return top, bar
@@ -2860,8 +2860,10 @@ class BasicTinUI(Canvas):
             self.itemconfig(bottom, fill=oncolor)
             self.itemconfig(back, outline=bg)
 
-        def leave(event):  # 鼠标离开
-            self.itemconfig(sc, outline=color, width=3)
+        def leave(event, w):  # 鼠标离开
+            self.itemconfig(sc, outline=color, width=w)
+            if w != 3:
+                self.after(32, lambda : leave(event, w-1))
 
         def all_leave(event):
             self.itemconfig(top, fill="")
@@ -3103,7 +3105,7 @@ class BasicTinUI(Canvas):
         self.tag_bind(sc, "<B1-Motion>", drag)
         # 绑定样式
         self.tag_bind(sc, "<Enter>", enter)
-        self.tag_bind(sc, "<Leave>", leave)
+        self.tag_bind(sc, "<Leave>", lambda event: leave(event, 7))
         # 绑定点击滚动
         self.tag_bind(top, "<Button-1>", topmove)
         self.tag_bind(bottom, "<Button-1>", bottommove)

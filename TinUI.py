@@ -6991,6 +6991,92 @@ class BasicTinUI(Canvas):
         funcs = FuncList(1)
         funcs.select = select
         return back, outline, button, button2, line, texts, funcs, uid
+    
+    def add_navigation(
+        self,
+        pos: tuple,
+        minwidth=30,
+        maxwidth=150,
+        bg='#FFFFFF',
+        fg='#1A1A1A',
+        activebg='#E9E9E9',
+        activefg='#191919',
+        onbg='#E9E9E9',
+        onfg='#191919',
+        oncolor='#0067C0',
+        font="微软雅黑 14",
+        content=(("","A"), ("","B"), ("","C")), # (icon, title)
+        command=None,
+        anchor="nw",
+    ): # 绘制一个导航边栏
+        def mouse_in(index):
+            if index == nowselect:
+                return
+            self.itemconfig(menus[index][1], fill=activefg)
+            self.itemconfig(menus[index][0], fill=activefg)
+            self.itemconfig(menus[index][2], fill=activebg, outline=activebg)
+        def mouse_out(index):
+            if index == nowselect:
+                return
+            self.itemconfig(menus[index][1], fill=fg)
+            self.itemconfig(menus[index][0], fill=fg)
+            self.itemconfig(menus[index][2], fill=bg, outline=bg)
+        def navigate(index):
+            nonlocal nowselect
+            if index == nowselect:
+                return
+            old_index = nowselect
+            nowselect = index
+            mouse_out(old_index)
+            self.itemconfig(menus[index][1], fill=onfg)
+            self.itemconfig(menus[index][0], fill=onfg)
+            self.itemconfig(menus[index][2], fill=onbg, outline=onbg)
+            self.moveto(line, x-7, y+(font_height+15)*(index-1/4))
+            if command:
+                command(menus[index][1].cget("text"))
+        font = tkfont.Font(font=font)
+        font_size = font.cget("size")
+        font_height = font.metrics("linespace")
+        segoe_font = f"{{Segoe Fluent Icons}} {font_size}"
+        segoe_font_width = font.measure("\uE700")
+        minwidth = max(minwidth, segoe_font_width + 10)
+        menus = [] # (icon, text, back)
+        nowselect = -1
+        topicon = self.create_text(pos, text="\uE700", font=segoe_font, fill=fg, anchor="nw")
+        uid = TinUIString(f"navigation-{topicon}")
+        self.itemconfig(topicon, tags=uid)
+        bbox = self.bbox(topicon)
+        topback = self.__ui_polygon(
+            ((bbox[0], bbox[1]), (bbox[2], bbox[3])), fill=bg, outline=bg, width=9, tags=uid
+        )
+        self.lower(topback, topicon)
+        line = self.create_line((0, 0, 0, font_height/2), fill=oncolor, width=3, tags=uid, capstyle="round", state="hidden")
+        starty = pos[1] + font_height + 15
+        x = pos[0]
+        cnt = 0
+        for i in content:
+            if i[0]:
+                icon = self.create_text((x, starty), text=i[0], font=segoe_font, fill=fg, anchor="w", tags=uid)
+            else:
+                icon = self.create_text((x, starty), text=" ", font=segoe_font, fill=fg, anchor="w", tags=uid)
+            text = self.create_text((x + segoe_font_width + 5, starty), text=i[1], font=font, fill=fg, anchor="w", tags=uid)
+            back = self.__ui_polygon(
+                ((x, starty-font_height/2), (x+maxwidth, starty+font_height/2)), fill=bg, outline=bg, width=9, tags=uid
+            )
+            self.tag_lower(back, text)
+            for item in (icon, text, back):
+                self.tag_bind(item, "<Enter>", lambda _, index=cnt: mouse_in(index))
+                self.tag_bind(item, "<Leave>", lambda _, index=cnt: mouse_out(index))
+                self.tag_bind(item, "<Button-1>", lambda _, index=cnt: navigate(index))
+            menus.append((icon, text, back))
+            starty += font_height + 15
+            cnt += 1
+        self.tag_raise(line)
+        dx, dy = self.__auto_anchor(uid, pos, anchor)
+        x += dx
+        y = pos[1] + font_height + 15 + dy
+        self.itemconfig(line, state='normal')
+        navigate(0)
 
 
 class BasePanel:
@@ -7921,6 +8007,7 @@ if __name__ == "__main__":
         b.add_segmentbutton(
             (1500, 450), content=("tkinter", "TinUI", "Other"), command=print
         )
+        b.add_navigation((1500, 550))
 
         b.bind("<Destroy>", lambda e: b.clean_windows())
 

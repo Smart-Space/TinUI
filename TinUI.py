@@ -6995,7 +6995,7 @@ class BasicTinUI(Canvas):
     def add_navigation(
         self,
         pos: tuple,
-        minwidth=30,
+        minwidth=20,
         maxwidth=150,
         bg='#FFFFFF',
         fg='#1A1A1A',
@@ -7005,10 +7005,34 @@ class BasicTinUI(Canvas):
         onfg='#191919',
         oncolor='#0067C0',
         font="微软雅黑 14",
-        content=(("","A"), ("","B"), ("","C")), # (icon, title)
+        content=(("\uE790","Color"), ("\uE743","Geometry"), ("\uED58","Iconography")), # (icon, title)
+        widget=True,
         command=None,
         anchor="nw",
     ): # 绘制一个导航边栏
+        def expand_in(event):
+            self.itemconfig(topicon, fill=activefg)
+            self.itemconfig(topback, fill=activebg, outline=activebg)
+        def expand_out(event):
+            self.itemconfig(topicon, fill=fg)
+            self.itemconfig(topback, fill=bg, outline=bg)
+        def expand_click(event):
+            nonlocal expanding
+            expanding = not expanding
+            if expanding:
+                for menu in menus:
+                    self.itemconfig(menu[1], state="normal")
+                    coords = self.coords(menu[2])
+                    coords[2] = coords[4] = coords[0]+maxwidth
+                    self.coords(menu[2], coords)
+            else:
+                for menu in menus:
+                    self.itemconfig(menu[1], state="hidden")
+                    coords = self.coords(menu[2])
+                    coords[2] = coords[4] = coords[0]+minwidth
+                    self.coords(menu[2], coords)
+            if command:
+                command(expanding)
         def mouse_in(index):
             if index == nowselect:
                 return
@@ -7034,24 +7058,39 @@ class BasicTinUI(Canvas):
             self.moveto(line, x-7, y+(font_height+15)*(index-1/4))
             if command:
                 command(menus[index][1].cget("text"))
+        def __layout(x1, y1, x2, y2, expand=False):
+            nonlocal x, y
+            dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), anchor)
+            x += dx
+            y += dy
         font = tkfont.Font(font=font)
         font_size = font.cget("size")
         font_height = font.metrics("linespace")
         segoe_font = f"{{Segoe Fluent Icons}} {font_size}"
         segoe_font_width = font.measure("\uE700")
-        minwidth = max(minwidth, segoe_font_width + 10)
+        minwidth = max(minwidth, segoe_font_width)
         menus = [] # (icon, text, back)
         nowselect = -1
-        topicon = self.create_text(pos, text="\uE700", font=segoe_font, fill=fg, anchor="nw")
+        expanding = True # 展开状态
+        topicon = self.create_text(pos, text="\uE700", font=segoe_font, fill=fg, anchor="w")
         uid = TinUIString(f"navigation-{topicon}")
         self.itemconfig(topicon, tags=uid)
         bbox = self.bbox(topicon)
         topback = self.__ui_polygon(
             ((bbox[0], bbox[1]), (bbox[2], bbox[3])), fill=bg, outline=bg, width=9, tags=uid
         )
+        for item in (topicon, topback):
+            self.tag_bind(item, "<Enter>", expand_in)
+            self.tag_bind(item, "<Leave>", expand_out)
+            self.tag_bind(item, "<Button-1>", expand_click)
         self.lower(topback, topicon)
         line = self.create_line((0, 0, 0, font_height/2), fill=oncolor, width=3, tags=uid, capstyle="round", state="hidden")
-        starty = pos[1] + font_height + 15
+        if widget:
+            starty = pos[1] + font_height + 15
+        else:
+            self.itemconfig(topicon, state="hidden")
+            self.itemconfig(topback, state="hidden")
+            starty = pos[1]
         x = pos[0]
         cnt = 0
         for i in content:
@@ -7063,7 +7102,7 @@ class BasicTinUI(Canvas):
             back = self.__ui_polygon(
                 ((x, starty-font_height/2), (x+maxwidth, starty+font_height/2)), fill=bg, outline=bg, width=9, tags=uid
             )
-            self.tag_lower(back, text)
+            self.tag_lower(back, icon)
             for item in (icon, text, back):
                 self.tag_bind(item, "<Enter>", lambda _, index=cnt: mouse_in(index))
                 self.tag_bind(item, "<Leave>", lambda _, index=cnt: mouse_out(index))
@@ -7074,9 +7113,14 @@ class BasicTinUI(Canvas):
         self.tag_raise(line)
         dx, dy = self.__auto_anchor(uid, pos, anchor)
         x += dx
-        y = pos[1] + font_height + 15 + dy
+        y = pos[1] + font_height + 15 + dy if widget else pos[1] + dy
         self.itemconfig(line, state='normal')
         navigate(0)
+        del bbox, dx, dy, starty, cnt
+        uid.layout = __layout
+        funcs = FuncList(1)
+        funcs.navigate = navigate
+        return topicon, topback, line, menus, funcs, uid
 
 
 class BasePanel:
@@ -7673,7 +7717,7 @@ class TinUIXml:  # TinUI的xml渲染方式
 
 # 此行（不含）以下代码不受GPLv3、LGPLv3许可证的限制，可以自由使用、修改、分发等。
 if __name__ == "__main__":
-    testmode = 2
+    testmode = 1
 
     if testmode == 1:
         # panel test
@@ -7693,7 +7737,7 @@ if __name__ == "__main__":
         hp.add_child(v1, size=150, weight=1)
         # hp.add_child(v1,size=150)
 
-        ct = b.add_scalebar((0, 0), width=100, direction="x", command=print)[-1]
+        ct = b.add_navigation((0,0), anchor='center')[-1]
 
         v1.set_child(ct)
         # hp.add_child(ct,weight=1)

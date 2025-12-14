@@ -7057,7 +7057,7 @@ class BasicTinUI(Canvas):
             self.itemconfig(menus[index][2], fill=onbg, outline=onbg)
             self.moveto(line, x-7, y+(font_height+15)*(index-1/4))
             if command:
-                command(menus[index][1].cget("text"))
+                command(self.itemcget(menus[index][1], "text"))
         def __layout(x1, y1, x2, y2, expand=False):
             nonlocal x, y
             dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), anchor)

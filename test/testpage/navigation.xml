@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='navigation'></title>
+    </line>
+    <line>
+        <paragraph text='导航边栏控件。建议配合TinUI面板布局使用。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <navigation></navigation>
+    </line>
+</line>
+</tinui>

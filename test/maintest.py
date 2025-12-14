@@ -68,7 +68,7 @@ t=ui.add_title((0,0),text='TinUI Gallery',anchor='n')
 img=ui.add_image((0,0),imgfile='LOGO.png',width=200,height=200,anchor='n')
 listbox=ui.add_listbox((0,0),height=340,bg='#f0f0f0',data=('back', 'barbutton', 'breadcrumb', 'button', 'button2', 'checkbutton', 
  'combobox', 'entry', 'expander', 'flyout', 'image', 'label', 'labelframe',
- 'link', 'listbox', 'listview', 'menubar', 'menubutton', 'notebook', 'notecard', 
+ 'link', 'listbox', 'listview', 'menubar', 'menubutton', 'navigation', 'notebook', 'notecard', 
  'onoff', 'paragraph', 'passwordbox', 'picker', 'pipspager', 'pivot', 'progressbar', 
  'radiobox', 'radiobutton', 'ratingbar', 'scalebar', 'scrollbar', 'separate', 
  'spinbox', 'segmentbutton', 'table', 'textbox', 'title', 'togglebutton', 'tooltip', 

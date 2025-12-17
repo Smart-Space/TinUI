@@ -3658,10 +3658,25 @@ class BasicTinUI(Canvas):
             ui.after(1000, __update)
 
         def re_scrollregion():  # 更新滚动范围
+            nonlocal show_scrollX, show_scrollY
             bbox = ui.bbox("all")
             if bbox != None:
+                w = bbox[2] - bbox[0]
+                h = bbox[3] - bbox[1]
                 ui.config(scrollregion=bbox)
-
+                if w > width and not show_scrollX:
+                    show_scrollX = True
+                    self.itemconfig(cavui, height=height)
+                elif w <= width and show_scrollX:
+                    show_scrollX = False
+                    self.itemconfig(cavui, height=height+13)
+                if h > height and not show_scrollY:
+                    show_scrollY = True
+                    self.itemconfig(cavui, width=width)
+                elif h <= height and show_scrollY:
+                    show_scrollY = False
+                    self.itemconfig(cavui, width=width+13)
+        
         def __layout(x1, y1, x2, y2, expand=False):
             nonlocal width, height
             if not expand:
@@ -3685,7 +3700,7 @@ class BasicTinUI(Canvas):
                 else:
                     width = x2 - x1
                     height = y2 - y1
-                self.itemconfig(cavui, width=width, height=height)
+                self.itemconfig(cavui, width=width if show_scrollY else width+13, height=height if show_scrollX else height+13)
 
         ui = BasicTinUI(self, bg=bg)
         cavui = self.create_window(
@@ -3694,6 +3709,8 @@ class BasicTinUI(Canvas):
         self.windows.append(ui)
         uid = TinUIString(f"ui-{cavui}")
         self.addtag_withtag(uid, cavui)
+        show_scrollX = False
+        show_scrollY = False
         if scrollbar:
             bbox = self.bbox(uid)
             cid1 = self.add_scrollbar(
@@ -7055,7 +7072,7 @@ class BasicTinUI(Canvas):
             self.itemconfig(menus[index][1], fill=onfg)
             self.itemconfig(menus[index][0], fill=onfg)
             self.itemconfig(menus[index][2], fill=onbg, outline=onbg)
-            self.moveto(line, x-7, y+(font_height+15)*(index-1/4))
+            self.moveto(line, x-8, y+(font_height+15)*(index-1/4))
             if command:
                 command(self.itemcget(menus[index][1], "text"))
         def __layout(x1, y1, x2, y2, expand=False):
@@ -7098,7 +7115,7 @@ class BasicTinUI(Canvas):
                 icon = self.create_text((x, starty), text=i[0], font=segoe_font, fill=fg, anchor="w", tags=uid)
             else:
                 icon = self.create_text((x, starty), text=" ", font=segoe_font, fill=fg, anchor="w", tags=uid)
-            text = self.create_text((x + segoe_font_width + 5, starty), text=i[1], font=font, fill=fg, anchor="w", tags=uid)
+            text = self.create_text((x + segoe_font_width + 8, starty), text=i[1], font=font, fill=fg, anchor="w", tags=uid)
             back = self.__ui_polygon(
                 ((x, starty-font_height/2), (x+maxwidth, starty+font_height/2)), fill=bg, outline=bg, width=9, tags=uid
             )
@@ -7717,7 +7734,7 @@ class TinUIXml:  # TinUI的xml渲染方式
 
 # 此行（不含）以下代码不受GPLv3、LGPLv3许可证的限制，可以自由使用、修改、分发等。
 if __name__ == "__main__":
-    testmode = 1
+    testmode = 2
 
     if testmode == 1:
         # panel test

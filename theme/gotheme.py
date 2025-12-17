@@ -142,6 +142,7 @@ def test(theme):
     for i in range(1,4):
         bdf.add(f'item{i}')
     du.add_segmentbutton(end(),content=('tkinter', 'TinUI', 'Others'))
+    du.add_navigation(end())
 
 w = Tk()
 w.geometry('500x500+500+100')

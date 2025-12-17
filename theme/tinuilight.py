@@ -384,3 +384,11 @@ class TinUILight(TinUITheme):
                 'onbg':'#FAFAFA',
                 'line':'#E5E5E5','sign':'#0067C0'
         },**kw})
+
+    def add_navigation(self,pos,*arg,**kw):
+        return self.ui.add_navigation(pos,*arg,**{
+            **{
+                'fg':'#1A1A1A','bg':'#F3F3F3',
+                'activefg':'#191919','activebg':'#E9E9E9',
+                'onfg':'#191919','onbg':'#E9E9E9','oncolor':'#0067C0'
+            },**kw})

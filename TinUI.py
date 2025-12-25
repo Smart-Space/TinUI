@@ -2375,7 +2375,7 @@ class BasicTinUI(Canvas):
                     )
                     bar.coords(back[0], bar_coords_2)
                     bar.coords(back[1], bar_coords)
-                elif len(back) == 3:
+                elif len(back) == 4:
                     pos = bar.bbox(back[1])
                     bar_coords = (
                         5,
@@ -2399,7 +2399,8 @@ class BasicTinUI(Canvas):
                     )
                     bar.coords(back[1], bar_coords_2)
                     bar.coords(back[2], bar_coords)
-                    # sign=bar.gettags(back[0])[-1]
+                    bbox = bar.bbox(back[3])
+                    bar.moveto(back[3], maxwidth - bbox[2] + bbox[0])
             for sep in seps:
                 pos = bar.bbox(sep)
                 bar.coords(sep, (1, pos[1], 5 + maxwidth, pos[1]))
@@ -2460,22 +2461,23 @@ class BasicTinUI(Canvas):
                 button = bar.add_menubutton(
                     (5, endy() - 5),
                     i[0],
+                    icon,
                     "x",
                     fg,
                     bg,
-                    line,
+                    bg,
                     3,
                     activefg,
                     activebg,
-                    activeline,
+                    activebg,
                     onfg,
                     onbg,
-                    online,
+                    onbg,
                     font=font,
                     cont=i[1],
                     tran=tran,
                 )
-                backs.append((button[0], button[1], button[2]))
+                backs.append((button[0], button[1], button[2], button[-1]+'widget'))
                 funcs.append(button[3])
                 pos = bar.bbox(button[1])
                 width = pos[2] - pos[0]
@@ -3697,11 +3699,12 @@ class BasicTinUI(Canvas):
                     cid1.move(dx + dw, dy, height)
                     self.move(cid2, 0, dh)
                     cid2.move(dx, dy + dh, width)
+                    self.itemconfig(cavui, width=width if show_scrollY else width+13, height=height if show_scrollX else height+13)
                 else:
                     width = x2 - x1
                     height = y2 - y1
-                self.itemconfig(cavui, width=width if show_scrollY else width+13, height=height if show_scrollX else height+13)
-
+                    self.itemconfig(cavui, width=width, height=height)
+                
         ui = BasicTinUI(self, bg=bg)
         cavui = self.create_window(
             pos, window=ui, width=width, height=height, anchor="nw"
@@ -3737,9 +3740,9 @@ class BasicTinUI(Canvas):
                 __update()
         if content:
             ui_xml = TinUIXml(ui)
+            ui.bind("<Destroy>", lambda _: self.__delete_uixml(ui_xml))
         else:
             ui_xml = None
-        ui.bind("<Destroy>", lambda _: self.__delete_uixml(ui_xml))
         dx, dy = self.__auto_anchor(uid, pos, anchor)
         if scrollbar:
             cid1.move(dx, dy, height)
@@ -4862,13 +4865,13 @@ class BasicTinUI(Canvas):
                 )
 
         font = tkfont.Font(font=font)
-        font_size = font.cget(option="size")
         mouse_in = False  # 鼠标是否在按钮上
         button = self.create_text(pos, text=text, fill=fg, font=font)
         uid = TinUIString(f"button2-{button}")
         buttonuid = uid + "button"
         self.itemconfig(button, tags=(uid, buttonuid))
         if icon:  # Fluent Icons编码图标
+            font_size = font.cget(option="size")
             icontext = self.create_text(
                 pos,
                 text=icon,
@@ -4878,21 +4881,21 @@ class BasicTinUI(Canvas):
             )
             iconbbox = self.bbox(icontext)
             if compound == "left":
-                textpos = (iconbbox[2] + 1, (iconbbox[3] + iconbbox[1]) / 2)
+                textpos = (iconbbox[2] + 3, (iconbbox[3] + iconbbox[1]) / 2)
                 self.__auto_anchor(button, textpos, "w")
             elif compound == "right":
-                textpos = (iconbbox[0] - 1, (iconbbox[3] + iconbbox[1]) / 2)
+                textpos = (iconbbox[0] - 3, (iconbbox[3] + iconbbox[1]) / 2)
                 self.__auto_anchor(button, textpos, "e")
             elif compound == "top":
-                textpos = ((iconbbox[0] + iconbbox[2]) / 2, iconbbox[3] + 1)
+                textpos = ((iconbbox[0] + iconbbox[2]) / 2, iconbbox[3] + 3)
                 self.__auto_anchor(button, textpos, "n")
             elif compound == "bottom":
-                textpos = ((iconbbox[0] + iconbbox[2]) / 2, iconbbox[1] - 1)
+                textpos = ((iconbbox[0] + iconbbox[2]) / 2, iconbbox[1] - 3)
                 self.__auto_anchor(button, textpos, "s")
             if text == "":  # 有图标的时候，如果无文本，则隐藏文本元素
                 self.delete(button)
                 button = None
-            del iconbbox
+            del iconbbox, font_size
         x1, y1, x2, y2 = self.bbox(buttonuid)
         linew -= 1
         # 判断宽度的极限，分为最大化和最小化
@@ -4922,6 +4925,9 @@ class BasicTinUI(Canvas):
         self.tag_bind(uid, "<Enter>", in_button)
         self.tag_bind(uid, "<Leave>", out_button)
         self.tkraise(buttonuid)
+        del x1, y1, x2, y2, nowwidth, linew
+        if text == "":
+            self.itemconfig(button, state="hidden")
         self.__auto_anchor(uid, pos, anchor)
         funcs = FuncList(3)
         funcs.change_command = change_command
@@ -5176,7 +5182,7 @@ class BasicTinUI(Canvas):
             else:
                 box.itemconfig(line, state="normal")
                 posi = posi[1]
-            box.moveto(line, 1, posi + linew / 5)
+            box.moveto(line, -1, posi + linew / 5)
             if command != None and send:
                 father_link.clear()
                 father_link.append(cid)
@@ -5211,12 +5217,13 @@ class BasicTinUI(Canvas):
                     sign = box.create_text(
                         (padx - 1, y + 3),
                         text="\ue96e",
-                        font="{Segoe Fluent Icons} 12",
+                        font=f"{{Segoe Fluent Icons}} {font_size}",
                         fill=signcolor,
                         anchor="nw",
                     )
+                    signx=box.bbox(sign)[2]
                     te = box.create_text(
-                        (padx + 15, y),
+                        (signx, y),
                         text=text[0],
                         font=font,
                         fill=fg,
@@ -5291,7 +5298,7 @@ class BasicTinUI(Canvas):
             elif bbox != None:
                 click(nowid)  # 单级输出
                 posi = box.bbox(nowid)[1]
-                box.moveto(line, 1, posi + linew / 5)
+                box.moveto(line, -1, posi + linew / 5)
             checkscroll()
 
         def close_view(sign, cid):  # 闭合
@@ -5361,6 +5368,15 @@ class BasicTinUI(Canvas):
                 old_coords[2] = old_coords[4] = widgetwidth
                 box.coords(back, old_coords)
 
+        def __close_all():
+            for i in items.values():
+                if len(i) == 4 and box.itemcget(i[-2], 'text') == '\ue96e':
+                    close_view(i[-2], i[1])
+        def __open_all():
+            for i in items.values():
+                if len(i) == 4 and box.itemcget(i[-2], 'text') == '\ue970':
+                    open_view(i[-2], i[1])
+
         def __layout(x1, y1, x2, y2, expand=False):
             nonlocal width, height
             if not expand:
@@ -5387,6 +5403,8 @@ class BasicTinUI(Canvas):
                 repaintback()
                 checkscroll()
 
+        font = tkfont.Font(font=font)
+        font_size = font.cget("size")
         nowid = None
         father_link = []  # 用于父级关系
         box = BasicTinUI(self, bg=bg, width=width, height=height)  # 显示选择内容
@@ -5442,9 +5460,12 @@ class BasicTinUI(Canvas):
         dx, dy = self.__auto_anchor(uid, pos, anchor)
         hscroll.move(dx, dy, height)
         vscroll.move(dx, dy, width)
-        del bbox, x1, y1, x2, y2, dx, dy
+        del bbox, x1, y1, x2, y2, dx, dy, font, font_size
         uid.layout = __layout
-        return items, items_dict, box, uid
+        funcs = FuncList(2)
+        funcs.close_all = __close_all
+        funcs.open_all = __open_all
+        return items, items_dict, box, funcs, uid
 
     def add_passwordbox(
         self,
@@ -6885,6 +6906,12 @@ class BasicTinUI(Canvas):
         # 用于theme
         return self.add_button2(pos, text, **kwargs)
 
+    def add_warningbutton(
+        self, pos: tuple, text: str, **kwargs
+    ):  # 绘制一个警告色按钮
+         # 用于theme
+        return self.add_button2(pos, text, **kwargs)
+
     def add_toolbutton(self, pos: tuple, text: str, **kwargs):  # 绘制一个扁平工具按钮
         # 用于theme
         return self.add_button2(pos, text, **kwargs)
@@ -7143,25 +7170,23 @@ class BasicTinUI(Canvas):
 class BasePanel:
     """面板的基类"""
 
-    def __init__(self, canvas):
-        self.canvas = canvas
-        # self.bg_rect = None
-        # self.id = f"{self.__class__.__name__}_{id(self)}"
-
-    # def create_bg(self, fill_color, outline_color):
-    #     if not self.bg_rect:
-    #         self.bg_rect = self.canvas.create_rectangle(
-    #             0, 0, 0, 0,
-    #             fill=fill_color, outline=outline_color,
-    #             tags=self.id
-    #         )
+    def __init__(self, canvas:Canvas, bg='', bd=9):
+        self.canvas:Canvas = canvas
+        self.bg = bg
+        self.bd = bd
+        self.rect = self.canvas.create_polygon(0, 0, 0, 0, fill=bg, outline=bg, width=bd)
+    
+    def fix_bg(self, x1, y1, x2, y2):
+        if self.bg:
+            coords = (x1+self.bd/2, y1+self.bd/2, x2-self.bd/2, y1+self.bd/2, x2-self.bd/2, y2-self.bd/2, x1+self.bd/2, y2-self.bd/2)
+            self.canvas.coords(self.rect, coords)
 
 
 class ExpandablePanel(BasePanel):
     """可扩展面板的基类（VerticalPanel和HorizonPanel的父类）"""
 
-    def __init__(self, canvas, padding=(0, 0, 0, 0), min_width=0, min_height=0):
-        super().__init__(canvas)
+    def __init__(self, canvas, padding=(0, 0, 0, 0), min_width=0, min_height=0, bg='', bd=9):
+        super().__init__(canvas, bg, bd)
         self.children = []
         self.padding = padding
         self.min_width = min_width
@@ -7209,9 +7234,9 @@ class ExpandablePanel(BasePanel):
 
 class ExpandPanel(BasePanel):
     def __init__(
-        self, canvas, child=None, padding=(0, 0, 0, 0), min_width=0, min_height=0
+        self, canvas, child=None, padding=(0, 0, 0, 0), min_width=0, min_height=0, bg='', bd=9
     ):
-        super().__init__(canvas)
+        super().__init__(canvas, bg, bd)
         self.child = child
         self.padding = padding
         self.min_width = min_width
@@ -7241,21 +7266,22 @@ class ExpandPanel(BasePanel):
         content_x2 = content_x1 + content_width
         content_y2 = content_y1 + content_height
         # 更新背景位置
-        # self.canvas.coords(self.bg_rect, x1, y1, x2, y2)
+        self.fix_bg(x1, y1, x2, y2)
         # 更新子元素位置
         if self.child:
             if issubclass(self.child.__class__, BasePanel):
                 self.child.update_layout(content_x1, content_y1, content_x2, content_y2)
+                self.canvas.tag_raise(self.child.rect, self.rect)
             elif isinstance(self.child, TinUIString):
                 self.child.layout(content_x1, content_y1, content_x2, content_y2, True)
-                # self.canvas.coords(self.child, content_x1, content_y1, content_x2, content_y2)
+                self.canvas.tag_raise(self.child, self.rect)
 
 
 class VerticalPanel(ExpandablePanel):
     def __init__(
-        self, canvas, padding=(0, 0, 0, 0), spacing=0, min_width=0, min_height=0
+        self, canvas, padding=(0, 0, 0, 0), spacing=0, min_width=0, min_height=0, bg='', bd=9
     ):
-        super().__init__(canvas, padding, min_width, min_height)
+        super().__init__(canvas, padding, min_width, min_height, bg, bd)
         self.spacing = spacing
         # self.create_bg("#f1f8e9", "#558b2f")
 
@@ -7275,7 +7301,7 @@ class VerticalPanel(ExpandablePanel):
         content_x2 = content_x1 + content_width
         content_y2 = content_y1 + content_height
         # 更新背景位置
-        # self.canvas.coords(self.bg_rect, x1, y1, x2, y2)
+        self.fix_bg(x1, y1, x2, y2)
         # 计算总权重和固定尺寸
         total_weight = 0
         fixed_size = 0
@@ -7322,9 +7348,10 @@ class VerticalPanel(ExpandablePanel):
             # 更新子元素位置
             if issubclass(child.__class__, BasePanel):
                 child.update_layout(content_x1, current_y, content_x2, child_y2)
+                self.canvas.tag_raise(child.rect, self.rect)
             elif isinstance(child, TinUIString):
                 child.layout(content_x1, current_y, content_x2, child_y2)
-                # self.canvas.coords(child, content_x1, current_y, content_x2, child_y2)
+                self.canvas.tag_raise(child, self.rect)
             current_y += actual_height + spacing
             # 如果已经超出面板底部，停止布局
             if current_y >= content_y2:
@@ -7333,9 +7360,9 @@ class VerticalPanel(ExpandablePanel):
 
 class HorizonPanel(ExpandablePanel):
     def __init__(
-        self, canvas, padding=(0, 0, 0, 0), spacing=0, min_width=0, min_height=0
+        self, canvas, padding=(0, 0, 0, 0), spacing=0, min_width=0, min_height=0, bg='', bd=9
     ):
-        super().__init__(canvas, padding, min_width, min_height)
+        super().__init__(canvas, padding, min_width, min_height, bg, bd)
         self.spacing = spacing
         # self.create_bg("#fff3e0", "#f57c00")
 
@@ -7354,10 +7381,8 @@ class HorizonPanel(ExpandablePanel):
         content_height = max(content_y2 - content_y1, self.min_height)
         content_x2 = content_x1 + content_width
         content_y2 = content_y1 + content_height
-
         # 更新背景位置
-        # self.canvas.coords(self.bg_rect, x1, y1, x2, y2)
-
+        self.fix_bg(x1, y1, x2, y2)
         total_weight = 0
         fixed_size = 0
         for i, (child, width, min_width, weight) in enumerate(self.children):
@@ -7394,9 +7419,10 @@ class HorizonPanel(ExpandablePanel):
                 child_x2 = content_x2
             if issubclass(child.__class__, BasePanel):
                 child.update_layout(current_x, content_y1, child_x2, content_y2)
+                self.canvas.tag_raise(child.rect, self.rect)
             elif isinstance(child, TinUIString):
                 child.layout(current_x, content_y1, child_x2, content_y2)
-                # self.canvas.coords(child, current_x, content_y1, child_x2, content_y2)
+                self.canvas.tag_raise(child, self.rect)
             current_x += actual_width + spacing
             if current_x >= content_x2:
                 break
@@ -7745,21 +7771,21 @@ if __name__ == "__main__":
         b = BasicTinUI(a, bg="white")
         b.pack(fill="both", expand=True)
         rp = ExpandPanel(b)
-        hp = HorizonPanel(b)
+        hp = HorizonPanel(b, bg="#fff3e0", bd=0)
         rp.set_child(hp)
 
-        v1 = ExpandPanel(b)
-        # v1=VerticalPanel(b)
+        # v1 = ExpandPanel(b, bg='#e0f7fa')
+        v1=VerticalPanel(b, bg='#f1f8e9')
 
-        hp.add_child(v1, size=150, weight=1)
-        # hp.add_child(v1,size=150)
+        # hp.add_child(v1, size=150, weight=1)
+        hp.add_child(v1,size=150)
 
         ct = b.add_navigation((0,0), anchor='center')[-1]
 
-        v1.set_child(ct)
-        # hp.add_child(ct,weight=1)
+        # v1.set_child(ct)
+        hp.add_child(ct,weight=1)
 
-        v2 = VerticalPanel(b)
+        v2 = VerticalPanel(b, bg='#f1f8e9')
         hp.add_child(v2, size=150)
 
         def update(e):
@@ -7935,7 +7961,7 @@ if __name__ == "__main__":
                 ("command", print, "\ue756"),
                 ("menu", print, "\uede3"),
                 "-",
-                ("TinUI文本移动", test, "\ue7c2"),
+                ("TinUI文本移动", test, "\ue7c2")
             ),
         )
         ttb = b.add_paragraph((10, 800), "TinUI能做些什么？")
@@ -8033,7 +8059,7 @@ if __name__ == "__main__":
             </line>
             </line>
             </tinui>""")
-        trvl, _, trvbox, _ = b.add_treeview((1220, 1300), command=test12)
+        trvl, _, trvbox, _, _ = b.add_treeview((1220, 1300), command=test12)
         try:
             b.add_image(
                 (10, 1300), 200, 250, imgfile=__file__[:-8] + "image/LOGO.png"
@@ -8046,7 +8072,7 @@ if __name__ == "__main__":
         # b.add_swipecontrol((320,1300),'swipe control')
         b.add_passwordbox((250, 1400), 350)
         b.add_picker((1400, 230), command=print)
-        # b.add_menubutton((1500,50),'menubutton',widget=False,cont=(('command',print),('menu',(('cmd1',print),('cmd2',test1))),'-',('TinUI文本移动',test)))
+        # b.add_menubutton((1500,50),'menubutton',widget=True,cont=(('command',print),('menu',(('cmd1',print),('cmd2',print))),'-',('TinUI文本移动',test)))
         b.add_menubutton(
             (1500, 50),
             "menubutton",

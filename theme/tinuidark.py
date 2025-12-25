@@ -271,6 +271,15 @@ class TinUIDark(TinUITheme):
                 'onfg':'#215069','onbg':'#42A1D2','online':'#42A1D2',
             },**kw})
     
+    def add_warningbutton(self,pos,*arg,**kw):
+        return self.ui.add_warningbutton(pos,*arg,**{
+            **{
+                'fg':'#000000','bg':'#FF99A4',
+                'activefg':'#000000','activebg':"#F57F90",
+                'line':"#FC8290",'linew':1,'activeline':"#BD233A",
+                'onfg':"#751F2C",'onbg':"#E96F81",'online':"#D83C5E",
+            },**kw})
+    
     def add_toolbutton(self,pos,*arg,**kw):
         return self.ui.add_toolbutton(pos,*arg,**{
             **{

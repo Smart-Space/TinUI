@@ -12,7 +12,7 @@ TinUI中有三个可用面板类，分别管理拓展、纵向、横向面板布
 
 ```python
 class ExpandPanel(BasePanel):
-    def __init__(self, canvas, child=None, padding=(0, 0, 0, 0), min_width=0, min_height=0):
+    def __init__(self, canvas, child=None, padding=(0, 0, 0, 0), min_width=0, min_height=0, bg='', bd=9):
         ...
 ```
 
@@ -50,7 +50,7 @@ b.bind('<Configure>',update)
 
 ```python
 class VerticalPanel(ExpandablePanel):
-    def __init__(self, canvas, padding=(0, 0, 0, 0), spacing=0, min_width=0, min_height=0):
+    def __init__(self, canvas, padding=(0, 0, 0, 0), spacing=0, min_width=0, min_height=0, bg='', bd=9):
         ...
 ```
 

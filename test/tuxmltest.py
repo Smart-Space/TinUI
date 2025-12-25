@@ -264,7 +264,7 @@ top.add_child(btn,300)
 uiep=ExpandPanel(tinui)
 vp2.add_child(uiep,weight=1)
 
-displayui,rescroll,duixml,uiid=tinui.add_ui((0,0),width=870,height=630,scrollbar='True')
+displayui,rescroll,duixml,uiid=tinui.add_ui((0,0),width=870,height=630,scrollbar='True',region='auto')
 uiep.set_child(uiid)
 
 def update(e):

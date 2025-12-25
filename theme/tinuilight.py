@@ -282,6 +282,15 @@ class TinUILight(TinUITheme):
                 'line':'#F3F3F3','linew':1,'activeline':'#EAEAEA',
                 'onfg':'#5A5A5A','onbg':'#EDEDED','online':'#EDEDED',
             },**kw})
+    
+    def add_warningbutton(self,pos,*arg,**kw):
+        return self.ui.add_warningbutton(pos,*arg,**{
+            **{
+                'fg':'#FFFFFF','bg':'#C42B1C',
+                'activefg':'#FFFFFF','activebg':'#E04030',
+                'line':"#CF2A1B",'linew':1,'activeline':"#CC4A3E",
+                'onfg':"#EFC2C2",'onbg':"#CB3E49",'online':"#D52E3C",
+            },**kw})
 
     def add_expander(self,pos,*arg,**kw):
         return self.ui.add_expander(pos,*arg,**{

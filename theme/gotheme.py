@@ -114,6 +114,7 @@ def test(theme):
     #button
     du.add_button2(end(),'button2')
     du.add_accentbutton(end(),'accentbutton')
+    du.add_warningbutton(end(),'warningbutton')
     #appbarbutton
     du.add_toolbutton(end(),'',icon='\uE90F')
     #expander

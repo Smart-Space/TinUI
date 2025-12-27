@@ -1001,7 +1001,7 @@ class BasicTinUI(Canvas):
         self,
         pos: tuple,
         text,
-        url,
+        url='',
         fg="#4f62ca",
         activefg="red",
         activebg="#eaeaea",
@@ -1055,7 +1055,7 @@ class BasicTinUI(Canvas):
         self.tag_bind(uid, "<Enter>", turn_red)
         self.tag_bind(uid, "<Leave>", turn_back)
         self.tag_bind(uid, "<Button-1>", go_url)
-        if type(url) == str:  # 为网址，显示提示框
+        if type(url) == str and url: # 为网址，显示提示框
             self.add_tooltip(
                 uid, text=url, fg=fg, bg=self["background"], font=font, outline=activebg
             )

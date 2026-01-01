@@ -7555,6 +7555,7 @@ class TinUIXml:  # TinUI的xml渲染方式
             "delay",
         )  # 需要转为数字的参数
         self.dataargs = (
+            "size",
             "command",
             "choices",
             "widgets",

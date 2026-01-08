@@ -303,6 +303,7 @@ class BasicTinUI(Canvas):
         self.windows.append(top)
         top.geometry(f"{width}x{height}")
         top.overrideredirect(True)
+        top.title(f"{uuid.uuid1()}")
         top.attributes("-topmost", 1)
         if sys.platform.startswith("win"):
             top.attributes("-transparent", tran)

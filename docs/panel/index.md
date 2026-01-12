@@ -66,7 +66,7 @@ class VerticalPanel(ExpandablePanel):
 
 ### add_child(child, size=None, min_size=0, weight=0, index=-1)
 
-若`size`未指定，当`child`是控件时，获取对应方向上的尺寸，否则为`100`，**注意**，每次布局时都会重新获取控件元素的尺寸。
+若`size`未指定，当`child`是控件时，获取对应方向上的尺寸；如果是横向面板，则获取最大控件高度；否则为`100`，**注意**，每次布局时都会重新获取控件元素的尺寸，将增大计算负荷。
 
 当`weight>0`时，该元素的尺寸将根据剩余空间按比例分配，否则其固定尺寸。
 
@@ -84,4 +84,4 @@ class VerticalPanel(ExpandablePanel):
 
 ## HorizonPanel
 
-同VerticalPanel
+同VerticalPanel，但`add_child`未指定`size`是，判断纵向面板最大控件宽度。

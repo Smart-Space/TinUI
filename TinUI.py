@@ -7176,7 +7176,7 @@ class BasePanel:
         self.bg = bg
         self.bd = bd
         self.rect = self.canvas.create_polygon(0, 0, 0, 0, fill=bg, outline=bg, width=bd)
-    
+
     def fix_bg(self, x1, y1, x2, y2):
         if self.bg:
             coords = (x1+self.bd/2, y1+self.bd/2, x2-self.bd/2, y1+self.bd/2, x2-self.bd/2, y2-self.bd/2, x1+self.bd/2, y2-self.bd/2)
@@ -7291,6 +7291,16 @@ class VerticalPanel(ExpandablePanel):
             index = len(self.children)
         self.children.insert(index, (child, size, min_size, weight))
 
+    def get_max_size(self):
+        # 元素最大宽度
+        max_size = 0
+        for c in self.children:
+            if isinstance(c[0], TinUIString):
+                bbox = self.canvas.bbox(c[0])
+                max_size = max(max_size, bbox[2] - bbox[0])
+                print(bbox[2] - bbox[0])
+        return max_size+self.padding[1]+self.padding[3]
+
     def update_layout(self, x1, y1, x2, y2):
         top, right, bottom, left = self.padding
         content_x1 = x1 + left
@@ -7314,6 +7324,8 @@ class VerticalPanel(ExpandablePanel):
                 if isinstance(child, TinUIString):
                     bbox = self.canvas.bbox(child)
                     height = bbox[3] - bbox[1]
+                elif isinstance(child, HorizonPanel):
+                    height = child.get_max_size()
                 else:
                     height = 100
 
@@ -7333,6 +7345,8 @@ class VerticalPanel(ExpandablePanel):
                 if isinstance(child, TinUIString):
                     bbox = self.canvas.bbox(child)
                     height = bbox[3] - bbox[1]
+                elif isinstance(child, HorizonPanel):
+                    height = child.get_max_size()
                 else:
                     height = 100
             # 计算元素高度
@@ -7372,6 +7386,15 @@ class HorizonPanel(ExpandablePanel):
             index = len(self.children)
         self.children.insert(index, (child, size, min_size, weight))
 
+    def get_max_size(self):
+        # 元素最大宽度
+        max_size = 0
+        for c in self.children:
+            if isinstance(c[0], TinUIString):
+                bbox = self.canvas.bbox(c[0])
+                max_size = max(max_size, bbox[3] - bbox[1])
+        return max_size+self.padding[0]+self.padding[2]
+
     def update_layout(self, x1, y1, x2, y2):
         top, right, bottom, left = self.padding
         content_x1 = x1 + left
@@ -7392,6 +7415,8 @@ class HorizonPanel(ExpandablePanel):
                 if isinstance(child, TinUIString):
                     bbox = self.canvas.bbox(child)
                     width = bbox[2] - bbox[0]
+                elif isinstance(child, VerticalPanel):
+                    width = child.get_max_size()
                 else:
                     width = 100
             if weight > 0:
@@ -7408,6 +7433,8 @@ class HorizonPanel(ExpandablePanel):
                 if isinstance(child, TinUIString):
                     bbox = self.canvas.bbox(child)
                     width = bbox[2] - bbox[0]
+                elif isinstance(child, VerticalPanel):
+                    width = child.get_max_size()
                 else:
                     width = 100
             if weight > 0:

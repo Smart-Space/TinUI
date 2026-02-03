@@ -6170,7 +6170,7 @@ class BasicTinUI(Canvas):
                 tags=(uid, uidcontent),
             )
             texts.append(tx)
-            end_x += w
+            end_x += w+3
             if text.index(i) + 1 == len(text):  # 最后一个省略分隔符
                 _outline = outline
                 outline = ""
@@ -6181,7 +6181,7 @@ class BasicTinUI(Canvas):
             )
         outline = _outline
         del _outline
-        width = end_x - pos[0] + 9  # 窗口宽度
+        width = end_x - pos[0] + 6  # 窗口宽度
         cds = self.bbox(uidcontent)
         coords = (cds[0], cds[1], cds[2], cds[1], cds[2], cds[3], cds[0], cds[3])
         self.coords(out_line, coords)

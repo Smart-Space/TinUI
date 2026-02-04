@@ -21,8 +21,12 @@ pip install tinui
 ---
 部分展示：
 
-![](https://github.com/Smart-Space/TinUI/raw/main/image/themes1.png)
-![](https://github.com/Smart-Space/TinUI/raw/main/image/themes2.png)
-![](https://github.com/Smart-Space/TinUI/raw/main/image/themes3.png)
-![](https://github.com/Smart-Space/TinUI/raw/main/image/themes4.png)
-![](https://github.com/Smart-Space/TinUI/raw/main/image/themes5.png)
+<img src="https://github.com/Smart-Space/TinUI/raw/main/image/themes1.png" width="400" />
+
+<img src="https://github.com/Smart-Space/TinUI/raw/main/image/themes2.png" width="400" />
+
+<img src="https://github.com/Smart-Space/TinUI/raw/main/image/themes3.png" width="400" />
+
+<img src="https://github.com/Smart-Space/TinUI/raw/main/image/themes4.png" width="400" />
+
+<img src="https://github.com/Smart-Space/TinUI/raw/main/image/themes5.png" width="400" />

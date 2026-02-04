@@ -5999,8 +5999,7 @@ class BasicTinUI(Canvas):
 
         def set_it(e):  # 确定选择
             results = []  # 结果列表
-            for ipicker in pickerbars:
-                num = pickerbars.index(ipicker)
+            for num, ipicker in enumerate(pickerbars):
                 if ipicker.newres == "":  # 没有选择
                     picker.withdraw()
                     return
@@ -6040,6 +6039,7 @@ class BasicTinUI(Canvas):
             box.itemconfig(box.choices[t][2], fill=onbg)
             box.itemconfig(box.choices[t][1], fill=onfg)
             box.choices[t][-1] = True
+            box.sel_back = box.choices[t][2]
             for i in box.choices.keys():
                 if i == t:
                     continue
@@ -6058,6 +6058,17 @@ class BasicTinUI(Canvas):
             wind.data = (maxx, maxy, winw, winh)
 
         def show(event):  # 显示的起始位置
+            # 选中项目居中
+            for pickerbar in pickerbars:
+                if not pickerbar.sel_back:
+                    continue
+                bbox = pickerbar.bbox(pickerbar.sel_back)
+                centery = (bbox[1]+bbox[3])/2
+                view_centery = pickerbar.winfo_height() / 2
+                scroll_region = pickerbar.cget("scrollregion").split()
+                scroll_y1, scroll_y2 = int(scroll_region[1]), int(scroll_region[3])
+                total_height = scroll_y2 - scroll_y1
+                pickerbar.yview_moveto((centery-view_centery)/total_height)
             # 初始位置
             maxx, maxy, winw, winh = wind.data
             bbox = self.bbox(uid)
@@ -6222,6 +6233,7 @@ class BasicTinUI(Canvas):
             pickbar.place(x=end_x, y=y, width=barw, height=height - 50)
             pickbar.newres = ""  # 待选
             pickbar.res = ""  # 选择结果
+            pickbar.sel_back = None # 选中项背景
             # pickbar.all_keys=[]#[a-id,b-id,...]
             pickbar.choices = {}  #'a-id':[a,a_text,a_back,is_sel:bool]
             _loaddata(pickbar, i, barw)

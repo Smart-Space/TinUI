@@ -4958,22 +4958,28 @@ class BasicTinUI(Canvas):
         height=200,
         scrollbar=False,
         font="微软雅黑 12",
-        anchor=None,
+        anchor="nw",
     ):  # 绘制一个可拓展UI
-        def do_expand(*e):
+        def do_expand(_):
             nonlocal expand
             expand = not expand
             self.itemconfig(content, state="normal" if expand else "hidden")
             self.itemconfig(button[-1] + "icon", text="\ue70e" if expand else "\ue70d")
             __size_back()
+        
+        def handle_expand(func):
+            nonlocal callback
+            callback = func
 
         def __size_back():  # 调整背景
             bx1, by1, bx2, by2 = self.bbox(contentid)  # 大背景
             bx1 += 8
             by1 += 8
             bx2 -= 8
-            by2 -= 3
+            by2 -= 8
             self.coords(allback, bx1, by1, bx2, by1, bx2, by2, bx1, by2)
+            if callback:
+                callback(expand)
 
         toptext = self.create_text(
             (pos[0] + 10, pos[1] + 10),
@@ -4983,9 +4989,8 @@ class BasicTinUI(Canvas):
             width=width - 30,
             anchor="nw",
         )  # 标题
-        uid = f"expander-{toptext}"
+        uid = TinUIString(f"expander-{toptext}")
         contentid = f"expander-content-{toptext}"
-        # movename='expander-move'+str(toptext)
         self.addtag_withtag(uid, toptext)
         self.addtag_withtag(contentid, toptext)
         tx1, ty1, tx2, ty2 = self.bbox(toptext)
@@ -5037,18 +5042,26 @@ class BasicTinUI(Canvas):
         )  # 便笺内容
         ax1, ay1, ax2, ay2 = self.bbox(uid)  # 大背景
         allback = self.__ui_polygon(
-            ((ax1 + 8, ay1 + 8), (ax2 - 8, ay2 - 3)),
+            ((ax1 + 8, ay1 + 8), (ax2 - 8, ay2 - 8)),
             outline=sep,
             fill=sep,
             width=17,
             tags=uid,
         )
         expand = False  # 当前还没有扩展
+        callback = None  # 回调函数
         # 调整元素层级关系
         self.tkraise(topback)
         self.tkraise(toptext)
         self.tkraise(button[-1])
-        return toptext, ui, ux, uid
+        del tx1, ty1, tx2, ty2, font_size, ax1, ay1, ax2, ay2
+        self.__auto_anchor(uid, pos, anchor)
+        uid.layout = lambda x1, y1, x2, y2, expand=False: self.__auto_layout(
+            uid, (x1, y1, x2, y2), anchor
+        )
+        funcs = FuncList(1)
+        funcs.on_expand = handle_expand
+        return toptext, ui, ux, funcs, uid
 
     def add_waitframe(
         self, pos: tuple, width=300, height=300, fg="#e0e0e0", bg="#ececee", anchor="nw"
@@ -7801,7 +7814,7 @@ class TinUIXml:  # TinUI的xml渲染方式
 
 # 此行（不含）以下代码不受GPLv3、LGPLv3许可证的限制，可以自由使用、修改、分发等。
 if __name__ == "__main__":
-    testmode = 2
+    testmode = 1
 
     if testmode == 1:
         # panel test
@@ -7821,10 +7834,10 @@ if __name__ == "__main__":
         # hp.add_child(v1, size=150, weight=1)
         hp.add_child(v1,size=150)
 
-        ct = b.add_navigation((0,0), anchor='center')[-1]
+        ct = b.add_expander((0,0), anchor='n')[-1]
 
         # v1.set_child(ct)
-        hp.add_child(ct,weight=1)
+        hp.add_child(ct, weight=1)
 
         v2 = VerticalPanel(b, bg='#f1f8e9')
         hp.add_child(v2, size=150)

@@ -6,7 +6,7 @@ nav_order: 4
 
 TinUI的拓展功能可以通过`from tinui import extension`导入。
 
-> 这部分不是TinUI开发的重点
+> 这部分不是TinUI开发的重点。
 
 ## 控件按钮化
 

@@ -6651,17 +6651,19 @@ class BasicTinUI(Canvas):
     ):  # 绘制一个浮出ui控件
         # 注意，默认布局在fid正上方
         def show(e):
-            self.tag_unbind(fid, bind)  # 避免接下来绑定self <button-1>事件时同步触发
+            self.tag_unbind(fid, bind, show_funcid)  # 避免接下来绑定self <button-1>事件时同步触发
             self.itemconfig(uid, state="normal")
             motion(None, 1)
             self.after(100, go_to_bind)  # 避免直接触发控件点击事件
 
         def go_to_bind():
-            self.bind("<Button-1>", hide)
+            nonlocal master_hide_funcid
+            master_hide_funcid = self.bind("<Button-1>", hide, True)
 
         def hide(e):
-            self.unbind("<Button-1>")
-            self.tag_bind(fid, bind, show)
+            nonlocal show_funcid
+            self.unbind("<Button-1>", master_hide_funcid)
+            show_funcid = self.tag_bind(fid, bind, show, True)
             motion(None, -1)
 
         def motion(e, dis):
@@ -6700,6 +6702,8 @@ class BasicTinUI(Canvas):
             self, bg=bg, highlightbackground=line, highlightthickness=1, relief="flat"
         )
         self.windows.append(ui)
+        show_funcid = None
+        master_hide_funcid = None
         uixml = TinUIXml(ui)
         ui.bind("<Destroy>", lambda _: self.__delete_uixml(uixml))
         # 围绕fid进行布局
@@ -6755,7 +6759,7 @@ class BasicTinUI(Canvas):
             x, y, width=width, height=height, window=ui, anchor=_anchor
         )
         self.itemconfig(uid, state="hidden")
-        self.tag_bind(fid, bind, show, True)
+        show_funcid = self.tag_bind(fid, bind, show, True)
         return ui, uixml, hide, uid
 
     def add_breadcrumb(
@@ -7814,7 +7818,7 @@ class TinUIXml:  # TinUI的xml渲染方式
 
 # 此行（不含）以下代码不受GPLv3、LGPLv3许可证的限制，可以自由使用、修改、分发等。
 if __name__ == "__main__":
-    testmode = 1
+    testmode = 2
 
     if testmode == 1:
         # panel test

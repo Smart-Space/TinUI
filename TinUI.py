@@ -2943,20 +2943,22 @@ class BasicTinUI(Canvas):
         def backmove(event):  # back
             bbox = self.bbox(sc)
             if mode == "y":
+                center = (bbox[1]+bbox[3]) // 2
                 posy = self.canvasy(event.y)
-                move = posy - bbox[1]
-                if move > 0 and move + bbox[3] > end:
-                    move = end - bbox[3]
-                if move < 0 and move + bbox[1] < start:
-                    move = start - bbox[1]
+                move = posy - center
+                if move > 0 and move + center > end:
+                    move = end - center
+                if move < 0 and move + center < start:
+                    move = start - center
                 self.move(sc, 0, move)
             elif mode == "x":
+                center = (bbox[0]+bbox[2]) // 2
                 posx = self.canvasx(event.x)
-                move = posx - bbox[0]
-                if move > 0 and move + bbox[2] > end:
-                    move = end - bbox[2]
-                if move < 0 and move + bbox[0] < start:
-                    move = start - bbox[0]
+                move = posx - center
+                if move > 0 and move + center > end:
+                    move = end - center
+                if move < 0 and move + center < start:
+                    move = start - center
                 self.move(sc, move, 0)
             sc_move()
 

@@ -75,19 +75,18 @@ def getloc(x,y):
 
 
 def inxml(e):#注入xml界面
+    displayui.delete('all')
+    duixml.clean()
     xml=text.get(1.0,'end')
     duixml.funcs=dict()
     duixml.datas=dict()
     duixml.tags=dict()
-    result=re.findall("self\.(.*?)\[.(.*?).\]",xml,re.M|re.S)
-    print(result)
+    result=re.findall(r"self\.(\w+)\[(['\"])([^\"]*)\2\]",xml)
     for i in result:
         if i[0]=='funcs':
-            duixml.funcs[i[1]]=None
+            duixml.funcs[i[2]]=None
         elif i[0]=='datas':
-            duixml.datas[i[1]]=(None,None)
-    displayui.delete('all')
-    duixml.clean()
+            duixml.datas[i[2]]=(None,None)
     duixml.loadxml(xml)
     rescroll()
     reset_marks()
@@ -216,7 +215,7 @@ initial_xml='''<!--TinUIXml编辑-->
     </line>
     <line anchor='w'>
     <paragraph text='下方就是back'>p1</paragraph>
-    <button2 text='本按钮与左边文字构成控件组'>b1</button2>
+    <button2 text='本按钮与左边文字构成控件组' command='self.funcs["show_msg"]'>b1</button2>
     <back uids='("b1","p1")' bg='yellow' fg='yellow'></back>
     </line>
 </line>

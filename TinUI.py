@@ -389,19 +389,19 @@ class BasicTinUI(Canvas):
         command=None,
         anchor="nw",
     ):  # 绘制按钮
-        def in_button(event):
+        def in_button(_):
             self.itemconfig(back, fill=activebg, outline=activeline)
             self.itemconfig(button, fill=activefg)
 
-        def out_button(event):
+        def out_button(_=None):
             self.itemconfig(back, fill=bg, outline=line)
             self.itemconfig(button, fill=fg)
 
         def on_click(event):
             self.itemconfig(back, fill=activebg, outline=activebg)
             self.itemconfig(button, fill=activefg)
-            self.after(500, lambda: out_button(None))
-            if command != None:
+            self.after(500, out_button)
+            if command:
                 command(event)
 
         def __layout(x1, y1, x2, y2, expand=False):
@@ -448,11 +448,10 @@ class BasicTinUI(Canvas):
         self.tag_bind(uid, "<Leave>", out_button)
         self.tkraise(button)
         self.__auto_anchor(uid, pos, anchor)
-        del bbox, x1, y1, x2, y2
         funcs = FuncList(3)
-        funcs.change_command = funcs[0] = change_command
-        funcs.disable = funcs[1] = disable
-        funcs.active = funcs[2] = active
+        funcs.change_command = change_command
+        funcs.disable = disable
+        funcs.active = active
         uid.layout = __layout
         return button, back, funcs, uid
 
@@ -4805,21 +4804,21 @@ class BasicTinUI(Canvas):
         command=None,
         anchor="nw",
     ):  # 绘制圆角按钮
-        def in_button(event):
+        def in_button(_):
             nonlocal mouse_in
             mouse_in = True
             self.itemconfig(outline, outline=activeline, fill=activeline)
             self.itemconfig(back, fill=activebg, outline=activebg)
             self.itemconfig(buttonuid, fill=activefg)
 
-        def out_button(event):
+        def out_button(_):
             nonlocal mouse_in
             mouse_in = False
             self.itemconfig(back, fill=bg, outline=bg)
             self.itemconfig(outline, outline=line, fill=line)
             self.itemconfig(buttonuid, fill=fg)
 
-        def on_click(event):
+        def on_click(_):
             self.itemconfig(back, fill=onbg, outline=onbg)
             self.itemconfig(buttonuid, fill=onfg)
             self.itemconfig(outline, outline=online, fill=online)
@@ -4829,7 +4828,7 @@ class BasicTinUI(Canvas):
                 in_button(event)
             else:
                 out_button(event)
-            if command != None:
+            if command:
                 command(event)
 
         def change_command(new_func):
@@ -4852,23 +4851,11 @@ class BasicTinUI(Canvas):
                 self.__auto_layout(uid, (x1, y1, x2, y2), anchor)
             else:
                 self.__auto_anchor(buttonuid, ((x1 + x2) / 2, (y1 + y2) / 2), "center")
-                self.coords(
-                    back, x1 + 5, y1 + 5, x2 - 5, y1 + 5, x2 - 5, y2 - 5, x1 + 5, y2 - 5
-                )
-                self.coords(
-                    outline,
-                    x1 + 4,
-                    y1 + 4,
-                    x2 - 4,
-                    y1 + 4,
-                    x2 - 4,
-                    y2 - 4,
-                    x1 + 4,
-                    y2 - 4,
-                )
+                self.coords(back, x1 + 5, y1 + 5, x2 - 5, y1 + 5, x2 - 5, y2 - 5, x1 + 5, y2 - 5)
+                self.coords(outline, x1 + 4, y1 + 4, x2 - 4, y1 + 4, x2 - 4, y2 - 4, x1 + 4, y2 - 4)
 
+        mouse_in = False # 鼠标是否在按钮上
         font = tkfont.Font(font=font)
-        mouse_in = False  # 鼠标是否在按钮上
         button = self.create_text(pos, text=text, fill=fg, font=font)
         uid = TinUIString(f"button2-{button}")
         buttonuid = uid + "button"
@@ -4928,7 +4915,6 @@ class BasicTinUI(Canvas):
         self.tag_bind(uid, "<Enter>", in_button)
         self.tag_bind(uid, "<Leave>", out_button)
         self.tkraise(buttonuid)
-        del x1, y1, x2, y2, nowwidth, linew
         if text == "":
             self.itemconfig(button, state="hidden")
         self.__auto_anchor(uid, pos, anchor)
@@ -7329,7 +7315,6 @@ class VerticalPanel(ExpandablePanel):
             if isinstance(c[0], TinUIString):
                 bbox = self.canvas.bbox(c[0])
                 max_size = max(max_size, bbox[2] - bbox[0])
-                print(bbox[2] - bbox[0])
         return max_size+self.padding[1]+self.padding[3]
 
     def update_layout(self, x1, y1, x2, y2):

@@ -1,18 +1,18 @@
 from window import win
 
 def change1(event):
-    func[0](test1)
+    func.change_command(test1)
 def test1(event):
     print('1')
 def change2(event):
-    func[0](test2)
+    func.change_command(test2)
 def test2(event):
     print('2')
 
 def disable(event):
     func2.disable()
 def active(event):
-    func2[2]()
+    func2.active()
 
 a=win()
 u=a.u

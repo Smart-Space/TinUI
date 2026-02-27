@@ -1,2 +1,4 @@
 TODO.txt
 *.pyc
+.ignore
+AGENTS.md

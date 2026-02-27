@@ -2854,10 +2854,10 @@ class BasicTinUI(Canvas):
         anchor=None,
     ):  # 绘制滚动条
         # 滚动条宽度7px，未激活宽度3px；建议与widget相隔5xp
-        def enter(event):  # 鼠标进入
+        def enter(_):  # 鼠标进入
             self.itemconfig(sc, outline=oncolor, width=7)
 
-        def all_enter(event):
+        def all_enter(_):
             self.itemconfig(top, fill=oncolor)
             self.itemconfig(bottom, fill=oncolor)
             self.itemconfig(back, outline=bg)
@@ -2867,19 +2867,19 @@ class BasicTinUI(Canvas):
             if w != 3:
                 self.after(32, lambda : leave(event, w-1))
 
-        def all_leave(event):
+        def all_leave(_):
             self.itemconfig(top, fill="")
             self.itemconfig(bottom, fill="")
             self.itemconfig(back, outline="")
 
         def widget_move(sp, ep):  # 控件控制滚动条滚动
-            if mode == "y" and use_widget:
-                startp = start + canmove * float(sp)
-                endp = start + canmove * float(ep)
+            if not use_widget:
+                return
+            startp = start + canmove * float(sp)
+            endp = start + canmove * float(ep)
+            if mode == "y":
                 self.coords(sc, (pos[0] + 5, startp + 5, pos[0] + 5, endp - 5))
-            elif mode == "x" and use_widget:
-                startp = start + canmove * float(sp)
-                endp = start + canmove * float(ep)
+            elif mode == "x":
                 self.coords(sc, (startp + 5, pos[1] + 5, endp + 5, pos[1] + 5))
 
         def mousedown(event):
@@ -2890,7 +2890,7 @@ class BasicTinUI(Canvas):
             elif mode == "x":
                 scroll.start = self.canvasx(event.x)  # 横坐标
 
-        def mouseup(event):
+        def mouseup(_):
             nonlocal use_widget
             use_widget = True
 
@@ -2911,7 +2911,7 @@ class BasicTinUI(Canvas):
             scroll.start += move
             sc_move()
 
-        def topmove(event):  # top
+        def topmove(_):  # top
             bbox = self.bbox(sc)
             if mode == "y":
                 move = -(bbox[3] - bbox[1]) / 2
@@ -2925,7 +2925,7 @@ class BasicTinUI(Canvas):
                 self.move(sc, move, 0)
             sc_move()
 
-        def bottommove(event):  # bottom
+        def bottommove(_):  # bottom
             bbox = self.bbox(sc)
             if mode == "y":
                 move = (bbox[3] - bbox[1]) / 2
@@ -2962,6 +2962,7 @@ class BasicTinUI(Canvas):
             sc_move()
 
         def sc_move():  # 滚动条控制控件滚动
+            nonlocal target_y, current_y
             bbox = self.bbox(sc)
             if mode == "y":
                 startp = (bbox[1] - start) / canmove
@@ -2969,6 +2970,67 @@ class BasicTinUI(Canvas):
             elif mode == "x":
                 startp = (bbox[0] - start) / canmove
                 widget.xview("moveto", startp)
+            target_y = current_y = startp
+
+        def animate():# 动画
+            nonlocal is_animation, target_y, current_y
+            if mode == "y":
+                view_first, view_last = widget.yview()
+            else:
+                view_first, view_last = widget.xview()
+            # 如果内容没有超出可视区域，不滚动
+            if view_last - view_first >= 1.0:
+                is_animation = False
+                current_y = 0.0
+                target_y = 0.0
+                return
+            # 当前位置与目标的距离
+            distance = target_y - current_y
+            # 吸附并停止
+            if abs(distance) < 0.001:
+                current_y = target_y
+                if mode == "y":
+                    widget.yview_moveto(current_y)
+                else:
+                    widget.xview_moveto(current_y)
+                is_animation = False
+                return
+            # 指数缓动公式：当前位置 += (目标 - 当前) * 速度系数
+            current_y += distance * scroll_speed
+            if mode == "y":
+                widget.yview_moveto(current_y)
+            else:
+                widget.xview_moveto(current_y)
+            widget.after(16, animate)
+        def on_mousewheel(event):# 处理目标控件滚动事件
+            nonlocal is_animation, target_y, current_y
+            # 过滤错误方向
+            if event.state and mode == "y":
+                return
+            elif not event.state and mode == "x":
+                return
+            # 判断滚动方向
+            if event.delta < 0:
+                direction = 1
+            elif event.delta > 0:
+                direction = -1
+            else:
+                return
+            # 限制位置
+            if mode == "y":
+                view_first, view_last = widget.yview()
+            else:
+                view_first, view_last = widget.xview()
+            current_y = view_first
+            view_distance = view_last - view_first
+            # 更新目标位置
+            target_y += direction * view_distance * scroll_step
+            target_y = max(0.0, min(1-view_distance, target_y))
+            # 启动动画
+            if not is_animation:
+                is_animation = True
+                animate()
+            return "break"
 
         def __move(dx, dy, size):
             nonlocal start, end, canmove, height
@@ -2994,6 +3056,11 @@ class BasicTinUI(Canvas):
                 self.coords(back, coord)
 
         pos = list(pos)
+        is_animation = False # 是否正在动画中
+        scroll_speed = 0.15 # 缓动系数
+        scroll_step = 0.15 # 滚动增量
+        current_y = 0.0 # 当前位置
+        target_y = 0.0 # 目标位置
         if direction.upper() == "X":
             mode = "x"
         elif direction.upper() == "Y":
@@ -3114,6 +3181,8 @@ class BasicTinUI(Canvas):
         self.tag_bind(top, "<Button-1>", topmove)
         self.tag_bind(bottom, "<Button-1>", bottommove)
         self.tag_bind(back, "<Button-1>", backmove)
+        # 绑定滚轮事件
+        widget.bind("<MouseWheel>", on_mousewheel, True)
         uid.move = __move
         return top, bottom, back, sc, uid
 
@@ -3295,9 +3364,6 @@ class BasicTinUI(Canvas):
             repaint_back()
             __re_scroll()
 
-        def set_y_view(event):
-            box.yview_scroll(int(-1 * (event.delta / 120)), "units")
-
         def __layout(x1, y1, x2, y2, expand=False):
             nonlocal width, height
             if not expand:
@@ -3323,7 +3389,7 @@ class BasicTinUI(Canvas):
                 self.itemconfig(cavui, width=width, height=height)
                 load_data({})
 
-        def clean(event):
+        def clean(_):
             nonlocal all_keys, choices
             del all_keys
             del choices
@@ -3371,7 +3437,6 @@ class BasicTinUI(Canvas):
         choices = {}  #'a-id':[a,a_text,a_back,is_sel:bool]
         maxwidth = 0  # 最大宽度
         load_data(data)  # 重复使用元素添加
-        box.bind("<MouseWheel>", set_y_view)
         box.bind("<Destroy>", clean)
         del x1, y1, x2, y2
         dx, dy = self.__auto_anchor(uid, pos, anchor)
@@ -3443,9 +3508,9 @@ class BasicTinUI(Canvas):
                 command(nowon)
 
         def bindyview(event):
-            ui.yview_scroll(int(-1 * (event.delta / 120)), "units")
+            ui.event_generate("<MouseWheel>", state=event.state, delta=event.delta)
 
-        def clean(event):
+        def clean(_):
             items.clear()
 
         def _load_item(num):
@@ -3611,7 +3676,6 @@ class BasicTinUI(Canvas):
         allback = self.add_back((), (view, scro[-1]), fg=bg, bg=bg, linew=8)
         self.lower(allback, view)
         self.addtag_withtag(uid, allback)
-        ui.bind("<MouseWheel>", bindyview)
         ui.bind("<Destroy>", clean)
         dx, dy = self.__auto_anchor(uid, pos, anchor)
         scroitem.move(dx, dy, height)
@@ -5332,13 +5396,7 @@ class BasicTinUI(Canvas):
                     for uid in items[i][:-1]:
                         box.move(uid, 0, moveheight)
 
-        def bindview(event):
-            if event.state == 0:
-                box.yview_scroll(int(-1 * (event.delta / 120)), "units")
-            elif event.state == 1:
-                box.xview_scroll(int(-1 * (event.delta / 120)), "units")
-
-        def clean(event):
+        def clean(_):
             # 销毁对象
             nonlocal father_link, items, items_dict
             del father_link
@@ -5457,7 +5515,6 @@ class BasicTinUI(Canvas):
         checkscroll()
         box.moveto(line, 0, -linew - height)
         box.itemconfig(line, state="hidden")
-        box.bind("<MouseWheel>", bindview)
         box.bind("<Destroy>", clean)
         dx, dy = self.__auto_anchor(uid, pos, anchor)
         hscroll.move(dx, dy, height)

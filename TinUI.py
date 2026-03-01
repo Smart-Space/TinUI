@@ -3005,9 +3005,9 @@ class BasicTinUI(Canvas):
         def on_mousewheel(event):# 处理目标控件滚动事件
             nonlocal is_animation, target_y, current_y
             # 过滤错误方向
-            if event.state and mode == "y":
+            if event.state in (1,9) and mode == "y":
                 return
-            elif not event.state and mode == "x":
+            elif event.state in (0,8) and mode == "x":
                 return
             # 判断滚动方向
             if event.delta < 0:

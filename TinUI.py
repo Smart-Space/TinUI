@@ -6698,7 +6698,58 @@ class BasicTinUI(Canvas):
         pos=None,
     ):  # 绘制一个浮出ui控件
         # 注意，默认布局在fid正上方
-        def show(e):
+        def __load_bbox():
+            # 围绕fid进行布局
+            bbox = self.bbox(fid)
+            if anchor == "nw":
+                x = bbox[0] - 4
+                y = bbox[1] - 4
+                _anchor = "se"
+                dxy = (1, 1)
+            elif anchor == "n":
+                x = (bbox[0] + bbox[2]) / 2
+                y = bbox[1] - 4
+                _anchor = "s"
+                dxy = (0, 1)
+            elif anchor == "ne":
+                x = bbox[2] + 4
+                y = bbox[1] - 4
+                _anchor = "sw"
+                dxy = (1, 1)
+            elif anchor == "e":
+                x = bbox[2] + 4
+                y = (bbox[1] + bbox[3]) / 2
+                _anchor = "w"
+                dxy = (1, 0)
+            elif anchor == "se":
+                x = bbox[2] + 4
+                y = bbox[3] + 4
+                _anchor = "nw"
+                dxy = (1, 1)
+            elif anchor == "s":
+                x = (bbox[0] + bbox[2]) / 2
+                y = bbox[3] + 4
+                _anchor = "n"
+                dxy = (0, 1)
+            elif anchor == "sw":
+                x = bbox[0] - 4
+                y = bbox[3] + 4
+                _anchor = "ne"
+                dxy = (1, 1)
+            elif anchor == "w":
+                x = bbox[0] - 4
+                y = (bbox[1] + bbox[3]) / 2
+                _anchor = "e"
+                dxy = (1, 0)
+            else:  # 默认为center
+                x = (bbox[0] + bbox[2]) / 2
+                y = (bbox[1] + bbox[3]) / 2
+                _anchor = "center"
+                dxy = (1, 1)
+            x += offset[0]
+            y += offset[1]
+            return x,y,_anchor,dxy
+        def show(_):
             self.tag_unbind(fid, bind, show_funcid)  # 避免接下来绑定self <button-1>事件时同步触发
             self.itemconfig(uid, state="normal")
             motion(None, 1)
@@ -6708,15 +6759,17 @@ class BasicTinUI(Canvas):
             nonlocal master_hide_funcid
             master_hide_funcid = self.bind("<Button-1>", hide, True)
 
-        def hide(e):
+        def hide(_):
             nonlocal show_funcid
             self.unbind("<Button-1>", master_hide_funcid)
             show_funcid = self.tag_bind(fid, bind, show, True)
             motion(None, -1)
 
-        def motion(e, dis):
+        def motion(_, dis):
             # 展开/收缩动画
             # dxy为动画方向，0为不变，1为变化
+            x,y,_anchor,dxy = __load_bbox()
+            self.__auto_anchor(uid, (x, y), _anchor)
             if dis == 1:
                 # 展开
                 _width = width * (1 - dxy[0])
@@ -6754,55 +6807,7 @@ class BasicTinUI(Canvas):
         master_hide_funcid = None
         uixml = TinUIXml(ui)
         ui.bind("<Destroy>", lambda _: self.__delete_uixml(uixml))
-        # 围绕fid进行布局
-        bbox = self.bbox(fid)
-        if anchor == "nw":
-            x = bbox[0] - 4
-            y = bbox[1] - 4
-            _anchor = "se"
-            dxy = (1, 1)
-        elif anchor == "n":
-            x = (bbox[0] + bbox[2]) / 2
-            y = bbox[1] - 4
-            _anchor = "s"
-            dxy = (0, 1)
-        elif anchor == "ne":
-            x = bbox[2] + 4
-            y = bbox[1] - 4
-            _anchor = "sw"
-            dxy = (1, 1)
-        elif anchor == "e":
-            x = bbox[2] + 4
-            y = (bbox[1] + bbox[3]) / 2
-            _anchor = "w"
-            dxy = (1, 0)
-        elif anchor == "se":
-            x = bbox[2] + 4
-            y = bbox[3] + 4
-            _anchor = "nw"
-            dxy = (1, 1)
-        elif anchor == "s":
-            x = (bbox[0] + bbox[2]) / 2
-            y = bbox[3] + 4
-            _anchor = "n"
-            dxy = (0, 1)
-        elif anchor == "sw":
-            x = bbox[0] - 4
-            y = bbox[3] + 4
-            _anchor = "ne"
-            dxy = (1, 1)
-        elif anchor == "w":
-            x = bbox[0] - 4
-            y = (bbox[1] + bbox[3]) / 2
-            _anchor = "e"
-            dxy = (1, 0)
-        else:  # 默认为center
-            x = (bbox[0] + bbox[2]) / 2
-            y = (bbox[1] + bbox[3]) / 2
-            _anchor = "center"
-            dxy = (1, 1)
-        x += offset[0]
-        y += offset[1]
+        x,y,_anchor,_ = __load_bbox()
         uid = self.create_window(
             x, y, width=width, height=height, window=ui, anchor=_anchor
         )

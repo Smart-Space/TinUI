@@ -2873,13 +2873,20 @@ class BasicTinUI(Canvas):
             self.itemconfig(back, outline="")
 
         def widget_move(sp, ep):  # 控件控制滚动条滚动
+            nonlocal target_y
             if not use_widget:
                 return
+            if not is_animation:
+                if mode == "y":
+                    view_start, _ = widget.yview()
+                else:
+                    view_start, _ = widget.xview()
+                target_y = view_start
             startp = start + canmove * float(sp)
             endp = start + canmove * float(ep)
             if mode == "y":
                 self.coords(sc, (pos[0] + 5, startp + 5, pos[0] + 5, endp - 5))
-            elif mode == "x":
+            else:
                 self.coords(sc, (startp + 5, pos[1] + 5, endp + 5, pos[1] + 5))
 
         def mousedown(event):
@@ -5299,11 +5306,7 @@ class BasicTinUI(Canvas):
                     back = box.add_back((), tuple((sign, te)), fg=bg, bg=bg, linew=0)
                     items[back] = (te, back, sign, father_id)
                     add_item(padx + 15, text[1], back)
-                    box.tag_bind(
-                        sign,
-                        "<Button-1>",
-                        lambda _, s=sign, cid=back: close_view(s, cid),
-                    )
+                    box.tag_bind(sign,"<Button-1>",lambda _, s=sign, cid=back: close_view(s, cid))
                 old_coords = box.coords(back)
                 old_coords[0] = old_coords[6] = 6
                 bbox = box.bbox(back)

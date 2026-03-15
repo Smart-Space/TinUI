@@ -169,11 +169,16 @@ class BasicTinUI(Canvas):
             kw["highlightthickness"] = 0
         Canvas.__init__(self, master, selectborderwidth=0, bd=0, **kw)
         self.init()
+        self.TINUIFONT = kw.get("font", "微软雅黑")
+        self.TINUIFONTSIZE = kw.get("fontsize", 12)
 
     def init(self):
         self.images = []
         self.title_size = {0: 20, 1: 18, 2: 16, 3: 14, 4: 12}
         self.windows = []  # 浮出控件的子窗口，需要开发者手动释放
+    
+    def __get_font(self, delta=0):
+        return f'{self.TINUIFONT} {self.TINUIFONTSIZE+delta}'
 
     def __get_text_size(self, text):
         # 获取文本元素字体大小
@@ -312,6 +317,8 @@ class BasicTinUI(Canvas):
         else:
             tran = 'SystemWindow' # 其他平台不支持透明效果
         bar = BasicTinUI(top, bg=tran)
+        bar.TINUIFONT = self.TINUIFONT
+        bar.TINUIFONTSIZE = self.TINUIFONTSIZE
         bar.pack(fill="both", expand=True)
         return top, bar
 
@@ -355,12 +362,13 @@ class BasicTinUI(Canvas):
         pos: tuple,
         text: str,
         fg="black",
-        font=("微软雅黑", 12),
+        font=None,
         side="left",
         width=500,
         anchor="nw",
         **kw,
     ):  # 绘制段落
+        font = font or self.__get_font()
         kw["anchor"] = anchor
         pgh = self.create_text(
             pos, text=text, fill=fg, font=font, justify=side, width=width, **kw
@@ -383,7 +391,7 @@ class BasicTinUI(Canvas):
         activefg="black",
         activebg="#999999",
         activeline="#7a7a7a",
-        font=("微软雅黑", 12),
+        font=None,
         minwidth=0,
         maxwidth=0,
         command=None,
@@ -423,7 +431,7 @@ class BasicTinUI(Canvas):
             self.itemconfig(button, state="normal")
             self.itemconfig(back, state="normal")
             out_button(None)
-
+        font = font or self.__get_font()
         button = self.create_text(pos, text=text, fill=fg, font=font, anchor="nw")
         uid = TinUIString(f"button-{button}")
         self.itemconfig(button, tags=uid)
@@ -462,7 +470,7 @@ class BasicTinUI(Canvas):
         fg="black",
         bg="#f0f0f0",
         outline="grey",
-        font=("微软雅黑", 12),
+        font=None,
         anchor="nw",
     ):  # 绘制标签
         def __layout(x1, y1, x2, y2, expand=False):
@@ -471,7 +479,7 @@ class BasicTinUI(Canvas):
             else:
                 self.__auto_layout(uid, (x1, y1, x2, y2), "center")
                 self.coords(back, x1 + 1, y1 + 1, x2 - 1, y2 - 1)
-
+        font = font or self.__get_font()
         label = self.create_text(pos, text=text, fill=fg, font=font, anchor="nw")
         uid = TinUIString(f"label-{label}")
         self.itemconfig(label, tags=uid)
@@ -497,7 +505,7 @@ class BasicTinUI(Canvas):
         activebg="#e5e5e5",
         onfg="white",
         onbg="#334ac0",
-        font=("微软雅黑", 12),
+        font=None,
         command=None,
         anchor="nw",
     ):  # 绘制复选框
@@ -554,7 +562,7 @@ class BasicTinUI(Canvas):
             self.itemconfig(checkname, state="normal")
             if not stateinfo:
                 self.itemconfig(state, state="hidden")
-
+        font = font or self.__get_font()
         stateinfo = False  # 是否勾选
         checkbutton = self.create_text(
             pos, text=text, fill=fontfg, font=font, anchor="nw"
@@ -624,7 +632,7 @@ class BasicTinUI(Canvas):
         line="#e5e5e5",
         activeline="#e5e5e5",
         insert="#000000",
-        font=("微软雅黑", 12),
+        font=None,
         outline="#868686",
         onoutline="#3041d8",
         icon="\ue974",
@@ -756,7 +764,7 @@ class BasicTinUI(Canvas):
             entry.config(disabledbackground=bg, disabledforeground=fg)
             self.itemconfig(back, fill=bg, outline=bg)
             self.itemconfig(bottomline, fill=outline)
-
+        font = font or self.__get_font()
         empty_flag = True
         font = tkfont.Font(font=font)
         font_size = font.cget("size")
@@ -892,16 +900,16 @@ class BasicTinUI(Canvas):
         choices=("choose me",),
         fg="#1a1a1a",
         bg="#f2f2f2",
-        font=("微软雅黑", 12),
+        font=None,
         activefg="#3c3c3c",
         activebg="#e9e9e9",
         command=None,
         anchor="nw",
     ):  # 绘制单选框
-        def button_in(tag, t):
+        def button_in(tag):
             self.itemconfig(tag, fill=activebg, outline=activebg)
 
-        def button_out(_tag, t):
+        def button_out(t):
             for tag in back_list:
                 self.itemconfig(tag, fill=bg, outline=bg)
             for t in choices_list:
@@ -914,7 +922,7 @@ class BasicTinUI(Canvas):
             for i in choices_back:  # 判断是否为当前选中
                 if i not in back_list:
                     back_list.append(i)
-                    button_out(tag, t)
+                    button_out(t)
             back_list.remove(tag)
             self.itemconfig(tag, fill=activebg, outline=activebg)
             self.itemconfig(t, fill=activefg)
@@ -935,7 +943,7 @@ class BasicTinUI(Canvas):
             for f, b in zip(choices_list, choices_back):
                 self.itemconfig(f, state="normal", fill=fg)
                 self.itemconfig(b, state="normal")
-
+        font = font or self.__get_font()
         word = self.create_text(
             pos, text=text, fill=fg, font=font, anchor="nw", width=width
         )
@@ -973,12 +981,12 @@ class BasicTinUI(Canvas):
                 self.tag_bind(
                     item_id,
                     "<Enter>",
-                    lambda _, back=back, c=choice: button_in(back, c),
+                    lambda _, back=back: button_in(back),
                 )
                 self.tag_bind(
                     item_id,
                     "<Leave>",
-                    lambda _, back=back, c=choice: button_out(back, c),
+                    lambda _, c=choice: button_out(c),
                 )
                 self.tag_bind(
                     item_id,
@@ -992,7 +1000,7 @@ class BasicTinUI(Canvas):
         funcs.select = funcs[0] = select
         funcs.disable = funcs[1] = disable
         funcs.active = funcs[2] = active
-        uid.layout = lambda x1, y1, x2, y2, expand=False: self.__auto_layout(
+        uid.layout = lambda x1, y1, x2, y2, _=False: self.__auto_layout(
             uid, (x1, y1, x2, y2), anchor
         )
         return word, choices_list, choices_back, funcs, uid
@@ -1005,7 +1013,7 @@ class BasicTinUI(Canvas):
         fg="#4f62ca",
         activefg="red",
         activebg="#eaeaea",
-        font: tuple = ("微软雅黑", 12),
+        font = None,
         anchor="nw",
         command=None,
     ):  # 绘制超链接
@@ -1037,7 +1045,7 @@ class BasicTinUI(Canvas):
         def active():
             self.itemconfig(link, state="normal", fill=fg)
             self.itemconfig(back, state="normal")
-
+        font = font or self.__get_font()
         link = self.create_text(pos, text=text, fill=fg, font=font, anchor="nw")
         uid = TinUIString(f"link-{link}")
         self.itemconfig(link, tags=uid)
@@ -1102,12 +1110,13 @@ class BasicTinUI(Canvas):
         self,
         widgets: tuple = (),
         title="",
-        font="微软雅黑 10",
+        font=None,
         fg="#A8A8A8",
         bg="",
         pos=None,
         anchor=None,
     ):  # 绘制标题框
+        font = font or self.__get_font(-2)
         sx, sy, ex, ey = self.bbox(widgets[0])  # 获取直接的起始位置
         for i in widgets:
             nsx, nsy, nex, ney = self.bbox(i)
@@ -1216,7 +1225,7 @@ class BasicTinUI(Canvas):
         scrollcolor="#999999",
         scrollon="#89898b",
         tran="#01FF11",
-        font=("微软雅黑", 12),
+        font=None,
         anchor="nw",
         command=None,
     ):  # 绘制组合/下拉框
@@ -1323,7 +1332,7 @@ class BasicTinUI(Canvas):
             self.itemconfig(main, fill=fg)
             self.itemconfig(back, fill=bg, outline=bg)
             self.itemconfig(uid, state="normal")
-
+        font = font or self.__get_font()
         if activefg == "":
             activefg = self["background"]
         main = self.create_text(pos, text=text, font=font, fill=fg, anchor="nw")
@@ -1559,7 +1568,7 @@ class BasicTinUI(Canvas):
         data=[["1", "2", "3"], ["a", "b", "c"]],
         minwidth=100,
         maxwidth=300,
-        font=("微软雅黑", 12),
+        font=None,
         headbg="#d9ebf9",
         anchor="nw",
     ):  # 绘制表格
@@ -1574,7 +1583,7 @@ class BasicTinUI(Canvas):
                 self.coords(widths[back][0], x1, y1, x2, y2)
                 self.tkraise(widths[back][3])
             return height
-
+        font = font or self.__get_font()
         end_x, end_y = pos  # 起始位置
         height, relheight = 0, 0
         line_width = {}  # 获取每列的固定宽度
@@ -1855,7 +1864,7 @@ class BasicTinUI(Canvas):
         boxbg="#f9f9f9",
         boxactivefg="#5b5b5b",
         boxactivebg="#f0f0f0",
-        font=("微软雅黑", 12),
+        font=None,
         anchor="nw",
         command=None,
     ):  # 绘制选值框
@@ -1915,7 +1924,7 @@ class BasicTinUI(Canvas):
                 return True, val
             else:
                 return False, val
-
+        font = font or self.__get_font()
         if bg == "":
             bg = self["background"]
         wentry = Entry(
@@ -2016,9 +2025,8 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(cui, button1[-1])
         self.addtag_withtag(cui, button2[-1])
         self.addtag_withtag(cui, cuiback)
-        self.tag_bind(
-            cuiback, "<Leave>", lambda _: self.itemconfig(cui, state="hidden")
-        )
+        self.tag_bind(cuiback, "<Leave>", lambda _: self.itemconfig(cui, state="hidden"))
+        self.tag_bind(cui, "<Enter>", _change_data)
         self.itemconfig(cui, state="hidden")
         self.tkraise(back)
         self.tkraise(entry)
@@ -2324,7 +2332,7 @@ class BasicTinUI(Canvas):
         self,
         cid="all",
         bind="<Button-3>",
-        font="微软雅黑 12",
+        font=None,
         fg="#1b1b1b",
         bg="#fbfbfc",
         line="#cccccc",
@@ -2444,7 +2452,7 @@ class BasicTinUI(Canvas):
             menu.update_idletasks()
             if alpha == 1:
                 menu.focus_set()
-
+        font = font or self.__get_font()
         self.tag_bind(cid, bind, show, True)
         menu, bar = self.__ui_toplevel(0, 0, tran, unshow)
         wind = TinUINum()  # 记录数据
@@ -2541,7 +2549,7 @@ class BasicTinUI(Canvas):
         fg="#3b3b3b",
         bg="#e7e7e7",
         outline="#3b3b3b",
-        font="微软雅黑 12",
+        font=None,
         tran="#01FF11",
         delay=0,
         width=400,
@@ -2600,7 +2608,7 @@ class BasicTinUI(Canvas):
 
         def get_return():
             return toti, bar
-
+        font = font or self.__get_font()
         toti = None
         bar = None
         bbox = None
@@ -2733,7 +2741,7 @@ class BasicTinUI(Canvas):
         height: int = 200,
         text: str = "",
         anchor="nw",
-        font="微软雅黑 12",
+        font=None,
         fg="black",
         bg="white",
         scrollbar=False,
@@ -2785,7 +2793,7 @@ class BasicTinUI(Canvas):
 
         def config(**kw):  # 设置样式
             textbox.config(**kw)
-
+        font = font or self.__get_font()
         textbox = Text(
             self,
             font=font,
@@ -3198,7 +3206,7 @@ class BasicTinUI(Canvas):
         pos: tuple,
         width: int = 200,
         height: int = 200,
-        font="微软雅黑 12",
+        font=None,
         data=("a", "b", "c"),
         fg="#1a1a1a",
         bg="#f2f2f2",
@@ -3406,7 +3414,7 @@ class BasicTinUI(Canvas):
                 return None
             key = choices[index]
             sel_it(key)
-
+        font = font or self.__get_font()
         box = BasicTinUI(self, bg=bg, width=width, height=height)  # 显示选择内容
         box.place(x=12, y=12)
         cavui = self.create_window(
@@ -3652,6 +3660,8 @@ class BasicTinUI(Canvas):
 
         nowon = -1
         ui = BasicTinUI(self, bg=bg)
+        ui.TINUIFONT = self.TINUIFONT
+        ui.TINUIFONTSIZE = self.TINUIFONTSIZE
         view = self.create_window(
             pos, window=ui, height=height, width=width, anchor="nw"
         )
@@ -3777,8 +3787,10 @@ class BasicTinUI(Canvas):
                     width = x2 - x1
                     height = y2 - y1
                     self.itemconfig(cavui, width=width, height=height)
-                
+
         ui = BasicTinUI(self, bg=bg)
+        ui.TINUIFONT = self.TINUIFONT
+        ui.TINUIFONTSIZE = self.TINUIFONTSIZE
         cavui = self.create_window(
             pos, window=ui, width=width, height=height, anchor="nw"
         )
@@ -4005,6 +4017,8 @@ class BasicTinUI(Canvas):
         dotx = 3
         for _ in range(0, num):
             ui = BasicTinUI(self, bg=bg)
+            ui.TINUIFONT = self.TINUIFONT
+            ui.TINUIFONTSIZE = self.TINUIFONTSIZE
             tinuixml = TinUIXml(ui)
             ui.bind(
                 "<Destroy>", lambda _, uixml=tinuixml: self.__delete_uixml(uixml)
@@ -4156,6 +4170,8 @@ class BasicTinUI(Canvas):
                     tags=uid,
                 )
                 self.windows.append(page)
+            page.TINUIFONT = self.TINUIFONT
+            page.TINUIFONTSIZE = self.TINUIFONTSIZE
             uixml = TinUIXml(page)
             page.bind("<Destroy>", lambda _: self.__delete_uixml(uixml))
             bbox = tbu.bbox("all")
@@ -4313,6 +4329,8 @@ class BasicTinUI(Canvas):
             viewpos[1] += dy
 
         tbu = BasicTinUI(self, bg=color)
+        tbu.TINUIFONT = self.TINUIFONT
+        tbu.TINUIFONTSIZE = self.TINUIFONTSIZE
         tbuid = self.create_window(
             (pos[0] + 2, pos[1] + 2), window=tbu, width=width, height=30, anchor="nw"
         )
@@ -4408,7 +4426,7 @@ class BasicTinUI(Canvas):
         bg="#f4f4f4",
         sep="#e5e5e5",
         width=200,
-        font="微软雅黑 12",
+        font=None,
         anchor=None,
     ):  # 绘制便笺
         def mousedown(event):
@@ -4422,7 +4440,7 @@ class BasicTinUI(Canvas):
             nowy = self.canvasy(event.y)
             self.move(uid, nowx - startx, nowy - starty)
             startx, starty = nowx, nowy
-
+        font = font or self.__get_font()
         startx, starty = None, None  # 拖动记录点
         toptext = self.create_text(
             (pos[0] + 10, pos[1] + 10),
@@ -4479,7 +4497,7 @@ class BasicTinUI(Canvas):
         bg="#f3f3f3",
         onfg="#3041d8",
         onbg="#3041d8",
-        size=12,
+        size=None,
         num: int = 5,
         linew: int = 10,
         anchor="nw",
@@ -4537,7 +4555,7 @@ class BasicTinUI(Canvas):
             nowon = p - 1
             __onnum(nowon)
             click(bars[nowon])
-
+        size = size or self.TINUIFONTSIZE
         nowon = -1  # 已选定
         tempon = -1  # 待选定
         bars = []
@@ -4605,7 +4623,7 @@ class BasicTinUI(Canvas):
         self,
         pos: tuple,
         fontfg="black",
-        font="微软雅黑 12",
+        font=None,
         fg="#8b8b8b",
         bg="#ededed",
         activefg="#898989",
@@ -4680,9 +4698,9 @@ class BasicTinUI(Canvas):
             # 选定指定项
             back, sign, _, _ = boxes[index]
             sel_it(index, sign, back)
-
+        font = font or self.__get_font()
         # 标识符内部宽度width和边框宽度line
-        back_width = 18
+        back_width = self.TINUIFONTSIZE + 6
         back_line = 2  # 16+2*2=20
         boxes = []  # [(sign_back_id,sign_id,text_id,back_id),...]，换行为(None,'\n',None)
         nowx, nowy = pos  # x坐标为左上角插入坐标，y坐标为底部坐标
@@ -4769,7 +4787,7 @@ class BasicTinUI(Canvas):
         activefg="#525252",
         activecolor="#5969e0",
         content=(("a-title", "tag1"), ("b-title", "tag2"), "", ("c-title", "tag3")),
-        font="微软雅黑 16",
+        font=None,
         padx=10,
         pady=10,
         anchor="nw",
@@ -4800,7 +4818,7 @@ class BasicTinUI(Canvas):
             text_uid = texts[index][2]
             tag = texts[index][1]
             sel_it(index, text_uid, tag, send)
-
+        font = font or self.__get_font(4)
         texts = []  # [(text,tag,text-uid),...]
         count = -1
         select = -1  # 当前选定
@@ -4869,7 +4887,7 @@ class BasicTinUI(Canvas):
         onfg="#5d5d5d",
         onbg="#f5f5f5",
         online="#e5e5e5",
-        font=("微软雅黑", 12),
+        font=None,
         minwidth=0,
         maxwidth=0,
         command=None,
@@ -4924,7 +4942,7 @@ class BasicTinUI(Canvas):
                 self.__auto_anchor(buttonuid, ((x1 + x2) / 2, (y1 + y2) / 2), "center")
                 self.coords(back, x1 + 5, y1 + 5, x2 - 5, y1 + 5, x2 - 5, y2 - 5, x1 + 5, y2 - 5)
                 self.coords(outline, x1 + 4, y1 + 4, x2 - 4, y1 + 4, x2 - 4, y2 - 4, x1 + 4, y2 - 4)
-
+        font = font or self.__get_font()
         mouse_in = False # 鼠标是否在按钮上
         font = tkfont.Font(font=font)
         button = self.create_text(pos, text=text, fill=fg, font=font)
@@ -5018,7 +5036,7 @@ class BasicTinUI(Canvas):
         width=200,
         height=200,
         scrollbar=False,
-        font="微软雅黑 12",
+        font=None,
         anchor="nw",
     ):  # 绘制一个可拓展UI
         def do_expand(_):
@@ -5041,7 +5059,7 @@ class BasicTinUI(Canvas):
             self.coords(allback, bx1, by1, bx2, by1, bx2, by2, bx1, by2)
             if callback:
                 callback(expand)
-
+        font = font or self.__get_font()
         toptext = self.create_text(
             (pos[0] + 10, pos[1] + 10),
             text=title,
@@ -5086,6 +5104,8 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(contentid, button[-1])
         if not scrollbar:  # 不使用滚动条，BasicTinUI
             ui = BasicTinUI(self, bg=bg)
+            ui.TINUIFONT = self.TINUIFONT
+            ui.TINUIFONTSIZE = self.TINUIFONTSIZE
             self.windows.append(ui)
         elif scrollbar:  # 使用TinUI
             ui = TinUI(self, bg=bg)
@@ -5178,6 +5198,8 @@ class BasicTinUI(Canvas):
                     start()
 
         frame = BasicTinUI(self, width=width, height=height, bg=bg)
+        frame.TINUIFONTSIZE = self.TINUIFONTSIZE
+        frame.TINUIFONT = self.TINUIFONT
         frameid = self.create_window(
             pos, window=frame, width=width, height=height, anchor=anchor
         )
@@ -5215,7 +5237,7 @@ class BasicTinUI(Canvas):
         signcolor="#8a8a8a",
         width=200,
         height=300,
-        font="微软雅黑 12",
+        font=None,
         content=(
             ("one", ("1", "2", "3")),
             "two",
@@ -5467,12 +5489,14 @@ class BasicTinUI(Canvas):
                 self.itemconfig(cavui, width=width, height=height)
                 repaintback()
                 checkscroll()
-
+        font = font or self.__get_font()
         font = tkfont.Font(font=font)
         font_size = font.cget("size")
         nowid = None
         father_link = []  # 用于父级关系
         box = BasicTinUI(self, bg=bg, width=width, height=height)  # 显示选择内容
+        box.TINUIFONTSIZE = self.TINUIFONTSIZE
+        box.TINUIFONT = self.TINUIFONT
         box.place(x=12, y=12)
         cavui = self.create_window(
             pos, window=box, width=width, height=height, anchor="nw"
@@ -5544,7 +5568,7 @@ class BasicTinUI(Canvas):
         line="#e5e5e5",
         activeline="#e5e5e5",
         insert="#000000",
-        font=("微软雅黑", 12),
+        font=None,
         outline="#868686",
         onoutline="#3041d8",
         anchor="nw",
@@ -5675,7 +5699,7 @@ class BasicTinUI(Canvas):
             entry.config(disabledbackground=bg, disabledforeground=fg)
             self.itemconfig(back, fill="#f0f0f0", outline="#f0f0f0")
             self.itemconfig(bottomline, fill=outline)
-
+        font = font or self.__get_font()
         nowstate = "hidden"  #'shown'
         entry = Entry(
             self,
@@ -5798,7 +5822,7 @@ class BasicTinUI(Canvas):
         activefg="#f3f4fd",
         activebg="#3041d8",
         activeline="#5360de",
-        font=("微软雅黑", 12),
+        font=None,
         command=None,
         anchor="nw",
     ):  # 绘制状态开关按钮
@@ -5884,7 +5908,7 @@ class BasicTinUI(Canvas):
                 new_rgb = tuple(max(0, min(255, x)) for x in new_rgb)
                 colors_list.append(__num2rgb(new_rgb))
             return colors_list
-
+        font = font or self.__get_font()
         state = False  # off:False on:True
         colors = []  # 渐变色颜色列表，25个，off->on，[[文本颜色,...],[背景色,...]]
         button = self.create_text(pos, text=text, fill=fg, font=font, anchor="nw")
@@ -6040,7 +6064,7 @@ class BasicTinUI(Canvas):
         buttonactivebg="#f3f3f3",
         buttononfg="#5d5d5d",
         buttononbg="#f5f5f5",
-        font=("微软雅黑", 10),
+        font=None,
         text=(
             ("year", 60),
             ("season", 100),
@@ -6050,17 +6074,17 @@ class BasicTinUI(Canvas):
         anchor="nw",
         command=None,
     ):  # 绘制滚动选值框
-        def _mouseenter(event):
+        def _mouseenter(_):
             self.itemconfig(back, fill=activebg, outline=activebg)
             for i in texts:
                 self.itemconfig(i, fill=activefg)
 
-        def _mouseleave(event):
+        def _mouseleave(_):
             self.itemconfig(back, fill=bg, outline=bg)
             for i in texts:
                 self.itemconfig(i, fill=fg)
 
-        def set_it(e):  # 确定选择
+        def set_it(_):  # 确定选择
             results = []  # 结果列表
             for num, ipicker in enumerate(pickerbars):
                 if ipicker.newres == "":  # 没有选择
@@ -6074,7 +6098,7 @@ class BasicTinUI(Canvas):
             if command != None:
                 command(results)
 
-        def cancel(e):  # 取消选择
+        def cancel(_):  # 取消选择
             for ipicker in pickerbars:
                 if ipicker.res == "":
                     pass
@@ -6162,7 +6186,7 @@ class BasicTinUI(Canvas):
                 picker.after(it * 20, lambda alpha=i: __show(alpha))
                 it += 1
 
-        def unshow(event):
+        def unshow(_):
             picker.withdraw()
 
         def __show(alpha):
@@ -6217,7 +6241,7 @@ class BasicTinUI(Canvas):
             bbox = box.bbox("all")
             box.config(scrollregion=bbox)
             box.bind("<MouseWheel>", __set_y_view)
-
+        font = font or self.__get_font(-2)
         out_line = self.create_polygon(
             (*pos, *pos), fill=outline, outline=outline, width=9
         )
@@ -6417,7 +6441,7 @@ class BasicTinUI(Canvas):
         menuonfg="#191919",
         menuonbg="#f0f0f0",
         menuonline="#f0f0f0",
-        font=("微软雅黑", 12),
+        font=None,
         cont=(("command", print), "-"),
         widget=True,
         tran="#01FF11",
@@ -6506,7 +6530,7 @@ class BasicTinUI(Canvas):
             self.itemconfig(back, state="normal")
             self.itemconfig(outline, state="normal")
             out_button(None)
-
+        font = font or self.__get_font()
         font = tkfont.Font(font=font)
         font_size = font.cget("size")
         button = self.create_text(pos, text=text, fill=fg, font=font, anchor="nw")
@@ -6595,7 +6619,7 @@ class BasicTinUI(Canvas):
     def add_barbutton(
         self,
         pos: tuple,
-        font="微软雅黑 12",
+        font=None,
         fg="#636363",
         bg="#f3f3f3",
         line="#f3f3f3",
@@ -6622,7 +6646,7 @@ class BasicTinUI(Canvas):
                 return bbox[2] + 5, (bbox[1] + bbox[3]) / 2
             else:
                 return pos
-
+        font = font or self.__get_font()
         # 获取字体大小，转化为像素大小
         font = tkfont.Font(font=font)
         pixel = font.metrics("linespace")
@@ -6804,6 +6828,8 @@ class BasicTinUI(Canvas):
         ui = BasicTinUI(
             self, bg=bg, highlightbackground=line, highlightthickness=1, relief="flat"
         )
+        ui.TINUIFONT = self.TINUIFONT
+        ui.TINUIFONTSIZE = self.TINUIFONTSIZE
         self.windows.append(ui)
         show_funcid = None
         master_hide_funcid = None
@@ -6820,7 +6846,7 @@ class BasicTinUI(Canvas):
     def add_breadcrumb(
         self,
         pos: tuple,
-        font="微软雅黑 12",
+        font=None,
         fg="#000000",
         bg="#ffffff",
         activefg="#5c5c5c",
@@ -6953,7 +6979,7 @@ class BasicTinUI(Canvas):
             pos[1] += dy
             endx += dx
             center_line += dy
-
+        font = font or self.__get_font()
         pos = list(pos)
         root = self.create_text(pos, text=root, font=font, fill=fg, anchor="w")
         font_size = self.__get_text_size(root)
@@ -7011,7 +7037,7 @@ class BasicTinUI(Canvas):
         onbg="#FAFAFA",
         line="#E5E5E5",
         sign="#3041d8",
-        font="微软雅黑 12",
+        font=None,
         content=("A", "B", "C"),
         command=None,
         anchor="nw",
@@ -7059,7 +7085,7 @@ class BasicTinUI(Canvas):
 
         def select(index: int):
             __click(texts[index])
-
+        font = font or self.__get_font()
         index = -1
         outline = self.__ui_polygon(((0, 0), (0, 0)), fill=line, outline=line, width=9)
         uid = TinUIString(f"segmentbutton-{outline}")
@@ -7133,7 +7159,7 @@ class BasicTinUI(Canvas):
         onbg='#E9E9E9',
         onfg='#191919',
         oncolor='#0067C0',
-        font="微软雅黑 14",
+        font=None,
         content=(("\uE790","Color"), ("\uE743","Geometry"), ("\uED58","Iconography")), # (icon, title)
         widget=True,
         command=None,
@@ -7192,6 +7218,7 @@ class BasicTinUI(Canvas):
             dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), anchor)
             x += dx
             y += dy
+        font = font or self.__get_font(2)
         font = tkfont.Font(font=font)
         font_size = font.cget("size")
         font_height = font.metrics("linespace")
@@ -7987,6 +8014,7 @@ if __name__ == "__main__":
         a.title("TinUI控件展示")
 
         b = TinUI(a, bg="white")
+        # b.TINUIFONTSIZE = 16
         b.pack(fill="both", expand=True)
 
         m = b.add_title(

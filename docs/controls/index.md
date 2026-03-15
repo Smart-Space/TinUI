@@ -17,7 +17,12 @@ tinui = BasicTinUI(root, bg='white')
 
 使用`tinui.clean_windows()`清除浮出控件的子窗口，开发者可以手动销毁子窗口。
 
+### 全局字体
+
+通过`self.TINUIFONT`和`self.TINUIFONTSIZE`可设置本BasicTinUI的全局字体以及字号信息。
+
 ## TinUI
+
 ```python
 from tinui import BasicTinUI, TinUI
 tinui = TinUI(root, bg='white', update=True, update_time=1000)
@@ -34,12 +39,12 @@ update_time:int::每次更新滚动画面的间隔（毫秒）
 | ------------- | ---------- | ----- |
 | TinUI绘制组件 | √          | √     |
 | 自动刷新      | ×          | √     |
-| 滚动条支持    | ×          | √     |
-| 窗口主组件    | ×          | √     |
-| 主窗口        | ×          | √     |
+| 滚动条支持    | √          | √     |
+| 窗口主组件    | √          | √     |
+| 主窗口        | √          | √     |
 | 区域渲染组件  | √          | ×     |
 
-> 表格中部分功能只是建议，并非不行。
+> **自TinUI-6.0**之后，建议直接使用`BasicTinUI`。
 
 ## TinUI支持的控件
 

@@ -4931,15 +4931,16 @@ class BasicTinUI(Canvas):
         uid = TinUIString(f"button2-{button}")
         buttonuid = uid + "button"
         self.itemconfig(button, tags=(uid, buttonuid))
+        icon_img = False
         if icon:  # Fluent Icons编码图标
-            font_size = font.cget(option="size")
-            icontext = self.create_text(
-                pos,
-                text=icon,
-                fill=fg,
-                font=f"{{Segoe Fluent Icons}} {font_size}",
-                tags=(uid, buttonuid, f"{uid}icon"),
-            )
+            if os.path.isfile(icon): # 这里要是文件不存在报错，那是开发者的问题
+                icon_img = True
+                image = PhotoImage(file=icon)
+                self.images.append(image)
+                icontext = self.create_image(pos,image=image,tags=(uid, buttonuid, f"{uid}icon"))
+            else:
+                font_size = font.cget(option="size")
+                icontext = self.create_text(pos,text=icon,fill=fg,font=f"{{Segoe Fluent Icons}} {font_size}",tags=(uid, buttonuid, f"{uid}icon"))
             iconbbox = self.bbox(icontext)
             if compound == "left":
                 textpos = (iconbbox[2] + 3, (iconbbox[3] + iconbbox[1]) / 2)
@@ -4956,7 +4957,6 @@ class BasicTinUI(Canvas):
             if text == "":  # 有图标的时候，如果无文本，则隐藏文本元素
                 self.delete(button)
                 button = None
-            del iconbbox, font_size
         x1, y1, x2, y2 = self.bbox(buttonuid)
         linew -= 1
         # 判断宽度的极限，分为最大化和最小化
@@ -4986,6 +4986,8 @@ class BasicTinUI(Canvas):
         self.tag_bind(uid, "<Enter>", in_button)
         self.tag_bind(uid, "<Leave>", out_button)
         self.tkraise(buttonuid)
+        if icon_img:
+            self.dtag(icontext, buttonuid)
         if text == "":
             self.itemconfig(button, state="hidden")
         self.__auto_anchor(uid, pos, anchor)
@@ -8129,9 +8131,7 @@ if __name__ == "__main__":
             (1200, 400), text="pivot text", anchor="nw", font="微软雅黑 12"
         )
         b.add_pivot((1200, 300), command=test10)
-        b.add_button2(
-            (1200, 180), text="圆角按钮", icon="\uf093", compound="top", minwidth=200
-        )
+        b.add_button2((1200, 180), text="圆角按钮", icon="\uf093", compound="top", minwidth=200)
         exux = b.add_expander((1200, 500))[2]
         exux.loadxml("""<tinui><line>
         <button2 text='拓展UI框架的按钮'></button2></line>

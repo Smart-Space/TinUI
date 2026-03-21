@@ -2958,21 +2958,23 @@ class BasicTinUI(Canvas):
             bbox = self.bbox(sc)
             if mode == "y":
                 center = (bbox[1]+bbox[3]) // 2
+                half = (bbox[3]-bbox[1]) // 2
                 posy = self.canvasy(event.y)
                 move = posy - center
-                if move > 0 and move + center > end:
-                    move = end - center
-                if move < 0 and move + center < start:
-                    move = start - center
+                if move > 0 and posy + half > end:
+                    move = end - half - center
+                elif move < 0 and posy - half < start:
+                    move = start + half - center
                 self.move(sc, 0, move)
             elif mode == "x":
                 center = (bbox[0]+bbox[2]) // 2
+                half = (bbox[2]-bbox[0]) // 2
                 posx = self.canvasx(event.x)
                 move = posx - center
-                if move > 0 and move + center > end:
-                    move = end - center
-                if move < 0 and move + center < start:
-                    move = start - center
+                if move > 0 and posx + half > end:
+                    move = end - half - center
+                elif move < 0 and posx - half < start:
+                    move = start + half - center
                 self.move(sc, move, 0)
             sc_move()
 

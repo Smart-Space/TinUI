@@ -3072,6 +3072,24 @@ class BasicTinUI(Canvas):
                 height = size
                 self.coords(back, coord)
 
+        def set_speed(speed):
+            nonlocal scroll_speed
+            scroll_speed = speed
+        def set_step(step):
+            nonlocal scroll_step
+            scroll_step = step
+        def moveto(target):
+            nonlocal is_animation, target_y, current_y
+            if mode == "y":
+                view_first, _ = widget.yview()
+            else:
+                view_first, _ = widget.xview()
+            current_y = view_first
+            target_y = target
+            if not is_animation:
+                is_animation = True
+                animate()
+
         pos = list(pos)
         is_animation = False # 是否正在动画中
         scroll_speed = 0.15 # 缓动系数
@@ -3201,7 +3219,11 @@ class BasicTinUI(Canvas):
         # 绑定滚轮事件
         widget.bind("<MouseWheel>", on_mousewheel, True)
         uid.move = __move
-        return top, bottom, back, sc, uid
+        funcs = FuncList(3)
+        funcs.speed = set_speed
+        funcs.step = set_step
+        funcs.moveto = moveto
+        return top, bottom, back, sc, funcs, uid
 
     def add_listbox(
         self,
@@ -7167,13 +7189,13 @@ class BasicTinUI(Canvas):
         command=None,
         anchor="nw",
     ): # 绘制一个导航边栏
-        def expand_in(event):
+        def expand_in(_):
             self.itemconfig(topicon, fill=activefg)
             self.itemconfig(topback, fill=activebg, outline=activebg)
-        def expand_out(event):
+        def expand_out(_):
             self.itemconfig(topicon, fill=fg)
             self.itemconfig(topback, fill=bg, outline=bg)
-        def expand_click(event):
+        def expand_click(_):
             nonlocal expanding
             expanding = not expanding
             if expanding:
@@ -7194,13 +7216,15 @@ class BasicTinUI(Canvas):
             if index == nowselect:
                 return
             self.itemconfig(menus[index][1], fill=activefg)
-            self.itemconfig(menus[index][0], fill=activefg)
+            if self.type(menus[index][0]) == 'text':
+                self.itemconfig(menus[index][0], fill=activefg)
             self.itemconfig(menus[index][2], fill=activebg, outline=activebg)
         def mouse_out(index):
             if index == nowselect:
                 return
             self.itemconfig(menus[index][1], fill=fg)
-            self.itemconfig(menus[index][0], fill=fg)
+            if self.type(menus[index][0]) == 'text':
+                self.itemconfig(menus[index][0], fill=fg)
             self.itemconfig(menus[index][2], fill=bg, outline=bg)
         def navigate(index):
             nonlocal nowselect
@@ -7210,7 +7234,8 @@ class BasicTinUI(Canvas):
             nowselect = index
             mouse_out(old_index)
             self.itemconfig(menus[index][1], fill=onfg)
-            self.itemconfig(menus[index][0], fill=onfg)
+            if self.type(menus[index][0]) == 'text':
+                self.itemconfig(menus[index][0], fill=onfg)
             self.itemconfig(menus[index][2], fill=onbg, outline=onbg)
             self.moveto(line, x-8, y+(font_height+15)*(index-1/4))
             if command:
@@ -7253,7 +7278,12 @@ class BasicTinUI(Canvas):
         cnt = 0
         for i in content:
             if i[0]:
-                icon = self.create_text((x, starty), text=i[0], font=segoe_font, fill=fg, anchor="w", tags=uid)
+                if len(i[0]) == 1:
+                    icon = self.create_text((x, starty), text=i[0], font=segoe_font, fill=fg, anchor="w", tags=uid)
+                else:
+                    img = PhotoImage(file=i[0])
+                    self.images.append(img)
+                    icon = self.create_image((x, starty), image=img, anchor="w", tags=uid)
             else:
                 icon = self.create_text((x, starty), text=" ", font=segoe_font, fill=fg, anchor="w", tags=uid)
             text = self.create_text((x + segoe_font_width + 8, starty), text=i[1], font=font, fill=fg, anchor="w", tags=uid)

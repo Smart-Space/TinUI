@@ -3,6 +3,10 @@ TinUI的控件整合展示
 考虑到TinUI.py的测试界面比较杂乱，大版本（5.0）中启用该界面展示/测试文件
 TinUI.py的测试部分仍然保持最新状态，本文件以及从属文件（./testpage）也会持续更新
 '''
+from ctypes import windll
+shcore = windll.shcore
+shcore.SetProcessDpiAwareness(2)
+scale_factor = shcore.GetScaleFactorForDevice(0) / 100
 import sys
 import os
 sys.path.append('..')
@@ -49,11 +53,14 @@ def loadcontrol(controlname):
 
 
 window = Tk()
+width = int(850*scale_factor)
+height = int(600*scale_factor)
 
 window.iconbitmap('../LOGO.ico')
 window.title("TinUI main test")
-window.geometry("850x600+5+5")
+window.geometry(f"{width}x{height}+5+5")
 ui=BasicTinUI(window, bg='#f3f3f3')
+ui.set_scale(scale_factor)
 
 ui.pack(fill='both',expand=True)
 

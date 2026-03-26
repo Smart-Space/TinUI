@@ -171,11 +171,21 @@ class BasicTinUI(Canvas):
         self.init()
         self.TINUIFONT = kw.get("font", "微软雅黑")
         self.TINUIFONTSIZE = kw.get("fontsize", 12)
+        self.set_scale(kw.get("scale", 1.0))
 
     def init(self):
         self.images = []
         self.title_size = {0: 20, 1: 18, 2: 16, 3: 14, 4: 12}
         self.windows = []  # 浮出控件的子窗口，需要开发者手动释放
+        self.TINUISCALE = 1.0
+        self.TINUI_RADIUS_SMALL = 9
+        self.TINUI_RADIUS_LARGE = 17
+    
+    def set_scale(self, scale: Union[int, float] = 1.0):
+        self.TINUISCALE = scale
+
+    def scale_value(self, value: Union[int, float]):
+        return int(value * self.TINUISCALE)
     
     def __get_font(self, delta=0):
         return f'{self.TINUIFONT} {self.TINUIFONTSIZE+delta}'
@@ -319,6 +329,7 @@ class BasicTinUI(Canvas):
         bar = BasicTinUI(top, bg=tran)
         bar.TINUIFONT = self.TINUIFONT
         bar.TINUIFONTSIZE = self.TINUIFONTSIZE
+        bar.set_scale(self.TINUISCALE)
         bar.pack(fill="both", expand=True)
         return top, bar
 
@@ -1339,7 +1350,7 @@ class BasicTinUI(Canvas):
         uid = TinUIString(f"combobox-{main}")
         self.itemconfig(main, tags=uid)
         bbox = self.bbox(main)  # 文本尺寸
-        x1, y1, x2, y2 = bbox[0] + 3, bbox[1] + 3, bbox[0] + width - 3, bbox[3] - 3
+        x1, y1, x2, y2 = bbox[0] + 3, bbox[1] + 3, bbox[0] + self.scale_value(width) - 3, bbox[3] - 3
         drop = False  # 未展开
         iconfont = tkfont.Font(font=font)
         font_size = str(iconfont.cget("size"))
@@ -1730,12 +1741,12 @@ class BasicTinUI(Canvas):
                 command(False)
 
         def __left30():
-            f = lambda: self.move(state, -1, 0)
+            f = lambda: self.move(state, -self.scale_value(1), 0)
             for i in range(0, int(bd / 4 * 3)):
                 self.after(i * 5, f)
 
         def __right30():
-            f = lambda: self.move(state, 1, 0)
+            f = lambda: self.move(state, self.scale_value(1), 0)
             for i in range(0, int(bd / 4 * 3)):
                 self.after(i * 5, f)
 
@@ -1827,7 +1838,7 @@ class BasicTinUI(Canvas):
         self.__auto_anchor(uid, pos, anchor)
         bbox = self.bbox(outline)
         state = self.create_text(
-            (bbox[0] + (bd / 10 * 3) + 1, (bbox[1] + bbox[3]) / 2 - 1),
+            (bbox[0] + self.scale_value((bd / 10 * 3) + 1), (bbox[1] + bbox[3]) / 2 - 1),
             text="\uf127",
             font="{Segoe Fluent Icons} " + str(int(bd / 4)),
             fill=fg,
@@ -2863,17 +2874,22 @@ class BasicTinUI(Canvas):
     ):  # 绘制滚动条
         # 滚动条宽度7px，未激活宽度3px；建议与widget相隔5xp
         def enter(_):  # 鼠标进入
-            self.itemconfig(sc, outline=oncolor, width=7)
+            if leave_animation:
+                self.after_cancel(leave_animation)
+            self.itemconfig(sc, outline=oncolor, width=basewidth-2)
 
         def all_enter(_):
             self.itemconfig(top, fill=oncolor)
             self.itemconfig(bottom, fill=oncolor)
             self.itemconfig(back, outline=bg)
 
+        leave_animation = None
         def leave(event, w):  # 鼠标离开
+            nonlocal leave_animation
+            leave_animation = None
             self.itemconfig(sc, outline=color, width=w)
             if w != 3:
-                self.after(32, lambda : leave(event, w-1))
+                leave_animation = self.after(32, lambda : leave(event, w-1))
 
         def all_leave(_):
             self.itemconfig(top, fill="")
@@ -3089,7 +3105,8 @@ class BasicTinUI(Canvas):
             if not is_animation:
                 is_animation = True
                 animate()
-
+        font = tkfont.Font(family="{Segoe Fluent Icons}", size=7)
+        basewidth = font.measure('\ueddb')
         pos = list(pos)
         is_animation = False # 是否正在动画中
         scroll_speed = 0.15 # 缓动系数
@@ -3113,7 +3130,7 @@ class BasicTinUI(Canvas):
                     pos[0] + 5,
                     pos[1] + 5,
                 ),
-                width=13,
+                width=basewidth+4,
                 outline=bg,
             )
             uid = TinUIString(f"scrollbar-{back}")
@@ -3163,7 +3180,7 @@ class BasicTinUI(Canvas):
                     pos[0] + 5,
                     pos[1] + 5,
                 ),
-                width=13,
+                width=basewidth+4,
                 outline=bg,
             )
             uid = TinUIString(f"scrollbar-{back}")
@@ -3211,7 +3228,7 @@ class BasicTinUI(Canvas):
         self.tag_bind(sc, "<B1-Motion>", drag)
         # 绑定样式
         self.tag_bind(sc, "<Enter>", enter)
-        self.tag_bind(sc, "<Leave>", lambda event: leave(event, 7))
+        self.tag_bind(sc, "<Leave>", lambda event: leave(event, basewidth-2))
         # 绑定点击滚动
         self.tag_bind(top, "<Button-1>", topmove)
         self.tag_bind(bottom, "<Button-1>", bottommove)
@@ -3291,13 +3308,13 @@ class BasicTinUI(Canvas):
             if bbox == None:
                 bbox = (0, 0, 0, 0)
             if bbox[2] - bbox[0] > width:
-                self.itemconfig(cavui, height=height - 8)
+                self.itemconfig(cavui, height=height - self.scale_value(8))
                 self.itemconfig(vscroll, state="normal")
             else:
                 self.itemconfig(cavui, height=height)
                 self.itemconfig(vscroll, state="hidden")
             if bbox[3] - bbox[1] > height:
-                self.itemconfig(cavui, width=width - 8)
+                self.itemconfig(cavui, width=width - self.scale_value(8))
                 self.itemconfig(hscroll, state="normal")
             else:
                 self.itemconfig(cavui, width=width)
@@ -3696,7 +3713,7 @@ class BasicTinUI(Canvas):
         pos = list(pos)
         pos[0], pos[1] = bbox[0], bbox[1]
         scro = self.add_scrollbar(
-            (pos[0] + width + 2, pos[1]),
+            (pos[0] + width + self.scale_value(2), pos[1]),
             ui,
             height=height,
             bg=scrobg,
@@ -3813,6 +3830,7 @@ class BasicTinUI(Canvas):
                     self.itemconfig(cavui, width=width, height=height)
 
         ui = BasicTinUI(self, bg=bg)
+        ui.set_scale(self.TINUISCALE)
         ui.TINUIFONT = self.TINUIFONT
         ui.TINUIFONTSIZE = self.TINUIFONTSIZE
         cavui = self.create_window(
@@ -4356,7 +4374,7 @@ class BasicTinUI(Canvas):
         tbu.TINUIFONT = self.TINUIFONT
         tbu.TINUIFONTSIZE = self.TINUIFONTSIZE
         tbuid = self.create_window(
-            (pos[0] + 2, pos[1] + 2), window=tbu, width=width, height=30, anchor="nw"
+            (pos[0] + 2, pos[1] + 2), window=tbu, width=width, height=self.scale_value(30), anchor="nw"
         )
         self.windows.append(tbu)
         uid = TinUIString(f"notebook-{tbuid}")
@@ -4364,7 +4382,7 @@ class BasicTinUI(Canvas):
         movename = "movetags"  # 更改标题时整体移动的临时名称
         self.addtag_withtag(uid, tbuid)
         scro = self.add_scrollbar(
-            (pos[0] + 5, pos[1] + 32),
+            (pos[0] + 5, pos[1] + self.scale_value(32)),
             tbu,
             height=width - 10,
             direction="x",
@@ -4723,9 +4741,11 @@ class BasicTinUI(Canvas):
             back, sign, _, _ = boxes[index]
             sel_it(index, sign, back)
         font = font or self.__get_font()
+        padx = self.scale_value(padx)
+        pady = self.scale_value(pady)
         # 标识符内部宽度width和边框宽度line
-        back_width = self.TINUIFONTSIZE + 6
-        back_line = 2  # 16+2*2=20
+        back_width = self.scale_value(18)
+        back_line = self.scale_value(2)  # 16+2*2=20
         boxes = []  # [(sign_back_id,sign_id,text_id,back_id),...]，换行为(None,'\n',None)
         nowx, nowy = pos  # x坐标为左上角插入坐标，y坐标为底部坐标
         uid = TinUIString(f"radiobox-{uuid.uuid1().hex}")
@@ -5460,13 +5480,13 @@ class BasicTinUI(Canvas):
                 self.itemconfig(cavui, height=height)
                 self.itemconfig(vscroll, state="hidden")
             else:
-                self.itemconfig(cavui, height=height - 8)
+                self.itemconfig(cavui, height=height - self.scale_value(8))
                 self.itemconfig(vscroll, state="normal")
             if bbox[3] - bbox[1] <= height:
                 self.itemconfig(cavui, width=width)
                 self.itemconfig(hscroll, state="hidden")
             else:
-                self.itemconfig(cavui, width=width - 8)
+                self.itemconfig(cavui, width=width - self.scale_value(8))
                 self.itemconfig(hscroll, state="normal")
             box.config(scrollregion=bbox)
 
@@ -7314,11 +7334,12 @@ class BasicTinUI(Canvas):
 class BasePanel:
     """面板的基类"""
 
-    def __init__(self, canvas:Canvas, bg='', bd=9):
-        self.canvas:Canvas = canvas
+    def __init__(self, canvas:BasicTinUI, bg='', bd=9):
+        self.canvas = canvas
         self.bg = bg
-        self.bd = bd
-        self.rect = self.canvas.create_polygon(0, 0, 0, 0, fill=bg, outline=bg, width=bd)
+        self._scale = canvas.scale_value
+        self.bd = self._scale(bd)
+        self.rect = self.canvas.create_polygon(0, 0, 0, 0, fill=bg, outline=bg, width=self.bd)
 
     def fix_bg(self, x1, y1, x2, y2):
         if self.bg:
@@ -7332,20 +7353,20 @@ class ExpandablePanel(BasePanel):
     def __init__(self, canvas, padding=(0, 0, 0, 0), min_width=0, min_height=0, bg='', bd=9):
         super().__init__(canvas, bg, bd)
         self.children = []
-        self.padding = padding
-        self.min_width = min_width
-        self.min_height = min_height
+        self.padding = tuple(self._scale(i) for i in padding)
+        self.min_width = self._scale(min_width)
+        self.min_height = self._scale(min_height)
         self.spacing = 0
 
     def set_padding(self, padding):
-        self.padding = padding
+        self.padding = tuple(self._scale(i) for i in padding)
 
     def set_min_size(self, min_width, min_height):
-        self.min_width = min_width
-        self.min_height = min_height
+        self.min_width = self._scale(min_width)
+        self.min_height = self._scale(min_height)
 
     def set_spacing(self, spacing):
-        self.spacing = spacing
+        self.spacing = self._scale(spacing)
 
     def clear_children(self):
         for child in self.children:
@@ -7366,14 +7387,12 @@ class ExpandablePanel(BasePanel):
         child = self.children.pop(index)
         return child[0]  # 开发者自己应当（可以）直到返回的对象类型
 
-    def add_child(self, child, size=100, min_size=0, weight=0, index=-1):
-        """
-        size: 元素尺寸（宽度或高度）
-        min_size: 元素最小尺寸
-        weight: 权重（用于分配剩余空间）
-        index: 索引（-1表示添加到最后）
-        """
-        ...
+    def add_child(self, child, size=None, min_size=0, weight=0, index=-1):
+        if index == -1:
+            index = len(self.children)
+        if size:
+            size = self._scale(size)
+        self.children.insert(index, (child, size, min_size, weight))
 
 
 class ExpandPanel(BasePanel):
@@ -7382,17 +7401,17 @@ class ExpandPanel(BasePanel):
     ):
         super().__init__(canvas, bg, bd)
         self.child = child
-        self.padding = padding
-        self.min_width = min_width
-        self.min_height = min_height
+        self.padding = tuple(self._scale(i) for i in padding)
+        self.min_width = self._scale(min_width)
+        self.min_height = self._scale(min_height)
         # self.create_bg("#e0f7fa", "#00838f")
 
     def set_padding(self, padding):
-        self.padding = padding
+        self.padding = tuple(self._scale(i) for i in padding)
 
     def set_min_size(self, min_width, min_height):
-        self.min_width = min_width
-        self.min_height = min_height
+        self.min_width = self._scale(min_width)
+        self.min_height = self._scale(min_height)
 
     def set_child(self, child):
         self.child = child
@@ -7426,13 +7445,8 @@ class VerticalPanel(ExpandablePanel):
         self, canvas, padding=(0, 0, 0, 0), spacing=0, min_width=0, min_height=0, bg='', bd=9
     ):
         super().__init__(canvas, padding, min_width, min_height, bg, bd)
-        self.spacing = spacing
+        self.spacing = self._scale(spacing)
         # self.create_bg("#f1f8e9", "#558b2f")
-
-    def add_child(self, child, size=None, min_size=0, weight=0, index=-1):
-        if index == -1:
-            index = len(self.children)
-        self.children.insert(index, (child, size, min_size, weight))
 
     def get_max_size(self):
         # 元素最大宽度
@@ -7469,7 +7483,7 @@ class VerticalPanel(ExpandablePanel):
                 elif isinstance(child, HorizonPanel):
                     height = child.get_max_size()
                 else:
-                    height = 100
+                    height = self._scale(100)
 
             if weight > 0:
                 total_weight += weight
@@ -7490,7 +7504,7 @@ class VerticalPanel(ExpandablePanel):
                 elif isinstance(child, HorizonPanel):
                     height = child.get_max_size()
                 else:
-                    height = 100
+                    height = self._scale(100)
             # 计算元素高度
             if weight > 0:
                 # 按权重分配剩余空间
@@ -7520,13 +7534,8 @@ class HorizonPanel(ExpandablePanel):
         self, canvas, padding=(0, 0, 0, 0), spacing=0, min_width=0, min_height=0, bg='', bd=9
     ):
         super().__init__(canvas, padding, min_width, min_height, bg, bd)
-        self.spacing = spacing
+        self.spacing = self._scale(spacing)
         # self.create_bg("#fff3e0", "#f57c00")
-
-    def add_child(self, child, size=None, min_size=0, weight=0, index=-1):
-        if index == -1:
-            index = len(self.children)
-        self.children.insert(index, (child, size, min_size, weight))
 
     def get_max_size(self):
         # 元素最大宽度
@@ -7560,7 +7569,7 @@ class HorizonPanel(ExpandablePanel):
                 elif isinstance(child, VerticalPanel):
                     width = child.get_max_size()
                 else:
-                    width = 100
+                    width = self._scale(100)
             if weight > 0:
                 total_weight += weight
             else:
@@ -7578,7 +7587,7 @@ class HorizonPanel(ExpandablePanel):
                 elif isinstance(child, VerticalPanel):
                     width = child.get_max_size()
                 else:
-                    width = 100
+                    width = self._scale(100)
             if weight > 0:
                 proportional_width = remaining_width * weight / total_weight
                 actual_width = max(proportional_width, min_width)
@@ -7724,6 +7733,18 @@ class TinUIXml:  # TinUI的xml渲染方式
             "num",
             "delay",
         )  # 需要转为数字的参数
+        self.scale_int = (
+            "width",
+            "linew",
+            "bd",
+            "r",
+            "minwidth",
+            "maxwidth",
+            "padx",
+            "pady",
+            "info_width",
+            "height",
+        )
         self.dataargs = (
             "size",
             "command",
@@ -7740,13 +7761,19 @@ class TinUIXml:  # TinUI的xml渲染方式
         self.funcs = TinUIXmlFuncDict()  # 内部调用方法集合
         self.datas = {}  # 内部数据结构集合
         self.tags = {}  # 内部组件tag集合
-        self.xendx, self.xendy = 5, 5  # 横向最宽原点
-        self.yendx, self.yendy = 5, 5  # 纵向最低原点
+        origin = self.__scale_value(5)
+        self.xendx, self.xendy = origin, origin  # 横向最宽原点
+        self.yendx, self.yendy = origin, origin  # 纵向最低原点
+
+    def __scale_value(self, value: Union[int, float]):
+        return self.realui.scale_value(value)
 
     def __attrib2kws(self, args: dict, ignorecmd):  # 将部分特定参数转化为正确类型
         for key in args:
             if key in self.intargs:
                 args[key] = int(args[key])
+                if key in self.scale_int:
+                    args[key] = self.__scale_value(args[key])
             elif key in self.dataargs:
                 if key == "command" and ignorecmd:
                     # 忽略command参数，允许开发者稍后定义
@@ -7779,6 +7806,8 @@ class TinUIXml:  # TinUI的xml渲染方式
         pady = int(line.get("pady", pady))
         xendx = x = int(line.get("x", x))
         xendy = y = int(line.get("y", y))
+        padx = self.__scale_value(padx)
+        pady = self.__scale_value(pady)
         allanchor = line.get("anchor", anchor)
         lineanchor = line.get("lineanchor", "")  # 整个模块的对齐方向
         ftag = "ftag-" + str(uuid.uuid1().hex)
@@ -7844,7 +7873,7 @@ class TinUIXml:  # TinUI的xml渲染方式
                 # 判断i是否存在子元素
                 if len(i) != 0:
                     # 存在子元素，递归渲染
-                    tagall[-2].__load_line(i, ignorecmd=True)
+                    tagall[2].__load_line(i, ignorecmd=True)
             elif i.tag == "flyout":
                 if len(i) != 0:
                     # 存在子元素，递归渲染

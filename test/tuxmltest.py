@@ -8,10 +8,12 @@ TinUIXml简易设计编辑器
 本文件可作为开发TinUIXml编辑器或通过绝对坐标设计TinUI界面的参考，
 不附带TinUI开发能力，不要单纯依靠本程序开发TinUI及python应用。
 """
+from ctypes import windll
+shcore = windll.shcore
+shcore.SetProcessDpiAwareness(2)
+scale_factor = shcore.GetScaleFactorForDevice(0) / 100
 from window import *
 from tkinter import Tk,Toplevel
-from tkinter.ttk import Button
-from tkinter.scrolledtext import ScrolledText
 from tkinter.simpledialog import askinteger
 import re
 import idlelib.colorizer as idc
@@ -197,8 +199,10 @@ def reset_marks():#重新绘制标记点
 
 root=Tk()
 
+width = int(1200*scale_factor)
+height = int(700*scale_factor)
 
-root.geometry('1200x700')
+root.geometry(f'{width}x{height}')
 root.title('TinUIXml设计测试')
 
 initial_xml='''<!--TinUIXml编辑-->
@@ -221,6 +225,7 @@ initial_xml='''<!--TinUIXml编辑-->
 </line>
 </tinui>'''
 tinui=BasicTinUI(root,bg='#f3f3f3')
+tinui.set_scale(scale_factor)
 tinui.pack(expand=True,fill='both')
 
 textids=tinui.add_textbox((0,0),400,700,font='微软雅黑 13',scrollbar=True)

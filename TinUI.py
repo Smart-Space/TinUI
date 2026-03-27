@@ -28,6 +28,7 @@ from tkinter import font as tkfont
 from webbrowser import open as webopen
 from typing import Union
 from xml.etree import ElementTree as ET
+import functools
 import collections
 import sys
 import os
@@ -183,9 +184,20 @@ class BasicTinUI(Canvas):
     
     def set_scale(self, scale: Union[int, float] = 1.0):
         self.TINUISCALE = scale
+        self.TINUI_RADIUS_LARGE = int(self.TINUISCALE * 17)
+        if self.TINUI_RADIUS_LARGE%2 == 0:
+            self.TINUI_RADIUS_LARGE += 1
+        self.TINUI_RADIUS_SMALL = int(self.TINUISCALE * 9)
+        if self.TINUI_RADIUS_SMALL%2 == 0:
+            self.TINUI_RADIUS_SMALL += 1
+        self.scale_value.cache_clear()
 
-    def scale_value(self, value: Union[int, float]):
-        return int(value * self.TINUISCALE)
+    @functools.cache
+    def scale_value(self, value: Union[int, float], needodd=False):
+        res = int(value * self.TINUISCALE)
+        if needodd and res%2 == 0:
+            res += 1
+        return res
     
     def __get_font(self, delta=0):
         return f'{self.TINUIFONT} {self.TINUIFONTSIZE+delta}'
@@ -834,7 +846,7 @@ class BasicTinUI(Canvas):
         bottomline = self.create_line(
             (bbox[0] + 2, bbox[3] - 1, bubbox[2] - 2, bbox[3] - 1),
             fill=outline,
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             capstyle="round",
             tags=uid,
         )  # bottomline
@@ -842,14 +854,14 @@ class BasicTinUI(Canvas):
             ((bbox[0] + 2, bbox[1] + 2), (bubbox[2] - 2, bbox[3] - 2)),
             fill=bg,
             outline=bg,
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             tags=uid,
         )  # back
         outl = self.__ui_polygon(
             ((bbox[0] + 1, bbox[1] + 1), (bubbox[2] - 1, bbox[3] - 1)),
             fill=line,
             outline=line,
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             tags=uid,
         )  # outline
         self.lower(outl, bottomline)
@@ -1065,7 +1077,7 @@ class BasicTinUI(Canvas):
         bbox = self.bbox(link)
         back = self.__ui_polygon(
             ((bbox[0] + 1, bbox[1] + 1), (bbox[2] - 1, bbox[3] - 1)),
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             tags=uid,
             fill="",
             outline="",
@@ -1137,7 +1149,7 @@ class BasicTinUI(Canvas):
             ey = ney if ney > ey else ey
         bg = self["background"] if bg == "" else bg
         back = self.__ui_polygon(
-            ((sx + 3, sy - 9), (ex - 3, ey - 3)), fill=bg, outline=bg, width=17
+            ((sx + 3, sy - 9), (ex - 3, ey - 3)), fill=bg, outline=bg, width=self.TINUI_RADIUS_LARGE
         )
         uid = f"labelframe-{back}"
         self.itemconfig(back, tags=uid)
@@ -1146,7 +1158,7 @@ class BasicTinUI(Canvas):
             ((sx + 2, sy - 10), (ex - 2, ey - 2)),
             fill=fg,
             outline=fg,
-            width=17,
+            width=self.TINUI_RADIUS_LARGE,
             tags=uid,
         )
         self.lower(outline)
@@ -1350,7 +1362,7 @@ class BasicTinUI(Canvas):
         uid = TinUIString(f"combobox-{main}")
         self.itemconfig(main, tags=uid)
         bbox = self.bbox(main)  # 文本尺寸
-        x1, y1, x2, y2 = bbox[0] + 3, bbox[1] + 3, bbox[0] + self.scale_value(width) - 3, bbox[3] - 3
+        x1, y1, x2, y2 = bbox[0] + 3, bbox[1] + 3, bbox[0] + width - 3, bbox[3] - 3
         drop = False  # 未展开
         iconfont = tkfont.Font(font=font)
         font_size = str(iconfont.cget("size"))
@@ -1364,10 +1376,10 @@ class BasicTinUI(Canvas):
         )  # 按钮
         x1, y1, x2, y2 = self.bbox(uid)  # 文本与按钮区域
         back = self.__ui_polygon(
-            ((x1 + 1, y1 + 1), (x2 - 1, y2 - 1)), fill=bg, outline=bg, width=9, tags=uid
+            ((x1 + 1, y1 + 1), (x2 - 1, y2 - 1)), fill=bg, outline=bg, width=self.TINUI_RADIUS_SMALL, tags=uid
         )
         oline = self.__ui_polygon(
-            ((x1, y1), (x2, y2)), fill=outline, outline=outline, width=9, tags=uid
+            ((x1, y1), (x2, y2)), fill=outline, outline=outline, width=self.TINUI_RADIUS_SMALL, tags=uid
         )
         self.tkraise(back)
         self.tkraise(main)
@@ -1391,8 +1403,8 @@ class BasicTinUI(Canvas):
         )
         boxback = bar.add_listbox(
             (2, 2),
-            x2 - x1 - 7,
-            height - 15,
+            x2 - x1 - self.scale_value(7),
+            height - self.scale_value(15),
             bg=bg,
             fg=listfg,
             data=content,
@@ -1673,21 +1685,21 @@ class BasicTinUI(Canvas):
             )
         all_back = self.__ui_polygon(
             (pos, (end_x - 1, end_y - 1)),
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             outline=headbg,
             fill=headbg,
             tags=uid,
         )
         outline_back = self.__ui_polygon(
             ((pos[0] - 1, pos[1] - 1), (end_x, end_y)),
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             outline=outline,
             fill=outline,
             tags=uid,
         )
         value_back = self.__ui_polygon(
             ((v_endx, v_endy), (end_x - 1, end_y - 1)),
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             outline=bg,
             fill=bg,
             tags=uid,
@@ -1983,14 +1995,14 @@ class BasicTinUI(Canvas):
             ((backbbox[0] + 2, backbbox[1] + 4), (backbbox[2] - 3, backbbox[3] - 5)),
             fill=bg,
             outline=bg,
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             tags=uid,
         )
         outline = self.__ui_polygon(
             ((backbbox[0] + 1, backbbox[1] + 3), (backbbox[2] - 2, backbbox[3] - 4)),
             fill=line,
             outline=line,
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             tags=uid,
         )
         # 隐藏的调节按钮
@@ -2201,45 +2213,44 @@ class BasicTinUI(Canvas):
             self.itemconfig(name, state="normal", fill=fg)
 
         scale = TinUINum()  # 记录数据结构体
+        # 计算刻度位置
+        dash_t = width / (len(data) - 1)
         # 创建背景线
         if direction == "x":
             back = self.create_line(
                 (pos[0], pos[1] + 8, pos[0] + width, pos[1] + 8),
                 fill=bg,
-                width=3,
+                width=self.scale_value(3,True),
                 capstyle="round",
             )
-        else:  # y方向
-            back = self.create_line(
-                (pos[0] + 8, pos[1] + width, pos[0] + 8, pos[1]),
-                fill=bg,
-                width=3,
-                capstyle="round",
-            )
-        uid = TinUIString(f"scalebar-{back}")
-        self.itemconfig(back, tags=uid)
-        self.tag_bind(back, "<Button-1>", checkval)
-        # 计算刻度位置
-        dash_t = width / (len(data) - 1)
-        if direction == "x":
             s = pos[0]  # 调节线段起点
             dash = [s]  # 调节线段的终点位置
             for _ in data[1:]:
                 s += dash_t
                 dash.append(s)
         else:  # y方向
+            back = self.create_line(
+                (pos[0] + 8, pos[1] + width, pos[0] + 8, pos[1]),
+                fill=bg,
+                width=self.scale_value(3,True),
+                capstyle="round",
+            )
             s = pos[1] + width
             dash = [s]
             for _ in data[1:]:
                 s -= dash_t
                 dash.append(s)
+        uid = TinUIString(f"scalebar-{back}")
+        self.itemconfig(back, tags=uid)
+        self.tag_bind(back, "<Button-1>", checkval)
+            
         # 创建活动线
         nowselect = start  # 当前选项
         if direction == "x":
             active = self.create_line(
                 (pos[0], pos[1] + 8, dash[start], pos[1] + 8),
                 fill=fg,
-                width=3,
+                width=self.scale_value(3,True),
                 tags=uid,
                 capstyle="round",
             )
@@ -2247,7 +2258,7 @@ class BasicTinUI(Canvas):
             active = self.create_line(
                 (pos[0] + 8, pos[1] + width, pos[0] + 8, dash[start]),
                 fill=fg,
-                width=3,
+                width=self.scale_value(3,True),
                 tags=uid,
                 capstyle="round",
             )
@@ -2373,24 +2384,24 @@ class BasicTinUI(Canvas):
                 if len(back) == 2:
                     pos = bar.bbox(back[0])
                     bar_coords = (
-                        5,
-                        pos[1] + 4.5,
-                        maxwidth + 5 - 4.5,
-                        pos[1] + 4.5,
-                        maxwidth + 5 - 4.5,
-                        pos[3] - 4.5,
-                        5,
-                        pos[3] - 4.5,
+                        self.scale_value(5),
+                        pos[1] + self.scale_value(4),
+                        maxwidth,
+                        pos[1] + self.scale_value(4),
+                        maxwidth,
+                        pos[3] - self.scale_value(4),
+                        self.scale_value(5),
+                        pos[3] - self.scale_value(4),
                     )
                     bar_coords_2 = (
-                        6,
-                        pos[1] + 5.5,
-                        maxwidth + 4 - 4.5,
-                        pos[1] + 5.5,
-                        maxwidth + 4 - 4.5,
-                        pos[3] - 5.5,
-                        6,
-                        pos[3] - 5.5,
+                        self.scale_value(6),
+                        pos[1] + self.scale_value(5.),
+                        maxwidth,
+                        pos[1] + self.scale_value(5.),
+                        maxwidth,
+                        pos[3] - self.scale_value(5.),
+                        self.scale_value(6),
+                        pos[3] - self.scale_value(5.),
                     )
                     bar.coords(back[0], bar_coords_2)
                     bar.coords(back[1], bar_coords)
@@ -2447,7 +2458,7 @@ class BasicTinUI(Canvas):
                 y = sy - winh
             else:
                 y = sy
-            menu.geometry(f"{winw + 30}x{winh + 20}+{x}+{y}")
+            menu.geometry(f"{winw + self.scale_value(30)}x{winh + self.scale_value(20)}+{x}+{y}")
             menu.attributes("-alpha", 0)
             menu.deiconify()
             it = 0
@@ -2539,13 +2550,13 @@ class BasicTinUI(Canvas):
             ((x1 + 9, bbox[1] + 5), (x2 - 5, bbox[3] - 5)),
             fill=bg,
             outline=bg,
-            width=17,
+            width=self.TINUI_RADIUS_LARGE,
         )
         mline = bar.__ui_polygon(
             ((x1 + 8, bbox[1] + 4), (x2 - 4, bbox[3] - 4)),
             fill=bg,
             outline=line,
-            width=17,
+            width=self.TINUI_RADIUS_LARGE,
         )
         bar.lower(mback)
         bar.lower(mline)
@@ -2662,7 +2673,7 @@ class BasicTinUI(Canvas):
                 ((cpos[0] + 2, cpos[1] + 2), (cpos[2] - 2, cpos[3] - 2)),
                 fill=bg,
                 outline=fg,
-                width=9 + linew,
+                width=self.TINUI_RADIUS_SMALL + linew,
             )
         self.lower(back)
         return back
@@ -2725,14 +2736,14 @@ class BasicTinUI(Canvas):
         ifok = False
         timesep = 10  # 时间间隔，快20，慢40
         bbox = (pos[0], pos[1], pos[0] + width, pos[1])
-        back = self.create_line(bbox, fill=bg, width=3, capstyle="round")
+        back = self.create_line(bbox, fill=bg, width=self.scale_value(3,True), capstyle="round")
         uid = TinUIString(f"waitbar3-{back}")
         self.itemconfig(back, tags=uid)
         maxwidth = width // 3 * 2  # 原长为三分之一，快速模式为原长两倍
         bar = self.create_line(
             (pos[0], pos[1], pos[0], pos[1]),
             fill=fg,
-            width=3,
+            width=self.scale_value(3,True),
             capstyle="round",
             tags=uid,
         )
@@ -2772,22 +2783,22 @@ class BasicTinUI(Canvas):
                 dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), "nw")
                 height = y2 - y1
                 if scrollbar:
-                    width2 = x2 - x1 - 20
+                    width2 = x2 - x1 - self.scale_value(20)
                     dw = width2 - width
                     dx += dw
                     width = width2
                     self.move(cid, dw, 0)
                     cid.move(dx, dy, height)
                 else:
-                    width = x2 - x1 - 4
-                self.itemconfig(cavui, width=width, height=height - 4)
+                    width = x2 - x1 - self.scale_value(4)
+                self.itemconfig(cavui, width=width, height=height - self.scale_value(4))
                 coords = self.coords(line)
                 coords[2] = coords[4] = x1 + width + 1
-                coords[5] = coords[7] = y2 - 3
+                coords[5] = coords[7] = y2 - self.scale_value(3)
                 self.coords(line, coords)
                 coords = self.coords(back)
                 coords[2] = coords[4] = x1 + width
-                coords[5] = coords[7] = y2 - 4
+                coords[5] = coords[7] = y2 - self.scale_value(4)
                 self.coords(back, coords)
 
         def focus_in(event):
@@ -2827,20 +2838,20 @@ class BasicTinUI(Canvas):
             ((pos[0] + 2, pos[1] + 2), (pos[0] + width - 5, pos[1] + height - 5)),
             fill=outline,
             outline=outline,
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             tags=uid,
         )
         back = self.__ui_polygon(
             ((pos[0] + 3, pos[1] + 3), (pos[0] + width - 6, pos[1] + height - 6)),
             fill=bg,
             outline=bg,
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             tags=uid,
         )
         if scrollbar:  # 不支持横向滚动自动绑定
             bbox = self.bbox(uid)
             cid = self.add_scrollbar(
-                (bbox[2] + 5, bbox[1]),
+                (bbox[2] + self.scale_value(5), bbox[1]),
                 textbox,
                 bbox[3] - bbox[1],
                 "y",
@@ -2888,7 +2899,7 @@ class BasicTinUI(Canvas):
             nonlocal leave_animation
             leave_animation = None
             self.itemconfig(sc, outline=color, width=w)
-            if w != 3:
+            if w != self.scale_value(3,True):
                 leave_animation = self.after(32, lambda : leave(event, w-1))
 
         def all_leave(_):
@@ -3160,7 +3171,7 @@ class BasicTinUI(Canvas):
                     pos[0] + 5,
                     pos[1] + 20,
                 ),
-                width=3,
+                width=self.scale_value(3,True),
                 outline=color,
                 tags=uid,
             )
@@ -3210,7 +3221,7 @@ class BasicTinUI(Canvas):
                     pos[0] + 20,
                     pos[1] + 5,
                 ),
-                width=3,
+                width=self.scale_value(3,True),
                 outline=color,
                 tags=uid,
             )
@@ -3428,9 +3439,9 @@ class BasicTinUI(Canvas):
                 vscroll.move(dx, dy, width)
             else:
                 dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), "nw")
-                width2 = x2 - x1 - 9
+                width2 = x2 - x1 - self.scale_value(9)
                 dw = width2 - width
-                height2 = y2 - y1 - 9
+                height2 = y2 - y1 - self.scale_value(9)
                 dh = height2 - height
                 width = width2
                 height = height2
@@ -3439,8 +3450,8 @@ class BasicTinUI(Canvas):
                 self.move(vscroll, 0, dh)
                 vscroll.move(dx, dy + dh, width)
                 coord = self.coords(allback)
-                coord[2] = coord[4] = x2 - 4
-                coord[5] = coord[7] = y2 - 4
+                coord[2] = coord[4] = x2 - self.scale_value(4)
+                coord[5] = coord[7] = y2 - self.scale_value(4)
                 self.coords(allback, coord)
                 self.itemconfig(cavui, width=width, height=height)
                 load_data({})
@@ -3457,7 +3468,6 @@ class BasicTinUI(Canvas):
             sel_it(key)
         font = font or self.__get_font()
         box = BasicTinUI(self, bg=bg, width=width, height=height)  # 显示选择内容
-        box.place(x=12, y=12)
         cavui = self.create_window(
             pos, window=box, width=width, height=height, anchor="nw"
         )
@@ -3485,7 +3495,7 @@ class BasicTinUI(Canvas):
         self.addtag_withtag(uid, vscroll)
         x1, y1, x2, y2 = self.bbox(uid)
         allback = self.__ui_polygon(
-            ((x1, y1), (x2, y2)), width=9, outline=bg, fill=bg, tags=uid
+            ((x1, y1), (x2, y2)), width=self.TINUI_RADIUS_SMALL, outline=bg, fill=bg, tags=uid
         )
         self.lower(allback, cavui)
         # choices不返回，避免编写者直接操作选项
@@ -3555,10 +3565,10 @@ class BasicTinUI(Canvas):
             tinui.itemconfig(tinui.background, fill=activebg, outline=activebg)
             ui.coords(
                 line,
-                1,
-                index * (linew + 2) + lineheight,
-                1,
-                index * (linew + 2) + lineheight * 2,
+                self.scale_value(1,True),
+                index * (linew + self.scale_value(2)) + lineheight,
+                self.scale_value(1,True),
+                index * (linew + self.scale_value(2)) + lineheight * 2,
             )
             if command != None and send:
                 command(nowon)
@@ -3572,12 +3582,12 @@ class BasicTinUI(Canvas):
         def _load_item(num):
             nonlocal endy
             for _ in range(0, num):
-                item = ui.add_ui((3, endy), width=width - 3, height=linew, bg=bg)
+                item = ui.add_ui((self.scale_value(3), endy), width=width - self.scale_value(3), height=linew, bg=bg)
                 items.append(item)
                 ui.addtag_withtag("item", item[-1])
-                endy += linew + 2
+                endy += linew + self.scale_value(2)
                 tinui = item[0]
-                back = tinui.__ui_polygon(((4, 4), (width - 8, linew - 5)), "", "", 9)
+                back = tinui.__ui_polygon(((self.scale_value(4), self.scale_value(4)), (width - self.scale_value(8), linew - self.scale_value(5))), "", "", self.TINUI_RADIUS_SMALL)
                 tinui.background = back
                 tinui.bind("<Enter>", lambda _, item=item: buttonin(item))
                 tinui.bind("<Button-1>", lambda _, item=item: click(item))
@@ -3689,10 +3699,10 @@ class BasicTinUI(Canvas):
             tinui.itemconfig(tinui.background, fill=activebg, outline=activebg)
             ui.coords(
                 line,
-                1,
-                index * (linew + 2) + lineheight,
-                1,
-                index * (linew + 2) + lineheight * 2,
+                self.scale_value(1,True),
+                index * (linew + self.scale_value(2)) + lineheight,
+                self.scale_value(1,True),
+                index * (linew + self.scale_value(2)) + lineheight * 2,
             )
             rank = (
                 index + 0.5 - ui.winfo_height() / (2 * (linew + 2))
@@ -3701,6 +3711,7 @@ class BasicTinUI(Canvas):
 
         nowon = -1
         ui = BasicTinUI(self, bg=bg)
+        ui.set_scale(self.TINUISCALE)
         ui.TINUIFONT = self.TINUIFONT
         ui.TINUIFONTSIZE = self.TINUIFONTSIZE
         view = self.create_window(
@@ -3727,11 +3738,11 @@ class BasicTinUI(Canvas):
         _load_item(num)  # 载入元素
         lineheight = linew / 3
         line = ui.create_line(
-            (1, linew / 3, 1, linew * 2 / 3), fill=oncolor, width=3, capstyle="round"
+            (self.scale_value(1,True), linew / 3, self.scale_value(1,True), linew * 2 / 3), fill=oncolor, width=self.scale_value(3,True), capstyle="round"
         )
         ui.config(scrollregion=ui.bbox("all"))
         ui.move(line, 0, -linew - height)
-        allback = self.add_back((), (view, scro[-1]), fg=bg, bg=bg, linew=8)
+        allback = self.add_back((), (view, scro[-1]), fg=bg, bg=bg, linew=self.scale_value(8))
         self.lower(allback, view)
         self.addtag_withtag(uid, allback)
         ui.bind("<Destroy>", clean)
@@ -3813,9 +3824,9 @@ class BasicTinUI(Canvas):
             else:
                 dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), "nw")
                 if scrollbar:
-                    width2 = x2 - x1 - 12
+                    width2 = x2 - x1 - self.scale_value(12)
                     dw = width2 - width
-                    height2 = y2 - y1 - 12
+                    height2 = y2 - y1 - self.scale_value(12)
                     dh = height2 - height
                     width = width2
                     height = height2
@@ -3823,7 +3834,7 @@ class BasicTinUI(Canvas):
                     cid1.move(dx + dw, dy, height)
                     self.move(cid2, 0, dh)
                     cid2.move(dx, dy + dh, width)
-                    self.itemconfig(cavui, width=width if show_scrollY else width+13, height=height if show_scrollX else height+13)
+                    self.itemconfig(cavui, width=width if show_scrollY else width+self.scale_value(13), height=height if show_scrollX else height+self.scale_value(13))
                 else:
                     width = x2 - x1
                     height = y2 - y1
@@ -3844,7 +3855,7 @@ class BasicTinUI(Canvas):
         if scrollbar:
             bbox = self.bbox(uid)
             cid1 = self.add_scrollbar(
-                (bbox[2] + 5, bbox[1]),
+                (bbox[2] + self.scale_value(5), bbox[1]),
                 ui,
                 bbox[3] - bbox[1],
                 bg=scrollbg,
@@ -3852,7 +3863,7 @@ class BasicTinUI(Canvas):
                 oncolor=scrollon,
             )[-1]
             cid2 = self.add_scrollbar(
-                (bbox[0], bbox[3] + 5),
+                (bbox[0], bbox[3] + self.scale_value(5)),
                 ui,
                 bbox[2] - bbox[0],
                 "x",
@@ -4139,13 +4150,13 @@ class BasicTinUI(Canvas):
             tbu.itemconfig(c, fill=onfg)
             tbu.itemconfig(b, fill=onbg, outline=onbg)
 
-        def __onnpin(e):
+        def __onnpin(_):
             tbu.itemconfig(newpageback, fill=activebg, outline=activebg)
 
-        def __onnpleave(e):
+        def __onnpleave(_):
             tbu.itemconfig(newpageback, fill=bg, outline=bg)
 
-        def __onnpclick(e):
+        def __onnpclick(_):
             if newfunction != None:
                 newfunction()
 
@@ -4156,13 +4167,13 @@ class BasicTinUI(Canvas):
             if tbu.bbox(labeluid) == None:
                 endx = 3
             else:
-                endx = tbu.bbox(labeluid)[2] + 3
+                endx = tbu.bbox(labeluid)[2] + self.scale_value(3)
             titleu = tbu.create_text(
                 (endx, 6), text=title, fill=fg, font=font, anchor="nw", tags=labeluid
             )  # 标题
             tbubbox = tbu.bbox(titleu)
             cby = (tbubbox[1] + tbubbox[3]) // 2
-            cbx = tbubbox[2] + 10
+            cbx = tbubbox[2] + self.scale_value(10)
             cb = tbu.create_text(
                 (cbx, cby),
                 text="\ue8bb",
@@ -4178,14 +4189,14 @@ class BasicTinUI(Canvas):
                 ((endx + 2, tbbbox[1]), (cbx + 13, tbbbox[3])),
                 fill=bg,
                 outline=bg,
-                width=9,
+                width=self.TINUI_RADIUS_SMALL,
                 tags=labeluid,
             )
             tbu.lower(bu)
             # 移动newpageuid
-            npmovex = cbx + 15 + 5.5 - npx
+            npmovex = cbx + 20 - npx
             tbu.move(newpageuid, npmovex, 0)
-            npx = cbx + 15 + 5.5
+            npx = cbx + 20
             if flag == None:
                 flag = "flag" + str(titleu)
             if scrollbar:
@@ -4214,6 +4225,7 @@ class BasicTinUI(Canvas):
                 self.windows.append(page)
             page.TINUIFONT = self.TINUIFONT
             page.TINUIFONTSIZE = self.TINUIFONTSIZE
+            page.set_scale(self.TINUISCALE)
             uixml = TinUIXml(page)
             page.bind("<Destroy>", lambda _: self.__delete_uixml(uixml))
             bbox = tbu.bbox("all")
@@ -4373,6 +4385,7 @@ class BasicTinUI(Canvas):
         tbu = BasicTinUI(self, bg=color)
         tbu.TINUIFONT = self.TINUIFONT
         tbu.TINUIFONTSIZE = self.TINUIFONTSIZE
+        tbu.set_scale(self.TINUISCALE)
         tbuid = self.create_window(
             (pos[0] + 2, pos[1] + 2), window=tbu, width=width, height=self.scale_value(30), anchor="nw"
         )
@@ -4382,9 +4395,9 @@ class BasicTinUI(Canvas):
         movename = "movetags"  # 更改标题时整体移动的临时名称
         self.addtag_withtag(uid, tbuid)
         scro = self.add_scrollbar(
-            (pos[0] + 5, pos[1] + self.scale_value(32)),
+            (pos[0] + self.scale_value(5), pos[1] + self.scale_value(32)),
             tbu,
-            height=width - 10,
+            height=width - self.scale_value(10),
             direction="x",
             bg=scrollbg,
             color=scrollcolor,
@@ -4398,12 +4411,12 @@ class BasicTinUI(Canvas):
             ((pos[0] + 8, pos[1] + 6), (pos[0] + width, barheight + height - 3)),
             outline=color,
             fill=color,
-            width=17,
+            width=self.TINUI_RADIUS_LARGE,
             tags=uid,
         )
         self.tkraise(tbuid)
         self.tkraise(scroitem)
-        viewpos = [pos[0] + 2, barheight + 2]
+        viewpos = [pos[0] + 2, barheight + self.scale_value(2)]
         nowpage = ""
         vdict = {}  # ui,uixml,uiid
         tbdict = {}  # title,cb,pyo
@@ -4872,7 +4885,7 @@ class BasicTinUI(Canvas):
         line = self.create_line(
             (pos[0], pos[1], pos[0] + 5, pos[1]),
             fill=activecolor,
-            width=3,
+            width=self.scale_value(3,True),
             capstyle="round",
             tags=uid,
         )
@@ -4984,8 +4997,10 @@ class BasicTinUI(Canvas):
                 self.__auto_layout(uid, (x1, y1, x2, y2), anchor)
             else:
                 self.__auto_anchor(buttonuid, ((x1 + x2) / 2, (y1 + y2) / 2), "center")
-                self.coords(back, x1 + 5, y1 + 5, x2 - 5, y1 + 5, x2 - 5, y2 - 5, x1 + 5, y2 - 5)
-                self.coords(outline, x1 + 4, y1 + 4, x2 - 4, y1 + 4, x2 - 4, y2 - 4, x1 + 4, y2 - 4)
+                scale_5 = self.scale_value(5)
+                scale_4 = self.scale_value(4)
+                self.coords(back, x1 + scale_5, y1 + scale_5, x2 - scale_5, y1 + scale_5, x2 - scale_5, y2 - scale_5, x1 + scale_5, y2 - scale_5)
+                self.coords(outline, x1 + scale_4, y1 + scale_4, x2 - scale_4, y1 + scale_4, x2 - scale_4, y2 - scale_4, x1 + scale_4, y2 - scale_4)
         font = font or self.__get_font()
         mouse_in = False # 鼠标是否在按钮上
         font = tkfont.Font(font=font)
@@ -5035,13 +5050,13 @@ class BasicTinUI(Canvas):
             x1 -= dx / 2
         outline = self.__ui_polygon(
             ((x1 - linew, y1 - linew), (x2 + linew, y2 + linew)),
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             tags=uid,
             fill=line,
             outline=line,
         )
         back = self.__ui_polygon(
-            ((x1 + 1, y1 + 1), (x2 - 1, y2 - 1)), width=9, tags=uid, fill=bg, outline=bg
+            ((x1 + 1, y1 + 1), (x2 - 1, y2 - 1)), width=self.TINUI_RADIUS_SMALL, tags=uid, fill=bg, outline=bg
         )
         self.tag_bind(uid, "<Button-1>", on_click)
         self.tag_bind(uid, "<ButtonRelease-1>", out_click)
@@ -5251,10 +5266,10 @@ class BasicTinUI(Canvas):
         uid = TinUIString(f"waitframe-{frameid}")
         self.addtag_withtag(uid, frameid)
         itemfg = frame.__ui_polygon(
-            ((0, 0), (width, height)), outline=fg, fill=fg, width=17
+            ((0, 0), (width, height)), outline=fg, fill=fg, width=self.TINUI_RADIUS_LARGE
         )
         itembg = frame.__ui_polygon(
-            ((0, 0), (width, height)), outline=bg, fill=bg, width=17
+            ((0, 0), (width, height)), outline=bg, fill=bg, width=self.TINUI_RADIUS_LARGE
         )
         frame.move(itemfg, -width, -height)
         mx = width / 40
@@ -5323,7 +5338,7 @@ class BasicTinUI(Canvas):
             else:
                 box.itemconfig(line, state="normal")
                 posi = posi[1]
-            box.moveto(line, -1, posi + linew / 5)
+            box.moveto(line, self.scale_value(-1), posi + linew / 5)
             if command != None and send:
                 father_link.clear()
                 father_link.append(cid)
@@ -5342,10 +5357,10 @@ class BasicTinUI(Canvas):
         def add_item(padx=5, texts: tuple = (), father_id=None):  # 添加元素
             child_id = []
             for text in texts:
-                y = endy() + 3
+                y = endy() + self.scale_value(3)
                 if type(text) == str:  # 单极
                     te = box.create_text(
-                        (padx + 15, y),
+                        (padx + self.scale_value(15), y),
                         text=text,
                         font=font,
                         fill=fg,
@@ -5356,7 +5371,7 @@ class BasicTinUI(Canvas):
                     items[back] = (te, back, father_id)
                 else:  # 存在子级
                     sign = box.create_text(
-                        (padx - 1, y + 3),
+                        (padx - self.scale_value(1), y + self.scale_value(3)),
                         text="\ue96e",
                         font=f"{{Segoe Fluent Icons}} {font_size}",
                         fill=signcolor,
@@ -5516,10 +5531,10 @@ class BasicTinUI(Canvas):
                 vscroll.move(dx, dy, width)
             else:
                 dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), "nw")
-                width2 = x2 - x1 - 9
+                width2 = x2 - x1 - self.scale_value(9)
                 dw = width2 - width
                 width = width2
-                height2 = y2 - y1 - 9
+                height2 = y2 - y1 - self.scale_value(9)
                 dh = height2 - height
                 height = height2
                 self.move(hscroll, dw, 0)
@@ -5527,8 +5542,8 @@ class BasicTinUI(Canvas):
                 self.move(vscroll, 0, dh)
                 vscroll.move(dx, dy + dh, width)
                 coord = self.coords(allback)
-                coord[2] = coord[4] = x2 - 4
-                coord[5] = coord[7] = y2 - 4
+                coord[2] = coord[4] = x2 - self.scale_value(4)
+                coord[5] = coord[7] = y2 - self.scale_value(4)
                 self.coords(allback, coord)
                 self.itemconfig(cavui, width=width, height=height)
                 repaintback()
@@ -5576,11 +5591,11 @@ class BasicTinUI(Canvas):
         bbox = box.bbox(tuple(items.keys())[0])  # 第一个元素
         linew = bbox[3] - bbox[1]
         line = box.create_line(
-            (1, linew / 3, 1, linew * 2 / 3), fill=oncolor, width=3, capstyle="round"
+            (self.scale_value(1), linew / 3, self.scale_value(1), linew * 2 / 3), fill=oncolor, width=self.scale_value(3,True), capstyle="round"
         )
         x1, y1, x2, y2 = self.bbox(uid)
         allback = self.__ui_polygon(
-            ((x1, y1), (x2, y2)), outline=bg, fill=bg, width=9, tags=uid
+            ((x1, y1), (x2, y2)), outline=bg, fill=bg, width=self.TINUI_RADIUS_SMALL, tags=uid
         )  # allback
         self.lift(cavui)
         self.lift(hscroll)
@@ -5778,20 +5793,20 @@ class BasicTinUI(Canvas):
         bubbox = self.bbox(funcw)
         bottomlinepos = (bbox[0] + 2, bbox[3] - 1, bubbox[2] - 2, bbox[3] - 1)
         bottomline = self.create_line(
-            bottomlinepos, fill=outline, width=9, capstyle="round", tags=uid
+            bottomlinepos, fill=outline, width=self.TINUI_RADIUS_SMALL, capstyle="round", tags=uid
         )  # bottomline
         back = self.__ui_polygon(
             ((bbox[0] + 2, bbox[1] + 2), (bubbox[2] - 2, bbox[3] - 2)),
             fill=bg,
             outline=bg,
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             tags=uid,
         )  # back
         outl = self.__ui_polygon(
             ((bbox[0] + 1, bbox[1] + 1), (bubbox[2] - 1, bbox[3] - 1)),
             fill=line,
             outline=line,
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             tags=uid,
         )  # out
         self.lower(outl, bottomline)
@@ -5962,13 +5977,13 @@ class BasicTinUI(Canvas):
         linew -= 1
         outline = self.__ui_polygon(
             ((x1 - linew, y1 - linew), (x2 + linew, y2 + linew)),
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             tags=uid,
             fill=line,
             outline=line,
         )
         back = self.__ui_polygon(
-            ((x1 + 1, y1 + 1), (x2 - 1, y2 - 1)), width=9, tags=uid, fill=bg, outline=bg
+            ((x1 + 1, y1 + 1), (x2 - 1, y2 - 1)), width=self.TINUI_RADIUS_SMALL, tags=uid, fill=bg, outline=bg
         )
         self.tag_bind(uid, "<Button-1>", on_click)
         self.tkraise(button)
@@ -6287,13 +6302,13 @@ class BasicTinUI(Canvas):
             box.bind("<MouseWheel>", __set_y_view)
         font = font or self.__get_font(-2)
         out_line = self.create_polygon(
-            (*pos, *pos), fill=outline, outline=outline, width=9
+            (*pos, *pos), fill=outline, outline=outline, width=self.TINUI_RADIUS_SMALL
         )
         uid = TinUIString(f"picker-{out_line}")
         self.addtag_withtag(uid, out_line)
-        back = self.create_polygon((*pos, *pos), fill=bg, outline=bg, width=9, tags=uid)
-        end_x = pos[0] + 9
-        y = pos[1] + 9
+        back = self.create_polygon((*pos, *pos), fill=bg, outline=bg, width=self.TINUI_RADIUS_SMALL, tags=uid)
+        end_x = pos[0] + self.TINUI_RADIUS_SMALL
+        y = pos[1] + self.TINUI_RADIUS_SMALL
         texts = []  # 文本元素
         # 测试文本高度
         txtest = self.create_text(pos, text=text[0][0], fill=fg, font=font)
@@ -6303,6 +6318,7 @@ class BasicTinUI(Canvas):
         uidcontent = f"{uid}content"
         for i in text:
             t, w = i  # 文本，宽度
+            w = int(self.TINUISCALE*w)
             tx = self.create_text(
                 (end_x, y),
                 anchor="w",
@@ -6359,7 +6375,7 @@ class BasicTinUI(Canvas):
         y = 9
         pickerbars = []  # 选择UI列表
         for i in data:
-            barw = text[__count][1]  # 本选择列表元素宽度
+            barw = text[__count][1] * self.TINUISCALE  # 本选择列表元素宽度
             pickbar = BasicTinUI(picker, bg=bg)
             pickbar.place(x=end_x, y=y, width=barw, height=height - 50)
             pickbar.newres = ""  # 待选
@@ -6372,7 +6388,7 @@ class BasicTinUI(Canvas):
             __count += 1
             end_x += barw + 3
         # ok button
-        okpos = ((5 + (width - 9) / 2) / 2, height - 22)
+        okpos = ((self.scale_value(5) + (width - self.scale_value(9)) / 2) / 2, height - 22)
         ok = bar.add_button2(
             okpos,
             text="\ue73e",
@@ -6392,31 +6408,31 @@ class BasicTinUI(Canvas):
         bar.coords(
             ok[1],
             (
-                9,
+                self.scale_value(9),
                 height - 35,
-                (width - 9) / 2 - 5,
+                (width - self.scale_value(9)) / 2 - self.scale_value(5),
                 height - 35,
-                (width - 9) / 2 - 5,
-                height - 9,
-                9,
-                height - 9,
+                (width - self.scale_value(9)) / 2 - self.scale_value(5),
+                height - self.scale_value(9),
+                self.scale_value(9),
+                height - self.scale_value(9),
             ),
         )
         bar.coords(
             ok[2],
             (
-                8,
+                self.scale_value(8),
                 height - 34,
-                (width - 9) / 2 - 4,
+                (width - self.scale_value(9)) / 2 - self.scale_value(4),
                 height - 34,
-                (width - 9) / 2 - 4,
-                height - 8,
-                8,
-                height - 8,
+                (width - self.scale_value(9)) / 2 - self.scale_value(4),
+                height - self.scale_value(8),
+                self.scale_value(8),
+                height - self.scale_value(8),
             ),
         )
         # cancel button
-        nopos = (((width - 9) / 2 + width - 4) / 2, height - 22)
+        nopos = (((width - self.scale_value(9)) / 2 + width - self.scale_value(4)) / 2, height - 22)
         no = bar.add_button2(
             nopos,
             text="\ue711",
@@ -6436,26 +6452,26 @@ class BasicTinUI(Canvas):
         bar.coords(
             no[1],
             (
-                (width - 9) / 2 + 5,
+                (width - self.scale_value(9)) / 2 + self.scale_value(5),
                 height - 35,
-                width - 9,
+                width - self.scale_value(9),
                 height - 35,
-                width - 9,
-                height - 9,
-                (width - 9) / 2 + 5,
-                height - 9,
+                width - self.scale_value(9),
+                height - self.scale_value(9),
+                (width - self.scale_value(9)) / 2 + self.scale_value(5),
+                height - self.scale_value(9),
             ),
         )
         bar.coords(
             no[2],
             (
-                (width - 9) / 2 + 4,
+                (width - self.scale_value(9)) / 2 + self.scale_value(4),
                 height - 34,
-                width - 8,
+                width - self.scale_value(8),
                 height - 34,
-                width - 8,
-                height - 8,
-                ((width - 9) / 2 + 4, height - 8),
+                width - self.scale_value(8),
+                height - self.scale_value(8),
+                ((width - self.scale_value(9)) / 2 + self.scale_value(4), height - self.scale_value(8)),
             ),
         )
         readyshow()
@@ -6618,13 +6634,13 @@ class BasicTinUI(Canvas):
         linew -= 1
         outline = self.__ui_polygon(
             ((x1 - linew, y1 - linew), (x2 + linew, y2 + linew)),
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             tags=uid,
             fill=line,
             outline=line,
         )
         back = self.__ui_polygon(
-            ((x1 + 1, y1 + 1), (x2 - 1, y2 - 1)), width=9, tags=uid, fill=bg, outline=bg
+            ((x1 + 1, y1 + 1), (x2 - 1, y2 - 1)), width=self.TINUI_RADIUS_SMALL, tags=uid, fill=bg, outline=bg
         )
         # 创建菜单
         menu = self.add_menubar(
@@ -6687,18 +6703,18 @@ class BasicTinUI(Canvas):
             # 获取最新位置
             bbox = self.bbox(buttons_id)
             if bbox:
-                return bbox[2] + 5, (bbox[1] + bbox[3]) / 2
+                return bbox[2] + self.scale_value(5), (bbox[1] + bbox[3]) / 2
             else:
                 return pos
         font = font or self.__get_font()
         # 获取字体大小，转化为像素大小
         font = tkfont.Font(font=font)
         pixel = font.metrics("linespace")
-        outline = self.create_polygon(*pos, *pos, width=9, fill=line, outline=line)
+        outline = self.create_polygon(*pos, *pos, width=self.TINUI_RADIUS_SMALL, fill=line, outline=line)
         uid = TinUIString(f"barbutton-{outline}")
         self.itemconfig(outline, tags=uid)
         buttons_id = f"{uid}button"
-        back = self.create_polygon(*pos, *pos, width=9, fill=bg, outline=bg, tags=uid)
+        back = self.create_polygon(*pos, *pos, width=self.TINUI_RADIUS_SMALL, fill=bg, outline=bg, tags=uid)
         # 左侧纵轴线对齐，anchor=w
         buttons = []
         for i in content:
@@ -6736,14 +6752,14 @@ class BasicTinUI(Canvas):
             buttons.append(button)
         bbox = self.bbox(buttons_id)
         bbox = (
-            bbox[0] + 1,
-            bbox[1] + 1,
-            bbox[2] - 1,
-            bbox[1] + 1,
-            bbox[2] - 1,
-            bbox[3] - 1,
-            bbox[0] + 1,
-            bbox[3] - 1,
+            bbox[0] + self.scale_value(1),
+            bbox[1] + self.scale_value(1),
+            bbox[2] - self.scale_value(1),
+            bbox[1] + self.scale_value(1),
+            bbox[2] - self.scale_value(1),
+            bbox[3] - self.scale_value(1),
+            bbox[0] + self.scale_value(1),
+            bbox[3] - self.scale_value(1),
         )
         self.coords(back, bbox)
         bbox = (bbox[0], bbox[1], bbox[2], bbox[1], bbox[2], bbox[3], bbox[0], bbox[3])
@@ -6874,6 +6890,7 @@ class BasicTinUI(Canvas):
         )
         ui.TINUIFONT = self.TINUIFONT
         ui.TINUIFONTSIZE = self.TINUIFONTSIZE
+        ui.set_scale(self.TINUISCALE)
         self.windows.append(ui)
         show_funcid = None
         master_hide_funcid = None
@@ -7036,7 +7053,7 @@ class BasicTinUI(Canvas):
             ((bbox[0] + 2, bbox[1] + 2), (bbox[2] - 2, bbox[3] - 2)),
             fill=bg,
             outline=bg,
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             tags=uid,
         )
         self.tkraise(root)
@@ -7131,21 +7148,21 @@ class BasicTinUI(Canvas):
             __click(texts[index])
         font = font or self.__get_font()
         index = -1
-        outline = self.__ui_polygon(((0, 0), (0, 0)), fill=line, outline=line, width=9)
+        outline = self.__ui_polygon(((0, 0), (0, 0)), fill=line, outline=line, width=self.TINUI_RADIUS_SMALL)
         uid = TinUIString(f"segmentbutton-{outline}")
         buttonid = f"{uid}-button"
         self.itemconfig(outline, tags=uid)
         back = self.__ui_polygon(
-            ((0, 0), (0, 0)), fill=bg, outline=bg, width=9, tags=uid
+            ((0, 0), (0, 0)), fill=bg, outline=bg, width=self.TINUI_RADIUS_SMALL, tags=uid
         )
         button = self.__ui_polygon(
-            ((0, 0), (0, 0)), fill="", outline="", width=9, tags=uid
+            ((0, 0), (0, 0)), fill="", outline="", width=self.TINUI_RADIUS_SMALL, tags=uid
         )
         button2 = self.__ui_polygon(
-            ((0, 0), (0, 0)), fill=onbg, outline=onbg, width=9, tags=uid
+            ((0, 0), (0, 0)), fill=onbg, outline=onbg, width=self.TINUI_RADIUS_SMALL, tags=uid
         )
         line = self.create_line(
-            (0, 0, 0, 0), fill=sign, width=3, tags=uid, capstyle="round", state="hidden"
+            (0, 0, 0, 0), fill=sign, width=self.scale_value(3,True), tags=uid, capstyle="round", state="hidden"
         )
         self.itemconfig(button2, state="hidden")
         maxwidth = 0
@@ -7165,9 +7182,9 @@ class BasicTinUI(Canvas):
         endx = maxwidth / 2
         for i in texts:
             self.coords(i, endx, 0)
-            endx += maxwidth + 10
+            endx += maxwidth + self.scale_value(10)
         bbox = self.bbox(buttonid)
-        width = (maxwidth + 10) * content.__len__() - 10
+        width = (maxwidth + self.scale_value(10)) * content.__len__() - self.scale_value(10)
         coord = (0, bbox[1], width, bbox[1], width, bbox[3], 0, bbox[3])
         self.coords(back, coord)
         coord = (
@@ -7184,7 +7201,7 @@ class BasicTinUI(Canvas):
         self.tag_bind(uid, "<Leave>", on_leave)
         self.__auto_anchor(uid, pos, anchor)
         del endx, coord, bbox
-        uid.layout = lambda x1, y1, x2, y2, expand=False: self.__auto_layout(
+        uid.layout = lambda x1, y1, x2, y2, _=False: self.__auto_layout(
             uid, (x1, y1, x2, y2), anchor
         )
         funcs = FuncList(1)
@@ -7257,7 +7274,7 @@ class BasicTinUI(Canvas):
             if self.type(menus[index][0]) == 'text':
                 self.itemconfig(menus[index][0], fill=onfg)
             self.itemconfig(menus[index][2], fill=onbg, outline=onbg)
-            self.moveto(line, x-8, y+(font_height+15)*(index-1/4))
+            self.moveto(line, x-self.scale_value(8), y+(font_height+self.scale_value(15))*(index-1/4))
             if command:
                 command(self.itemcget(menus[index][1], "text"))
         def __layout(x1, y1, x2, y2, expand=False):
@@ -7280,16 +7297,16 @@ class BasicTinUI(Canvas):
         self.itemconfig(topicon, tags=uid)
         bbox = self.bbox(topicon)
         topback = self.__ui_polygon(
-            ((bbox[0], bbox[1]), (bbox[2], bbox[3])), fill=bg, outline=bg, width=9, tags=uid
+            ((bbox[0], bbox[1]), (bbox[2], bbox[3])), fill=bg, outline=bg, width=self.TINUI_RADIUS_SMALL, tags=uid
         )
         for item in (topicon, topback):
             self.tag_bind(item, "<Enter>", expand_in)
             self.tag_bind(item, "<Leave>", expand_out)
             self.tag_bind(item, "<Button-1>", expand_click)
         self.lower(topback, topicon)
-        line = self.create_line((0, 0, 0, font_height/2), fill=oncolor, width=3, tags=uid, capstyle="round", state="hidden")
+        line = self.create_line((0, 0, 0, font_height/2), fill=oncolor, width=self.scale_value(3,True), tags=uid, capstyle="round", state="hidden")
         if widget:
-            starty = pos[1] + font_height + 15
+            starty = pos[1] + font_height + self.scale_value(15)
         else:
             self.itemconfig(topicon, state="hidden")
             self.itemconfig(topback, state="hidden")
@@ -7306,9 +7323,9 @@ class BasicTinUI(Canvas):
                     icon = self.create_image((x, starty), image=img, anchor="w", tags=uid)
             else:
                 icon = self.create_text((x, starty), text=" ", font=segoe_font, fill=fg, anchor="w", tags=uid)
-            text = self.create_text((x + segoe_font_width + 8, starty), text=i[1], font=font, fill=fg, anchor="w", tags=uid)
+            text = self.create_text((x + segoe_font_width + self.scale_value(8), starty), text=i[1], font=font, fill=fg, anchor="w", tags=uid)
             back = self.__ui_polygon(
-                ((x, starty-font_height/2), (x+maxwidth, starty+font_height/2)), fill=bg, outline=bg, width=9, tags=uid
+                ((x, starty-font_height/2), (x+maxwidth, starty+font_height/2)), fill=bg, outline=bg, width=self.TINUI_RADIUS_SMALL, tags=uid
             )
             self.tag_lower(back, icon)
             for item in (icon, text, back):
@@ -7316,12 +7333,12 @@ class BasicTinUI(Canvas):
                 self.tag_bind(item, "<Leave>", lambda _, index=cnt: mouse_out(index))
                 self.tag_bind(item, "<Button-1>", lambda _, index=cnt: navigate(index))
             menus.append((icon, text, back))
-            starty += font_height + 15
+            starty += font_height + self.scale_value(15)
             cnt += 1
         self.tag_raise(line)
         dx, dy = self.__auto_anchor(uid, pos, anchor)
         x += dx
-        y = pos[1] + font_height + 15 + dy if widget else pos[1] + dy
+        y = pos[1] + font_height + self.scale_value(15) + dy if widget else pos[1] + dy
         self.itemconfig(line, state='normal')
         navigate(0)
         del bbox, dx, dy, starty, cnt
@@ -7804,8 +7821,12 @@ class TinUIXml:  # TinUI的xml渲染方式
         linex = None  # 纵块中的最大宽度
         padx = int(line.get("padx", padx))
         pady = int(line.get("pady", pady))
-        xendx = x = int(line.get("x", x))
-        xendy = y = int(line.get("y", y))
+        _x = line.get("x", None)
+        _x = self.__scale_value(int(_x)) if _x else x
+        xendx = x = _x
+        _y = line.get("y", None)
+        _y = self.__scale_value(int(_y)) if _y else y
+        xendy = y = _y
         padx = self.__scale_value(padx)
         pady = self.__scale_value(pady)
         allanchor = line.get("anchor", anchor)
@@ -7960,30 +7981,35 @@ class TinUIXml:  # TinUI的xml渲染方式
 
 # 此行（不含）以下代码不受GPLv3、LGPLv3许可证的限制，可以自由使用、修改、分发等。
 if __name__ == "__main__":
-    testmode = 2
+    from ctypes import windll
+    shcore = windll.shcore
+    shcore.SetProcessDpiAwareness(2)
+    scale_factor = shcore.GetScaleFactorForDevice(0) / 100
+    testmode = 1
 
     if testmode == 1:
         # panel test
         a = Tk()
-        a.geometry("500x500+5+5")
+        a.geometry("800x800+5+5")
         a.title("TinUIPanel")
         a.iconbitmap("LOGO.ico")
         b = BasicTinUI(a, bg="white")
+        b.set_scale(scale_factor)
         b.pack(fill="both", expand=True)
         rp = ExpandPanel(b)
         hp = HorizonPanel(b, bg="#fff3e0", bd=0)
         rp.set_child(hp)
 
-        # v1 = ExpandPanel(b, bg='#e0f7fa')
-        v1=VerticalPanel(b, bg='#f1f8e9')
+        v1 = ExpandPanel(b, bg='#e0f7fa')
+        # v1=VerticalPanel(b, bg='#f1f8e9')
 
-        # hp.add_child(v1, size=150, weight=1)
-        hp.add_child(v1,size=150)
+        hp.add_child(v1, size=150, weight=1)
+        # hp.add_child(v1,size=150)
 
-        ct = b.add_expander((0,0), anchor='n')[-1]
+        ct = b.add_textbox((0,0),scrollbar=True,anchor='center')[-1]
 
-        # v1.set_child(ct)
-        hp.add_child(ct, weight=1)
+        v1.set_child(ct)
+        # hp.add_child(ct, weight=1)
 
         v2 = VerticalPanel(b, bg='#f1f8e9')
         hp.add_child(v2, size=150)
@@ -8075,7 +8101,7 @@ if __name__ == "__main__":
         a.title("TinUI控件展示")
 
         b = TinUI(a, bg="white")
-        # b.TINUIFONTSIZE = 16
+        # b.set_scale(scale_factor)
         b.pack(fill="both", expand=True)
 
         m = b.add_title(

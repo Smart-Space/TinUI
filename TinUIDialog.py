@@ -280,7 +280,7 @@ class Dialog(Toplevel):
         self.destroy()
         self.master.focus_set()
     
-    def initial_choice(self,title,content,choices,yestext='OK',notext='Cancel'):
+    def initial_choice(self,title,content,choices,height=300,yestext='OK',notext='Cancel'):
         """
         初始化对话框-选择类
         """
@@ -298,7 +298,7 @@ class Dialog(Toplevel):
         width = max(content_bbox[2]-content_bbox[0], 300)
 
         if self.type=='listbox':
-            self.tinui.add_listbox((5,self._endy()+5),width=width,height=300,data=choices,command=self.return_choice,**self.listargs)
+            self.tinui.add_listbox((5,self._endy()+5),width=width,height=height,data=choices,command=self.return_choice,**self.listargs)
 
         bbox=self.tinui.bbox('all')
         btn_width=(bbox[2]-bbox[0])/2
@@ -503,12 +503,12 @@ def ask_float(master,title,content,text:float="0.0",yestext='OK',notext='Cancel'
     dialog=Dialog(master,'float',theme)
     return dialog.initial_input(title,content,text,yestext,notext)
 
-def ask_choice(master,title,content,choices,yestext='OK',notext='Cancel',theme='light'):
+def ask_choice(master,title,content,choices,height=300,yestext='OK',notext='Cancel',theme='light'):
     """
     选择列表对话框
     """
     dialog=Dialog(master,'listbox',theme)
-    return dialog.initial_choice(title,content,choices,yestext,notext)
+    return dialog.initial_choice(title,content,choices,height,yestext,notext)
 
 
 

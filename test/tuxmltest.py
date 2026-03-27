@@ -280,8 +280,8 @@ tinui.bind('<Configure>',update)
 pycodew=Toplevel()
 pycodew.title("Python代码")
 # 设置窗口大小
-window_width = 520
-window_height = 550
+window_width = int(520*scale_factor)
+window_height = int(550*scale_factor)
 # 获取屏幕大小
 screen_width = pycodew.winfo_screenwidth()
 screen_height = pycodew.winfo_screenheight()
@@ -293,6 +293,7 @@ pycodew.geometry("{}x{}+{}+{}".format(window_width, window_height,
                                       x_coordinate, y_coordinate))
 pycodew.resizable(width=False, height=False)  # 禁止改变窗口大小
 pctinui=BasicTinUI(pycodew)
+pctinui.set_scale(scale_factor)
 pctinui.pack(fill='both',expand=True)
 pycodew.protocol("WM_DELETE_WINDOW", lambda: pycodew.withdraw())  # 忽略关闭窗口的协议
 pycodew.withdraw()
@@ -314,10 +315,14 @@ p.insertfilter(d)
 #标记点管理页面
 markw = Toplevel(root)
 markw.title("标记点管理")
-markw.geometry("400x600")
+markw_width = int(400*scale_factor)
+markw_height = int(600*scale_factor)
+# 获取屏幕大小
+markw.geometry(f"{markw_width}x{markw_height}")
 markw.resizable(width=False, height=False)  # 禁止改变窗口大小
 markw.protocol("WM_DELETE_WINDOW", lambda: markw.withdraw())  # 忽略关闭窗口的协议
 markui=BasicTinUI(markw)
+markui.set_scale(scale_factor)
 markui.pack(fill='both',expand=True)
 markw.withdraw()
 markuix=TinUIXml(markui)

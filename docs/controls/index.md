@@ -21,6 +21,10 @@ tinui = BasicTinUI(root, bg='white')
 
 通过`self.TINUIFONT`和`self.TINUIFONTSIZE`可设置本BasicTinUI的全局字体以及字号信息。
 
+### 设置缩放比
+
+使用`set_scale(scale_factor)`设置缩放比，该缩放比不会使得控件元素缩放，而是让TinUI知道窗口dpi缩放系数，进而对部分元素进行调整。该方法将直接影响被绑定的TinUIXml和TinUI面板布局。
+
 ## TinUI
 
 ```python

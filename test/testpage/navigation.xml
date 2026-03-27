@@ -10,7 +10,7 @@
     <paragraph text=' ' width='580'></paragraph>
     </line>
     <line>
-    <navigation></navigation>
+    <navigation maxwidth='150'></navigation>
     </line>
 </line>
 </tinui>

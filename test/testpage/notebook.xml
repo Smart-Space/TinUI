@@ -10,7 +10,7 @@
     <paragraph text=' ' width='580'></paragraph>
     </line>
     <line>
-    <notebook>notebook</notebook>
+    <notebook width='400' height='400'>notebook</notebook>
     </line>
 </line>
 </tinui>

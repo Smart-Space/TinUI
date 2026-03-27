@@ -36,7 +36,7 @@ def loadcontrol(controlname):
         displayui.add_menubar(label)
     elif controlname=='notebook':
         notebook=duixml.tags['notebook'][-2]
-        for i in range(1,5):
+        for i in range(1,15):
             if i==5:#第五个不可删除:
                 notebook.addpage('test'+str(i),'t'+str(i),cancancel=False)
             else:
@@ -84,7 +84,7 @@ vp.add_child(t,50)
 vp.add_child(img,200)
 ep1=ExpandPanel(ui)
 ep1.set_child(listbox)
-vp.add_child(ep1,200,weight=1)
+vp.add_child(ep1,weight=1)
  
 displayui,_,duixml,uid=ui.add_ui((0,0),bg='#F9F9F9',width=610,height=575,scrollbar="True",region='auto')
 ep=ExpandPanel(ui,bg='#F9F9F9',padding=(5,5,5,5))

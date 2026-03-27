@@ -10,7 +10,7 @@
     <paragraph text=' ' width='580'></paragraph>
     </line>
     <line>
-    <picker></picker>
+    <picker height='280'></picker>
     </line>
 </line>
 </tinui>

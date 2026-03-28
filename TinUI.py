@@ -2794,11 +2794,11 @@ class BasicTinUI(Canvas):
                 self.itemconfig(cavui, width=width, height=height - self.scale_value(4))
                 coords = self.coords(line)
                 coords[2] = coords[4] = x1 + width + 1
-                coords[5] = coords[7] = y2 - self.scale_value(3)
+                coords[5] = coords[7] = y2 - 3
                 self.coords(line, coords)
                 coords = self.coords(back)
                 coords[2] = coords[4] = x1 + width
-                coords[5] = coords[7] = y2 - self.scale_value(4)
+                coords[5] = coords[7] = y2 - 4
                 self.coords(back, coords)
 
         def focus_in(event):
@@ -3082,7 +3082,7 @@ class BasicTinUI(Canvas):
             pos[1] += dy
             if mode == "y":
                 start += dy
-                end = start + size - 30
+                end = start + size - 30 - baseheigth
                 canmove = size - 30
                 self.move(bottom, 0, size - height)
                 coord = self.coords(back)
@@ -3091,7 +3091,7 @@ class BasicTinUI(Canvas):
                 self.coords(back, coord)
             elif mode == "x":
                 start += dx
-                end = start + size - 30
+                end = start + size - 30 - basewidth
                 canmove = size - 40
                 self.move(bottom, size - height, 0)
                 coord = self.coords(back)
@@ -3118,6 +3118,7 @@ class BasicTinUI(Canvas):
                 animate()
         font = tkfont.Font(family="{Segoe Fluent Icons}", size=7)
         basewidth = font.measure('\ueddb')
+        baseheigth = font.metrics("linespace")
         pos = list(pos)
         is_animation = False # 是否正在动画中
         scroll_speed = 0.15 # 缓动系数
@@ -3138,8 +3139,6 @@ class BasicTinUI(Canvas):
                     pos[1] + 5,
                     pos[0] + 5,
                     pos[1] + height - 5,
-                    pos[0] + 5,
-                    pos[1] + 5,
                 ),
                 width=basewidth+4,
                 outline=bg,
@@ -3147,7 +3146,7 @@ class BasicTinUI(Canvas):
             uid = TinUIString(f"scrollbar-{back}")
             self.itemconfig(back, tags=uid)
             top = self.create_text(
-                (pos[0] + 5, pos[1] + 10),
+                (pos[0] + 5, pos[1] + baseheigth),
                 text="\ueddb",
                 font="{Segoe Fluent Icons} 7",
                 anchor="s",
@@ -3165,18 +3164,16 @@ class BasicTinUI(Canvas):
             sc = self.create_polygon(
                 (
                     pos[0] + 5,
-                    pos[1] + 20,
+                    pos[1] + baseheigth,
                     pos[0] + 5,
                     pos[1] + height - 20,
-                    pos[0] + 5,
-                    pos[1] + 20,
                 ),
                 width=self.scale_value(3,True),
                 outline=color,
                 tags=uid,
             )
             # 起始和终止位置
-            start = pos[1] + 15
+            start = pos[1] + baseheigth + 5
             end = pos[1] + height - 15
             canmove = end - start
             # 绑定组件
@@ -3188,8 +3185,6 @@ class BasicTinUI(Canvas):
                     pos[1] + 5,
                     pos[0] + height - 5,
                     pos[1] + 5,
-                    pos[0] + 5,
-                    pos[1] + 5,
                 ),
                 width=basewidth+4,
                 outline=bg,
@@ -3197,7 +3192,7 @@ class BasicTinUI(Canvas):
             uid = TinUIString(f"scrollbar-{back}")
             self.itemconfig(back, tags=uid)
             top = self.create_text(
-                (pos[0] + 10, pos[1] + 5),
+                (pos[0] + basewidth, pos[1] + 5),
                 text="\uedd9",
                 font="{Segoe Fluent Icons} 7",
                 anchor="e",
@@ -3214,18 +3209,16 @@ class BasicTinUI(Canvas):
             )
             sc = self.create_polygon(
                 (
-                    pos[0] + 20,
+                    pos[0] + basewidth,
                     pos[1] + 5,
                     pos[0] + height - 20,
-                    pos[1] + 5,
-                    pos[0] + 20,
                     pos[1] + 5,
                 ),
                 width=self.scale_value(3,True),
                 outline=color,
                 tags=uid,
             )
-            start = pos[0] + 15
+            start = pos[0] + basewidth + 5
             end = pos[0] + height - 15
             canmove = end - start - 10
             widget.config(xscrollcommand=widget_move)
@@ -8006,7 +7999,7 @@ if __name__ == "__main__":
         hp.add_child(v1, size=150, weight=1)
         # hp.add_child(v1,size=150)
 
-        ct = b.add_textbox((0,0),scrollbar=True,anchor='center')[-1]
+        ct = b.add_treeview((0,0),anchor='center')[-1]
 
         v1.set_child(ct)
         # hp.add_child(ct, weight=1)

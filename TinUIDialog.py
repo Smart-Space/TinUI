@@ -2,6 +2,8 @@
 TinUI风格对话框
 """
 from tkinter import Tk, Toplevel
+from typing import Union
+import functools
 
 try:
     from .TinUI import BasicTinUI, TinUIXml
@@ -14,6 +16,24 @@ class Dialog(Toplevel):
     """
     TinUI对话框基础类
     """
+    scale_factor = 1.0
+
+    @staticmethod
+    def set_scale(scale: Union[int, float] = 1.0):
+        """
+        设置全局缩放比例
+        """
+        Dialog.scale_factor = scale
+    
+    @functools.cache
+    def scale_value(self, value: Union[int, float], needodd=False):
+        """
+        根据缩放比例缩放值
+        """
+        res = int(value * Dialog.scale_factor)
+        if needodd and res%2 == 0:
+            res += 1
+        return res
 
     def __init__(self,master,dialogtype='normal',theme='light',**options):
         """
@@ -26,6 +46,7 @@ class Dialog(Toplevel):
             self.transient(self.master)
         
         self.tinui=BasicTinUI(self)
+        self.tinui.set_scale(Dialog.scale_factor)
         self.tinui.pack(fill='both',expand=True)
 
         self.type=dialogtype#对话框类型
@@ -180,7 +201,7 @@ class Dialog(Toplevel):
             self.tinui.addtag_withtag('content',icon_uid1)
             self.tinui.addtag_withtag('content',icon_uid2)
 
-        content_uid=self.tinui.add_paragraph((35,5),text=content,fg=self.fg,anchor='w')
+        content_uid=self.tinui.add_paragraph((self.scale_value(35),5),width=self.scale_value(500),text=content,fg=self.fg,anchor='w')
         self.tinui.addtag_withtag('content',content_uid)
         content_bbox=self.tinui.bbox('content')
         btn_width=(content_bbox[2]-content_bbox[0])/2
@@ -210,7 +231,7 @@ class Dialog(Toplevel):
             now_focus = 'no'
             self.tinui.coords(focus_button, nb_coords)
 
-        focus_button = self.tinui.create_polygon(yb_coords, width=11, fill=self.barback, outline=self.selback)
+        focus_button = self.tinui.create_polygon(yb_coords, width=self.scale_value(11,True), fill=self.barback, outline=self.selback)
         self.tinui.lower(focus_button, yesbutton_uid)
         now_focus = 'yes'
         self.bind('<Return>', return_focus)
@@ -239,10 +260,10 @@ class Dialog(Toplevel):
         self.title(title)
         self.protocol('WM_DELETE_WINDOW',lambda:self.return_input(None))
         
-        self.tinui.add_paragraph((5,5),text=content,fg=self.fg)
+        self.tinui.add_paragraph((5,5),width=self.scale_value(500),text=content,fg=self.fg)
         content_bbox=self.tinui.bbox('all')
         entry_width=content_bbox[2]-content_bbox[0]
-        width=entry_width if entry_width>200 else 200
+        width=max(entry_width,self.scale_value(200))
         self.entryw, self.entry=self.tinui.add_entry((5,self._endy()+5),width=width,**self.entryargs)[:-1]# tinui entry widget, funcs
         self.entry.insert(0,str(text))
         bbox=self.tinui.bbox('all')
@@ -254,7 +275,7 @@ class Dialog(Toplevel):
         nobutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:self.return_input(None),anchor='nw',**self.buttonargs)[-1]
         self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.barback,fg=self.barback,linew=8)
 
-        focus_button = self.tinui.create_polygon(yb_coords, width=11, fill=self.barback, outline=self.selback)
+        focus_button = self.tinui.create_polygon(yb_coords, width=self.scale_value(11,True), fill=self.barback, outline=self.selback)
         self.tinui.lower(focus_button, yesbutton_uid)
         self.bind('<Return>', lambda e:self.return_input(self.entry.get()))
 
@@ -280,7 +301,7 @@ class Dialog(Toplevel):
         self.destroy()
         self.master.focus_set()
     
-    def initial_choice(self,title,content,choices,height=300,yestext='OK',notext='Cancel'):
+    def initial_choice(self,title,content,choices,yestext='OK',notext='Cancel'):
         """
         初始化对话框-选择类
         """
@@ -293,12 +314,12 @@ class Dialog(Toplevel):
         self.title(title)
         self.protocol('WM_DELETE_WINDOW',lambda:self.return_choice(None))
 
-        self.tinui.add_paragraph((5,5),text=content,fg=self.fg)
+        self.tinui.add_paragraph((5,5),width=self.scale_value(500),text=content,fg=self.fg)
         content_bbox=self.tinui.bbox('all')
-        width = max(content_bbox[2]-content_bbox[0], 300)
+        width = max(content_bbox[2]-content_bbox[0], self.scale_value(300))
 
         if self.type=='listbox':
-            self.tinui.add_listbox((5,self._endy()+5),width=width,height=height,data=choices,command=self.return_choice,**self.listargs)
+            self.tinui.add_listbox((5,self._endy()+5),width=width,height=self.scale_value(200),data=choices,command=self.return_choice,**self.listargs)
 
         bbox=self.tinui.bbox('all')
         btn_width=(bbox[2]-bbox[0])/2
@@ -503,17 +524,21 @@ def ask_float(master,title,content,text:float="0.0",yestext='OK',notext='Cancel'
     dialog=Dialog(master,'float',theme)
     return dialog.initial_input(title,content,text,yestext,notext)
 
-def ask_choice(master,title,content,choices,height=300,yestext='OK',notext='Cancel',theme='light'):
+def ask_choice(master,title,content,choices,yestext='OK',notext='Cancel',theme='light'):
     """
     选择列表对话框
     """
     dialog=Dialog(master,'listbox',theme)
-    return dialog.initial_choice(title,content,choices,height,yestext,notext)
+    return dialog.initial_choice(title,content,choices,yestext,notext)
 
 
 
 # 此行（不含）以下代码不受GPLv3、LGPLv3许可证的限制，可以自由使用、修改、分发等。
 if __name__=='__main__':
+    # import ctypes
+    # ctypes.windll.shcore.SetProcessDpiAwareness(1)
+    # scale_factor = ctypes.windll.shcore.GetScaleFactorForDevice(0) / 100
+    # Dialog.set_scale(scale_factor)
     root=Tk()
     root.iconbitmap('LOGO.ico')
     a=show_msg(root,'test','hello world!',theme='dark')

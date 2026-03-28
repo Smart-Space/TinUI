@@ -472,7 +472,7 @@ class BasicTinUI(Canvas):
             x2 += dx / 2
             x1 -= dx / 2
         back = self.create_rectangle(
-            (x1, y1, x2, y2), fill=bg, outline=line, width=linew, tags=uid
+            (x1, y1, x2, y2), fill=bg, outline=line, width=self.scale_value(linew), tags=uid
         )
         self.tag_bind(uid, "<Button-1>", on_click)
         self.tag_bind(uid, "<Enter>", in_button)
@@ -3082,8 +3082,8 @@ class BasicTinUI(Canvas):
             pos[1] += dy
             if mode == "y":
                 start += dy
-                end = start + size - 30 - baseheigth
-                canmove = size - 30
+                end = start + size - 2*baseheigth
+                canmove = end - start
                 self.move(bottom, 0, size - height)
                 coord = self.coords(back)
                 coord[3] += size - height
@@ -3091,8 +3091,8 @@ class BasicTinUI(Canvas):
                 self.coords(back, coord)
             elif mode == "x":
                 start += dx
-                end = start + size - 30 - basewidth
-                canmove = size - 40
+                end = start + size - 2*basewidth
+                canmove = end - start
                 self.move(bottom, size - height, 0)
                 coord = self.coords(back)
                 coord[2] += size - height
@@ -3146,18 +3146,18 @@ class BasicTinUI(Canvas):
             uid = TinUIString(f"scrollbar-{back}")
             self.itemconfig(back, tags=uid)
             top = self.create_text(
-                (pos[0] + 5, pos[1] + baseheigth),
+                (pos[0] + 5, pos[1]),
                 text="\ueddb",
                 font="{Segoe Fluent Icons} 7",
-                anchor="s",
+                anchor="n",
                 fill=oncolor,
                 tags=uid,
             )
             bottom = self.create_text(
-                (pos[0] + 5, pos[1] - 10 + height),
+                (pos[0] + 5, pos[1] + height),
                 text="\ueddc",
                 font="{Segoe Fluent Icons} 7",
-                anchor="n",
+                anchor="s",
                 fill=oncolor,
                 tags=uid,
             )
@@ -3174,7 +3174,7 @@ class BasicTinUI(Canvas):
             )
             # 起始和终止位置
             start = pos[1] + baseheigth + 5
-            end = pos[1] + height - 15
+            end = pos[1] + height - baseheigth - 5
             canmove = end - start
             # 绑定组件
             widget.config(yscrollcommand=widget_move)
@@ -3192,18 +3192,18 @@ class BasicTinUI(Canvas):
             uid = TinUIString(f"scrollbar-{back}")
             self.itemconfig(back, tags=uid)
             top = self.create_text(
-                (pos[0] + basewidth, pos[1] + 5),
+                (pos[0], pos[1] + 5),
                 text="\uedd9",
                 font="{Segoe Fluent Icons} 7",
-                anchor="e",
+                anchor="w",
                 fill=oncolor,
                 tags=uid,
             )
             bottom = self.create_text(
-                (pos[0] - 10 + height, pos[1] + 5),
+                (pos[0] + height, pos[1] + 5),
                 text="\uedda",
                 font="{Segoe Fluent Icons} 7",
-                anchor="w",
+                anchor="e",
                 fill=oncolor,
                 tags=uid,
             )
@@ -3219,7 +3219,7 @@ class BasicTinUI(Canvas):
                 tags=uid,
             )
             start = pos[0] + basewidth + 5
-            end = pos[0] + height - 15
+            end = pos[0] + height - basewidth - 5
             canmove = end - start - 10
             widget.config(xscrollcommand=widget_move)
         scroll = TinUINum()
@@ -7746,7 +7746,6 @@ class TinUIXml:  # TinUI的xml渲染方式
         self.scale_int = (
             "width",
             "linew",
-            "bd",
             "r",
             "minwidth",
             "maxwidth",

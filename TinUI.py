@@ -811,7 +811,7 @@ class BasicTinUI(Canvas):
         funce = self.create_window(
             pos, window=entry, width=width, anchor="nw"
         )  # 输入框画布对象
-        self.windows.append(entry)
+        # self.windows.append(entry)
         uid = TinUIString(f"entru-{funce}")
         entrybutton = f"enrtyb-{funce}"
         self.itemconfig(funce, tags=uid)
@@ -1965,7 +1965,7 @@ class BasicTinUI(Canvas):
             now = data[0]
         wentry.insert(0, now)
         entry = self.create_window(pos, window=wentry, width=width, anchor="nw")
-        self.windows.append(wentry)
+        # self.windows.append(wentry)
         uid = TinUIString(f"spinbox-{entry}")
         self.itemconfig(entry, tags=uid)
         _font = tkfont.Font(font=font)
@@ -2830,7 +2830,7 @@ class BasicTinUI(Canvas):
         cavui = self.create_window(
             pos, window=textbox, width=width - 2, height=height - 2, anchor="nw"
         )
-        self.windows.append(textbox)
+        # self.windows.append(textbox)
         uid = TinUIString(f"textbox-{cavui}")
         self.addtag_withtag(uid, cavui)
         textbox.insert(1.0, text)
@@ -3082,7 +3082,7 @@ class BasicTinUI(Canvas):
             pos[1] += dy
             if mode == "y":
                 start += dy
-                end = start + size - 2*baseheigth
+                end = start + size - 2*baseheigth - 10
                 canmove = end - start
                 self.move(bottom, 0, size - height)
                 coord = self.coords(back)
@@ -3091,7 +3091,7 @@ class BasicTinUI(Canvas):
                 self.coords(back, coord)
             elif mode == "x":
                 start += dx
-                end = start + size - 2*basewidth
+                end = start + size - 2*basewidth - 10
                 canmove = end - start
                 self.move(bottom, size - height, 0)
                 coord = self.coords(back)
@@ -3464,7 +3464,7 @@ class BasicTinUI(Canvas):
         cavui = self.create_window(
             pos, window=box, width=width, height=height, anchor="nw"
         )
-        self.windows.append(box)
+        # self.windows.append(box)
         uid = TinUIString(f"listbox-{cavui}")
         self.addtag_withtag(uid, cavui)
         hscroll = self.add_scrollbar(
@@ -3710,7 +3710,7 @@ class BasicTinUI(Canvas):
         view = self.create_window(
             pos, window=ui, height=height, width=width, anchor="nw"
         )
-        self.windows.append(ui)
+        # self.windows.append(ui)
         uid = TinUIString(f"listview-{view}")
         self.addtag_withtag(uid, view)
         bbox = self.bbox(view)
@@ -3840,7 +3840,7 @@ class BasicTinUI(Canvas):
         cavui = self.create_window(
             pos, window=ui, width=width, height=height, anchor="nw"
         )
-        self.windows.append(ui)
+        # self.windows.append(ui)
         uid = TinUIString(f"ui-{cavui}")
         self.addtag_withtag(uid, cavui)
         show_scrollX = False
@@ -4059,7 +4059,7 @@ class BasicTinUI(Canvas):
         barid = self.create_window(
             (startx, doty), window=bar, width=width, height=11, anchor="nw", tags=uid
         )
-        self.windows.append(bar)
+        # self.windows.append(bar)
         dotx = 3
         for _ in range(0, num):
             ui = BasicTinUI(self, bg=bg)
@@ -4078,7 +4078,7 @@ class BasicTinUI(Canvas):
                 anchor="nw",
                 tags=uid,
             )
-            self.windows.append(ui)
+            # self.windows.append(ui)
             uilist.append((uiid, ui, tinuixml))
             dot = bar.create_text(
                 (dotx + 2, 5.5),
@@ -4203,7 +4203,7 @@ class BasicTinUI(Canvas):
                     state="hidden",
                     tags=uid,
                 )
-                self.windows.append(page.frame)
+                # self.windows.append(page.frame)
             else:
                 page = BasicTinUI(self, bg=self["background"])
                 uiid = self.create_window(
@@ -4215,7 +4215,7 @@ class BasicTinUI(Canvas):
                     state="hidden",
                     tags=uid,
                 )
-                self.windows.append(page)
+                # self.windows.append(page)
             page.TINUIFONT = self.TINUIFONT
             page.TINUIFONTSIZE = self.TINUIFONTSIZE
             page.set_scale(self.TINUISCALE)
@@ -4382,7 +4382,7 @@ class BasicTinUI(Canvas):
         tbuid = self.create_window(
             (pos[0] + 2, pos[1] + 2), window=tbu, width=width, height=self.scale_value(30), anchor="nw"
         )
-        self.windows.append(tbu)
+        # self.windows.append(tbu)
         uid = TinUIString(f"notebook-{tbuid}")
         labeluid = "notebooklabel"  # 标签元素名称
         movename = "movetags"  # 更改标题时整体移动的临时名称
@@ -5158,10 +5158,10 @@ class BasicTinUI(Canvas):
             ui = BasicTinUI(self, bg=bg)
             ui.TINUIFONT = self.TINUIFONT
             ui.TINUIFONTSIZE = self.TINUIFONTSIZE
-            self.windows.append(ui)
+            # self.windows.append(ui)
         elif scrollbar:  # 使用TinUI
             ui = TinUI(self, bg=bg)
-            self.windows.append(ui.frame)
+            # self.windows.append(ui.frame)
         ux = TinUIXml(ui)
         ui.bind("<Destroy>", lambda _: self.__delete_uixml(ux))
         content = self.create_window(
@@ -5255,7 +5255,7 @@ class BasicTinUI(Canvas):
         frameid = self.create_window(
             pos, window=frame, width=width, height=height, anchor=anchor
         )
-        self.windows.append(frame)
+        # self.windows.append(frame)
         uid = TinUIString(f"waitframe-{frameid}")
         self.addtag_withtag(uid, frameid)
         itemfg = frame.__ui_polygon(
@@ -5553,7 +5553,7 @@ class BasicTinUI(Canvas):
         cavui = self.create_window(
             pos, window=box, width=width, height=height, anchor="nw"
         )
-        self.windows.append(box)
+        # self.windows.append(box)
         uid = TinUIString(f"treeview-{cavui}")
         self.addtag_withtag(uid, cavui)
         hscroll = self.add_scrollbar(
@@ -5768,7 +5768,7 @@ class BasicTinUI(Canvas):
         funce = self.create_window(
             pos, window=entry, width=width, anchor=anchor
         )  # 输入框画布对象
-        self.windows.append(entry)
+        # self.windows.append(entry)
         uid = TinUIString(f"entry-{funce}")
         entrybutton = f"enrtyb-{funce}"
         self.itemconfig(funce, tags=uid)
@@ -6884,7 +6884,7 @@ class BasicTinUI(Canvas):
         ui.TINUIFONT = self.TINUIFONT
         ui.TINUIFONTSIZE = self.TINUIFONTSIZE
         ui.set_scale(self.TINUISCALE)
-        self.windows.append(ui)
+        # self.windows.append(ui)
         show_funcid = None
         master_hide_funcid = None
         uixml = TinUIXml(ui)

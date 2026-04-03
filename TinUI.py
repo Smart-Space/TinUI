@@ -5384,10 +5384,10 @@ class BasicTinUI(Canvas):
                     add_item(padx + self.scale_value(15), text[1], back)
                     box.tag_bind(sign,"<Button-1>",lambda _, s=sign, cid=back: close_view(s, cid))
                 old_coords = box.coords(back)
-                old_coords[0] = old_coords[6] = 6
+                old_coords[0] = old_coords[6] = self.scale_value(6)
                 bbox = box.bbox(back)
                 if bbox[2] - bbox[0] < width:
-                    old_coords[2] = old_coords[4] = width - 9
+                    old_coords[2] = old_coords[4] = width - self.TINUI_RADIUS_SMALL
                 box.coords(back, old_coords)
                 for item_id in (back, te):
                     box.tag_bind(
@@ -5547,6 +5547,7 @@ class BasicTinUI(Canvas):
         box = BasicTinUI(self, bg=bg, width=width, height=height)  # 显示选择内容
         box.TINUIFONTSIZE = self.TINUIFONTSIZE
         box.TINUIFONT = self.TINUIFONT
+        box.set_scale(self.TINUISCALE)
         box.place(x=12, y=12)
         cavui = self.create_window(
             pos, window=box, width=width, height=height, anchor="nw"

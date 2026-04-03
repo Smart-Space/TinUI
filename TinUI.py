@@ -85,6 +85,26 @@ class TinUITheme:
     def get_theme(self):
         return self.theme
 
+    def adjust_color_lightness(self, hex_color, factor):
+        # 调整颜色亮度
+        hex_color = hex_color.lstrip('#')
+        r = int(hex_color[0:2], 16)
+        g = int(hex_color[2:4], 16)
+        b = int(hex_color[4:6], 16)
+        if factor > 0:
+            r = int(r + (255 - r) * factor)
+            g = int(g + (255 - g) * factor)
+            b = int(b + (255 - b) * factor)
+        else:
+            factor = -factor
+            r = int(r * (1 - factor))
+            g = int(g * (1 - factor))
+            b = int(b * (1 - factor))
+        r = max(0, min(255, r))
+        g = max(0, min(255, g))
+        b = max(0, min(255, b))
+        return f'#{r:02x}{g:02x}{b:02x}'
+
 
 class TinUIFont:
     # 添加字体文件，见CustomTkinter

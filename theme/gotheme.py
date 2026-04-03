@@ -1,7 +1,6 @@
 # 由chat-glm4生成，作者小改。作为示例，不会维护
-from typing import Union
 from tkinter import Tk, Toplevel
-from tinui import TinUI, BasicTinUI, TinUITheme, TinUIXml
+from tinui import TinUI, BasicTinUI, TinUIXml
 
 from tinuilight import TinUILight
 from tinuidark import TinUIDark
@@ -26,7 +25,7 @@ def test(theme):
     u=TinUI(r)
     u.pack(fill='both',expand=True)
     
-    du=theme(u)
+    du=theme(u,accent="#019fab")
 
     #button
     du.add_button(end(),text='TinUI theme')

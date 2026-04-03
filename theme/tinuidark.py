@@ -7,10 +7,20 @@ class TinUIDark(TinUITheme):
     调用时这需要注意文本和数据，样式类参数无需理会
     '''
 
-    def __init__(self,ui:Union[TinUI,BasicTinUI]):
+    def __init__(self,ui:Union[TinUI,BasicTinUI],accent='#4CC2FF'):
         super().__init__(ui,'tinui-dark-theme')
         self.label='dark'
         self.ui['background']='#202020'
+        self.set_accent_color(accent)
+    
+    def set_accent_color(self, accent):
+        self.accent_color = accent
+        self.accent_light = self.adjust_color_lightness(accent, 0.2)
+        self.accent_dark = self.adjust_color_lightness(accent, -0.2)
+        self.accentb_ab = self.adjust_color_lightness(accent, -0.082)
+        self.accentb_l = self.adjust_color_lightness(accent, 0.08)
+        self.accentb_al = self.adjust_color_lightness(accent, -0.3)
+        self.accentb_ol = self.adjust_color_lightness(accent, -0.15)
     
     def add_title(self,pos,*arg,**kw):
         return self.ui.add_title(pos,*arg,**{
@@ -35,7 +45,7 @@ class TinUIDark(TinUITheme):
             **{
                 'fontfg':'#ffffff','fg':'#989898','bg':'#1d1d1d',
                 'activefg':'#9E9E9E','activebg':'#2a2a2a',
-                'onfg':'black','onbg':'#4CC2FF',
+                'onfg':'black','onbg':self.accent_color,
             },**kw})
 
     def add_label(self,pos,*arg,**kw):
@@ -52,7 +62,7 @@ class TinUIDark(TinUITheme):
                 'activefg':'#ffffff','activebg':'#323232',
                 'onfg':'#ffffff','onbg':'#1f1f1f',
                 'line':'#303030','activeline':'#303030',
-                'outline':'#9a9a9a','onoutline':'#4CC2FF','insert':'#e0e0e0',
+                'outline':'#9a9a9a','onoutline':self.accent_color,'insert':'#e0e0e0',
             },**kw})
 
     def add_separate(self,pos,*arg,**kw):
@@ -71,8 +81,8 @@ class TinUIDark(TinUITheme):
     def add_link(self,pos,*arg,**kw):
         return self.ui.add_link(pos,*arg,**{
             **{
-                'fg':'#99EBFF',
-                'activefg':'#99EBFF','activebg':'#2d2d2d',
+                'fg':self.accent_light,
+                'activefg':self.accent_light,'activebg':'#2d2d2d',
             },**kw})
 
     def add_waitbar1(self,pos,*arg,**kw):
@@ -109,7 +119,7 @@ class TinUIDark(TinUITheme):
     def add_progressbar(self,pos,*arg,**kw):
         return self.ui.add_progressbar(pos,*arg,**{
             **{
-                'fg':'#9a9a9a','bg':'#4CC2FF','back':'#202020',
+                'fg':'#9a9a9a','bg':self.accent_color,'back':'#202020',
                 'fontc':'#0000ff',
             },**kw})
 
@@ -125,8 +135,8 @@ class TinUIDark(TinUITheme):
             **{
                 'fg':'#cccccc','bg':'#1d1d1d',
                 'activefg':'#cfcfcf','activebg':'#2a2a2a',
-                'onactivefg':'#000000','onactivebg':'#47B1E8',
-                'onfg':'#000000','onbg':'#4CC2FF',
+                'onactivefg':'#000000','onactivebg':self.accent_dark,
+                'onfg':'#000000','onbg':self.accent_color,
             },**kw})
 
     def add_spinbox(self,pos,*arg,**kw):
@@ -145,7 +155,7 @@ class TinUIDark(TinUITheme):
     def add_scalebar(self,pos,*arg,**kw):
         return self.ui.add_scalebar(pos,*arg,**{
             **{
-                'fg':'#4CC2FF','bg':'#9a9a9a','activefg':'#4BB5EC',
+                'fg':self.accent_color,'bg':'#9a9a9a','activefg':self.accent_dark,
                 'buttonbg':'#454545','buttonoutline':'#353535',
             },**kw})
 
@@ -173,14 +183,14 @@ class TinUIDark(TinUITheme):
     def add_waitbar3(self,pos,*arg,**kw):
         return self.ui.add_waitbar3(pos,*arg,**{
             **{
-                'fg':'#4CC2FF','bg':'#202020','okcolor':'#4CC2FF',
+                'fg':self.accent_color,'bg':'#202020','okcolor':self.accent_color,
             },**kw})
 
     def add_textbox(self,pos,*arg,**kw):
         return self.ui.add_textbox(pos,*arg,**{
             **{
                 'fg':'#ffffff','bg':'#2d2d2d',
-                'outline':'#9a9a9a','onoutline':'#4CC2FF',
+                'outline':'#9a9a9a','onoutline':self.accent_color,
                 'scrollbg':'#2e2e2e','scrollcolor':'#9f9f9f','scrollon':'#a0a0a0',
             },**kw})
 
@@ -195,7 +205,7 @@ class TinUIDark(TinUITheme):
             **{
                 'bg':'#2b2b2b','fg':'white',
                 'activefg':'#ffffff','activebg':'#373737',
-                'onfg':'#ffffff','onbg':'#333333','sel':'#115990',
+                'onfg':'#ffffff','onbg':'#333333','sel':self.accent_dark,
                 'scrollbg':'#2e2e2e','scrollcolor':'#9f9f9f','scrollon':'#a0a0a0',
             },**kw})
 
@@ -228,7 +238,7 @@ class TinUIDark(TinUITheme):
         return self.ui.add_ratingbar(pos,*arg,**{
             **{
                 'fg':'#cccccc','bg':'#202020',
-                'onfg':'#4CC2FF','onbg':'#4CC2FF',
+                'onfg':self.accent_color,'onbg':self.accent_color,
             },**kw})
 
     def add_radiobox(self,pos,*arg,**kw):
@@ -236,7 +246,7 @@ class TinUIDark(TinUITheme):
             **{
                 'fontfg':'#ffffff','fg':'#939393','bg':'#2a2a2a',
                 'activefg':'#959595','activebg':'#2a2a2a',
-                'onfg':'#4CC2FF','onbg':'#000000',
+                'onfg':self.accent_color,'onbg':'#000000',
             },**kw})
 
     def add_notecard(self,pos,*arg,**kw):
@@ -250,7 +260,7 @@ class TinUIDark(TinUITheme):
         return self.ui.add_pivot(pos,*arg,**{
             **{
                 'fg':'#a6a6a6','bg':'',
-                'activefg':'#ffffff','activecolor':'#4CC2FF',
+                'activefg':'#ffffff','activecolor':self.accent_color,
             },**kw})
 
     def add_button2(self,pos,*arg,**kw):
@@ -265,10 +275,10 @@ class TinUIDark(TinUITheme):
     def add_accentbutton(self,pos,*arg,**kw):
         return self.ui.add_accentbutton(pos,*arg,**{
             **{
-                'fg':'#000000','bg':'#4CC2FF',
-                'activefg':'#000000','activebg':'#47B1E8',
-                'line':'#5AC7FF','linew':1,'activeline':'#2B80CA',
-                'onfg':'#215069','onbg':'#42A1D2','online':'#42A1D2',
+                'fg':'#000000','bg':self.accent_color,
+                'activefg':'#000000','activebg':self.accentb_ab,
+                'line':self.accentb_l,'linew':1,'activeline':self.accentb_al,
+                'onfg':'#215069','onbg':self.accentb_ol,'online':self.accentb_ol,
             },**kw})
     
     def add_warningbutton(self,pos,*arg,**kw):
@@ -308,7 +318,7 @@ class TinUIDark(TinUITheme):
     def add_listview(self,pos,*arg,**kw):
         return self.ui.add_listview(pos,*arg,**{
             **{
-                'bg':'#202020','activebg':'#2d2d2d','oncolor':'#4CC2FF',
+                'bg':'#202020','activebg':'#2d2d2d','oncolor':self.accent_color,
                 'scrobg':'#2e2e2e','scroc':'#9a9a9a','scrooc':'#9f9f9f',
             },**kw})
 
@@ -317,14 +327,14 @@ class TinUIDark(TinUITheme):
             **{
                 'fg':'#ffffff','bg':'#202020',
                 'onfg':'#ffffff','onbg':'#2d2d2d',
-                'oncolor':'#4CC2FF','signcolor':'#9f9f9f',
+                'oncolor':self.accent_color,'signcolor':'#9f9f9f',
             },**kw})
 
     def add_togglebutton(self,pos,*arg,**kw):
         return self.ui.add_togglebutton(pos,*arg,**{
             **{
                 'fg':'#ffffff','bg':'#2d2d2d','line':"#303030",
-                'activefg':'#000000','activebg':'#4CC2FF','activeline':'#5AC7FF',
+                'activefg':'#000000','activebg':self.accent_color,'activeline':self.accent_light,
             },**kw})
     
     def add_swipecontrol(self,pos,*arg,**kw):
@@ -341,7 +351,7 @@ class TinUIDark(TinUITheme):
             **{
                 'fg':'#cfcfcf','bg':'#2d2d2d','outline':'#3c3c3c',
                 'activefg':'#ffffff','activebg':'#323232',
-                'onfg':'#000000','onbg':'#4CC2FF',
+                'onfg':'#000000','onbg':self.accent_color,
                 'buttonfg':'#ffffff','buttonbg':'#2d2d2d',
                 'buttonactivefg':'#ffffff','buttonactivebg':'#383838',
                 'buttononfg':'#ffffff','buttononbg':'#343434',
@@ -390,7 +400,7 @@ class TinUIDark(TinUITheme):
                 'fg':'#FFFFFF','bg':'#1D1D1D',
                 'activefg':'#FFFFFF','activebg':'#2A2A2A',
                 'onbg':'#3A3A3A',
-                'line':'#303030','sign':'#4CC2FF'
+                'line':'#303030','sign':self.accent_color
         },**kw})
 
     def add_navigation(self,pos,*arg,**kw):
@@ -398,5 +408,5 @@ class TinUIDark(TinUITheme):
             **{
                 'fg':'#FFFFFF','bg':'#202020',
                 'activefg':'#FFFFFF','activebg':'#2C2C2C',
-                'onfg':'#FFFFFF','onbg':'#2C2C2C','oncolor':'#4CC2FF'
+                'onfg':'#FFFFFF','onbg':'#2C2C2C','oncolor':self.accent_color
             },**kw})

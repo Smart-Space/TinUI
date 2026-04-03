@@ -2670,7 +2670,7 @@ class BasicTinUI(Canvas):
                             cpos[count] = p
                     count += 1
             back = self.__ui_polygon(
-                ((cpos[0] + 2, cpos[1] + 2), (cpos[2] - 2, cpos[3] - 2)),
+                ((cpos[0] + self.scale_value(2), cpos[1] + self.scale_value(2)), (cpos[2] - self.scale_value(2), cpos[3] - self.scale_value(2))),
                 fill=bg,
                 outline=fg,
                 width=self.TINUI_RADIUS_SMALL + linew,
@@ -5331,7 +5331,7 @@ class BasicTinUI(Canvas):
             else:
                 box.itemconfig(line, state="normal")
                 posi = posi[1]
-            box.moveto(line, self.scale_value(-1), posi + linew / 5)
+            box.coords(line, self.scale_value(1), posi+linewt, self.scale_value(1), posi+linewb)
             if command != None and send:
                 father_link.clear()
                 father_link.append(cid)
@@ -5381,7 +5381,7 @@ class BasicTinUI(Canvas):
                     )
                     back = box.add_back((), tuple((sign, te)), fg=bg, bg=bg, linew=0)
                     items[back] = (te, back, sign, father_id)
-                    add_item(padx + 15, text[1], back)
+                    add_item(padx + self.scale_value(15), text[1], back)
                     box.tag_bind(sign,"<Button-1>",lambda _, s=sign, cid=back: close_view(s, cid))
                 old_coords = box.coords(back)
                 old_coords[0] = old_coords[6] = 6
@@ -5442,8 +5442,6 @@ class BasicTinUI(Canvas):
                 click(nowid)
             elif bbox != None:
                 click(nowid)  # 单级输出
-                posi = box.bbox(nowid)[1]
-                box.moveto(line, -1, posi + linew / 5)
             checkscroll()
 
         def close_view(sign, cid):  # 闭合
@@ -5501,7 +5499,7 @@ class BasicTinUI(Canvas):
         def repaintback():
             bbox = box.bbox("item")
             widgetwidth = bbox[2]
-            widgetwidth = max(width, widgetwidth) - 9
+            widgetwidth = max(width, widgetwidth) - self.TINUI_RADIUS_SMALL
             for back in items:
                 old_coords = box.coords(back)
                 old_coords[2] = old_coords[4] = widgetwidth
@@ -5524,10 +5522,10 @@ class BasicTinUI(Canvas):
                 vscroll.move(dx, dy, width)
             else:
                 dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), "nw")
-                width2 = x2 - x1 - self.scale_value(9)
+                width2 = x2 - x1 - self.TINUI_RADIUS_SMALL
                 dw = width2 - width
                 width = width2
-                height2 = y2 - y1 - self.scale_value(9)
+                height2 = y2 - y1 - self.TINUI_RADIUS_SMALL
                 dh = height2 - height
                 height = height2
                 self.move(hscroll, dw, 0)
@@ -5583,8 +5581,10 @@ class BasicTinUI(Canvas):
         # 重绘宽度
         bbox = box.bbox(tuple(items.keys())[0])  # 第一个元素
         linew = bbox[3] - bbox[1]
+        linewt = linew//3
+        linewb = linew*2//3
         line = box.create_line(
-            (self.scale_value(1), linew / 3, self.scale_value(1), linew * 2 / 3), fill=oncolor, width=self.scale_value(3,True), capstyle="round"
+            (self.scale_value(1), linewt, self.scale_value(1), linewb), fill=oncolor, width=self.scale_value(3,True), capstyle="round"
         )
         x1, y1, x2, y2 = self.bbox(uid)
         allback = self.__ui_polygon(

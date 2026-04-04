@@ -3609,7 +3609,7 @@ class BasicTinUI(Canvas):
             bbox = ui.bbox("item")
             if bbox != None:
                 bbox = list(bbox)
-                bbox[0] -= 3
+                bbox[0] -= self.scale_value(3,True)
                 ui.config(scrollregion=bbox)
 
         def __layout(x1, y1, x2, y2, expand=False):

@@ -18,6 +18,9 @@ class TinUITheme:
 
     def __init__(self,ui,name='tinui-theme'):
         #ui为TinUI框架
+    
+    def adjust_color_lightness(self, hex_color, factor):
+        #调整颜色亮度
 ```
 
 使用示例见开源TinUI代码库见 `theme\tinuilight.py`等。

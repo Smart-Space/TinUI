@@ -1,3 +1,4 @@
-from .TinUI import BasicTinUI, TinUI, TinUIXml, TinUITheme, ExpandPanel, VerticalPanel, HorizonPanel
+from .TinUI import BasicTinUI, TinUI, TinUIXml, TinUITheme
 from .TinUIDialog import show_msg, show_info, show_success, show_warning, show_error, show_question,\
     ask_string, ask_integer, ask_float, ask_choice
+from .TinUIPanel import ExpandPanel, VerticalPanel, HorizonPanel, CardPanel

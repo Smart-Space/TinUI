@@ -76,12 +76,43 @@ class VerticalPanel(ExpandablePanel):
 
 删除位置在`index`的托管元素。
 
+如果`index`不是int而是元素uid或者面板，则删除指定元素或面板，不存在则会报错。
+
 ### pop_child(index)
 
 不再管理位置在`index`的托管元素，并返回这个元素。
+
+如果`index`不是int而是元素uid或者面板，则取消指定元素或面板的托管，不存在则会报错。
 
 ---
 
 ## HorizonPanel
 
-同VerticalPanel，但`add_child`未指定`size`是，判断纵向面板最大控件宽度。
+同VerticalPanel，但`add_child`未指定`size`时，判断纵向面板最大控件宽度。
+
+---
+
+## CardPanel
+
+```python
+class CardPanel(ExpandablePanel):
+    def __init__(self, canvas, card_width=100, card_height=100, padding=(0, 0, 0, 0), h_spacing=5, v_spacing=5, min_width=0, bg='', bd=9):
+ 		...
+```
+
+- card_width::卡片宽度
+- card_height::卡片高度
+- h_spacing::水平间距
+- v_spacing::垂直间距
+
+### set_card_size(width, height)
+
+调整卡片尺寸。
+
+### set_spacing(horizontal=None, vertical=None)
+
+设置卡片间距。
+
+### add_child(child, index=-1)
+
+在指定位置插入托管元素。

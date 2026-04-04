@@ -11,6 +11,9 @@
 1. 优化treeview元素布局
 2. TinUITheme可设置标识色
 3. 优化listview在dpi感知下的可视范围计算
+4. Panel的删除可以直接使用元素名删除
+5. 添加卡片面板CardPanel
+6. 添加ExpandPanel的删除方法
 
 ==========6.21==========
 2026-4-3

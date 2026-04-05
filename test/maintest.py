@@ -11,6 +11,7 @@ import sys
 import os
 sys.path.append('..')
 from TinUI import *
+from TinUIPanel import *
 from tkinter import Tk
 path=os.path.dirname(os.path.abspath(__file__))
 

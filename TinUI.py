@@ -2961,12 +2961,12 @@ class BasicTinUI(Canvas):
             if mode == "y":  # 纵向
                 move = self.canvasy(event.y) - scroll.start  # 将窗口坐标转化为画布坐标
                 # 防止被拖出范围
-                if bbox[1] + move < start - 1 or bbox[3] + move > end + 1:
+                if bbox[1] + move < start - self.scale_value(1) or bbox[3] + move > end + self.scale_value(1):
                     return
                 self.move(sc, 0, move)
             elif mode == "x":  # 横向
                 move = self.canvasx(event.x) - scroll.start
-                if bbox[0] + move < start - 1 or bbox[2] + move > end + 1:
+                if bbox[0] + move < start - self.scale_value(1) or bbox[2] + move > end + self.scale_value(1):
                     return
                 self.move(sc, move, 0)
             # 重新定义画布中的起始拖动位置
@@ -3112,7 +3112,7 @@ class BasicTinUI(Canvas):
             elif mode == "x":
                 start += dx
                 end = start + size - 2*basewidth - 10
-                canmove = end - start
+                canmove = end - start - 10
                 self.move(bottom, size - height, 0)
                 coord = self.coords(back)
                 coord[2] += size - height

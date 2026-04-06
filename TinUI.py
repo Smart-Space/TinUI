@@ -2708,58 +2708,76 @@ class BasicTinUI(Canvas):
         anchor="nw",
     ):  # 绘制带状等待框
         def move(startx, endx, nowwidth):
-            if nowwidth - maxwidth > width:  # 一轮动画完成
+            if nowwidth - nowmaxwidth > width:  # 一轮动画完成
                 start()
                 return
             self.coords(bar, (pos[0] + startx, pos[1], pos[0] + endx, pos[1]))
-            start(nowwidth + 5)
+            start(nowwidth + self.scale_value(5))
 
         def start(nowwidth=0):  # 开始动画
-            nonlocal timesep, maxwidth
+            nonlocal timesep, nowmaxwidth
             if ifok:  # 已完成
-                self.itemconfig(bar, fill=okcolor)
-                self.coords(bar, (pos[0], pos[1], pos[0] + width, pos[1]))
+                if progress == 100: self.itemconfig(bar, fill=okcolor)
+                self.coords(bar, (pos[0], pos[1], pos[0] + width*progress//100, pos[1]))
+                return
             if nowwidth == 0:  # 重新定义时间间隔与滑块长度
                 if timesep == 10:
                     timesep = 40
-                    maxwidth /= 2
+                    nowmaxwidth = halfmaxwidth
                 else:
                     timesep = 10
-                    maxwidth *= 2
-            if nowwidth <= maxwidth:  # 增长阶段
+                    nowmaxwidth = maxwidth
+            if nowwidth <= nowmaxwidth:  # 增长阶段
                 self.after(timesep, lambda: move(0, nowwidth, nowwidth))
             elif nowwidth >= width:  # 缩小阶段
-                self.after(timesep, lambda: move(nowwidth - maxwidth, width, nowwidth))
+                self.after(timesep, lambda: move(nowwidth - nowmaxwidth, width, nowwidth))
             else:  # 平滑阶段。因为取整数，所以平滑阶段无法使用断点判断
                 self.after(
-                    timesep, lambda: move(nowwidth - maxwidth, nowwidth, nowwidth)
+                    timesep, lambda: move(nowwidth - nowmaxwidth, nowwidth, nowwidth)
                 )
 
         def __layout(x1, y1, x2, y2, expand=False):
-            nonlocal width, maxwidth
+            nonlocal width, maxwidth, halfmaxwidth
             if not expand:
                 dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), anchor)
                 pos[0] += dx
                 pos[1] += dy
             else:
+                x2 -= self.scale_value(3,True)
                 width = x2 - x1
                 maxwidth = (width) // 3 * 2
+                halfmaxwidth = maxwidth // 2
                 dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), "w")
                 pos[0] += dx
                 pos[1] += dy
                 self.coords(back, pos[0], pos[1], x2, pos[1])
+                if ifok:
+                    start()
 
         def stop():  # 停止
             nonlocal ifok
             ifok = True
+        def __start():
+            nonlocal ifok
+            ifok = False
+            start()
+        def set_progress(prog:int):
+            # prog//100
+            nonlocal progress
+            progress = prog
+            if ifok:
+                start()
 
         ifok = False
+        progress = 100 # 内部进度
         timesep = 10  # 时间间隔，快20，慢40
         bbox = (pos[0], pos[1], pos[0] + width, pos[1])
         back = self.create_line(bbox, fill=bg, width=self.scale_value(3,True), capstyle="round")
         uid = TinUIString(f"waitbar3-{back}")
         self.itemconfig(back, tags=uid)
         maxwidth = width // 3 * 2  # 原长为三分之一，快速模式为原长两倍
+        halfmaxwidth = maxwidth // 2
+        nowmaxwidth = maxwidth # 当前最大宽度
         bar = self.create_line(
             (pos[0], pos[1], pos[0], pos[1]),
             fill=fg,
@@ -2772,9 +2790,12 @@ class BasicTinUI(Canvas):
         pos[0] += dx
         pos[1] += dy
         del bbox
-        start()
+        funcs = FuncList(3)
+        funcs.start = __start
+        funcs.stop = stop
+        funcs.progress = set_progress
         uid.layout = __layout
-        return back, bar, stop, uid
+        return back, bar, funcs, uid
 
     def add_textbox(
         self,
@@ -3028,11 +3049,12 @@ class BasicTinUI(Canvas):
         def sc_move():  # 滚动条控制控件滚动
             nonlocal target_y, current_y
             bbox = self.bbox(sc)
+            effective = canmove - 10
             if mode == "y":
-                startp = (bbox[1] - start) / canmove
+                startp = (bbox[1] - start) / effective
                 widget.yview("moveto", startp)
             elif mode == "x":
-                startp = (bbox[0] - start) / canmove
+                startp = (bbox[0] - start) / effective
                 widget.xview("moveto", startp)
             target_y = current_y = startp
 
@@ -7892,7 +7914,9 @@ if __name__ == "__main__":
     b.add_tooltip(ttb, "很多很多", delay=1)
     b.add_back(pos=(0, 0), uids=(ttb,), bg="cyan", fg="cyan")
     _, _, ok3, _ = b.add_waitbar3((600, 800), width=240)
-    b.add_button((600, 750), text="停止带状等待框", command=lambda event: ok3())
+    ok3.start()
+    ok3.progress(45)
+    b.add_button((600, 750), text="停止带状等待框", command=lambda _: ok3.stop())
     textbox = b.add_textbox(
         (890, 100),
         text="这是文本输入框，当然，无法在textbox的参数中绑定横向滚动"

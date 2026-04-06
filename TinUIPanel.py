@@ -1,10 +1,7 @@
-from typing import override
-
-
 try:
     from .TinUI import BasicTinUI, TinUIString
-except:
-    from tinui.TinUI import BasicTinUI, TinUIString
+except Exception as err:
+    from TinUI import BasicTinUI, TinUIString
 
 
 class BasePanel:
@@ -390,7 +387,9 @@ if __name__ == "__main__":
     hp.add_child(v1, size=150, weight=1)
     # hp.add_child(v1,size=150)
 
-    ct = b.add_treeview((0,0),anchor='center')[-1]
+    cts = b.add_waitbar3((0,0),anchor='center')
+    ct = cts[-1]
+    cts[-2].start()
 
     v1.set_child(ct)
     # hp.add_child(ct, weight=1)

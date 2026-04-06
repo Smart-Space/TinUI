@@ -1120,34 +1120,55 @@ class BasicTinUI(Canvas):
         )
         return link, back, funcs, uid
 
-    # def add_waitbar1(self,pos:tuple,fg='#0078D7',bg='',okfg='lightgreen',okbg='',bd=5,r=20,anchor='nw'):#绘制圆形等待组件
-    #     def __start(i):
-    #         if is_ok:
-    #             return
-    #         self.itemconfig(waitbar1,extent=i,start=90+i)
-    #         self.update_idletasks()
-    #         if i==355:
-    #             start()
-    #     def start():
-    #         if is_ok:
-    #             return
-    #         for i in range(0,360,5):
-    #             self.after(i*8,lambda i=i:__start(i))
-    #     def ok():
-    #         nonlocal is_ok
-    #         is_ok=True
-    #         self.itemconfig(waitbar1,outline=okfg,extent=359)
-    #         self.itemconfig(back,fill=okbg)
-    #     is_ok = False
-    #     bbox=(pos[0],pos[1],pos[0]+2*r,pos[1]+2*r)
-    #     back_bbox=(pos[0]+bd,pos[1]+bd,pos[0]+2*r-bd,pos[1]+2*r-bd)
-    #     back=self.create_oval(back_bbox,width=0,fill=bg)
-    #     uid=f'waitbar1-{back}'
-    #     self.itemconfig(back,tags=uid)
-    #     waitbar1=self.create_arc(bbox,outline=fg,extent=5,start=90,width=bd,style='arc',tags=uid)
-    #     self.__auto_anchor(uid,pos,anchor)
-    #     start()
-    #     return waitbar1,ok,uid
+    def add_waitbar1(self,pos:tuple,fg='#0078D7',okcolor='#0f7b0f',r=20,anchor='nw'):#绘制圆形等待组件
+        def __start(i):
+            self.itemconfig(waitbar1,extent=i,start=90+i)
+            self.update_idletasks()
+            if i==355:
+                start(0)
+            else:
+                start(i+5)
+        def start(s=0):
+            if is_ok:
+                if progress == 100:
+                    self.itemconfig(waitbar1,outline=okcolor)
+                self.itemconfig(waitbar1,extent=360*progress//100+1,start=90)
+                self.update_idletasks()
+                return
+            self.after(32,lambda :__start(s))
+        def ok():
+            nonlocal is_ok
+            is_ok=True
+        def go():
+            nonlocal is_ok
+            is_ok = False
+            self.itemconfig(waitbar1, fill=fg)
+            start()
+        def set_progress(prog:int):
+            nonlocal progress
+            progress = prog
+            if is_ok:
+                start()
+        def __layout(x1, y1, x2, y2, _):
+            centerx = (x1+x2)//2
+            centery = (y1+y2)//2
+            self.coords(waitbar1, centerx-r, centery-r, centerx+r, centery+r)
+        is_ok = False
+        progress = 100 # 100/100
+        bd = max(r//5, 1)
+        bbox=(pos[0],pos[1],pos[0]+2*r,pos[1]+2*r)
+        waitbar1=self.create_arc(bbox,outline=fg,extent=361,start=90,width=bd,style='arc')
+        uid=TinUIString(f'waitbar1-{waitbar1}')
+        self.itemconfig(waitbar1,tags=uid)
+        
+        self.__auto_anchor(uid,pos,anchor)
+        funcs = FuncList(3)
+        funcs.start = go
+        funcs.stop = ok
+        funcs.progress = set_progress
+
+        uid.layout = __layout
+        return waitbar1,funcs,uid
 
     def add_labelframe(
         self,
@@ -1196,51 +1217,6 @@ class BasicTinUI(Canvas):
         else:
             label = None
         return label, back, outline, uid
-
-    # def add_waitbar2(self,pos:tuple,width:int=240,fg='#3041d8',bg='#f3f3f3',okcolor='#0f7b0f',anchor='nw'):#绘制点状等待框
-    #     #单点运动
-    #     def ball_go(ball,w,x,num):
-    #         self.move(ball,x,0)
-    #         if num==4 and w>=width:
-    #             for i in balls:
-    #                 self.coords(i,pos)
-    #                 self.update_idletasks()
-    #             start()
-    #     #单点运动控制
-    #     def _start(ball):
-    #         if ifok:
-    #             return
-    #         self.itemconfig(ball,state='normal')
-    #         num=balls.index(ball)
-    #         fast=width//2
-    #         for w in range(0,width+5-fast,5):
-    #             self.after(w*10,lambda w=w:ball_go(ball,w,5,num))
-    #         for w in range(width+5-fast,width+5-fast//2,5):
-    #             self.after(w*10,lambda w=w:ball_go(ball,w+fast//2,10,num))
-    #     #整体动画控制
-    #     def start():
-    #         if ifok:
-    #             return
-    #         for i, ball in enumerate(balls):
-    #             #每0.3秒释放一个小球标识
-    #             self.after(i * 300, lambda ball=ball:_start(ball))
-    #     def stop():
-    #         nonlocal ifok
-    #         ifok = True
-    #         for i in balls:
-    #             self.itemconfig(i,state='hidden')
-    #         self.itemconfig(back,fill=okcolor,width=3)
-    #     ifok = False
-    #     back=self.create_line((pos[0],pos[1]+5,pos[0]+width+5,pos[1]+5),fill=fg,width=1,capstyle='round')
-    #     uid=f'waitbar2-{back}'
-    #     self.itemconfig(back,tags=uid)
-    #     self.__auto_anchor(uid,pos,anchor)
-    #     balls=[]
-    #     for _ in range(5):
-    #         ball=self.create_text(pos,text='\uF127',fill=fg,state='hidden',font='{Segoe Fluent Icons} 4',tags=uid)
-    #         balls.append(ball)
-    #     start()
-    #     return back,balls,stop,uid
 
     def add_combobox(
         self,
@@ -2760,6 +2736,7 @@ class BasicTinUI(Canvas):
         def __start():
             nonlocal ifok
             ifok = False
+            self.itemconfig(bar, fill=fg)
             start()
         def set_progress(prog:int):
             # prog//100
@@ -7868,10 +7845,9 @@ if __name__ == "__main__":
         "https://smart-space.com.cn/",
         command=lambda url: print("open> " + url),
     )
-    # _,ok1,_=b.add_waitbar1((500,220),bg='#CCCCCC')
-    # _,_,ok2,_=b.add_waitbar2((600,400))
-    # b.add_button((500,270),'停止等待动画',activefg='cyan',activebg='black',command=lambda e: ok1())
-    # bu1=b.add_button((700,200),'停止点状滚动条',activefg='white',activebg='black',command=lambda e: ok2())[1]
+    _,wait1,_=b.add_waitbar1((500,220))
+    wait1.start()
+    b.add_button((500,270),'停止等待动画',activefg='cyan',activebg='black',command=lambda _: wait1.stop())
     bu2 = b.add_button((700, 250), "nothing button 2")[1]
     bu3 = b.add_button((700, 300), "nothing button 3")[1]
     b.add_labelframe((bu2, bu3), "")

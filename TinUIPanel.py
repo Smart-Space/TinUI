@@ -387,7 +387,7 @@ if __name__ == "__main__":
     hp.add_child(v1, size=150, weight=1)
     # hp.add_child(v1,size=150)
 
-    cts = b.add_waitbar3((0,0),anchor='center')
+    cts = b.add_waitbar1((0,0),anchor='center')
     ct = cts[-1]
     cts[-2].start()
 

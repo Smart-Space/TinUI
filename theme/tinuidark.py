@@ -86,24 +86,16 @@ class TinUIDark(TinUITheme):
             },**kw})
 
     def add_waitbar1(self,pos,*arg,**kw):
-        # return self.ui.add_waitbar1(pos,*arg,**{
-        #     **{
-        #         'fg':'#b2b8f2','bg':'#202020','okfg':'#b2b8f2','bd':5,
-        #     },**kw})
-        ...
+        return self.ui.add_waitbar1(pos,*arg,**{
+            **{
+                'fg':self.accent_color,'okcolor':self.accent_color,
+            },**kw})
 
     def add_labelframe(self,uids:tuple,*arg,**kw):
         return self.ui.add_labelframe(uids,*arg,**{
             **{
                 'fg':'#1D1D1D','bg':'#272727',
             },**kw})
-
-    def add_waitbar2(self,pos,*arg,**kw):
-        # return self.ui.add_waitbar2(pos,*arg,**{
-        #     **{
-        #         'fg':'#b2b8f2','bg':'#202020','okcolor':'#6ccb5f',
-        #     },**kw})
-        ...
 
     def add_combobox(self,pos,*arg,**kw):
         return self.ui.add_combobox(pos,*arg,**{

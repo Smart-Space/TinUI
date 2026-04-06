@@ -49,8 +49,6 @@ def test(theme):
     lb2=du.add_button(end(),text='labelframe button2')[-1]
     lb3=du.add_button(end(),text='labelframe button3')[-1]
     du.add_labelframe((lb1,lb2,lb3),title='labelframe')
-    #progressbar
-    du.add_waitbar2(end())
     #combobox
     du.add_combobox(end(),text='test combobox',content=('1','2','3','4','5'))
     #progressbar

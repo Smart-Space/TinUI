@@ -1153,7 +1153,7 @@ class BasicTinUI(Canvas):
             centerx = (x1+x2)//2
             centery = (y1+y2)//2
             self.coords(waitbar1, centerx-r, centery-r, centerx+r, centery+r)
-        is_ok = False
+        is_ok = True
         progress = 100 # 100/100
         bd = max(r//5, 1)
         bbox=(pos[0],pos[1],pos[0]+2*r,pos[1]+2*r)
@@ -2745,7 +2745,7 @@ class BasicTinUI(Canvas):
             if ifok:
                 start()
 
-        ifok = False
+        ifok = True
         progress = 100 # 内部进度
         timesep = 10  # 时间间隔，快20，慢40
         bbox = (pos[0], pos[1], pos[0] + width, pos[1])

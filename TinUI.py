@@ -2120,6 +2120,7 @@ class BasicTinUI(Canvas):
             # 计算最近的刻度位置
             rend = min(dash, key=lambda x: abs(x - move))
             nowselect = dash.index(rend)
+            select(nowselect, False)
             if command is not None:
                 command(data[nowselect])
 
@@ -2372,7 +2373,7 @@ class BasicTinUI(Canvas):
 
         def endy():  # 获取最低位置
             pos = bar.bbox("all")
-            return 0 if pos == None else pos[3] + 10
+            return 0 if pos == None else pos[3] + self.scale_value(10)
 
         def repaint():  # 重新绘制以适配
             maxwidth = max(widths)
@@ -2440,7 +2441,7 @@ class BasicTinUI(Canvas):
             maxx = self.winfo_screenwidth()
             maxy = self.winfo_screenheight()
             wind.data = (maxx, maxy, winw, winh)
-            bar.move("all", 0, 14)
+            bar.move("all", 0, self.scale_value(14))
 
         def show(event):  # 显示的起始位置
             # 初始位置
@@ -2480,12 +2481,13 @@ class BasicTinUI(Canvas):
         widths = []  # 寻找最宽位置
         for i in cont:  # 添加菜单内容
             if i == "-":
-                sep = bar.create_line((5, endy(), 20, endy()), fill=line, width=3)
+                _endy = endy()
+                sep = bar.create_line((self.scale_value(5), _endy, self.scale_value(20), _endy), fill=line, width=self.scale_value(3,True))
                 seps.append(sep)
             elif type(i[1]) in (list, tuple):
                 # 嵌套菜单，只接受列表或元组，不接受集合等
                 button = bar.add_menubutton(
-                    (5, endy() - 5),
+                    (self.scale_value(5), endy() - self.scale_value(5)),
                     i[0],
                     icon,
                     "x",
@@ -2508,7 +2510,7 @@ class BasicTinUI(Canvas):
                 pos = bar.bbox(button[1])
                 width = pos[2] - pos[0]
                 widths.append(width)
-            elif callable(i[1]):
+            elif callable(i[1]) or i[1] is None:
                 if len(i) == 3:
                     icon = i[2]
                 else:
@@ -2541,22 +2543,22 @@ class BasicTinUI(Canvas):
         # 绘制圆角边框
         bbox = bar.bbox("all")
         x1 = bbox[0]
-        x2 = bbox[0] + max(widths) + 8
+        x2 = bbox[0] + max(widths) + self.scale_value(8)
         mback = bar.__ui_polygon(
-            ((x1 + 9, bbox[1] + 5), (x2 - 5, bbox[3] - 5)),
+            ((x1 + self.scale_value(9), bbox[1] + self.scale_value(5)), (x2 - self.scale_value(5), bbox[3] - self.scale_value(5))),
             fill=bg,
             outline=bg,
             width=self.TINUI_RADIUS_LARGE,
         )
         mline = bar.__ui_polygon(
-            ((x1 + 8, bbox[1] + 4), (x2 - 4, bbox[3] - 4)),
+            ((x1 + self.scale_value(8), bbox[1] + self.scale_value(4)), (x2 - self.scale_value(4), bbox[3] - self.scale_value(4))),
             fill=bg,
             outline=line,
             width=self.TINUI_RADIUS_LARGE,
         )
         bar.lower(mback)
         bar.lower(mline)
-        bar.move("all", 12, 5)
+        bar.move("all", self.scale_value(12), self.scale_value(5))
         menu.wind = wind  # 给menubutton用
         return menu, bar, funcs
 
@@ -2809,14 +2811,14 @@ class BasicTinUI(Canvas):
                     cid.move(dx, dy, height)
                 else:
                     width = x2 - x1 - self.scale_value(4)
-                self.itemconfig(cavui, width=width, height=height - self.scale_value(4))
+                self.itemconfig(cavui, width=width, height=height - self.scale_value(7))
                 coords = self.coords(line)
-                coords[2] = coords[4] = x1 + width + 1
-                coords[5] = coords[7] = y2 - 3
+                coords[2] = coords[4] = x1 + width + self.scale_value(1)
+                coords[5] = coords[7] = y2 - self.scale_value(6)
                 self.coords(line, coords)
                 coords = self.coords(back)
                 coords[2] = coords[4] = x1 + width
-                coords[5] = coords[7] = y2 - 4
+                coords[5] = coords[7] = y2 - self.scale_value(7)
                 self.coords(back, coords)
 
         def focus_in(event):
@@ -2846,21 +2848,20 @@ class BasicTinUI(Canvas):
         textbox.bind("<FocusIn>", focus_in, True)
         textbox.bind("<FocusOut>", focus_out, True)
         cavui = self.create_window(
-            pos, window=textbox, width=width - 2, height=height - 2, anchor="nw"
+            pos, window=textbox, width=width - self.scale_value(2), height=height - self.scale_value(2), anchor="nw"
         )
-        # self.windows.append(textbox)
         uid = TinUIString(f"textbox-{cavui}")
         self.addtag_withtag(uid, cavui)
         textbox.insert(1.0, text)
         line = self.__ui_polygon(
-            ((pos[0] + 2, pos[1] + 2), (pos[0] + width - 5, pos[1] + height - 5)),
+            ((pos[0] + self.scale_value(2), pos[1] + self.scale_value(2)), (pos[0] + width - self.scale_value(5), pos[1] + height - self.scale_value(5))),
             fill=outline,
             outline=outline,
             width=self.TINUI_RADIUS_SMALL,
             tags=uid,
         )
         back = self.__ui_polygon(
-            ((pos[0] + 3, pos[1] + 3), (pos[0] + width - 6, pos[1] + height - 6)),
+            ((pos[0] + self.scale_value(3), pos[1] + self.scale_value(3)), (pos[0] + width - self.scale_value(6), pos[1] + height - self.scale_value(6))),
             fill=bg,
             outline=bg,
             width=self.TINUI_RADIUS_SMALL,
@@ -6521,22 +6522,28 @@ class BasicTinUI(Canvas):
         anchor="nw",
     ):  # 绘制按钮展开菜单
         # Segoe Fluent Icons x右侧展开\uE76B \uE76C，y下方展开\uE70D \uE70E，默认y
-        def in_button(event):
+        def in_button(_):
             self.itemconfig(outline, outline=activeline, fill=activeline)
             self.itemconfig(back, fill=activebg, outline=activebg)
             self.itemconfig(uid + "button", fill=activefg)
+        
+        def on_click(_):
+            if widget:
+                self.move(widget_item, 0, self.scale_value(2))
 
-        def out_button(event):
+        def out_button(_):
             self.itemconfig(back, fill=bg, outline=bg)
             self.itemconfig(outline, outline=line, fill=line)
             self.itemconfig(uid + "button", fill=fg)
 
-        def unshow(event):  # 重写菜单
+        def unshow(_):  # 重写菜单
             menu.withdraw()
             menu.unbind("<FocusOut>")
 
         def show(event):  # 显示的起始位置
             # 按钮样式更改
+            if widget:
+                self.move(widget_item, 0, -self.scale_value(2))
             self.itemconfig(outline, outline=online, fill=online)
             self.itemconfig(back, fill=onbg, outline=onbg)
             self.itemconfig(uid + "button", fill=onfg)
@@ -6550,30 +6557,20 @@ class BasicTinUI(Canvas):
             scx, scy = event.x_root, event.y_root  # 屏幕坐标
             if side == "y":
                 dx, dy = (
-                    round(
-                        self.canvasx(
-                            event.x,
-                        )
-                        - bbox[0]
-                    ),
+                    round(self.canvasx(event.x) - bbox[0]),
                     round(self.canvasy(event.y) - bbox[3]),
                 )  # 画布坐标差值
             elif side == "x":
                 dx, dy = (
-                    round(
-                        self.canvasx(
-                            event.x,
-                        )
-                        - bbox[2]
-                    ),
+                    round(self.canvasx(event.x) - bbox[2]),
                     round(self.canvasy(event.y) - bbox[1]),
                 )  # 画布坐标差值
             sx, sy = scx - dx, scy - dy
             #
             if sx + winw > maxx:
-                x = sx - winw - 5
+                x = sx - winw - self.scale_value(5)
             else:
-                x = sx - 5
+                x = sx - self.scale_value(5)
             if sy + winh > maxy:
                 y = sy - winh
             else:
@@ -6622,6 +6619,7 @@ class BasicTinUI(Canvas):
             if text == "":
                 self.delete(button)
                 button = None
+        widget_item = uid + "widget" # 下拉标识的tag
         if side == "y":
             self.create_text(
                 (x2 + 5, (y1 + y2) / 2),
@@ -6629,7 +6627,7 @@ class BasicTinUI(Canvas):
                 fill=fg,
                 font=f"{{Segoe Fluent Icons}} {font_size}",
                 anchor="w",
-                tags=(uid, uid + "button", uid + "widget"),
+                tags=(uid, uid + "button", widget_item),
             )
         elif side == "x":
             self.create_text(
@@ -6638,11 +6636,11 @@ class BasicTinUI(Canvas):
                 fill=fg,
                 font=f"{{Segoe Fluent Icons}} {font_size}",
                 anchor="w",
-                tags=(uid, uid + "button", uid + "widget"),
+                tags=(uid, uid + "button", widget_item),
             )
         if not widget:  # 如果被指定不显示标识符
-            self.delete(uid + "widget")
-            self.dtag(uid + "widget")
+            self.delete(widget_item)
+            self.dtag(widget_item)
         x1, y1, x2, y2 = self.bbox(uid + "button")
         linew -= 1
         outline = self.__ui_polygon(
@@ -6658,7 +6656,7 @@ class BasicTinUI(Canvas):
         # 创建菜单
         menu = self.add_menubar(
             uid,
-            "<Button-1>",
+            "<ButtonRelease-1>",
             font=font,
             fg=fg,
             bg=bg,
@@ -6672,12 +6670,12 @@ class BasicTinUI(Canvas):
             cont=cont,
             tran=tran,
         )[0]
-        self.tag_unbind(uid, "<Button-1>")
+        self.tag_unbind(uid, "<ButtonRelease-1>")
         # 重新绑定事件
-        for item_id in (uid + "button", back, outline):
-            self.tag_bind(item_id, "<Button-1>", show)
-            self.tag_bind(item_id, "<Enter>", in_button)
-            self.tag_bind(item_id, "<Leave>", out_button)
+        self.tag_bind(uid, "<Button-1>", on_click)
+        self.tag_bind(uid, "<ButtonRelease-1>", show)
+        self.tag_bind(uid, "<Enter>", in_button)
+        self.tag_bind(uid, "<Leave>", out_button)
         self.tkraise(uid + "button")
         self.__auto_anchor(uid, pos, anchor)
         del x1, y1, x2, y2, linew

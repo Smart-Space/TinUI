@@ -10,7 +10,7 @@
     <paragraph text=' ' width='580'></paragraph>
     </line>
     <line>
-    <menubutton text='menubutton'></menubutton>
+    <menubutton text='Email' icon='&#xE715;' cont='(("Send",None,"&#xE725;"),"-",("Reply",None,"&#xE8CA;"),("Reply All",None,"&#xE8C2;"))'></menubutton>
     </line>
 </line>
 </tinui>

@@ -752,15 +752,15 @@ class BasicTinUI(Canvas):
             if not expand:
                 self.__auto_layout(uid, (x1, y1, x2, y2), anchor)
             else:
-                self.itemconfig(funce, width=x2 - x1 - dwidth - 6)
+                self.itemconfig(funce, width=x2 - x1 - dwidth - self.scale_value(6))
                 bbox1 = self.bbox(funce)
                 coord = self.coords(back)
-                coord[0] = coord[6] = bbox1[0] + 3
-                coord[2] = coord[4] = bbox1[2] + dwidth - 3
+                coord[0] = coord[6] = bbox1[0] + self.scale_value(3)
+                coord[2] = coord[4] = bbox1[2] + dwidth - self.scale_value(3)
                 self.coords(back, coord)
                 coord = self.coords(outl)
-                coord[0] = coord[6] = bbox1[0] + 2
-                coord[2] = coord[4] = bbox1[2] + dwidth - 2
+                coord[0] = coord[6] = bbox1[0] + self.scale_value(3)-1
+                coord[2] = coord[4] = bbox1[2] + dwidth - self.scale_value(3)+1
                 self.coords(outl, coord)
                 coordl = self.coords(bottomline)
                 coordl[0] = coord[0]
@@ -822,6 +822,7 @@ class BasicTinUI(Canvas):
             highlightthickness=0,
             insertbackground=insert,
             textvariable=var,
+            insertwidth=self.scale_value(1),
         )
         entry.var = var
         if text != "":
@@ -1951,7 +1952,7 @@ class BasicTinUI(Canvas):
             font=font,
             fg=fg,
             highlightthickness=0,
-            insertwidth=1,
+            insertwidth=self.scale_value(1),
             bd=0,
             bg=bg,
             relief="flat",
@@ -2148,7 +2149,7 @@ class BasicTinUI(Canvas):
                     dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), "w")
                     pos[0] += dx
                     pos[1] += dy
-                    width = x2 - x1
+                    width = x2 - pos[0]
                     dash_t = width / (len(data) - 1)
                     s = x1
                     dash.clear()
@@ -2156,13 +2157,13 @@ class BasicTinUI(Canvas):
                     for _ in data[1:]:
                         s += dash_t
                         dash.append(s)
-                    self.coords(back, pos[0], pos[1] + 8, pos[0] + width, pos[1] + 8)
+                    self.coords(back, pos[0], pos[1] + 8, x2, pos[1] + 8)
                     self.coords(name, pos[0], pos[1] + 8, dash[nowselect], pos[1] + 8)
                 else:  # y方向
                     dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), "n")
                     pos[0] += dx
                     pos[1] += dy
-                    width = y2 - y1
+                    width = y2 - pos[1]
                     dash_t = width / (len(data) - 1)
                     s = y2
                     dash.clear()
@@ -2170,7 +2171,7 @@ class BasicTinUI(Canvas):
                     for _ in data[1:]:
                         s -= dash_t
                         dash.append(s)
-                    self.coords(back, pos[0] + 8, pos[1], pos[0] + 8, pos[1] + width)
+                    self.coords(back, pos[0] + 8, pos[1], pos[0] + 8, y2)
                     self.coords(name, pos[0] + 8, pos[1], pos[0] + 8, dash[nowselect])
                 select(nowselect, False)
 
@@ -2844,6 +2845,7 @@ class BasicTinUI(Canvas):
             borderwidth=0,
             highlightthickness=0,
             relief="flat",
+            insertwidth=self.scale_value(1),
         )
         textbox.bind("<FocusIn>", focus_in, True)
         textbox.bind("<FocusOut>", focus_out, True)
@@ -5675,14 +5677,14 @@ class BasicTinUI(Canvas):
         def showkey(e):
             nonlocal nowstate
             nowstate = "shown"
-            self.itemconfig(funcw, fill=onoutline)
+            self.itemconfig(funcw, fill=onoutline, text='\uf78d')
             entry.config(show="")
             if_empty(None)
 
         def hidekey(e):
             nonlocal nowstate
             nowstate = "hidden"
-            self.itemconfig(funcw, fill=fg)
+            self.itemconfig(funcw, fill=fg, text='\uED1A')
             entry.config(show="●")
             if_empty(None)
 
@@ -5724,15 +5726,15 @@ class BasicTinUI(Canvas):
             if not expand:
                 self.__auto_layout(uid, (x1, y1, x2, y2), anchor)
             else:
-                self.itemconfig(funce, width=x2 - x1 - dwidth - 6)
+                self.itemconfig(funce, width=x2 - x1 - dwidth - self.scale_value(6))
                 bbox1 = self.bbox(funce)
                 coord = self.coords(back)
-                coord[0] = coord[6] = bbox1[0] + 2
-                coord[2] = coord[4] = bbox1[2] + dwidth - 2
+                coord[0] = coord[6] = bbox1[0] + self.scale_value(3)
+                coord[2] = coord[4] = bbox1[2] + dwidth - self.scale_value(3)
                 self.coords(back, coord)
                 coord = self.coords(outl)
-                coord[0] = coord[6] = bbox1[0] + 1
-                coord[2] = coord[4] = bbox1[2] + dwidth - 1
+                coord[0] = coord[6] = bbox1[0] + self.scale_value(3)-1
+                coord[2] = coord[4] = bbox1[2] + dwidth - self.scale_value(3)+1
                 self.coords(outl, coord)
                 coordl = self.coords(bottomline)
                 coordl[0] = coord[0]
@@ -5784,6 +5786,7 @@ class BasicTinUI(Canvas):
             highlightthickness=0,
             show="●",
             insertbackground=insert,
+            insertwidth=self.scale_value(1),
         )
         entry_bind()
         funce = self.create_window(
@@ -5798,7 +5801,7 @@ class BasicTinUI(Canvas):
         font_size = str(_font.cget("size"))
         funcw = self.create_text(
             (bbox[0] + width, (bbox[1] + bbox[3]) / 2),
-            text="\uf78d",
+            text="\uED1A",#对立\uf78d
             fill=fg,
             font="{Segoe Fluent Icons} " + font_size,
             anchor="w",
@@ -6182,21 +6185,21 @@ class BasicTinUI(Canvas):
             box = e.widget
             if box.choices[t][-1] == True:  # 已被选中
                 return
-            box.itemconfig(box.choices[t][2], fill=buttonactivebg)
+            box.itemconfig(box.choices[t][2], fill=buttonactivebg, outline=buttonactivebg)
             box.itemconfig(box.choices[t][1], fill=activefg)
 
         def pick_out_mouse(e, t):
             box = e.widget
             if box.choices[t][-1] == True:  # 已被选中
-                box.itemconfig(box.choices[t][2], fill=onbg)
+                box.itemconfig(box.choices[t][2], fill=onbg, outline=onbg)
                 box.itemconfig(box.choices[t][1], fill=onfg)
             else:
-                box.itemconfig(box.choices[t][2], fill=bg)
+                box.itemconfig(box.choices[t][2], fill=bg, outline=bg)
                 box.itemconfig(box.choices[t][1], fill=fg)
 
         def pick_sel_it(e, t):
             box = e.widget
-            box.itemconfig(box.choices[t][2], fill=onbg)
+            box.itemconfig(box.choices[t][2], fill=onbg, outline=onbg)
             box.itemconfig(box.choices[t][1], fill=onfg)
             box.choices[t][-1] = True
             box.sel_back = box.choices[t][2]
@@ -6268,7 +6271,7 @@ class BasicTinUI(Canvas):
             if alpha == 1:
                 picker.focus_set()
 
-        def _loaddata(box, items, mw):
+        def _loaddata(box:BasicTinUI, items, mw):
             def __set_y_view(event):
                 box.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
@@ -6277,7 +6280,7 @@ class BasicTinUI(Canvas):
                 end = box.bbox("all")
                 end = 5 if end == None else end[-1]
                 text = box.create_text(
-                    (5, end + 7),
+                    (self.scale_value(5), end + self.scale_value(7)),
                     text=i,
                     fill=fg,
                     font=font,
@@ -6285,8 +6288,8 @@ class BasicTinUI(Canvas):
                     tags="textcid",
                 )
                 bbox = box.bbox(text)  # 获取文本宽度
-                back = box.create_rectangle(
-                    (3, bbox[1] - 4, 3 + mw, bbox[3] + 4), width=0, fill=bg
+                back = box.__ui_polygon(
+                    ((self.scale_value(7), bbox[1]), (-self.scale_value(7) + mw, bbox[3])), width=self.TINUI_RADIUS_SMALL, fill=bg, outline=bg
                 )
                 box.tkraise(text)
                 box.choices[text] = [

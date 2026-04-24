@@ -6,6 +6,15 @@
 ==========更新日志==========
 
 
+==========6.25==========
+2026-5-1
+1. 优化scale在面板布局中的响应
+2. picker内部元素背景圆角
+3. theme中添加子ui默认配色
+4. 优化entry, passwordbox在拓展面板中的布局
+5. 优化entry, textbox, passwordbox, spinbox在高DPI下的光标表现
+6. passwordbox对于密码显示的状态使用两种图标
+
 ==========6.24==========
 2026-4-24
 1. 优化textbox在高DPI下的边框表现

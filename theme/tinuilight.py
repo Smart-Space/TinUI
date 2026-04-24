@@ -207,6 +207,13 @@ class TinUILight(TinUITheme):
     #             'outline':'#808080','linew':1,
     #             'scrollbg':'#f9f9f9','scrollcolor':'#8d8d8d','scrollon':'#8a8a8a',
     #         },**kw})
+    
+    def add_ui(self,pos,*arg,**kw):
+        return self.ui.add_canvas(pos,*arg,**{
+            **{
+                'bg':'#f9f9f9',
+                'scrollbg':'#f9f9f9','scrollcolor':'#8a8a8a','scrollon':'#8a8a8a',
+            },**kw})
 
     def add_pipspager(self,pos,*arg,**kw):
         return self.ui.add_pipspager(pos,*arg,**{

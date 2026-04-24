@@ -388,7 +388,7 @@ if __name__ == "__main__":
     hp.add_child(v1, size=150, weight=1)
     # hp.add_child(v1,size=150)
 
-    ct = b.add_scalebar((0,0),command=print)[-1]
+    ct = b.add_picker((0,0),command=print)[-1]
 
     v1.set_child(ct)
     # hp.add_child(ct, weight=1)

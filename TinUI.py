@@ -7355,12 +7355,115 @@ class BasicTinUI(Canvas):
         y = pos[1] + font_height + self.scale_value(15) + dy if widget else pos[1] + dy
         self.itemconfig(line, state='normal')
         navigate(0)
-        del bbox, dx, dy, starty, cnt
         uid.layout = __layout
         funcs = FuncList(1)
         funcs.navigate = navigate
         return topicon, topback, line, menus, funcs, uid
 
+    def add_labels(self, pos:tuple, fg='#000000', bg='#fdfdfd', activefg='#1b1b1b', activebg='#f9f9f9', outline='#eeeeee', font=None, widget=True, anchor='nw', command=None): # 绘制一个标签栏
+        def mouse_in(_):
+            self.itemconfig(plustext, fill=activefg)
+            self.itemconfig(plusback, fill=activebg)
+        def mouse_out(_):
+            self.itemconfig(plustext, fill=fg)
+            self.itemconfig(plusback, fill=bg)
+        def mouse_click(_):
+            if callable(command):
+                label, oncancel = command()
+                if label is not None:
+                    add(label, oncancel)
+        def __layout(x1, y1, x2, y2, expand=False):
+            nonlocal endx, endy
+            if not expand:
+                dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), anchor)
+            else:
+                dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2))
+            endx += dx
+            endy += dy
+        def add(label:str, oncancel=None):
+            nonlocal endx
+            def on_enter(_):
+                self.itemconfig(cancelt, fill=fg)
+            def on_leave(_):
+                self.itemconfig(cancelt, fill=bg)
+            def on_click(_):
+                nonlocal endx
+                oncancel(label)
+                self.delete(text, back, line, cancelt)
+                index = labell[-1]
+                for items in labels[index:]:
+                    items[-1] -= 1
+                    for item in items[:-1]:
+                        self.move(item, -width, 0)
+                if widget:
+                    self.move(plusuid, -width, 0)
+                endx -= width
+                labels.pop(index)
+            text = self.create_text(endx, endy, text=label, font=font, fill=fg, tags=uid)
+            textuid = f'label-text-{text}'
+            self.addtag_withtag(textuid, text)
+            bbox = self.bbox(text)
+            width = (bbox[2]-bbox[0])*2//3
+            height = bbox[3]-bbox[1]
+            if height%2 == 0:
+                height += 1
+            linew = height+self.scale_value(2)
+            back = self.create_line(endx-width, endy, endx+width, endy, fill=bg, width=height, tags=(uid,textuid), capstyle='round')
+            line = self.create_line(endx-width, endy, endx+width, endy, fill=outline, width=linew, tags=(uid,textuid), capstyle='round')
+            self.tag_raise(back)
+            self.tag_raise(text)
+            labell = [text, back, line]
+            if callable(oncancel):
+                self.move(text, -self.scale_value(3), 0)
+                cancelt = self.create_text(bbox[2]-self.scale_value(2), endy, anchor='w', text='\uE711', font=segoe_font, tags=(uid,textuid), fill=bg)
+                self.tag_bind(cancelt, '<Enter>', on_enter)
+                self.tag_bind(cancelt, '<Leave>', on_leave)
+                self.tag_bind(cancelt, '<Button-1>', on_click)
+                labell.append(cancelt)
+            bbox = self.bbox(line)
+            width = bbox[2]-bbox[0]
+            self.__auto_anchor(textuid, (endx,endy), 'w')
+            self.dtag(textuid)
+            endx += width
+            labell.append(labels.__len__())
+            if widget:
+                self.move(plusuid, width, 0)
+            labels.append(labell)
+        def get():
+            return labels.copy()
+        font = font or self.__get_font(-2)
+        font = tkfont.Font(font=font)
+        font_size = font.cget("size")+1
+        segoe_font = f'{{Segoe Fluent Icons}} {font_size}'
+        endx, endy = pos
+        labels = [] # [[text, back, line, [cancelt], index], ...]
+        plustext = self.create_text(endx, endy, text='\uF8AA', font=segoe_font, fill=fg)
+        uid = TinUIString(f"labels-{plustext}")
+        plusuid = uid+'plus'
+        self.itemconfig(plustext, tags=(uid, plusuid))
+        bbox = self.bbox(plustext)
+        pluswidth = (bbox[2]-bbox[0])*2//3
+        plusheight = bbox[3]-bbox[1]
+        if plusheight%2 == 0:
+            plusheight += 1
+        pluslinew = plusheight+self.scale_value(2)
+        plusback = self.create_line(endx-pluswidth, endy, endx+pluswidth, endy, width=plusheight, capstyle='round', tags=(uid, plusuid), fill=bg) # 背景
+        self.create_line(endx-pluswidth, endy, endx+pluswidth, endy, width=pluslinew, capstyle='round', tags=(uid, plusuid), fill=outline) # 边框
+        self.tag_raise(plusback)
+        self.tag_raise(plustext)
+        self.tag_bind(plusuid, '<Enter>', mouse_in)
+        self.tag_bind(plusuid, '<Leave>', mouse_out)
+        self.tag_bind(plusuid, '<Button-1>', mouse_click)
+        _, dy = self.__auto_anchor(uid, pos)
+        endy += dy
+        if not widget:
+            self.delete(plusuid)
+            self.dtag(plusuid)
+        funcs = FuncList(2)
+        funcs.add = add
+        funcs.get = get
+        uid.layout = __layout
+        return funcs, uid
 
 class TinUI(BasicTinUI):
     """对BasicTinUI的封装，添加了滚动条自动刷新"""
@@ -7792,6 +7895,9 @@ if __name__ == "__main__":
         else:
             b.itemconfig(tgbutton, text="状态开关按钮：关闭")
 
+    def test14():
+        return '标签', print
+
     a = Tk()
     a.geometry("700x700+5+5")
     a.iconbitmap("LOGO.ico")
@@ -8018,6 +8124,10 @@ if __name__ == "__main__":
         (1500, 450), content=("tkinter", "TinUI", "Other"), command=print
     )
     b.add_navigation((1500, 550))
+    labels_funcs = b.add_labels((1500, 700), widget=True)[-2]
+    labels_funcs.add('label')
+    labels_funcs.add('123')
+    labels_funcs.add('标签')
 
     b.bind("<Destroy>", lambda e: b.clean_windows())
 

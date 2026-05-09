@@ -7403,13 +7403,12 @@ class BasicTinUI(Canvas):
             textuid = f'label-text-{text}'
             self.addtag_withtag(textuid, text)
             bbox = self.bbox(text)
-            width = (bbox[2]-bbox[0])//2
             height = bbox[3]-bbox[1]
             if height%2 == 0:
                 height += 1
             linew = height+self.scale_value(2)
-            back = self.create_line(endx-width, endy, endx+width, endy, fill=bg, width=height, tags=(uid,textuid), capstyle='round')
-            line = self.create_line(endx-width, endy, endx+width, endy, fill=outline, width=linew, tags=(uid,textuid), capstyle='round')
+            back = self.create_line(bbox[0]-self.scale_value(2), endy, bbox[2]+self.scale_value(2), endy, fill=bg, width=height, tags=(uid,textuid), capstyle='round')
+            line = self.create_line(bbox[0]-self.scale_value(2), endy, bbox[2]+self.scale_value(2), endy, fill=outline, width=linew, tags=(uid,textuid), capstyle='round')
             self.tag_raise(back)
             self.tag_raise(text)
             labell = [text, back, line]
@@ -8124,7 +8123,7 @@ if __name__ == "__main__":
         (1500, 450), content=("tkinter", "TinUI", "Other"), command=print
     )
     b.add_navigation((1500, 550))
-    labels_funcs = b.add_labels((1500, 700), widget=True)[-2]
+    labels_funcs = b.add_labels((1500, 700), widget=True, command=test14)[-2]
     labels_funcs.add('label')
     labels_funcs.add('123')
     labels_funcs.add('标签')

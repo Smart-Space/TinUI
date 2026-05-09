@@ -361,6 +361,167 @@ class CardPanel(ExpandablePanel):
                 self.canvas.tag_raise(child, self.rect)
 
 
+class PanelSash(BasePanel):
+    """
+    面板拉伸条
+    用于动态调整 HorizontalPanel 或 VerticalPanel 中相邻子元素的尺寸或权重
+    """
+    def __init__(self, parent_panel, bg='#cccccc', bd=0):
+        # 传入的 parent_panel 必须是 VerticalPanel 或 HorizonPanel
+        super().__init__(parent_panel.canvas, bg, bd)
+        self.parent = parent_panel
+        
+        # 判断方向
+        if isinstance(parent_panel, HorizonPanel):
+            self.orientation = 'h'
+            self.cursor = 'sb_h_double_arrow'
+        elif isinstance(parent_panel, VerticalPanel):
+            self.orientation = 'v'
+            self.cursor = 'sb_v_double_arrow'
+        else:
+            raise ValueError("PanelSash 仅能在 HorizonPanel 或 VerticalPanel 中使用")
+
+        self._drag_data = {}
+
+        # 绑定鼠标事件
+        self.canvas.tag_bind(self.rect, '<ButtonPress-1>', self.start_drag)
+        self.canvas.tag_bind(self.rect, '<B1-Motion>', self.on_drag)
+        self.canvas.tag_bind(self.rect, '<Enter>', self.on_enter)
+        self.canvas.tag_bind(self.rect, '<Leave>', self.on_leave)
+
+    def update_layout(self, x1, y1, x2, y2):
+        self.fix_bg(x1, y1, x2, y2)
+
+    def on_enter(self, _):
+        self.canvas.config(cursor=self.cursor)
+
+    def on_leave(self, _):
+        self.canvas.config(cursor='')
+
+    def _get_child_size(self, child):
+        """获取相邻元素的当前像素尺寸（宽度或高度）"""
+        if issubclass(child.__class__, BasePanel):
+            coords = self.canvas.coords(child.rect)
+            if not coords or len(coords) < 6:
+                return 0
+            # 还原真实的宽高：消除 self.bd/2 导致的坐标偏移
+            if self.orientation == 'h':
+                return coords[4] - coords[0] + child.bd
+            else:
+                return coords[5] - coords[1] + child.bd
+        elif isinstance(child, TinUIString):
+            bbox = self.canvas.bbox(child)
+            if not bbox:
+                return 0
+            if self.orientation == 'h':
+                return bbox[2] - bbox[0]
+            else:
+                return bbox[3] - bbox[1]
+        return 0
+
+    def start_drag(self, event):
+        idx = -1
+        for i, c in enumerate(self.parent.children):
+            if c[0] == self:
+                idx = i
+                break
+        
+        # 必须存在于父组件中，且不能是首尾元素（需要有相邻的左右/上下元素才能拉伸）
+        if idx <= 0 or idx >= len(self.parent.children) - 1:
+            self._drag_data = {}
+            return
+
+        self._drag_data['idx'] = idx
+        self._drag_data['start_x'] = event.x
+        self._drag_data['start_y'] = event.y
+
+        # 获取左右或上下元素的配置和实时像素大小
+        left_child = self.parent.children[idx-1]
+        right_child = self.parent.children[idx+1]
+        
+        self._drag_data['left_px'] = self._get_child_size(left_child[0])
+        self._drag_data['right_px'] = self._get_child_size(right_child[0])
+        self._drag_data['left_cfg'] = left_child
+        self._drag_data['right_cfg'] = right_child
+
+    def on_drag(self, event):
+        if not self._drag_data:
+            return
+
+        idx = self._drag_data['idx']
+        # 计算鼠标移动的差值
+        delta = event.x - self._drag_data['start_x'] if self.orientation == 'h' else event.y - self._drag_data['start_y']
+
+        left_c, left_size, left_min, left_weight = self._drag_data['left_cfg']
+        right_c, right_size, right_min, right_weight = self._drag_data['right_cfg']
+
+        left_px = self._drag_data['left_px']
+        right_px = self._drag_data['right_px']
+
+        # 确保尺寸至少为1，避免挤压到负数或 0 导致错位
+        actual_left_min = max(left_min, 1)
+        actual_right_min = max(right_min, 1)
+
+        # 限制 delta，避免相邻元素被压缩到超出最小限制
+        max_negative_delta = actual_left_min - left_px  
+        max_positive_delta = right_px - actual_right_min 
+
+        if delta < max_negative_delta:
+            delta = max_negative_delta
+        if delta > max_positive_delta:
+            delta = max_positive_delta
+
+        if delta == 0:
+            return
+
+        new_left_size = left_size
+        new_left_weight = left_weight
+        new_right_size = right_size
+        new_right_weight = right_weight
+
+        # 策略计算
+        if left_weight == 0 and right_weight == 0:
+            # 双固定尺寸
+            curr_l_size = left_px if left_size == 0 else left_size
+            curr_r_size = right_px if right_size == 0 else right_size
+            new_left_size = curr_l_size + delta
+            new_right_size = curr_r_size - delta
+
+        elif left_weight > 0 and right_weight > 0:
+            # 双权重分配
+            total_weight = left_weight + right_weight
+            total_px = left_px + right_px
+            new_l_px = left_px + delta
+            
+            if total_px > 0:
+                new_left_weight = (new_l_px / total_px) * total_weight
+                new_right_weight = total_weight - new_left_weight
+
+        elif left_weight == 0 and right_weight > 0:
+            # 左固定，右权重
+            curr_l_size = left_px if left_size == 0 else left_size
+            new_left_size = curr_l_size + delta
+
+        elif left_weight > 0 and right_weight == 0:
+            # 左权重，右固定
+            curr_r_size = right_px if right_size == 0 else right_size
+            new_right_size = curr_r_size - delta
+
+        # 更新父组件的子元素列表 tuple (child, size, min_size, weight)
+        self.parent.children[idx-1] = (left_c, new_left_size, left_min, new_left_weight)
+        self.parent.children[idx+1] = (right_c, new_right_size, right_min, new_right_weight)
+
+        # 反算触发父组件局部重绘
+        p_coords = self.canvas.coords(self.parent.rect)
+        if p_coords:
+            bd = self.parent.bd
+            x1 = p_coords[0] - bd/2
+            y1 = p_coords[1] - bd/2
+            x2 = p_coords[4] + bd/2
+            y2 = p_coords[5] + bd/2
+            self.parent.update_layout(x1, y1, x2, y2)
+
+
 # 此行（不含）以下代码不受GPLv3、LGPLv3许可证的限制，可以自由使用、修改、分发等。
 if __name__ == "__main__":
     from tkinter import Tk
@@ -382,22 +543,29 @@ if __name__ == "__main__":
     hp = HorizonPanel(b, bg="#fff3e0", bd=0)
     rp.set_child(hp)
 
-    v1 = ExpandPanel(b, bg='#e0f7fa')
-    # v1=VerticalPanel(b, bg='#f1f8e9')
+    ep = ExpandPanel(b)
 
-    hp.add_child(v1, size=150, weight=1)
-    # hp.add_child(v1,size=150)
+    ct = b.add_picker((0,0),command=print,anchor='center')[-1]
+    ep.set_child(ct)
+    hp.add_child(ep, weight=1)
 
-    ct = b.add_picker((0,0),command=print)[-1]
+    v1 = VerticalPanel(b, bg='#e0f7fa')
+    hp.add_child(v1, size=150, min_size=50) # 左侧面板，固定宽度150，不能拉伸小于50
 
-    v1.set_child(ct)
-    # hp.add_child(ct, weight=1)
+    # 添加拉伸条
+    sash1 = PanelSash(hp, bg='#999999')
+    hp.add_child(sash1, size=5)
 
+    # 包含中间卡片的带权重的面板
+    card = CardPanel(b, bg='#fff3e0', v_spacing=10)
+    hp.add_child(card, weight=1) # 中间面板，自适应填充权重
+    
+    sash2 = PanelSash(hp, bg='#999999')
+    hp.add_child(sash2, size=5)
+    
+    # 放入右侧固定尺寸的面板
     v2 = VerticalPanel(b, bg='#f1f8e9')
     hp.add_child(v2, size=150)
-
-    card = CardPanel(b, bg='#fff3e0', v_spacing=10)
-    hp.add_child(card, weight=1)
 
     for i in range(10):
         vp = VerticalPanel(b, bg='#f1f8e9')
@@ -405,7 +573,6 @@ if __name__ == "__main__":
         vp.add_child(button)
         vp.add_child(b.add_paragraph((0,0), text=f"Paragraph{i}", anchor='center'))
         card.add_child(vp)
-    hp.remove_child(v2)
 
     def update(e):
         rp.update_layout(5, 5, e.width - 5, e.height - 5)

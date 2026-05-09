@@ -7403,7 +7403,7 @@ class BasicTinUI(Canvas):
             textuid = f'label-text-{text}'
             self.addtag_withtag(textuid, text)
             bbox = self.bbox(text)
-            width = (bbox[2]-bbox[0])*2//3
+            width = (bbox[2]-bbox[0])//2
             height = bbox[3]-bbox[1]
             if height%2 == 0:
                 height += 1

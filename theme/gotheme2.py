@@ -115,6 +115,9 @@ def _build_demo(ui: BasicTinUI, theme_, title: str, width: int):
         bdf.add(f"item{i}")
     theme.add_segmentbutton(end(), content=("tkinter", "TinUI", "Others"))
     theme.add_navigation(end())
+    labels_funcs = theme.add_labels(end())[-2]
+    labels_funcs.add('label1')
+    labels_funcs.add('label2')
 
 
 def _sync_mousewheel(parent: TinUI, child: BasicTinUI):

@@ -407,3 +407,12 @@ class TinUILight(TinUITheme):
                 'activefg':'#191919','activebg':'#E9E9E9',
                 'onfg':'#191919','onbg':'#E9E9E9','oncolor':self.accent_color
             },**kw})
+
+    def add_labels(self,pos,*arg,**kw):
+        return self.ui.add_labels(pos,*arg,**{
+            **{
+                'fg':'#1b1b1b','bg':'#fdfdfd',
+                'activefg':'#1b1b1b','activebg':'#f9f9f9',
+                'outline':'#eeeeee'
+            }
+        })

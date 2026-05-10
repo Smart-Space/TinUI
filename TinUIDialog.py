@@ -87,7 +87,7 @@ class Dialog(Toplevel):
                 'activebg':'#e9e9e9',
                 'onfg':'#191919',
                 'onbg':'#ececec',
-                'sel':'#91C1E6',
+                'sel':'#3385cc',
                 'scrollbg':'#f9f9f9',
                 'scrollcolor':'#8d8d8d',
                 'scrollon':'#8a8a8a'
@@ -138,7 +138,7 @@ class Dialog(Toplevel):
                 'activebg':'#373737',
                 'onfg':'#ffffff',
                 'onbg':'#333333',
-                'sel':'#115990',
+                'sel':'#3c9bcc',
                 'scrollbg':'#2e2e2e',
                 'scrollcolor':'#9f9f9f',
                 'scrollon':'#a0a0a0'
@@ -329,7 +329,7 @@ class Dialog(Toplevel):
         yb_coords = self.tinui.coords(yesbutton_uid)
         nobutton_uid=self.tinui.add_button2(((bbox[0]+bbox[2])/2+5,button_endy),text=NO,minwidth=button_width,command=lambda e:self.return_choice(None),anchor='nw',**self.buttonargs)[-1]
         nb_coords = self.tinui.coords(nobutton_uid)
-        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.background,fg=self.background,linew=8)
+        self.tinui.add_back((),(yesbutton_uid,nobutton_uid),bg=self.barback,fg=self.barback,linew=8)
 
         def return_focus(event):
             if now_focus == 'yes':

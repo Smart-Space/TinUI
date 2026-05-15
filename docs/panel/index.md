@@ -28,6 +28,14 @@ class ExpandPanel(BasePanel):
 
 设置托管元素。
 
+### clear_children()
+
+删除下辖所有元素。
+
+### destroy()
+
+删除下辖所有元素，删除自身背景。
+
 ### update_layout(x1, y1, x2, y2)
 
 设置布局区域，一般使用如下方法，将ExpandPanel作为TinUI框架的根面板：
@@ -63,6 +71,10 @@ class VerticalPanel(ExpandablePanel):
 ### clear_children()
 
 删除下辖所有元素。
+
+### destroy()
+
+删除下辖所有元素，删除自身背景。
 
 ### add_child(child, size=None, min_size=0, weight=0, index=-1)
 

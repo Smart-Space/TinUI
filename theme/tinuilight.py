@@ -209,7 +209,7 @@ class TinUILight(TinUITheme):
     #         },**kw})
     
     def add_ui(self,pos,*arg,**kw):
-        return self.ui.add_canvas(pos,*arg,**{
+        return self.ui.add_ui(pos,*arg,**{
             **{
                 'bg':'#f9f9f9',
                 'scrollbg':'#f9f9f9','scrollcolor':'#8a8a8a','scrollon':'#8a8a8a',

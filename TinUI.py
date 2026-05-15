@@ -6852,6 +6852,7 @@ class BasicTinUI(Canvas):
         def show(_):
             self.tag_unbind(fid, bind, show_funcid)  # 避免接下来绑定self <button-1>事件时同步触发
             self.itemconfig(uid, state="normal")
+            self.tag_raise(uid)
             motion(None, 1)
             self.after(100, go_to_bind)  # 避免直接触发控件点击事件
 

@@ -44,10 +44,13 @@ class ExpandablePanel(BasePanel):
     def clear_children(self):
         for child in self.children:
             if issubclass(child[0].__class__, BasePanel):
-                child[0].clear_children()
+                child[0].destroy()
             else:
                 self.canvas.delete(child[0])
         self.children.clear()
+    
+    def destroy(self):
+        self.clear_children()
         self.canvas.delete(self.rect)
 
     def remove_child(self, index):
@@ -59,7 +62,7 @@ class ExpandablePanel(BasePanel):
                     child = self.children.pop(i)
                     break
         if issubclass(child[0].__class__, BasePanel):
-            child[0].clear_children()
+            child[0].destroy()
         else:
             self.canvas.delete(child[0])
 
@@ -105,9 +108,12 @@ class ExpandPanel(BasePanel):
     def clear_children(self):
         if self.child:
             if issubclass(self.child.__class__, BasePanel):
-                self.child.clear_children()
+                self.child.destroy()
             else:
                 self.canvas.delete(self.child)
+    
+    def destroy(self):
+        self.clear_children()
         self.canvas.delete(self.rect)
 
     def update_layout(self, x1, y1, x2, y2):

@@ -3821,13 +3821,13 @@ class BasicTinUI(Canvas):
                     self.itemconfig(cavui, height=height)
                 elif w <= width and show_scrollX:
                     show_scrollX = False
-                    self.itemconfig(cavui, height=height+13)
+                    self.itemconfig(cavui, height=height+self.scale_value(13))
                 if h > height and not show_scrollY:
                     show_scrollY = True
                     self.itemconfig(cavui, width=width)
                 elif h <= height and show_scrollY:
                     show_scrollY = False
-                    self.itemconfig(cavui, width=width+13)
+                    self.itemconfig(cavui, width=width+self.scale_value(13))
         
         def __layout(x1, y1, x2, y2, expand=False):
             nonlocal width, height

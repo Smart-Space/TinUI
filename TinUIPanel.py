@@ -7,24 +7,32 @@ except Exception as err:
 class BasePanel:
     """面板的基类"""
 
-    def __init__(self, canvas:BasicTinUI, bg='', bd=9):
+    def __init__(self, canvas:BasicTinUI, bg='', bd=9, line='', linew=0):
         self.canvas = canvas
         self.bg = bg
+        self.line = line
         self._scale = canvas.scale_value
-        self.bd = self._scale(bd)
-        self.rect = self.canvas.create_polygon(0, 0, 0, 0, fill=bg, outline=bg, width=self.bd)
+        self.bd = self._scale(bd, True)
+        linew = self._scale(linew)
+        self.linew_mask = (linew, linew, -linew, linew, -linew, -linew, linew, -linew)
+        self.bg1 = self.canvas.create_polygon(0, 0, 0, 0, fill=line, outline=line, width=self.bd) # outline
+        self.rect = f'panel-{self.bg1}'
+        self.canvas.addtag_withtag(self.rect, self.bg1)
+        self.bg2 = self.canvas.create_polygon(0, 0, 0, 0, fill=bg, outline=bg, width=self.bd, tags=self.rect) # back
 
     def fix_bg(self, x1, y1, x2, y2):
         if self.bg:
             coords = (x1+self.bd/2, y1+self.bd/2, x2-self.bd/2, y1+self.bd/2, x2-self.bd/2, y2-self.bd/2, x1+self.bd/2, y2-self.bd/2)
-            self.canvas.coords(self.rect, coords)
+            backcoords = tuple(x+y for x, y in zip(coords, self.linew_mask))
+            self.canvas.coords(self.bg2, backcoords)
+            self.canvas.coords(self.bg1, coords)
 
 
 class ExpandablePanel(BasePanel):
     """可扩展面板的基类（VerticalPanel和HorizonPanel的父类）"""
 
-    def __init__(self, canvas, padding=(0, 0, 0, 0), min_width=0, min_height=0, bg='', bd=9):
-        super().__init__(canvas, bg, bd)
+    def __init__(self, canvas, padding=(0, 0, 0, 0), min_width=0, min_height=0, bg='', bd=9, line='', linew=0):
+        super().__init__(canvas, bg, bd, line, linew)
         self.children = []
         self.padding = tuple(self._scale(i) for i in padding)
         self.min_width = self._scale(min_width)
@@ -86,9 +94,9 @@ class ExpandablePanel(BasePanel):
 
 class ExpandPanel(BasePanel):
     def __init__(
-        self, canvas, child=None, padding=(0, 0, 0, 0), min_width=0, min_height=0, bg='', bd=9
+        self, canvas, child=None, padding=(0, 0, 0, 0), min_width=0, min_height=0, bg='', bd=9, line='', linew=0
     ):
-        super().__init__(canvas, bg, bd)
+        super().__init__(canvas, bg, bd, line, linew)
         self.child = child
         self.padding = tuple(self._scale(i) for i in padding)
         self.min_width = self._scale(min_width)
@@ -142,9 +150,9 @@ class ExpandPanel(BasePanel):
 
 class VerticalPanel(ExpandablePanel):
     def __init__(
-        self, canvas, padding=(0, 0, 0, 0), spacing=0, min_width=0, min_height=0, bg='', bd=9
+        self, canvas, padding=(0, 0, 0, 0), spacing=0, min_width=0, min_height=0, bg='', bd=9, line='', linew=0
     ):
-        super().__init__(canvas, padding, min_width, min_height, bg, bd)
+        super().__init__(canvas, padding, min_width, min_height, bg, bd, line, linew)
         self.spacing = self._scale(spacing)
         # self.create_bg("#f1f8e9", "#558b2f")
 
@@ -231,9 +239,9 @@ class VerticalPanel(ExpandablePanel):
 
 class HorizonPanel(ExpandablePanel):
     def __init__(
-        self, canvas, padding=(0, 0, 0, 0), spacing=0, min_width=0, min_height=0, bg='', bd=9
+        self, canvas, padding=(0, 0, 0, 0), spacing=0, min_width=0, min_height=0, bg='', bd=9, line='', linew=0
     ):
-        super().__init__(canvas, padding, min_width, min_height, bg, bd)
+        super().__init__(canvas, padding, min_width, min_height, bg, bd, line, linew)
         self.spacing = self._scale(spacing)
         # self.create_bg("#fff3e0", "#f57c00")
 
@@ -309,9 +317,9 @@ class HorizonPanel(ExpandablePanel):
 
 class CardPanel(ExpandablePanel):
     """卡片面板：子元素以固定宽高网格/流式排列，高度随内容自适应（无限）"""
-    def __init__(self, canvas, card_width=100, card_height=100, padding=(0, 0, 0, 0), h_spacing=5, v_spacing=5, min_width=0, bg='', bd=9):
+    def __init__(self, canvas, card_width=100, card_height=100, padding=(0, 0, 0, 0), h_spacing=5, v_spacing=5, min_width=0, bg='', bd=9, line='', linew=0):
         # min_height 固定为 0，高度完全由内容决定
-        super().__init__(canvas, padding, min_width, 0, bg, bd)
+        super().__init__(canvas, padding, min_width, 0, bg, bd, line, linew)
         self.card_width = self._scale(card_width)
         self.card_height = self._scale(card_height)
         self.h_spacing = self._scale(h_spacing)
@@ -372,9 +380,9 @@ class PanelSash(BasePanel):
     面板拉伸条
     用于动态调整 HorizontalPanel 或 VerticalPanel 中相邻子元素的尺寸或权重
     """
-    def __init__(self, parent_panel, bg='#cccccc', bd=0):
+    def __init__(self, parent_panel, bg='#cccccc', bd=0, line='', linew=0):
         # 传入的 parent_panel 必须是 VerticalPanel 或 HorizonPanel
-        super().__init__(parent_panel.canvas, bg, bd)
+        super().__init__(parent_panel.canvas, bg, bd, line, linew)
         self.parent = parent_panel
         
         # 判断方向
@@ -574,7 +582,7 @@ if __name__ == "__main__":
     hp.add_child(v2, size=150)
 
     for i in range(10):
-        vp = VerticalPanel(b, bg='#f1f8e9')
+        vp = VerticalPanel(b, bg='#f1f8e9', line='#e5e5e5', linew=1)
         button = b.add_button2((0,0), text=f"Button{i}", anchor='center', command=lambda e, v=vp: (card.remove_child(v),b.event_generate("<Configure>",x=0,y=0,width=b.winfo_width(),height=b.winfo_height())))[-1]
         vp.add_child(button)
         vp.add_child(b.add_paragraph((0,0), text=f"Paragraph{i}", anchor='center'))

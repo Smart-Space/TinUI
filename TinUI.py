@@ -190,12 +190,14 @@ class BasicTinUI(Canvas):
             kw["highlightthickness"] = 0
         Canvas.__init__(self, master, selectborderwidth=0, bd=0, **kw)
         self.init()
+        self.bind("<Destroy>", self.__on_destroy, True)
         self.TINUIFONT = kw.get("font", "微软雅黑")
         self.TINUIFONTSIZE = kw.get("fontsize", 12)
         self.set_scale(kw.get("scale", 1.0))
 
     def init(self):
         self.images = []
+        self._image_refs = {}
         self.title_size = {0: 20, 1: 18, 2: 16, 3: 14, 4: 12}
         self.windows = []  # 浮出控件的子窗口，需要开发者手动释放
         self.TINUISCALE = 1.0
@@ -347,6 +349,7 @@ class BasicTinUI(Canvas):
         top = Toplevel(self)
         top.withdraw()
         top.bind("<FocusOut>", focusout)
+        top.protocol("WM_DELETE_WINDOW", top.destroy)
         self.windows.append(top)
         top.geometry(f"{width}x{height}")
         top.overrideredirect(True)
@@ -363,6 +366,19 @@ class BasicTinUI(Canvas):
         bar.TINUIFONTSIZE = self.TINUIFONTSIZE
         bar.set_scale(self.TINUISCALE)
         bar.pack(fill="both", expand=True)
+        def _on_destroy(event):
+            if event.widget is not top:
+                return
+            try:
+                top.unbind("<FocusOut>")
+            except:
+                pass
+            try:
+                if top in self.windows:
+                    self.windows.remove(top)
+            except:
+                pass
+        top.bind("<Destroy>", _on_destroy, True)
         return top, bar
 
     def __delete_uixml(self, uixml):
@@ -377,7 +393,33 @@ class BasicTinUI(Canvas):
             except:
                 continue
         self.images.clear()
+        self._image_refs.clear()
         self.windows.clear()
+
+    def __on_destroy(self, event):
+        if event.widget is not self:
+            return
+        try:
+            self.clean_windows()
+        except:
+            pass
+
+    def delete(self, *items):
+        if items:
+            try:
+                item_ids = set()
+                for item in items:
+                    item_ids.update(self.find_withtag(item))
+                for item_id in item_ids:
+                    image = self._image_refs.pop(item_id, None)
+                    if image is not None:
+                        try:
+                            self.images.remove(image)
+                        except ValueError:
+                            pass
+            except:
+                pass
+        return Canvas.delete(self, *items)
 
     def add_title(
         self,
@@ -812,6 +854,7 @@ class BasicTinUI(Canvas):
         font = tkfont.Font(font=font)
         font_size = font.cget("size")
         var = StringVar()  # 变量
+        trace_id = None
         entry = Entry(
             self,
             fg=fg,
@@ -893,9 +936,25 @@ class BasicTinUI(Canvas):
         self.tkraise(entrybutton)
         self.__auto_anchor(uid, pos, anchor)
         if_empty(None)
-        var.trace_add(
+        trace_id = var.trace_add(
             "write", lambda name, index, mode, var=var: if_empty(None)
         )  # 变量绑定
+        def __cleanup_entry(_):
+            nonlocal trace_id
+            try:
+                if trace_id is not None:
+                    var.trace_remove("write", trace_id)
+            except:
+                pass
+            try:
+                entry.unbind("<FocusIn>")
+                entry.unbind("<FocusOut>")
+                entry.unbind("<Enter>")
+                entry.unbind("<Leave>")
+                entry.unbind("<Return>")
+            except:
+                pass
+        entry.bind("<Destroy>", __cleanup_entry, True)
         funcs = FuncList(7)
         funcs.get = get_entry
         funcs.insert = __insert
@@ -3260,7 +3319,14 @@ class BasicTinUI(Canvas):
         self.tag_bind(bottom, "<Button-1>", bottommove)
         self.tag_bind(back, "<Button-1>", backmove)
         # 绑定滚轮事件
-        widget.bind("<MouseWheel>", on_mousewheel, True)
+        mousewheel_bind = widget.bind("<MouseWheel>", on_mousewheel, True)
+        def __cleanup_scroll(_):
+            try:
+                if mousewheel_bind:
+                    widget.unbind("<MouseWheel>", mousewheel_bind)
+            except:
+                pass
+        widget.bind("<Destroy>", __cleanup_scroll, True)
         uid.move = __move
         funcs = FuncList(3)
         funcs.speed = set_speed
@@ -5030,6 +5096,7 @@ class BasicTinUI(Canvas):
                 image = PhotoImage(file=icon)
                 self.images.append(image)
                 icontext = self.create_image(pos,image=image,tags=(uid, buttonuid, f"{uid}icon"))
+                self._image_refs[icontext] = image
             else:
                 font_size = font.cget(option="size")
                 icontext = self.create_text(pos,text=icon,fill=fg,font=f"{{Segoe Fluent Icons}} {font_size}",tags=(uid, buttonuid, f"{uid}icon"))
@@ -5861,6 +5928,7 @@ class BasicTinUI(Canvas):
             image = PhotoImage(file=imgfile)
         self.images.append(image)  # 存储图片，防止被python垃圾回收
         img = self.create_image(pos, anchor="nw", image=self.images[-1])
+        self._image_refs[img] = image
         uid = TinUIString(f"image-{img}")
         self.addtag_withtag(uid, img)
         bbox = self.bbox(img)
@@ -5879,6 +5947,7 @@ class BasicTinUI(Canvas):
             image = PhotoImage.zoom(image, key, key)
             image = image.subsample(round(key / xrate), round(key / yrate))
             self.images[-1] = image
+            self._image_refs[img] = image
             self.itemconfig(img, image=self.images[-1])
         self.__auto_anchor(img, pos, anchor)
         del rwidth, rheight, bbox, width, height, state
@@ -7336,6 +7405,7 @@ class BasicTinUI(Canvas):
                     img = PhotoImage(file=i[0])
                     self.images.append(img)
                     icon = self.create_image((x, starty), image=img, anchor="w", tags=uid)
+                    self._image_refs[icon] = img
             else:
                 icon = self.create_text((x, starty), text=" ", font=segoe_font, fill=fg, anchor="w", tags=uid)
             text = self.create_text((x + segoe_font_width + self.scale_value(8), starty), text=i[1], font=font, fill=fg, anchor="w", tags=uid)
@@ -7374,12 +7444,13 @@ class BasicTinUI(Canvas):
                 if label is not None:
                     add(label, oncancel)
         def __layout(x1, y1, x2, y2, expand=False):
-            nonlocal endx, endy
+            nonlocal endx, endy, startx
             if not expand:
                 dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), anchor)
             else:
                 dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2))
             endx += dx
+            startx += dx
             endy += dy
         def add(label:str, oncancel=None):
             nonlocal endx
@@ -7431,11 +7502,21 @@ class BasicTinUI(Canvas):
             labels.append(labell)
         def get():
             return labels.copy()
+        def clear():
+            nonlocal endx
+            for items in labels:
+                self.delete(*items[:-1])
+            labels.clear()
+            if widget:
+                dx = startx-endx
+                self.move(plusuid, dx, 0)
+            endx = startx
         font = font or self.__get_font(-2)
         font = tkfont.Font(font=font)
         font_size = font.cget("size")+1
         segoe_font = f'{{Segoe Fluent Icons}} {font_size}'
         endx, endy = pos
+        startx = endx
         labels = [] # [[text, back, line, [cancelt], index], ...]
         plustext = self.create_text(endx, endy, text='\uF8AA', font=segoe_font, fill=fg)
         uid = TinUIString(f"labels-{plustext}")
@@ -7459,9 +7540,10 @@ class BasicTinUI(Canvas):
         if not widget:
             self.delete(plusuid)
             self.dtag(plusuid)
-        funcs = FuncList(2)
+        funcs = FuncList(3)
         funcs.add = add
         funcs.get = get
+        funcs.clear = clear
         uid.layout = __layout
         return funcs, uid
 
@@ -7488,11 +7570,13 @@ class TinUI(BasicTinUI):
         for m in methods:
             if m[0] != "_" and m != "config" and m != "configure":
                 setattr(self, m, getattr(self.frame, m))
-        self.bind("<MouseWheel>", self.set_y_view, True)
-        config_bind = self.bind("<Configure>", lambda _: self.update__(), True)
+        self._update_after_id = None
+        self._mousewheel_bind = self.bind("<MouseWheel>", self.set_y_view, True)
+        self._configure_bind = self.bind("<Configure>", lambda _: self.update__(), True)
+        self.bind("<Destroy>", self.__on_destroy, True)
         self.update_time = update_time
         if update == False:
-            self.unbind("<Configure>", config_bind)
+            self.unbind("<Configure>", self._configure_bind)
 
     def set_y_view(self, event):
         if event.state == 0:  # 纵向滚动
@@ -7516,7 +7600,26 @@ class TinUI(BasicTinUI):
         except:
             pass
         else:
-            self.after(self.update_time, self.update__)
+            self._update_after_id = self.after(self.update_time, self.update__)
+
+    def __on_destroy(self, event):
+        if event.widget is not self:
+            return
+        try:
+            if self._update_after_id:
+                self.after_cancel(self._update_after_id)
+        except:
+            pass
+        try:
+            if self._configure_bind:
+                self.unbind("<Configure>", self._configure_bind)
+        except:
+            pass
+        try:
+            if self._mousewheel_bind:
+                self.unbind("<MouseWheel>", self._mousewheel_bind)
+        except:
+            pass
 
 
 class TinUIXmlFunc:
@@ -8128,6 +8231,7 @@ if __name__ == "__main__":
     labels_funcs.add('label')
     labels_funcs.add('123')
     labels_funcs.add('标签')
+    labels_funcs.clear()
 
     b.bind("<Destroy>", lambda e: b.clean_windows())
 

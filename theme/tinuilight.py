@@ -16,6 +16,7 @@ class TinUILight(TinUITheme):
     def set_accent_color(self,accent):
         self.accent_color = accent
         self.accent_light = self.adjust_color_lightness(accent, 0.2)
+        self.accent_lslight = self.adjust_color_lightness(accent, 0.4)
         self.accent_dark = self.adjust_color_lightness(accent, -0.2)
         self.accentb_ab = self.adjust_color_lightness(accent, 0.09)
         self.accentb_l = self.adjust_color_lightness(accent, 0.078)
@@ -197,7 +198,7 @@ class TinUILight(TinUITheme):
             **{
                 'fg':'#1a1a1a','bg':'#f2f2f2',
                 'activefg':'#191919','activebg':'#e9e9e9',
-                'onfg':'#191919','onbg':'#ececec','sel':self.accent_light,
+                'onfg':'#191919','onbg':'#ececec','sel':self.accent_lslight,
                 'scrollbg':'#f9f9f9','scrollcolor':'#8d8d8d','scrollon':'#8a8a8a',
             },**kw})
 

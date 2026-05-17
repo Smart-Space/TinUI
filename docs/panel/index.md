@@ -4,7 +4,26 @@ nav_order: 7
 ---
 # TinUI面板布局
 
-TinUI中有三个可用面板类，分别管理拓展、纵向、横向面板布局。
+TinUI中有四个可用面板类，分别管理拓展、纵向、横向、卡片式面板布局；以及一个辅助面板类，面板拉伸条。
+
+---
+
+## 通用面板类参数
+
+```python
+class BasePanel:
+    """面板的基类"""
+
+    def __init__(self, canvas:BasicTinUI, bg='', bd=9, line='', linew=0):
+        ...
+```
+
+- bg::背景颜色
+- bd::圆角大小（高DPI下自动适配）
+- line::边框颜色
+- linew::边框宽度（高DPI下自动适配）
+
+面板相关颜色只有在背景色不为空时才展示，单有边框颜色无效。
 
 ---
 
@@ -64,9 +83,17 @@ class VerticalPanel(ExpandablePanel):
 
 `set_padding`,`set_min_size`,`update_layout`同ExpandPanel。
 
+### set_padding(padding)
+
+设置内边距，四元组(top, right, bottom, left)。
+
 ### set_spacing(spacing)
 
 设置元素间间距。
+
+### set_min_size(min_width, min_height)
+
+设置最小尺寸。
 
 ### clear_children()
 
@@ -128,3 +155,22 @@ class CardPanel(ExpandablePanel):
 ### add_child(child, index=-1)
 
 在指定位置插入托管元素。
+
+---
+
+## PanelSash
+
+```python
+class PanelSash(BasePanel):
+    """
+    面板拉伸条
+    用于动态调整 HorizontalPanel 或 VerticalPanel 中相邻子元素的尺寸或权重
+    """
+    def __init__(self, parent_panel, bg='#cccccc', bd=0, line='', linew=0):
+```
+
+直接作为子元素添加进纵向面板或者横向面板，其`parent_panel`与加入该面板的上级面板需要一致。
+
+- 当相邻元素为固定尺寸时，调整尺寸；
+- 均为权重时，调整权重系数；
+- 权重与固定尺寸相邻，则调整尺寸。

@@ -20,6 +20,9 @@ load_menubar=False
 def opentutest(e):
     exec(open("tuxmltest.py",encoding='utf-8').read(),{'__file__':os.path.dirname(__file__)+r'\tuxmltest.py'})
 
+def add_labels():
+    return '标签',None
+
 def loadcontrol(controlname):
     global load_menubar
     #导入控件说明
@@ -30,6 +33,7 @@ def loadcontrol(controlname):
     duixml.clean()
 
     duixml.funcs["opentutest"] = opentutest
+    duixml.funcs['add-labels'] = add_labels
     
     duixml.loadxml(cxml)
     if controlname=='menubar':
@@ -75,14 +79,14 @@ hp.add_child(vp,200)
 t=ui.add_title((0,0),text='TinUI Gallery',anchor='n')
 img=ui.add_image((0,0),imgfile='LOGO.png',width=200,height=200,anchor='n')
 listbox=ui.add_listbox((0,0),height=340,bg='#f0f0f0',data=('back', 'barbutton', 'breadcrumb', 'button', 'button2', 'checkbutton', 
- 'combobox', 'entry', 'expander', 'flyout', 'image', 'label', 'labelframe',
+ 'combobox', 'entry', 'expander', 'flyout', 'image', 'label', 'labels', 'labelframe',
  'link', 'listbox', 'listview', 'menubar', 'menubutton', 'navigation', 'notebook', 'notecard', 
  'onoff', 'paragraph', 'passwordbox', 'picker', 'pipspager', 'pivot', 'progressbar', 
  'radiobox', 'radiobutton', 'ratingbar', 'scalebar', 'scrollbar', 'separate', 
  'spinbox', 'segmentbutton', 'table', 'textbox', 'title', 'togglebutton', 'tooltip', 
  'treeview', 'ui', 'waitbar', 'waitframe','TinUIXml'),command=loadcontrol)[-1]
 vp.add_child(t,50)
-vp.add_child(img,200)
+vp.add_child(img)
 ep1=ExpandPanel(ui)
 ep1.set_child(listbox)
 vp.add_child(ep1,weight=1)

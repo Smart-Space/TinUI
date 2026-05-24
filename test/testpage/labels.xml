@@ -1,0 +1,16 @@
+<tinui>
+<line>
+    <line>
+        <title text='labels'></title>
+    </line>
+    <line>
+        <paragraph text='标签控件。' width='580'></paragraph>
+    </line>
+    <line>
+    <paragraph text=' ' width='580'></paragraph>
+    </line>
+    <line>
+    <labels command='self.funcs["add-labels"]'></labels>
+    </line>
+</line>
+</tinui>

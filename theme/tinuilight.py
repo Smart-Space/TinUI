@@ -1,5 +1,6 @@
 from typing import Union
 from tinui import TinUI, BasicTinUI, TinUITheme
+from tinui.TinUIPanel import ExpandPanel, VerticalPanel, HorizonPanel, CardPanel, PanelSash
 
 class TinUILight(TinUITheme):
     '''
@@ -12,6 +13,14 @@ class TinUILight(TinUITheme):
         self.label='light'
         self.ui['background']='#f3f3f3'
         self.set_accent_color(accent)
+        self.background_colors = [ # 面板层级
+            '#e9e9e9',
+            '#f3f3f3',
+            '#f9f9f9',
+            '#fbfbfb',
+            '#ffffff',
+        ]
+        self.panel_line = '#e5e5e5' # 面板分割线
     
     def set_accent_color(self,accent):
         self.accent_color = accent
@@ -22,6 +31,41 @@ class TinUILight(TinUITheme):
         self.accentb_l = self.adjust_color_lightness(accent, 0.078)
         self.accentb_al = self.adjust_color_lightness(accent, 0.169)
         self.accentb_ol = self.adjust_color_lightness(accent, 0.192)
+
+    def add_expandpanel(self,level=1,*arg,**kw):
+        return ExpandPanel(self.ui,*arg,**{
+            **{
+                'bg':self.background_colors[level],
+                'line':self.panel_line
+            },**kw})
+
+    def add_verticalpanel(self,level=1,*arg,**kw):
+        return VerticalPanel(self.ui,*arg,**{
+            **{
+                'bg':self.background_colors[level],
+                'line':self.panel_line
+            },**kw})
+
+    def add_horizonpanel(self,level=1,*arg,**kw):
+        return HorizonPanel(self.ui,*arg,**{
+            **{
+                'bg':self.background_colors[level],
+                'line':self.panel_line
+            },**kw})
+
+    def add_cardpanel(self,level=1,*arg,**kw):
+        return CardPanel(self.ui,*arg,**{
+            **{
+                'bg':self.background_colors[level],
+                'line':self.panel_line
+            },**kw})
+
+    def add_panelsash(self,parent_panel,level=1,*arg,**kw):
+        return PanelSash(parent_panel,*arg,**{
+            **{
+                'bg':self.background_colors[level],
+                'line':self.panel_line
+            },**kw})
     
     def add_title(self,pos,*arg,**kw):
         return self.ui.add_title(pos,*arg,**{
@@ -92,7 +136,7 @@ class TinUILight(TinUITheme):
     def add_labelframe(self,uids:tuple,*arg,**kw):
         return self.ui.add_labelframe(uids,*arg,**{
             **{
-                'fg':'#E5E5E5','bg':'#f4f4f4',
+                'fg':'#E5E5E5','bg':'#f3f3f3',
             },**kw})
 
     def add_combobox(self,pos,*arg,**kw):

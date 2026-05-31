@@ -2980,7 +2980,7 @@ class BasicTinUI(Canvas):
             leave_animation = None
             self.itemconfig(sc, outline=color, width=w)
             if w != self.scale_value(3,True):
-                leave_animation = self.after(32, lambda : leave(event, w-1))
+                leave_animation = self.after(32, lambda : leave(event, w-self.scale_value(1)))
 
         def all_leave(_):
             self.itemconfig(top, fill="")

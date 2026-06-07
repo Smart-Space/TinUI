@@ -125,8 +125,6 @@ def test(theme):
     du.add_treeview(end())
     #togglebutton
     du.add_togglebutton(end(),text='状态开关按钮')
-    #swipecontrol
-    du.add_swipecontrol(end(),text='SwipeControl')
     #timepicker
     du.add_picker(end())
     #dropdownbutton

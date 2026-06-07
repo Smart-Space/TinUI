@@ -379,15 +379,6 @@ class TinUIDark(TinUITheme):
                 'fg':'#ffffff','bg':'#2d2d2d','line':"#303030",
                 'activefg':'#000000','activebg':self.accent_color,'activeline':self.accent_light,
             },**kw})
-    
-    def add_swipecontrol(self,pos,*arg,**kw):
-        # return self.ui.add_swipecontrol(pos,*arg,**{
-        #     **{
-        #         'fg':'#ffffff','bg':'#202020','line':'#2d2d2d',
-        #         'data':{'left':({'text':'✔️\nok','fg':'#000000','bg':'#a9a9a9','command':print},),
-        #         'right':({'text':'❌\nclose'},)},
-        #     },**kw})
-        ...
 
     def add_picker(self,pos,*arg,**kw):
         return self.ui.add_picker(pos,*arg,**{

@@ -6089,109 +6089,6 @@ class BasicTinUI(Canvas):
         )
         return button, back, outline, funcs, uid
 
-    # def add_swipecontrol(self,pos:tuple,text:str='',height=50,width=400,fg='#1a1a1a',bg='#f3f3f3',line='#fbfbfb',data:dict={'left':({'text':'OK','fg':'#202020','bg':'#bcbcbc','command':print},),'right':({'text':'CLOSE'},)},font=('微软雅黑',12),anchor='nw'):#绘制滑动控件
-    #     def _animation(side):#移动动画
-    #         it = 0
-    #         if side=='left':
-    #             for _ in range(0,rightw+5,5):
-    #                 back.after(it*5, lambda: __animate(-5))
-    #                 it += 1
-    #         elif side=='right':
-    #             for _ in range(0,leftw+5,5):
-    #                 back.after(it*5, lambda: __animate(5))
-    #                 it += 1
-    #         elif side=='center':
-    #             if nowmode==right:
-    #                 for _ in range(0,rightw+5,5):
-    #                     back.after(it*5, lambda: __animate(5))
-    #                     it += 1
-    #             elif nowmode==left:
-    #                 for _ in range(0,leftw+5,5):
-    #                     back.after(it*5, lambda: __animate(-5))
-    #                     it += 1
-    #     def __animate(movex):
-    #         back.move('cont',movex,0)
-    #         back.update_idletasks()
-    #     def move(event):#滚动响应
-    #         nonlocal nowmode
-    #         back.unbind('<MouseWheel>')
-    #         if event.state!=1:
-    #             back.bind('<MouseWheel>',move)
-    #             return
-    #         if event.delta<0 and 'right' in data:#左滑，显示right
-    #             if nowmode==right:
-    #                 back.bind('<MouseWheel>',move)
-    #                 return
-    #             back.itemconfig(left,state='hidden')
-    #             back.itemconfig(right,state='normal')
-    #             _animation('center')
-    #             _animation('left')
-    #             nowmode=right
-    #         elif event.delta>0 and 'left' in data:#右滑，显示left
-    #             if nowmode==left:
-    #                 back.bind('<MouseWheel>',move)
-    #                 return
-    #             back.itemconfig(right,state='hidden')
-    #             back.itemconfig(left,state='normal')
-    #             _animation('center')
-    #             _animation('right')
-    #             nowmode=left
-    #         back.bind('<MouseWheel>',move)
-    #     def _docommand(func):
-    #         nonlocal nowmode
-    #         _animation('center')
-    #         nowmode=center
-    #         if func!=None:
-    #             func()
-    #     def _recenter(e):
-    #         nonlocal nowmode
-    #         _animation('center')
-    #         nowmode=center
-    #     itemw=width//6#背景元素宽度。软限制为6个，多出内容没有意义
-    #     back=BasicTinUI(self,bg=line)#背景容器
-    #     backitem=self.create_window(pos,width=width+2,height=height+2,anchor='nw',window=back)
-    #     self.windows.append(back)
-    #     uid=f'swipecontrol-{backitem}'
-    #     self.addtag_withtag(uid,backitem)
-    #     right,left='rights','lefts'#背景元素位置
-    #     center='centers'
-    #     nowmode=center#当前状态
-    #     if 'left' in data:#往右滑
-    #         endx=1
-    #         for item in data['left']:
-    #             _bg=item['bg'] if 'bg' in item else '#bcbcbc'
-    #             _fg=item['fg'] if 'fg' in item else '#202020'
-    #             bitem=back.create_rectangle((endx,1,endx+itemw,1+height),fill=_bg,width=0,tags=left)
-    #             fitem=back.create_text((endx+itemw/2,1+height/2),text=item['text'],fill=_fg,font=font,tags=left)
-    #             command=item['command'] if 'command' in item else None
-    #             back.tag_bind(bitem,'<Button-1>',lambda e,func=command:_docommand(func))
-    #             back.tag_bind(fitem,'<Button-1>',lambda e,func=command:_docommand(func))
-    #             endx+=itemw
-    #         leftbbox=back.bbox(left)
-    #         leftw=leftbbox[2]-leftbbox[0]
-    #     if 'right' in data:#往左滑
-    #         endx=width+1
-    #         for item in data['right']:
-    #             _bg=item['bg'] if 'bg' in item else '#bcbcbc'
-    #             _fg=item['fg'] if 'fg' in item else '#202020'
-    #             bitem=back.create_rectangle((endx-itemw,1,endx,1+height),fill=_bg,width=0,tags=right)
-    #             fitem=back.create_text((endx-itemw/2,1+height/2),text=item['text'],fill=_fg,font=font,tags=right)
-    #             command=item['command'] if 'command' in item else None
-    #             back.tag_bind(bitem,'<Button-1>',lambda e,func=command:_docommand(func))
-    #             back.tag_bind(fitem,'<Button-1>',lambda e,func=command:_docommand(func))
-    #             endx-=itemw
-    #         rightbbox=back.bbox(right)
-    #         rightw=rightbbox[2]-rightbbox[0]
-    #     contback=back.create_rectangle((1,1,width+1,height+1),fill=bg,width=0,tags='cont')
-    #     cont=back.create_text((3,1+height/2),anchor='w',text=text,fill=fg,font=font,tags='cont')
-    #     back.itemconfig(left,state='hidden')
-    #     back.itemconfig(right,state='hidden')
-    #     back.bind('<MouseWheel>',move)
-    #     back.tag_bind(contback,'<Button-1>',_recenter)
-    #     back.tag_bind(cont,'<Button-1>',_recenter)
-    #     self.__auto_anchor(uid,pos,anchor)
-    #     return back,backitem
-
     def add_picker(
         self,
         pos: tuple,
@@ -8201,7 +8098,6 @@ if __name__ == "__main__":
     tgbutton = b.add_togglebutton(
         (1200, 230), text="状态开关按钮：关闭", command=test13
     )[0]
-    # b.add_swipecontrol((320,1300),'swipe control')
     b.add_passwordbox((250, 1400), 350)
     b.add_picker((1400, 230), command=print)
     # b.add_menubutton((1500,50),'menubutton',widget=True,cont=(('command',print),('menu',(('cmd1',print),('cmd2',print))),'-',('TinUI文本移动',test)))

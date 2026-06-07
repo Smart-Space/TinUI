@@ -5,7 +5,11 @@ def additem(e):
     uixml = funcs.add()[-2]
     uixml.loadxml(onexml)
 def deleteitemthis(e):
+    global index
+    if index == -1:
+        return
     funcs.delete(index)
+    index = -1
 def add10(e):
     for i in range(0,10):
         additem(e)

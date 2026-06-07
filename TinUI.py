@@ -3099,10 +3099,7 @@ class BasicTinUI(Canvas):
 
         def animate():# 动画
             nonlocal is_animation, target_y, current_y
-            if mode == "y":
-                view_first, view_last = widget.yview()
-            else:
-                view_first, view_last = widget.xview()
+            view_first, view_last = widget_view()
             # 如果内容没有超出可视区域，不滚动
             if view_last - view_first >= 1.0:
                 is_animation = False
@@ -3114,38 +3111,24 @@ class BasicTinUI(Canvas):
             # 吸附并停止
             if abs(distance) < 0.001:
                 current_y = target_y
-                if mode == "y":
-                    widget.yview_moveto(current_y)
-                else:
-                    widget.xview_moveto(current_y)
+                widget_viewto(current_y)
                 is_animation = False
                 return
             # 指数缓动公式：当前位置 += (目标 - 当前) * 速度系数
             current_y += distance * scroll_speed
-            if mode == "y":
-                widget.yview_moveto(current_y)
-            else:
-                widget.xview_moveto(current_y)
+            widget_viewto(current_y)
             widget.after(16, animate)
         def on_mousewheel(event):# 处理目标控件滚动事件
             nonlocal is_animation, target_y, current_y
-            # 过滤错误方向
-            if event.state in (1,9) and mode == "y":
-                return
-            elif event.state in (0,8) and mode == "x":
+            # Shift按下 => 横向滚; 否则 => 纵向滚; 方向不匹配时忽略
+            if ((event.state & 0x1) != 0) == (mode == "y"):
                 return
             # 判断滚动方向
-            if event.delta < 0:
-                direction = 1
-            elif event.delta > 0:
-                direction = -1
-            else:
+            direction = 1 if event.delta < 0 else (-1 if event.delta > 0 else 0)
+            if direction == 0:
                 return
             # 限制位置
-            if mode == "y":
-                view_first, view_last = widget.yview()
-            else:
-                view_first, view_last = widget.xview()
+            view_first, view_last = widget_view()
             current_y = view_first
             view_distance = view_last - view_first
             # 更新目标位置
@@ -3168,8 +3151,6 @@ class BasicTinUI(Canvas):
                 self.move(bottom, 0, size - height)
                 coord = self.coords(back)
                 coord[3] += size - height
-                height = size
-                self.coords(back, coord)
             elif mode == "x":
                 start += dx
                 end = start + size - 2*basewidth - 10
@@ -3177,8 +3158,8 @@ class BasicTinUI(Canvas):
                 self.move(bottom, size - height, 0)
                 coord = self.coords(back)
                 coord[2] += size - height
-                height = size
-                self.coords(back, coord)
+            height = size
+            self.coords(back, coord)
 
         def set_speed(speed):
             nonlocal scroll_speed
@@ -3188,10 +3169,7 @@ class BasicTinUI(Canvas):
             scroll_step = step
         def moveto(target):
             nonlocal is_animation, target_y, current_y
-            if mode == "y":
-                view_first, _ = widget.yview()
-            else:
-                view_first, _ = widget.xview()
+            view_first, _ = widget_view()
             current_y = view_first
             target_y = target
             if not is_animation:
@@ -3259,6 +3237,8 @@ class BasicTinUI(Canvas):
             canmove = end - start
             # 绑定组件
             widget.config(yscrollcommand=widget_move)
+            widget_view = widget.yview
+            widget_viewto = widget.yview_moveto
         elif mode == "x":
             back = self.create_polygon(
                 (
@@ -3303,6 +3283,8 @@ class BasicTinUI(Canvas):
             end = pos[0] + height - basewidth - 5
             canmove = end - start - 10
             widget.config(xscrollcommand=widget_move)
+            widget_view = widget.xview
+            widget_viewto = widget.xview_moveto
         scroll = TinUINum()
         scroll.__move = False
         self.tag_bind(uid, "<Enter>", all_enter)

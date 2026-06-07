@@ -3687,30 +3687,30 @@ class BasicTinUI(Canvas):
                 scro[-1].move(dx, dy, height)
             else:
                 dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), "nw")
-                width2 = x2 - x1 - 18
+                width2 = x2 - x1 - self.scale_value(18)
                 dw = width2 - width
                 width = width2
-                height = y2 - y1 - 16
+                height = y2 - y1 - self.scale_value(16)
                 self.move(scroitem, dw, 0)
                 scroitem.move(dx + dw, dy, height)
                 coord = self.coords(allback)
-                coord[2] = coord[4] = x2 - 4
-                coord[5] = coord[7] = y2 - 4
+                coord[2] = coord[4] = x2 - self.scale_value(4)
+                coord[5] = coord[7] = y2 - self.scale_value(4)
                 self.coords(allback, coord)
                 self.itemconfig(view, width=width, height=height)
                 for i in items:
                     tinui = i[0]
-                    ui.itemconfig(i[-1], width=width - 3)
+                    ui.itemconfig(i[-1], width=width - self.scale_value(3))
                     tinui.coords(
                         tinui.background,
-                        4,
-                        4,
-                        width - 11,
-                        4,
-                        width - 11,
-                        linew - 6,
-                        4,
-                        linew - 6,
+                        self.scale_value(4),
+                        self.scale_value(4),
+                        width - self.scale_value(11),
+                        self.scale_value(4),
+                        width - self.scale_value(11),
+                        linew - self.scale_value(6),
+                        self.scale_value(4),
+                        linew - self.scale_value(6),
                     )
 
         def getitems():  # 获取items
@@ -6425,7 +6425,7 @@ class BasicTinUI(Canvas):
             )
         outline = _outline
         del _outline
-        width = end_x - pos[0] + 6  # 窗口宽度
+        width = end_x - pos[0]  # 窗口宽度
         cds = self.bbox(uidcontent)
         coords = (cds[0], cds[1], cds[2], cds[1], cds[2], cds[3], cds[0], cds[3])
         self.coords(out_line, coords)
@@ -6472,7 +6472,7 @@ class BasicTinUI(Canvas):
             _loaddata(pickbar, i, barw)
             pickerbars.append(pickbar)
             __count += 1
-            end_x += barw + 3
+            end_x += barw + self.scale_value(3)
         # ok button
         okpos = ((self.scale_value(5) + (width - self.scale_value(9)) / 2) / 2, height - 22)
         ok = bar.add_button2(

@@ -1,4 +1,2 @@
 TODO.txt
-*.pyc
-.ignore
-AGENTS.md
+__pycache__

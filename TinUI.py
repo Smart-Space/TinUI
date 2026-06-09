@@ -2964,7 +2964,15 @@ class BasicTinUI(Canvas):
         anchor=None,
     ):  # 绘制滚动条
         # 滚动条宽度7px，未激活宽度3px；建议与widget相隔5xp
-        def enter(_):  # 鼠标进入
+        font = tkfont.Font(family="{Segoe Fluent Icons}", size=7)
+        basewidth = font.measure('\ueddb')
+        baseheigth = font.metrics("linespace")
+
+        def enter():  # 鼠标进入
+            nonlocal leave_handle
+            if leave_handle:
+                self.after_cancel(leave_handle)
+                leave_handle = None
             if leave_animation:
                 self.after_cancel(leave_animation)
             self.itemconfig(sc, outline=oncolor, width=basewidth-2)
@@ -2973,19 +2981,24 @@ class BasicTinUI(Canvas):
             self.itemconfig(top, fill=oncolor)
             self.itemconfig(bottom, fill=oncolor)
             self.itemconfig(back, outline=bg)
+            enter()
 
         leave_animation = None
-        def leave(event, w):  # 鼠标离开
+        def leave_target():
+            nonlocal leave_handle
+            leave_handle = self.after(300, leave)
+        def leave(w=basewidth-2):  # 鼠标离开
             nonlocal leave_animation
             leave_animation = None
             self.itemconfig(sc, outline=color, width=w)
             if w != self.scale_value(3,True):
-                leave_animation = self.after(32, lambda : leave(event, w-self.scale_value(1)))
+                leave_animation = self.after(32, lambda : leave(w-self.scale_value(1)))
 
         def all_leave(_):
             self.itemconfig(top, fill="")
             self.itemconfig(bottom, fill="")
             self.itemconfig(back, outline="")
+            leave_target()
 
         def widget_move(sp, ep):  # 控件控制滚动条滚动
             nonlocal target_y
@@ -3091,10 +3104,9 @@ class BasicTinUI(Canvas):
             effective = canmove - 10
             if mode == "y":
                 startp = (bbox[1] - start) / effective
-                widget.yview("moveto", startp)
             elif mode == "x":
                 startp = (bbox[0] - start) / effective
-                widget.xview("moveto", startp)
+            widget_viewto(startp)
             target_y = current_y = startp
 
         def animate():# 动画
@@ -3175,10 +3187,8 @@ class BasicTinUI(Canvas):
             if not is_animation:
                 is_animation = True
                 animate()
-        font = tkfont.Font(family="{Segoe Fluent Icons}", size=7)
-        basewidth = font.measure('\ueddb')
-        baseheigth = font.metrics("linespace")
         pos = list(pos)
+        leave_handle = None # 鼠标离开动画计时器
         is_animation = False # 是否正在动画中
         scroll_speed = 0.15 # 缓动系数
         scroll_step = 0.15 # 滚动增量
@@ -3293,9 +3303,6 @@ class BasicTinUI(Canvas):
         self.tag_bind(sc, "<Button-1>", mousedown)
         self.tag_bind(sc, "<ButtonRelease-1>", mouseup)
         self.tag_bind(sc, "<B1-Motion>", drag)
-        # 绑定样式
-        self.tag_bind(sc, "<Enter>", enter)
-        self.tag_bind(sc, "<Leave>", lambda event: leave(event, basewidth-2))
         # 绑定点击滚动
         self.tag_bind(top, "<Button-1>", topmove)
         self.tag_bind(bottom, "<Button-1>", bottommove)

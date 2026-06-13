@@ -560,7 +560,7 @@ if __name__ == "__main__":
 
     ep = ExpandPanel(b)
 
-    ct = b.add_listview((0,0),command=print,anchor='center')[-1]
+    ct = b.add_passwordbox((0,0),width=100)[-1]
     ep.set_child(ct)
     hp.add_child(ep, weight=1)
 

@@ -796,14 +796,14 @@ class BasicTinUI(Canvas):
             else:
                 self.itemconfig(funce, width=x2 - x1 - dwidth - self.scale_value(6))
                 bbox1 = self.bbox(funce)
-                coord = self.coords(back)
-                coord[0] = coord[6] = bbox1[0] + self.scale_value(3)
-                coord[2] = coord[4] = bbox1[2] + dwidth - self.scale_value(3)
-                self.coords(back, coord)
                 coord = self.coords(outl)
-                coord[0] = coord[6] = bbox1[0] + self.scale_value(3)-1
-                coord[2] = coord[4] = bbox1[2] + dwidth - self.scale_value(3)+1
+                coord[0] = coord[6] = bbox1[0] + self.scale_value(1)
+                coord[2] = coord[4] = bbox1[2] + dwidth - self.scale_value(1)
                 self.coords(outl, coord)
+                coord = self.coords(back)
+                coord[0] = coord[6] = bbox1[0] + self.scale_value(2)
+                coord[2] = coord[4] = bbox1[2] + dwidth - self.scale_value(2)
+                self.coords(back, coord)
                 coordl = self.coords(bottomline)
                 coordl[0] = coord[0]
                 coordl[2] = coord[2]
@@ -908,21 +908,21 @@ class BasicTinUI(Canvas):
             entry.bind("<Return>", call_command)
             bubbox = self.bbox(button)
         bottomline = self.create_line(
-            (bbox[0] + 2, bbox[3] - 1, bubbox[2] - 2, bbox[3] - 1),
+            (bbox[0] + self.scale_value(2), bbox[3] - self.scale_value(1), bubbox[2] - self.scale_value(2), bbox[3] - self.scale_value(1)),
             fill=outline,
             width=self.TINUI_RADIUS_SMALL,
             capstyle="round",
             tags=uid,
         )  # bottomline
         back = self.__ui_polygon(
-            ((bbox[0] + 2, bbox[1] + 2), (bubbox[2] - 2, bbox[3] - 2)),
+            ((bbox[0] + self.scale_value(2), bbox[1] + self.scale_value(2)), (bubbox[2] - self.scale_value(2), bbox[3] - self.scale_value(2))),
             fill=bg,
             outline=bg,
             width=self.TINUI_RADIUS_SMALL,
             tags=uid,
         )  # back
         outl = self.__ui_polygon(
-            ((bbox[0] + 1, bbox[1] + 1), (bubbox[2] - 1, bbox[3] - 1)),
+            ((bbox[0] + self.scale_value(1), bbox[1] + self.scale_value(1)), (bubbox[2] - self.scale_value(1), bbox[3] - self.scale_value(1))),
             fill=line,
             outline=line,
             width=self.TINUI_RADIUS_SMALL,
@@ -5784,14 +5784,14 @@ class BasicTinUI(Canvas):
             else:
                 self.itemconfig(funce, width=x2 - x1 - dwidth - self.scale_value(6))
                 bbox1 = self.bbox(funce)
-                coord = self.coords(back)
-                coord[0] = coord[6] = bbox1[0] + self.scale_value(3)
-                coord[2] = coord[4] = bbox1[2] + dwidth - self.scale_value(3)
-                self.coords(back, coord)
                 coord = self.coords(outl)
-                coord[0] = coord[6] = bbox1[0] + self.scale_value(3)-1
-                coord[2] = coord[4] = bbox1[2] + dwidth - self.scale_value(3)+1
+                coord[0] = coord[6] = bbox1[0] + self.scale_value(1)
+                coord[2] = coord[4] = bbox1[2] + dwidth - self.scale_value(1)
                 self.coords(outl, coord)
+                coord = self.coords(back)
+                coord[0] = coord[6] = bbox1[0] + self.scale_value(2)
+                coord[2] = coord[4] = bbox1[2] + dwidth - self.scale_value(2)
+                self.coords(back, coord)
                 coordl = self.coords(bottomline)
                 coordl[0] = coord[0]
                 coordl[2] = coord[2]
@@ -5864,19 +5864,19 @@ class BasicTinUI(Canvas):
             tags=(uid, entrybutton),
         )
         bubbox = self.bbox(funcw)
-        bottomlinepos = (bbox[0] + 2, bbox[3] - 1, bubbox[2] - 2, bbox[3] - 1)
+        bottomlinepos = (bbox[0] + self.scale_value(2), bbox[3] - self.scale_value(1), bubbox[2] - self.scale_value(2), bbox[3] - self.scale_value(1))
         bottomline = self.create_line(
             bottomlinepos, fill=outline, width=self.TINUI_RADIUS_SMALL, capstyle="round", tags=uid
         )  # bottomline
         back = self.__ui_polygon(
-            ((bbox[0] + 2, bbox[1] + 2), (bubbox[2] - 2, bbox[3] - 2)),
+            ((bbox[0] + self.scale_value(2), bbox[1] + self.scale_value(2)), (bubbox[2] - self.scale_value(2), bbox[3] - self.scale_value(2))),
             fill=bg,
             outline=bg,
             width=self.TINUI_RADIUS_SMALL,
             tags=uid,
         )  # back
         outl = self.__ui_polygon(
-            ((bbox[0] + 1, bbox[1] + 1), (bubbox[2] - 1, bbox[3] - 1)),
+            ((bbox[0] + self.scale_value(1), bbox[1] + self.scale_value(1)), (bubbox[2] - self.scale_value(1), bbox[3] - self.scale_value(1))),
             fill=line,
             outline=line,
             width=self.TINUI_RADIUS_SMALL,

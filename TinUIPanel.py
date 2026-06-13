@@ -380,7 +380,7 @@ class PanelSash(BasePanel):
     面板拉伸条
     用于动态调整 HorizontalPanel 或 VerticalPanel 中相邻子元素的尺寸或权重
     """
-    def __init__(self, parent_panel, bg='#cccccc', bd=0, line='', linew=0):
+    def __init__(self, parent_panel, bg='#cccccc', bd=0, line='', linew=0, draggable=True):
         # 传入的 parent_panel 必须是 VerticalPanel 或 HorizonPanel
         super().__init__(parent_panel.canvas, bg, bd, line, linew)
         self.parent = parent_panel
@@ -398,10 +398,11 @@ class PanelSash(BasePanel):
         self._drag_data = {}
 
         # 绑定鼠标事件
-        self.canvas.tag_bind(self.rect, '<ButtonPress-1>', self.start_drag)
-        self.canvas.tag_bind(self.rect, '<B1-Motion>', self.on_drag)
-        self.canvas.tag_bind(self.rect, '<Enter>', self.on_enter)
-        self.canvas.tag_bind(self.rect, '<Leave>', self.on_leave)
+        if draggable:
+            self.canvas.tag_bind(self.rect, '<ButtonPress-1>', self.start_drag)
+            self.canvas.tag_bind(self.rect, '<B1-Motion>', self.on_drag)
+            self.canvas.tag_bind(self.rect, '<Enter>', self.on_enter)
+            self.canvas.tag_bind(self.rect, '<Leave>', self.on_leave)
 
     def update_layout(self, x1, y1, x2, y2):
         self.fix_bg(x1, y1, x2, y2)
@@ -574,7 +575,7 @@ if __name__ == "__main__":
     card = CardPanel(b, bg='#fff3e0', v_spacing=10)
     hp.add_child(card, weight=1) # 中间面板，自适应填充权重
     
-    sash2 = PanelSash(hp, bg='#999999')
+    sash2 = PanelSash(hp, bg='#999999', draggable=False) # 不可拖动的分隔条
     hp.add_child(sash2, size=5)
     
     # 放入右侧固定尺寸的面板

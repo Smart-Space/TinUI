@@ -166,10 +166,12 @@ class PanelSash(BasePanel):
     面板拉伸条
     用于动态调整 HorizontalPanel 或 VerticalPanel 中相邻子元素的尺寸或权重
     """
-    def __init__(self, parent_panel, bg='#cccccc', bd=0, line='', linew=0):
+    def __init__(self, parent_panel, bg='#cccccc', bd=0, line='', linew=0, draggable=True):
 ```
 
 直接作为子元素添加进纵向面板或者横向面板，其`parent_panel`与加入该面板的上级面板需要一致。
+
+`draggable`参数控制拉伸条是否允许被拖动，如果为`False`，则可当作面板分割线使用。
 
 - 当相邻元素为固定尺寸时，调整尺寸；
 - 均为权重时，调整权重系数；

@@ -12,6 +12,7 @@
 2. 优化scrollbar事件响应动作
 3. PanelSash添加draggable参数
 4. 优化entry, passwordbox在高DPI下的边框样式
+5. ask_choice支持高度设置
 
 ==========6.29==========
 2026-6-7

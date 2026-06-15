@@ -13,6 +13,7 @@
 3. PanelSash添加draggable参数
 4. 优化entry, passwordbox在高DPI下的边框样式
 5. ask_choice支持高度设置
+6. listview.add添加是否初始化TinUIXml参数支持
 
 ==========6.29==========
 2026-6-7

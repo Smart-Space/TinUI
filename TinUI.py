@@ -3649,10 +3649,10 @@ class BasicTinUI(Canvas):
         def clean(_):
             items.clear()
 
-        def _load_item(num):
+        def _load_item(num, uixml=True):
             nonlocal endy
             for _ in range(0, num):
-                item = ui.add_ui((self.scale_value(3), endy), width=width - self.scale_value(3), height=linew, bg=bg)
+                item = ui.add_ui((self.scale_value(3), endy), width=width - self.scale_value(3), height=linew, bg=bg, content=uixml)
                 items.append(item)
                 ui.addtag_withtag("item", item[-1])
                 endy += linew + self.scale_value(2)
@@ -3751,8 +3751,8 @@ class BasicTinUI(Canvas):
             items.clear()
             ui.config(scrollregion=(0, 0, width, height))
 
-        def add():  # 增加 add_ui uid 到底部，并获取返回值
-            _load_item(1)
+        def add(uixml=True):  # 增加 add_ui uid 到底部，并获取返回值
+            _load_item(1, uixml)
             return items[-1]
 
         def getsel():  # 获取选中项

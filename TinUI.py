@@ -6695,7 +6695,7 @@ class BasicTinUI(Canvas):
                     position[0],
                     position[1] + pixel / 2,
                 )
-                self.create_line(sp_pos, width=1, fill=sepcolor, tags=(uid, buttons_id))
+                self.create_line(sp_pos, width=self.scale_value(1), fill=sepcolor, tags=(uid, buttons_id))
                 continue
             position = new_pos()
             button = self.add_button2(

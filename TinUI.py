@@ -3369,9 +3369,11 @@ class BasicTinUI(Canvas):
             box.itemconfig(choices[t][2], fill=onbg)
 
         def sel_it(t):
+            nonlocal selected_index
             box.itemconfig(choices[t][1], fill=onfg)
             box.itemconfig(choices[t][2], fill=sel)
             choices[t][-1] = True
+            selected_index = all_keys.index(t)
             for i in choices.keys():
                 if i == t:
                     continue
@@ -3379,9 +3381,8 @@ class BasicTinUI(Canvas):
                 out_mouse(i)
             if command != None:
                 name = choices[t][0]
-                index = all_keys.index(t)
                 result = TinUIString(name)
-                result.index = index
+                result.index = selected_index
                 command(result)
 
         def __re_scroll():
@@ -3402,15 +3403,69 @@ class BasicTinUI(Canvas):
                 self.itemconfig(hscroll, state="hidden")
             box.config(scrollregion=bbox)
 
-        def _add(item: str = "new item"):  # 添加元素
-            load_data(
-                {
-                    item,
-                }
+        def _add(item:str="new item", index:int=-1):  # 添加元素
+            nonlocal maxwidth, selected_index
+            total = len(all_keys)
+            if index < 0 or index >= total: index = total
+            # 确定绘制位置的 Y 坐标
+            if total == 0 or index == 0:
+                # 为空或插入到顶部
+                y_start = 5
+            elif index == total or index == -1:
+                # 追加到末尾：获取最后一项的底部坐标 + 间隔
+                index = total
+                last_key = all_keys[-1]
+                last_bbox = box.bbox(choices[last_key][2])
+                y_start = last_bbox[3] + 7 if last_bbox else 5
+            else:
+                # 插入中间：获取目标位置当前项的 Y 坐标，新项将占据此位置
+                target_key = all_keys[index]
+                target_text_bbox = box.bbox(choices[target_key][1])
+                y_start = target_text_bbox[1] if target_text_bbox else 5
+            text = box.create_text((5, y_start), text=item, fill=fg, font=font, anchor="nw", tags=("textcid", "item"))
+            bbox = box.bbox(text)
+            back = box.create_rectangle(
+                (3, bbox[1]-4, bbox[2]+2, bbox[3]+4),
+                width=0,
+                fill=bg,
+                tags=("item",),
             )
+            # 更新数据结构
+            box.tkraise(text)
+            choices[text] = [item, text, back, False]
+            all_keys.insert(index, text)
+            # 绑定交互
+            for item_id in (text, back):
+                box.tag_bind(item_id, "<Enter>", lambda _, text=text: in_mouse(text))
+                box.tag_bind(item_id, "<Leave>", lambda _, text=text: out_mouse(text))
+                box.tag_bind(item_id, "<Button-1>", lambda _, text=text: mouse_click(text))
+                box.tag_bind(item_id, "<ButtonRelease-1>", lambda _, text=text: sel_it(text))
+            # 非末尾元素下移所有元素
+            if index < total:
+                # 计算新元素的高度来确定偏移量
+                new_back_bbox = box.bbox(back)
+                delta = new_back_bbox[3] + 7 - y_start
+                # 移动原本在该位置及之后的元素
+                endbox = box.bbox('all')
+                box.addtag_overlapping("tag_move", 0, y_start, endbox[2], endbox[3])
+                box.dtag(text, "tag_move")
+                box.dtag(back, "tag_move")
+                box.move("tag_move", 0, delta)
+                box.dtag("tag_move", "tag_move")
+            if selected_index >= index:
+                selected_index += 1
+            # 更新最大宽度和滚动条
+            tbbox = box.bbox("textcid")
+            if tbbox:
+                twidth = tbbox[2] - tbbox[0]
+                maxwidth = twidth
+                if maxwidth < width:
+                    maxwidth = width
+                repaint_back()
+            __re_scroll()
 
         def _delete(index: int = 0):  # 删除元素，默认第一个
-            nonlocal maxwidth
+            nonlocal maxwidth, selected_index
             total = len(all_keys)
             if index + 1 > total:  # 序数超出总数
                 return
@@ -3425,6 +3480,10 @@ class BasicTinUI(Canvas):
                     box.move(choices[keyid][2], 0, -item_height - 2)
             del choices[key]
             del all_keys[index]
+            if selected_index > index:
+                selected_index -= 1
+            elif selected_index == index:
+                selected_index = -1
             tbbox = box.bbox("textcid")
             maxwidth = tbbox[2] - tbbox[0]
             if maxwidth < width:
@@ -3433,7 +3492,8 @@ class BasicTinUI(Canvas):
             __re_scroll()
 
         def _clear():  # 清空元素
-            nonlocal maxwidth
+            nonlocal maxwidth, selected_index
+            selected_index = -1
             for key in choices.keys():
                 for cid in choices[key][1:3]:
                     box.delete(cid)
@@ -3445,61 +3505,18 @@ class BasicTinUI(Canvas):
             self.itemconfig(cavui, width=width)
             self.itemconfig(hscroll, state="hidden")
             box.config(scrollregion=(0, 0, width, height))
+        
+        def _get_selected(): # 获取选中元素
+            if selected_index == -1:
+                selected_text = None
+            else:
+                selected_text = choices[all_keys[selected_index]][0]
+            return selected_text, selected_index
 
         def load_data(datas):  # 导入元素
             nonlocal maxwidth
             for i in datas:
-                end = box.bbox("item")
-                end = 5 if end == None else end[-1]
-                text = box.create_text(
-                    (5, end + 7),
-                    text=i,
-                    fill=fg,
-                    font=font,
-                    anchor="nw",
-                    tags=("textcid", "item"),
-                )
-                bbox = box.bbox(text)  # 获取文本宽度
-                back = box.create_rectangle(
-                    (3, bbox[1] - 4, bbox[2] + 2, bbox[3] + 4),
-                    width=0,
-                    fill=bg,
-                    tags=("item"),
-                )
-                box.tkraise(text)
-                choices[text] = [
-                    i,
-                    text,
-                    back,
-                    False,
-                ]  # 用文本id代表键，避免选项文本重复带来的逻辑错误
-                all_keys.append(text)
-                for item_id in (text, back):
-                    box.tag_bind(
-                        item_id, "<Enter>", lambda _, text=text: in_mouse(text)
-                    )
-                    box.tag_bind(
-                        item_id, "<Leave>", lambda _, text=text: out_mouse(text)
-                    )
-                    box.tag_bind(
-                        item_id,
-                        "<Button-1>",
-                        lambda _, text=text: mouse_click(text),
-                    )
-                    box.tag_bind(
-                        item_id,
-                        "<ButtonRelease-1>",
-                        lambda _, text=text: sel_it(text),
-                    )
-            tbbox = box.bbox("textcid")
-            if tbbox == None:
-                return
-            twidth = tbbox[2] - tbbox[0]
-            maxwidth = twidth
-            if maxwidth < width:
-                maxwidth = width
-            repaint_back()
-            __re_scroll()
+                _add(i)
 
         def __layout(x1, y1, x2, y2, expand=False):
             nonlocal width, height
@@ -3536,12 +3553,11 @@ class BasicTinUI(Canvas):
                 return None
             key = choices[index]
             sel_it(key)
+
         font = font or self.__get_font()
+        selected_index = -1
         box = BasicTinUI(self, bg=bg, width=width, height=height)  # 显示选择内容
-        cavui = self.create_window(
-            pos, window=box, width=width, height=height, anchor="nw"
-        )
-        # self.windows.append(box)
+        cavui = self.create_window(pos, window=box, width=width, height=height, anchor="nw")
         uid = TinUIString(f"listbox-{cavui}")
         self.addtag_withtag(uid, cavui)
         hscroll = self.add_scrollbar(
@@ -3584,6 +3600,7 @@ class BasicTinUI(Canvas):
         funcs.delete = _delete
         funcs.clear = _clear
         funcs.select = select
+        funcs.get = _get_selected
         uid.layout = __layout
         return box, allback, funcs, uid
 

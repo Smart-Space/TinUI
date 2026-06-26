@@ -3794,7 +3794,7 @@ class BasicTinUI(Canvas):
         pos = list(pos)
         pos[0], pos[1] = bbox[0], bbox[1]
         scro = self.add_scrollbar(
-            (pos[0] + width + self.scale_value(2), pos[1]),
+            (pos[0] + width + self.scale_value(3), pos[1]),
             ui,
             height=height,
             bg=scrobg,

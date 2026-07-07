@@ -3667,24 +3667,8 @@ class BasicTinUI(Canvas):
             items.clear()
 
         def _load_item(num, uixml=True):
-            nonlocal endy
-            for _ in range(0, num):
-                item = ui.add_ui((self.scale_value(3), endy), width=width - self.scale_value(3), height=linew, bg=bg, content=uixml)
-                items.append(item)
-                ui.addtag_withtag("item", item[-1])
-                endy += linew + self.scale_value(2)
-                tinui = item[0]
-                back = tinui.__ui_polygon(((self.scale_value(4), self.scale_value(4)), (width - self.scale_value(8), linew - self.scale_value(5))), "", "", self.TINUI_RADIUS_SMALL)
-                tinui.background = back
-                tinui.bind("<Enter>", lambda _, item=item: buttonin(item))
-                tinui.bind("<Button-1>", lambda _, item=item: click(item))
-                tinui.bind("<Leave>", lambda _, item=item: buttonout(item))
-                tinui.bind("<MouseWheel>", bindyview)
-            bbox = ui.bbox("item")
-            if bbox != None:
-                bbox = list(bbox)
-                bbox[0] -= self.scale_value(3,True)
-                ui.config(scrollregion=bbox)
+            for _ in range(num):
+                add(uixml, -1)
 
         def __layout(x1, y1, x2, y2, expand=False):
             nonlocal width, height
@@ -3731,11 +3715,11 @@ class BasicTinUI(Canvas):
                 return
             if index == nowon:
                 nowon = -1
-                ui.moveto(line, 1, -linew)
+                ui.moveto(line, self.scale_value(1), -linew)
             elif index < nowon:
                 nowon -= 1
-                ui.move(line, 0, -linew - 2)
-            endy -= linew + 2
+                ui.move(line, 0, -linew - self.scale_value(2))
+            endy -= linew + self.scale_value(2)
             subui = items[index]
             ui.dtag(subui[-1], "item")
             ui.delete(subui[-1])
@@ -3744,13 +3728,13 @@ class BasicTinUI(Canvas):
             # 其它UI上移
             if index != len(items):
                 for item in items[index:]:
-                    ui.move(item[-1], 0, -linew - 2)
+                    ui.move(item[-1], 0, -linew - self.scale_value(2))
             bbox = ui.bbox("item")
             if bbox == None:
                 bbox = (0, 0, 0, 0)
             else:
                 bbox = list(bbox)
-                bbox[0] -= 3
+                bbox[0] -= self.scale_value(3,True)
             ui.config(scrollregion=bbox)
 
         def clear():  # 清空所有元素
@@ -3768,9 +3752,40 @@ class BasicTinUI(Canvas):
             items.clear()
             ui.config(scrollregion=(0, 0, width, height))
 
-        def add(uixml=True):  # 增加 add_ui uid 到底部，并获取返回值
-            _load_item(1, uixml)
-            return items[-1]
+        def add(uixml:bool=True, index:int=-1):  # 增加 add_ui uid 到底部，并获取返回值
+            nonlocal endy, nowon
+            if index >= len(items):
+                return None
+            if index == -1:
+                posy = endy
+                item = ui.add_ui((self.scale_value(3), posy), width=width - self.scale_value(3), height=linew, bg=bg, content=uixml)
+                items.append(item)
+            else:
+                posy = endy - (len(items) - index) * (linew + self.scale_value(2))
+                item = ui.add_ui((self.scale_value(3), posy), width=width - self.scale_value(3), height=linew, bg=bg, content=uixml)
+                items.insert(index, item)
+                # 移动下方元素
+                for i in range(index + 1, len(items)):
+                    ui.move(item[i], 0, linew + self.scale_value(2))
+            endy += linew + self.scale_value(2)
+            ui.addtag_withtag("item", item[-1])
+            if index <= nowon and nowon != -1 and index != -1:
+                # 移动选中线
+                nowon += 1
+                ui.move(line, 0, linew + self.scale_value(2))
+            tinui = item[0]
+            back = tinui.__ui_polygon(((self.scale_value(4), self.scale_value(4)), (width - self.scale_value(8), linew - self.scale_value(5))), "", "", self.TINUI_RADIUS_SMALL)
+            tinui.background = back
+            tinui.bind("<Enter>", lambda _, item=item: buttonin(item))
+            tinui.bind("<Button-1>", lambda _, item=item: click(item))
+            tinui.bind("<Leave>", lambda _, item=item: buttonout(item))
+            tinui.bind("<MouseWheel>", bindyview)
+            bbox = ui.bbox("item")
+            if bbox != None:
+                bbox = list(bbox)
+                bbox[0] -= self.scale_value(3,True)
+            ui.config(scrollregion=bbox)
+            return item
 
         def getsel():  # 获取选中项
             return nowon

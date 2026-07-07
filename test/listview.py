@@ -26,10 +26,12 @@ def print__(name):
 def getnowon(e):
     print(funcs.getsel())
 def selectnext(e):
+    global index
     num = len(funcs.getitems())
     now = funcs.getsel()
     if now < num:
         funcs.select(now+1)
+        index = now+1
 
 a=win()
 u=a.u

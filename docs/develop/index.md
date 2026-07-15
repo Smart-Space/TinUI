@@ -24,3 +24,9 @@ TinUI使用GPLv3作为开源协议。
 
 - 发送issue至GitHub-TinUI储存库
 - 发送邮件至tsan-zane@outlook.com或smart-space@qq.com
+
+---
+
+## 捐赠
+
+[微信支付](https://smart-space.com.cn/img/tinuisupport/微信支付.png)

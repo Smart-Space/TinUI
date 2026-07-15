@@ -3519,7 +3519,7 @@ class BasicTinUI(Canvas):
                 _add(i)
 
         def __layout(x1, y1, x2, y2, expand=False):
-            nonlocal width, height
+            nonlocal width, height, maxwidth
             if not expand:
                 dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), anchor)
                 hscroll.move(dx, dy, height)
@@ -3541,7 +3541,9 @@ class BasicTinUI(Canvas):
                 coord[5] = coord[7] = y2 - self.scale_value(4)
                 self.coords(allback, coord)
                 self.itemconfig(cavui, width=width, height=height)
-                load_data({})
+                maxwidth = max(maxwidth, width)
+                repaint_back()
+                __re_scroll()
 
         def clean(_):
             nonlocal all_keys, choices

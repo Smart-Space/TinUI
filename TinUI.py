@@ -2967,15 +2967,17 @@ class BasicTinUI(Canvas):
         font = tkfont.Font(family="{Segoe Fluent Icons}", size=7)
         basewidth = font.measure('\ueddb')
         baseheigth = font.metrics("linespace")
+        leave_width_state = True # 当前是否是鼠标离开状态的宽度，在进入和离开操作的最后一步赋值
 
         def enter():  # 鼠标进入
-            nonlocal leave_handle
+            nonlocal leave_handle, leave_width_state
             if leave_handle:
                 self.after_cancel(leave_handle)
                 leave_handle = None
             if leave_animation:
                 self.after_cancel(leave_animation)
             self.itemconfig(sc, outline=oncolor, width=basewidth-2)
+            leave_width_state = False
 
         def all_enter(_):
             self.itemconfig(top, fill=oncolor)
@@ -2988,17 +2990,20 @@ class BasicTinUI(Canvas):
             nonlocal leave_handle
             leave_handle = self.after(300, leave)
         def leave(w=basewidth-2):  # 鼠标离开
-            nonlocal leave_animation
+            nonlocal leave_animation, leave_width_state
             leave_animation = None
             self.itemconfig(sc, outline=color, width=w)
             if w != self.scale_value(3,True):
                 leave_animation = self.after(32, lambda : leave(w-self.scale_value(1)))
+            else:
+                leave_width_state = True
 
         def all_leave(_):
             self.itemconfig(top, fill="")
             self.itemconfig(bottom, fill="")
             self.itemconfig(back, outline="")
-            leave_target()
+            if not leave_width_state:
+                leave_target()
 
         def widget_move(sp, ep):  # 控件控制滚动条滚动
             nonlocal target_y

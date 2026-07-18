@@ -1508,42 +1508,39 @@ class BasicTinUI(Canvas):
                 width = x2 - x1
                 width2 = width * per / 100
                 y = (y1 + y2) / 2
-                self.coords(
-                    outline,
-                    x1 + 4,
-                    y - 3.5,
-                    x2 - 4,
-                    y - 3.5,
-                    x2 - 4,
-                    y + 3.5,
-                    x1 + 4,
-                    y + 3.5,
+                self.coords(outline,
+                    x1 + self.scale_value(4),
+                    y - self.scale_value(3),
+                    x2 - self.scale_value(4),
+                    y - self.scale_value(3),
+                    x2 - self.scale_value(4),
+                    y + self.scale_value(3),
+                    x1 + self.scale_value(4),
+                    y + self.scale_value(3),
                 )
-                self.coords(
-                    back,
-                    x1 + 5,
-                    y - 2.5,
-                    x2 - 5,
-                    y - 2.5,
-                    x2 - 5,
-                    y + 2.5,
-                    x1 + 5,
-                    y + 2.5,
+                self.coords(back,
+                    x1 + self.scale_value(5),
+                    y - self.scale_value(2),
+                    x2 - self.scale_value(5),
+                    y - self.scale_value(2),
+                    x2 - self.scale_value(5),
+                    y + self.scale_value(2),
+                    x1 + self.scale_value(5),
+                    y + self.scale_value(2),
                 )
-                self.coords(
-                    progressbar,
-                    x1 + 4,
-                    y - 3.5,
-                    x1 + 4 + width2,
-                    y - 3.5,
-                    x1 + 4 + width2,
-                    y + 3.5,
-                    x1 + 4,
-                    y + 3.5,
+                self.coords(progressbar,
+                    x1 + self.scale_value(4),
+                    y - self.scale_value(3),
+                    x1 + self.scale_value(4) + width2,
+                    y - self.scale_value(3),
+                    x1 + self.scale_value(4) + width2,
+                    y + self.scale_value(3),
+                    x1 + self.scale_value(4),
+                    y + self.scale_value(3),
                 )
                 self.coords(text, x1 + width / 2, y)
                 pos[0] = x1
-                pos[1] = y - 7.5
+                pos[1] = y - self.scale_value(7)
 
         def goto(num: int):
             nonlocal per
@@ -1554,14 +1551,14 @@ class BasicTinUI(Canvas):
             pw = max(8, pw)
             self.coords(
                 progressbar,
-                pos[0] + 4,
-                pos[1] + 4,
-                pos[0] + pw - 4,
-                pos[1] + 4,
-                pos[0] + pw - 4,
-                pos[1] + 11,
-                pos[0] + 4,
-                pos[1] + 11,
+                pos[0] + self.scale_value(4),
+                pos[1] + self.scale_value(4),
+                pos[0] + pw - self.scale_value(4),
+                pos[1] + self.scale_value(4),
+                pos[0] + pw - self.scale_value(4),
+                pos[1] + self.scale_value(11),
+                pos[0] + self.scale_value(4),
+                pos[1] + self.scale_value(11),
             )
             if percentage:
                 self.itemconfig(text, text=str(per) + "%")
@@ -1585,25 +1582,25 @@ class BasicTinUI(Canvas):
         pos = list(pos)
         per = 0  # 当前进度
         outline = self.__ui_polygon(
-            ((pos[0] + 4, pos[1] + 4), (pos[0] + width - 4, pos[1] + 11)),
+            ((pos[0] + self.scale_value(4), pos[1] + self.scale_value(4)), (pos[0] + width - self.scale_value(4), pos[1] + self.scale_value(11))),
             outline=fg,
             fill=fg,
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
         )
         uid = TinUIString(f"progressbar-{outline}")
         self.itemconfig(outline, tags=uid)
         back = self.__ui_polygon(
-            ((pos[0] + 5, pos[1] + 5), (pos[0] + width - 5, pos[1] + 10)),
+            ((pos[0] + self.scale_value(5), pos[1] + self.scale_value(5)), (pos[0] + width - self.scale_value(5), pos[1] + self.scale_value(10))),
             outline=back,
             fill=back,
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             tags=uid,
         )
         progressbar = self.__ui_polygon(
-            ((pos[0] + 4, pos[1] + 4), (pos[0] + 4, pos[1] + 11)),
+            ((pos[0] + self.scale_value(4), pos[1] + self.scale_value(4)), (pos[0] + self.scale_value(4), pos[1] + self.scale_value(11))),
             outline=bg,
             fill=bg,
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             tags=uid,
         )
         pro_tagname = "progressbar>" + str(back)
@@ -1611,20 +1608,20 @@ class BasicTinUI(Canvas):
         # 是否显示默认文本
         if percentage:
             text = self.create_text(
-                (pos[0] + width // 2, pos[1] + 7.5),
+                (pos[0] + width // 2, pos[1] + self.scale_value(7)),
                 anchor="center",
                 text="0%",
                 fill=fontc,
-                font="微软雅黑 10",
+                font="{Segoe UI} 10",
                 tags=uid,
             )
         else:
             text = self.create_text(
-                (pos[0] + width // 2, pos[1] + 7.5),
+                (pos[0] + width // 2, pos[1] + self.scale_value(7)),
                 anchor="center",
                 text=text,
                 fill=fontc,
-                font="微软雅黑 10",
+                font="{Segoe UI} 10",
                 tags=uid,
             )
         dx, dy = self.__auto_anchor(uid, pos, anchor)
@@ -4725,8 +4722,9 @@ class BasicTinUI(Canvas):
         bars = []
         item_num = 1  # 总数量
         line_num = 1  # 行数量
-        center_x = pos[0] + 5
-        center_y = pos[1] + 5
+        pad_5 = self.scale_value(5)
+        center_x = pos[0] + pad_5
+        center_y = pos[1] + pad_5
         uid = TinUIString(f"ratinbar-{uuid.uuid1().hex}")
         starid = f"{uid}star"
         bbox = None
@@ -4758,30 +4756,31 @@ class BasicTinUI(Canvas):
             if item_num == num:
                 break
             if line_num == linew:
-                center_x = pos[0] + 5
-                center_y += 5 + (bbox[3] - bbox[1])
+                center_x = pos[0] + pad_5
+                center_y += pad_5 + (bbox[3] - bbox[1])
                 line_num = 1
                 continue
             item_num += 1
             line_num += 1
-            center_x += 5 + (bbox[2] - bbox[0])
+            center_x += pad_5 + (bbox[2] - bbox[0])
         start = list(self.bbox(uid))
-        start[0] -= 5
-        start[1] -= 5
-        start[2] += 5
-        start[3] += 5
-        back = self.create_rectangle(start, fill=bg, outline=fg, width=1, tags=uid)
+        start[0] -= pad_5
+        start[1] -= pad_5
+        start[2] += pad_5
+        start[3] += pad_5
+        back = self.__ui_polygon(((start[0], start[1]), (start[2], start[3])), fill=bg, outline=bg, width=self.TINUI_RADIUS_SMALL, tags=uid)
+        outline = self.__ui_polygon(((start[0]-self.scale_value(1), start[1]-self.scale_value(1)), (start[2]+self.scale_value(1), start[3]+self.scale_value(1))), fill=fg, outline=fg, width=self.TINUI_RADIUS_SMALL, tags=uid)
         self.lower(back, starid)
+        self.lower(outline, back)
         self.tag_bind(back, "<Leave>", leaveback)
         self.tag_bind(back, "<Button>", __ontemp)
-        del start, starid, item_num, line_num, bbox, center_x, center_y
         funcs = FuncList(1)
         funcs.setrate = setrate
         self.__auto_anchor(uid, pos, anchor)
         uid.layout = lambda x1, y1, x2, y2, expand=False: self.__auto_layout(
             uid, (x1, y1, x2, y2), anchor
         )
-        return bars, back, funcs, uid
+        return bars, back, outline, funcs, uid
 
     def add_radiobox(
         self,

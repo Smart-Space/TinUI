@@ -4,6 +4,9 @@ index=-1
 def additem(e):
     uixml = funcs.add()[-2]
     uixml.loadxml(onexml)
+def additematback(e):
+    uixml = funcs.add(index=items.__len__()-1)[-2]
+    uixml.loadxml(onexml)
 def deleteitemthis(e):
     global index
     if index == -1:
@@ -35,7 +38,7 @@ def selectnext(e):
 
 a=win()
 u=a.u
-funcs=u.add_listview((10,5),height=400,command=print__)[-2]
+_, _, items, funcs, _=u.add_listview((10,5),height=400,command=print__)
 
 onexml='''<tinui>
 <line>
@@ -77,5 +80,6 @@ u.add_button((120,420),'删除第一个元素',command=deleteitem1)
 u.add_button((120,470),'删除第二个元素',command=deleteitem)
 u.add_button((120,520),'清空元素',command=deleteall)
 u.add_button((120,570),'增加十个',command=add10)
+u.add_button((250,420),'倒数添加元素',command=additematback)
 
 a.go()

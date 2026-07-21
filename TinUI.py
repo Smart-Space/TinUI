@@ -3770,7 +3770,7 @@ class BasicTinUI(Canvas):
                 items.insert(index, item)
                 # 移动下方元素
                 for i in range(index + 1, len(items)):
-                    ui.move(item[i], 0, linew + self.scale_value(2))
+                    ui.move(items[i][-1], 0, linew + self.scale_value(2))
             endy += linew + self.scale_value(2)
             ui.addtag_withtag("item", item[-1])
             if index <= nowon and nowon != -1 and index != -1:

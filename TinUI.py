@@ -3017,7 +3017,7 @@ class BasicTinUI(Canvas):
             if mode == "y":
                 self.coords(sc, (pos[0] + scale_5, startp + scale_5, pos[0] + scale_5, endp - scale_5))
             else:
-                self.coords(sc, (startp + scale_5, pos[1] + scale_5, endp + scale_5, pos[1] + scale_5))
+                self.coords(sc, (startp + scale_5, pos[1] + scale_5, endp - scale_5, pos[1] + scale_5))
 
         def mousedown(event):
             nonlocal use_widget  # 当该值为真，才允许响应widget_move函数
@@ -3167,8 +3167,8 @@ class BasicTinUI(Canvas):
                 coord[3] += size - height
             elif mode == "x":
                 start += dx
-                end = start + size - 2*basewidth - 10
-                canmove = end - start - 10
+                end = start + size - 2*basewidth - self.scale_value(10)
+                canmove = end - start
                 self.move(bottom, size - height, 0)
                 coord = self.coords(back)
                 coord[2] += size - height
@@ -3266,7 +3266,7 @@ class BasicTinUI(Canvas):
             uid = TinUIString(f"scrollbar-{back}")
             self.itemconfig(back, tags=uid)
             top = self.create_text(
-                (pos[0] + scale_5, pos[1] + scale_5),
+                (pos[0], pos[1] + scale_5),
                 text="\uedd9",
                 font="{Segoe Fluent Icons} 7",
                 anchor="w",
@@ -3274,7 +3274,7 @@ class BasicTinUI(Canvas):
                 tags=uid,
             )
             bottom = self.create_text(
-                (pos[0] + height - scale_5, pos[1] + scale_5),
+                (pos[0] + height, pos[1] + scale_5),
                 text="\uedda",
                 font="{Segoe Fluent Icons} 7",
                 anchor="e",
@@ -3294,7 +3294,7 @@ class BasicTinUI(Canvas):
             )
             start = pos[0] + basewidth + scale_5
             end = pos[0] + height - basewidth - scale_5
-            canmove = end - start - self.scale_value(10)
+            canmove = end - start
             widget.config(xscrollcommand=widget_move)
             widget_view = widget.xview
             widget_viewto = widget.xview_moveto
@@ -3544,7 +3544,10 @@ class BasicTinUI(Canvas):
                 coord[5] = coord[7] = y2 - self.scale_value(4)
                 self.coords(allback, coord)
                 self.itemconfig(cavui, width=width, height=height)
-                maxwidth = max(maxwidth, width)
+                bbox = box.bbox("textcid")
+                if bbox == None:
+                    bbox = (0, 0, 0, 0)
+                maxwidth = max(bbox[2]-bbox[0], width)
                 repaint_back()
                 __re_scroll()
 
@@ -3566,7 +3569,7 @@ class BasicTinUI(Canvas):
         uid = TinUIString(f"listbox-{cavui}")
         self.addtag_withtag(uid, cavui)
         hscroll = self.add_scrollbar(
-            (pos[0] + width - 8, pos[1]),
+            (pos[0] + width - self.scale_value(8), pos[1]),
             widget=box,
             height=height,
             bg=scrollbg,
@@ -3574,7 +3577,7 @@ class BasicTinUI(Canvas):
             oncolor=scrollon,
         )[-1]  # 纵向
         vscroll = self.add_scrollbar(
-            (pos[0], pos[1] + height - 8),
+            (pos[0], pos[1] + height - self.scale_value(8)),
             widget=box,
             height=width,
             direction="x",
@@ -4272,11 +4275,11 @@ class BasicTinUI(Canvas):
         ):  # 创建页面
             nonlocal npx
             if tbu.bbox(labeluid) == None:
-                endx = 3
+                endx = self.scale_value(3)
             else:
                 endx = tbu.bbox(labeluid)[2] + self.scale_value(3)
             titleu = tbu.create_text(
-                (endx, 6), text=title, fill=fg, font=font, anchor="nw", tags=labeluid
+                (endx, self.scale_value(6)), text=title, fill=fg, font=font, anchor="nw", tags=labeluid
             )  # 标题
             tbubbox = tbu.bbox(titleu)
             cby = (tbubbox[1] + tbubbox[3]) // 2
@@ -4293,7 +4296,7 @@ class BasicTinUI(Canvas):
             if cancancel == False:
                 tbu.itemconfig(cb, state="hidden")
             bu = tbu.__ui_polygon(
-                ((endx + 2, tbbbox[1]), (cbx + 13, tbbbox[3])),
+                ((endx + self.scale_value(2), tbbbox[1]), (cbx + self.scale_value(13), tbbbox[3])),
                 fill=bg,
                 outline=bg,
                 width=self.TINUI_RADIUS_SMALL,
@@ -4301,9 +4304,9 @@ class BasicTinUI(Canvas):
             )
             tbu.lower(bu)
             # 移动newpageuid
-            npmovex = cbx + 20 - npx
+            npmovex = cbx + self.scale_value(20) - npx
             tbu.move(newpageuid, npmovex, 0)
-            npx = cbx + 20
+            npx = cbx + self.scale_value(20)
             if flag == None:
                 flag = "flag" + str(titleu)
             if scrollbar:
@@ -4311,8 +4314,8 @@ class BasicTinUI(Canvas):
                 uiid = self.create_window(
                     viewpos,
                     window=page.frame,
-                    width=width + 4,
-                    height=height - 3,
+                    width=width + self.scale_value(4),
+                    height=height - self.scale_value(3),
                     anchor="nw",
                     state="hidden",
                     tags=uid,
@@ -4323,8 +4326,8 @@ class BasicTinUI(Canvas):
                 uiid = self.create_window(
                     viewpos,
                     window=page,
-                    width=width + 4,
-                    height=height - 3,
+                    width=width + self.scale_value(4),
+                    height=height - self.scale_value(3),
                     anchor="nw",
                     state="hidden",
                     tags=uid,
@@ -4367,7 +4370,7 @@ class BasicTinUI(Canvas):
         def deletepage(flag):  # 删除页面
             nonlocal nowpage, npx
             wbbox = tbu.bbox(tbdict[flag][2])
-            w = wbbox[2] - wbbox[0] - 1
+            w = wbbox[2] - wbbox[0] - self.scale_value(1)
             for i in tbdict[flag]:
                 tbu.delete(i)
             self.delete(vdict[flag][2])
@@ -4441,15 +4444,16 @@ class BasicTinUI(Canvas):
             )
             tbu.move(movename, movex, 0)  # 移动其它标题
             tbu.dtag(movename)
+            scale_6 = self.scale_value(6)
             pyo_t = (
-                pyo_bbox[0] + 6,
-                pyo_bbox[1] + 6,
-                pyo_bbox[2] + movex - 6,
-                pyo_bbox[1] + 6,
-                pyo_bbox[2] + movex - 6,
-                pyo_bbox[3] - 6,
-                pyo_bbox[0] + 6,
-                pyo_bbox[3] - 6,
+                pyo_bbox[0] + scale_6,
+                pyo_bbox[1] + scale_6,
+                pyo_bbox[2] + movex - scale_6,
+                pyo_bbox[1] + scale_6,
+                pyo_bbox[2] + movex - scale_6,
+                pyo_bbox[3] - scale_6,
+                pyo_bbox[0] + scale_6,
+                pyo_bbox[3] - scale_6,
             )
             tbu.coords(pyo, pyo_t)  # 调整背景
             tbu.move(cb, movex, 0)
@@ -4470,15 +4474,15 @@ class BasicTinUI(Canvas):
                 scroitem.move(dx, dy, width)
             else:
                 dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), "nw")
-                width = x2 - x1 - 12
-                height = y2 - y1 - 50
+                width = x2 - x1 - self.scale_value(12)
+                height = y2 - y1 - self.scale_value(50)
                 scroitem.move(dx, dy, width)
                 self.itemconfig(tbuid, width=width)
                 for i in vdict.values():
-                    self.itemconfig(i[-1], width=width + 4, height=height)
+                    self.itemconfig(i[-1], width=width + self.scale_value(4), height=height)
                 coord = self.coords(back)
-                coord[2] = coord[4] = x2 - 8
-                coord[5] = coord[7] = y2 - 8
+                coord[2] = coord[4] = x2 - self.scale_value(8)
+                coord[5] = coord[7] = y2 - self.scale_value(8)
                 self.coords(back, coord)
                 bbox = tbu.bbox("all")
                 if bbox and bbox[2] - bbox[0] > width:
@@ -4494,7 +4498,7 @@ class BasicTinUI(Canvas):
         tbu.TINUIFONTSIZE = self.TINUIFONTSIZE
         tbu.set_scale(self.TINUISCALE)
         tbuid = self.create_window(
-            (pos[0] + 2, pos[1] + 2), window=tbu, width=width, height=self.scale_value(30), anchor="nw"
+            (pos[0] + self.scale_value(2), pos[1] + self.scale_value(2)), window=tbu, width=width, height=self.scale_value(30), anchor="nw"
         )
         # self.windows.append(tbu)
         uid = TinUIString(f"notebook-{tbuid}")
@@ -4515,7 +4519,7 @@ class BasicTinUI(Canvas):
         barheight = self.bbox(scroitem)[3]
         # 新的backpos横纵坐标集向内缩小3单位
         back = self.__ui_polygon(
-            ((pos[0] + 8, pos[1] + 6), (pos[0] + width, barheight + height - 3)),
+            ((pos[0] + self.scale_value(8), pos[1] + self.scale_value(6)), (pos[0] + width, barheight + height - self.scale_value(3))),
             outline=color,
             fill=color,
             width=self.TINUI_RADIUS_LARGE,
@@ -4523,17 +4527,17 @@ class BasicTinUI(Canvas):
         )
         self.tkraise(tbuid)
         self.tkraise(scroitem)
-        viewpos = [pos[0] + 2, barheight + self.scale_value(2)]
+        viewpos = [pos[0] + self.scale_value(2), barheight + self.scale_value(2)]
         nowpage = ""
         vdict = {}  # ui,uixml,uiid
         tbdict = {}  # title,cb,pyo
         flaglist = []
-        font = "微软雅黑 12"
+        font = self.__get_font()
         # 新页面按钮（默认不显示）
-        npx = 3
+        npx = self.scale_value(3)
         newpageuid = f"notebooknew{tbuid}"
         newpagetext = tbu.create_text(
-            (npx, 9),
+            (npx, self.TINUI_RADIUS_SMALL),
             text="\uf8aa",
             font="{Segoe Fluent Icons} 12",
             fill=fg,
@@ -4543,10 +4547,10 @@ class BasicTinUI(Canvas):
         nptbbox = tbu.bbox(newpagetext)
         # newpageback
         newpageback = tbu.__ui_polygon(
-            ((nptbbox[0] + 2, nptbbox[1] + 2), (nptbbox[2] - 2, nptbbox[3] - 2)),
+            ((nptbbox[0] + self.scale_value(2), nptbbox[1] + self.scale_value(2)), (nptbbox[2] - self.scale_value(2), nptbbox[3] - self.scale_value(2))),
             fill=bg,
             outline=bg,
-            width=9,
+            width=self.TINUI_RADIUS_SMALL,
             tags=newpageuid,
         )
         tbu.tkraise(newpagetext)
@@ -5673,7 +5677,7 @@ class BasicTinUI(Canvas):
         uid = TinUIString(f"treeview-{cavui}")
         self.addtag_withtag(uid, cavui)
         hscroll = self.add_scrollbar(
-            (pos[0] + width - 8, pos[1]),
+            (pos[0] + width - self.scale_value(8), pos[1]),
             widget=box,
             height=height,
             bg=bg,
@@ -5681,7 +5685,7 @@ class BasicTinUI(Canvas):
             oncolor=signcolor,
         )[-1]  # 纵向
         vscroll = self.add_scrollbar(
-            (pos[0], pos[1] + height - 8),
+            (pos[0], pos[1] + height - self.scale_value(8)),
             widget=box,
             height=width,
             direction="x",

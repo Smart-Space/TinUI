@@ -2928,7 +2928,7 @@ class BasicTinUI(Canvas):
         if scrollbar:  # 不支持横向滚动自动绑定
             bbox = self.bbox(uid)
             cid = self.add_scrollbar(
-                (bbox[2] + self.scale_value(5), bbox[1]),
+                (bbox[2] + self.scale_value(4), bbox[1]),
                 textbox,
                 bbox[3] - bbox[1],
                 "y",
@@ -2973,7 +2973,7 @@ class BasicTinUI(Canvas):
                 leave_handle = None
             if leave_animation:
                 self.after_cancel(leave_animation)
-            self.itemconfig(sc, outline=oncolor, width=basewidth-2)
+            self.itemconfig(sc, outline=oncolor, width=basewidth-self.scale_value(2))
             leave_width_state = False
 
         def all_enter(_):
@@ -2986,7 +2986,7 @@ class BasicTinUI(Canvas):
         def leave_target():
             nonlocal leave_handle
             leave_handle = self.after(300, leave)
-        def leave(w=basewidth-2):  # 鼠标离开
+        def leave(w=basewidth-self.scale_value(2)):  # 鼠标离开
             nonlocal leave_animation, leave_width_state
             leave_animation = None
             self.itemconfig(sc, outline=color, width=w)
@@ -3015,9 +3015,9 @@ class BasicTinUI(Canvas):
             startp = start + canmove * float(sp)
             endp = start + canmove * float(ep)
             if mode == "y":
-                self.coords(sc, (pos[0] + 5, startp + 5, pos[0] + 5, endp - 5))
+                self.coords(sc, (pos[0] + scale_5, startp + scale_5, pos[0] + scale_5, endp - scale_5))
             else:
-                self.coords(sc, (startp + 5, pos[1] + 5, endp + 5, pos[1] + 5))
+                self.coords(sc, (startp + scale_5, pos[1] + scale_5, endp + scale_5, pos[1] + scale_5))
 
         def mousedown(event):
             nonlocal use_widget  # 当该值为真，才允许响应widget_move函数
@@ -3103,7 +3103,7 @@ class BasicTinUI(Canvas):
         def sc_move():  # 滚动条控制控件滚动
             nonlocal target_y, current_y
             bbox = self.bbox(sc)
-            effective = canmove - 10
+            effective = canmove - self.scale_value(10)
             if mode == "y":
                 startp = (bbox[1] - start) / effective
             elif mode == "x":
@@ -3160,7 +3160,7 @@ class BasicTinUI(Canvas):
             pos[1] += dy
             if mode == "y":
                 start += dy
-                end = start + size - 2*baseheigth - 10
+                end = start + size - 2*baseheigth - self.scale_value(10)
                 canmove = end - start
                 self.move(bottom, 0, size - height)
                 coord = self.coords(back)
@@ -3190,6 +3190,7 @@ class BasicTinUI(Canvas):
                 is_animation = True
                 animate()
         pos = list(pos)
+        scale_5 = self.scale_value(5, True)
         leave_handle = None # 鼠标离开动画计时器
         is_animation = False # 是否正在动画中
         scroll_speed = 0.15 # 缓动系数
@@ -3206,18 +3207,18 @@ class BasicTinUI(Canvas):
         if mode == "y":
             back = self.create_polygon(
                 (
-                    pos[0] + 5,
-                    pos[1] + 5,
-                    pos[0] + 5,
-                    pos[1] + height - 5,
+                    pos[0] + scale_5,
+                    pos[1] + scale_5,
+                    pos[0] + scale_5,
+                    pos[1] + height - scale_5,
                 ),
-                width=basewidth+4,
+                width=basewidth+self.scale_value(4),
                 outline=bg,
             )
             uid = TinUIString(f"scrollbar-{back}")
             self.itemconfig(back, tags=uid)
             top = self.create_text(
-                (pos[0] + 5, pos[1]),
+                (pos[0] + scale_5, pos[1]),
                 text="\ueddb",
                 font="{Segoe Fluent Icons} 7",
                 anchor="n",
@@ -3225,7 +3226,7 @@ class BasicTinUI(Canvas):
                 tags=uid,
             )
             bottom = self.create_text(
-                (pos[0] + 5, pos[1] + height),
+                (pos[0] + scale_5, pos[1] + height),
                 text="\ueddc",
                 font="{Segoe Fluent Icons} 7",
                 anchor="s",
@@ -3234,18 +3235,18 @@ class BasicTinUI(Canvas):
             )
             sc = self.create_polygon(
                 (
-                    pos[0] + 5,
+                    pos[0] + scale_5,
                     pos[1] + baseheigth,
-                    pos[0] + 5,
-                    pos[1] + height - 20,
+                    pos[0] + scale_5,
+                    pos[1] + height - self.scale_value(20),
                 ),
                 width=self.scale_value(3,True),
                 outline=color,
                 tags=uid,
             )
             # 起始和终止位置
-            start = pos[1] + baseheigth + 5
-            end = pos[1] + height - baseheigth - 5
+            start = pos[1] + baseheigth + scale_5
+            end = pos[1] + height - baseheigth - scale_5
             canmove = end - start
             # 绑定组件
             widget.config(yscrollcommand=widget_move)
@@ -3254,18 +3255,18 @@ class BasicTinUI(Canvas):
         elif mode == "x":
             back = self.create_polygon(
                 (
-                    pos[0] + 5,
-                    pos[1] + 5,
-                    pos[0] + height - 5,
-                    pos[1] + 5,
+                    pos[0] + scale_5,
+                    pos[1] + scale_5,
+                    pos[0] + height - scale_5,
+                    pos[1] + scale_5,
                 ),
-                width=basewidth+4,
+                width=basewidth+self.scale_value(4),
                 outline=bg,
             )
             uid = TinUIString(f"scrollbar-{back}")
             self.itemconfig(back, tags=uid)
             top = self.create_text(
-                (pos[0], pos[1] + 5),
+                (pos[0] + scale_5, pos[1] + scale_5),
                 text="\uedd9",
                 font="{Segoe Fluent Icons} 7",
                 anchor="w",
@@ -3273,7 +3274,7 @@ class BasicTinUI(Canvas):
                 tags=uid,
             )
             bottom = self.create_text(
-                (pos[0] + height, pos[1] + 5),
+                (pos[0] + height - scale_5, pos[1] + scale_5),
                 text="\uedda",
                 font="{Segoe Fluent Icons} 7",
                 anchor="e",
@@ -3283,17 +3284,17 @@ class BasicTinUI(Canvas):
             sc = self.create_polygon(
                 (
                     pos[0] + basewidth,
-                    pos[1] + 5,
-                    pos[0] + height - 20,
-                    pos[1] + 5,
+                    pos[1] + scale_5,
+                    pos[0] + height - self.scale_value(20),
+                    pos[1] + scale_5,
                 ),
                 width=self.scale_value(3,True),
                 outline=color,
                 tags=uid,
             )
-            start = pos[0] + basewidth + 5
-            end = pos[0] + height - basewidth - 5
-            canmove = end - start - 10
+            start = pos[0] + basewidth + scale_5
+            end = pos[0] + height - basewidth - scale_5
+            canmove = end - start - self.scale_value(10)
             widget.config(xscrollcommand=widget_move)
             widget_view = widget.xview
             widget_viewto = widget.xview_moveto

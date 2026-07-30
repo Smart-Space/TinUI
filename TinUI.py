@@ -876,8 +876,8 @@ class BasicTinUI(Canvas):
             pos, window=entry, width=width, anchor="nw"
         )  # 输入框画布对象
         # self.windows.append(entry)
-        uid = TinUIString(f"entru-{funce}")
-        entrybutton = f"enrtyb-{funce}"
+        uid = TinUIString(f"entry-{funce}")
+        entrybutton = f"entryb-{funce}"
         self.itemconfig(funce, tags=uid)
         bbox = self.bbox(funce)
         funcw = self.create_text(
@@ -931,7 +931,7 @@ class BasicTinUI(Canvas):
         self.lower(outl, bottomline)
         bbox1 = self.bbox(entrybutton)
         bbox2 = self.bbox(funce)
-        dwidth = bbox1[2] - bbox2[2] + 6
+        dwidth = bbox1[2] - bbox2[2] + self.scale_value(6)
         del bbox1, bbox2, bubbox, bbox
         self.tkraise(entrybutton)
         self.__auto_anchor(uid, pos, anchor)
@@ -5928,7 +5928,7 @@ class BasicTinUI(Canvas):
         self.lower(outl, bottomline)
         bbox1 = self.bbox(entrybutton)
         bbox2 = self.bbox(funce)
-        dwidth = bbox1[2] - bbox2[2] + 6
+        dwidth = bbox1[2] - bbox2[2] + self.scale_value(6)
         del bbox1, bbox2, bubbox, bbox, _font, font_size
         self.tkraise(funcw)
         if_empty(None)

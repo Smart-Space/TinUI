@@ -1046,6 +1046,7 @@ class BasicTinUI(Canvas):
             for f, b in zip(choices_list, choices_back):
                 self.itemconfig(f, state="normal", fill=fg)
                 self.itemconfig(b, state="normal")
+        scale_4 = self.scale_value(4)
         font = font or self.__get_font()
         word = self.create_text(
             pos, text=text, fill=fg, font=font, anchor="nw", width=width
@@ -1054,30 +1055,30 @@ class BasicTinUI(Canvas):
         uid = TinUIString(f"radiobutton-{word}")
         self.itemconfig(word, tags=uid)
         start_x = pos[0]  # 起始x位置
-        height = self.bbox(word)[3] + 3  # 变量y位置
+        height = self.bbox(word)[3] + self.scale_value(3)  # 变量y位置
         choices_list = []
         choices_back = []
         for i in choices:
             choice = self.create_text(
-                (start_x + 2, height + 2),
+                (start_x + self.scale_value(2), height + self.scale_value(2)),
                 text=i,
                 fill=fg,
                 font=font,
                 anchor="nw",
-                width=width - 4,
+                width=width - scale_4,
                 tags=uid,
             )
             bbox = self.bbox(choice)
-            h = bbox[3] - bbox[1] + 4
+            h = bbox[3] - bbox[1] + scale_4
             back = self.__ui_polygon(
-                ((start_x + 4, height + 4), (start_x + width - 4, height + h - 4)),
+                ((start_x + scale_4, height + scale_4), (start_x + width - scale_4, height + h - scale_4)),
                 outline=bg,
                 fill=bg,
                 tags=uid,
-                width=9,
+                width=self.TINUI_RADIUS_SMALL,
             )
             self.tkraise(choice)
-            height += h + 4
+            height += h + scale_4
             choices_list.append(choice)
             choices_back.append(back)
             for item_id in (choice, back):
@@ -5975,9 +5976,11 @@ class BasicTinUI(Canvas):
                     xrate = yrate
                 else:  # yrate>=xrate
                     yrate = xrate
-            key = round(10)  # 计算精度
+            key = 10 # 计算精度
             image = PhotoImage.zoom(image, key, key)
-            image = image.subsample(round(key / xrate), round(key / yrate))
+            sx = max(1, int(key / xrate))
+            sy = max(1, int(key / yrate))
+            image = image.subsample(sx, sy)
             self.images[-1] = image
             self._image_refs[img] = image
             self.itemconfig(img, image=self.images[-1])

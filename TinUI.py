@@ -6330,6 +6330,8 @@ class BasicTinUI(Canvas):
         texts = []  # 文本元素
         # 测试文本高度
         txtest = self.create_text(pos, text=text[0][0], fill=fg, font=font)
+        scale_1 = self.scale_value(1)
+        scale_3 = self.scale_value(3)
         bbox = self.bbox(txtest)
         self.delete(txtest)
         uidheight = bbox[3] - bbox[1]
@@ -6337,21 +6339,14 @@ class BasicTinUI(Canvas):
         for i in text:
             t, w = i  # 文本，宽度
             w = int(self.TINUISCALE*w)
-            tx = self.create_text(
-                (end_x, y),
-                anchor="w",
-                text=t,
-                fill=fg,
-                font=font,
-                tags=(uid, uidcontent),
-            )
+            tx = self.create_text((end_x, y), anchor="w", text=t, fill=fg, font=font, tags=(uid, uidcontent))
             texts.append(tx)
-            end_x += w+3
+            end_x += w+scale_3
             if text.index(i) + 1 == len(text):  # 最后一个省略分隔符
                 _outline = outline
                 outline = ""
             self.create_line(
-                (end_x - 3, pos[1], end_x - 3, pos[1] + uidheight),
+                (end_x - scale_3, pos[1], end_x - scale_3, pos[1] + uidheight),
                 fill=outline,
                 tags=(uid, uidcontent),
             )
@@ -6362,14 +6357,14 @@ class BasicTinUI(Canvas):
         coords = (cds[0], cds[1], cds[2], cds[1], cds[2], cds[3], cds[0], cds[3])
         self.coords(out_line, coords)
         coords = (
-            cds[0] + 1,
-            cds[1] + 1,
-            cds[2] - 1,
-            cds[1] + 1,
-            cds[2] - 1,
-            cds[3] - 1,
-            cds[0] + 1,
-            cds[3] - 1,
+            cds[0] + scale_1,
+            cds[1] + scale_1,
+            cds[2] - scale_1,
+            cds[1] + scale_1,
+            cds[2] - scale_1,
+            cds[3] - scale_1,
+            cds[0] + scale_1,
+            cds[3] - scale_1,
         )
         self.coords(back, coords)
         self.tag_bind(uid, "<Enter>", _mouseenter)
@@ -6378,24 +6373,25 @@ class BasicTinUI(Canvas):
         wind = TinUINum()  # 记录数据
         picker, bar = self.__ui_toplevel(width, height, tran, unshow)
         bar.__ui_polygon(
-            ((13, 13), (width - 13, height - 11)), fill=bg, outline=bg, width=17
+            ((self.scale_value(13), self.scale_value(13)), (width - self.scale_value(13), height - self.scale_value(11))),
+            fill=bg, outline=bg, width=self.TINUI_RADIUS_LARGE
         )
         bar.lower(
             bar.__ui_polygon(
-                ((12, 12), (width - 12, height - 10)),
+                ((self.scale_value(12), self.scale_value(12)), (width - self.scale_value(12), height - self.scale_value(10))),
                 fill=outline,
                 outline=outline,
-                width=17,
+                width=self.TINUI_RADIUS_LARGE,
             )
         )
         __count = 0
-        end_x = 8
-        y = 9
+        end_x = self.scale_value(8)
+        y = self.TINUI_RADIUS_SMALL
         pickerbars = []  # 选择UI列表
         for i in data:
             barw = text[__count][1] * self.TINUISCALE  # 本选择列表元素宽度
             pickbar = BasicTinUI(picker, bg=bg)
-            pickbar.place(x=end_x, y=y, width=barw, height=height - 50)
+            pickbar.place(x=end_x, y=y, width=barw, height=height - self.scale_value(50))
             pickbar.newres = ""  # 待选
             pickbar.res = ""  # 选择结果
             pickbar.sel_back = None # 选中项背景
@@ -6406,7 +6402,7 @@ class BasicTinUI(Canvas):
             __count += 1
             end_x += barw + self.scale_value(3)
         # ok button
-        okpos = ((self.scale_value(5) + (width - self.scale_value(9)) / 2) / 2, height - 22)
+        okpos = ((self.scale_value(5) + (width - self.scale_value(9)) / 2) / 2, height - self.scale_value(22))
         ok = bar.add_button2(
             okpos,
             text="\ue73e",
@@ -6427,9 +6423,9 @@ class BasicTinUI(Canvas):
             ok[1],
             (
                 self.scale_value(9),
-                height - 35,
+                height - self.scale_value(35),
                 (width - self.scale_value(9)) / 2 - self.scale_value(5),
-                height - 35,
+                height - self.scale_value(35),
                 (width - self.scale_value(9)) / 2 - self.scale_value(5),
                 height - self.scale_value(9),
                 self.scale_value(9),
@@ -6440,9 +6436,9 @@ class BasicTinUI(Canvas):
             ok[2],
             (
                 self.scale_value(8),
-                height - 34,
+                height - self.scale_value(34),
                 (width - self.scale_value(9)) / 2 - self.scale_value(4),
-                height - 34,
+                height - self.scale_value(34),
                 (width - self.scale_value(9)) / 2 - self.scale_value(4),
                 height - self.scale_value(8),
                 self.scale_value(8),
@@ -6450,7 +6446,7 @@ class BasicTinUI(Canvas):
             ),
         )
         # cancel button
-        nopos = (((width - self.scale_value(9)) / 2 + width - self.scale_value(4)) / 2, height - 22)
+        nopos = (((width - self.scale_value(9)) / 2 + width - self.scale_value(4)) / 2, height - self.scale_value(22))
         no = bar.add_button2(
             nopos,
             text="\ue711",
@@ -6471,9 +6467,9 @@ class BasicTinUI(Canvas):
             no[1],
             (
                 (width - self.scale_value(9)) / 2 + self.scale_value(5),
-                height - 35,
+                height - self.scale_value(35),
                 width - self.scale_value(9),
-                height - 35,
+                height - self.scale_value(35),
                 width - self.scale_value(9),
                 height - self.scale_value(9),
                 (width - self.scale_value(9)) / 2 + self.scale_value(5),
@@ -6484,9 +6480,9 @@ class BasicTinUI(Canvas):
             no[2],
             (
                 (width - self.scale_value(9)) / 2 + self.scale_value(4),
-                height - 34,
+                height - self.scale_value(34),
                 width - self.scale_value(8),
-                height - 34,
+                height - self.scale_value(34),
                 width - self.scale_value(8),
                 height - self.scale_value(8),
                 ((width - self.scale_value(9)) / 2 + self.scale_value(4), height - self.scale_value(8)),

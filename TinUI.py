@@ -5991,25 +5991,32 @@ class BasicTinUI(Canvas):
         )
         return uid
 
-    def add_togglebutton(
-        self,
-        pos: tuple,
-        text: str,
-        fg="#1b1b1b",
-        bg="#fbfbfb",
-        line="#CCCCCC",
-        linew=1,
-        activefg="#f3f4fd",
-        activebg="#3041d8",
-        activeline="#5360de",
-        font=None,
-        command=None,
-        anchor="nw",
-    ):  # 绘制状态开关按钮
+    def add_togglebutton(self,pos:tuple,text:str,fg="#1b1b1b",bg="#fbfbfb",line="#CCCCCC",activefg='#1a1a1a',activebg='#f6f6f6',activeline='#cccccc',onfg="#f3f4fd",onbg="#3041d8",online="#5360de",onactivefg="#e3e3eb",onactivebg="#3c4cda",onactiveline="#626ede",linew=1,font=None,command=None,anchor="nw"): # 绘制状态开关按钮
         # 状态开关按钮当前不再对鼠标进入和离开进行响应
-        def out_button(event):
-            pass
-
+        def out_button(_):
+            if state:
+                _fg = onfg
+                _bg = onbg
+                _line = online
+            else:
+                _fg = fg
+                _bg = bg
+                _line = line
+            self.itemconfig(button, fill=_fg)
+            self.itemconfig(back, fill=_bg, outline=_bg)
+            self.itemconfig(outline, fill=_line, outline=_line)
+        def in_button(_):
+            if state:
+                _fg = onactivefg
+                _bg = onactivebg
+                _line = onactiveline
+            else:
+                _fg = activefg
+                _bg = activebg
+                _line = activeline
+            self.itemconfig(button, fill=_fg)
+            self.itemconfig(back, fill=_bg, outline=_bg)
+            self.itemconfig(outline, fill=_line, outline=_line)
         def on_click(event):
             if state == False:
                 __on()
@@ -6022,7 +6029,7 @@ class BasicTinUI(Canvas):
                 command(state)
                 return
             state = True
-            self.itemconfig(outline, fill=activeline, outline=activeline)
+            self.itemconfig(outline, fill=online, outline=online)
             change_color(0, 2)
             if command != None:
                 command(state)
@@ -6089,13 +6096,14 @@ class BasicTinUI(Canvas):
                 colors_list.append(__num2rgb(new_rgb))
             return colors_list
         font = font or self.__get_font()
+        scale_1 = self.scale_value(1)
         state = False  # off:False on:True
         colors = []  # 渐变色颜色列表，25个，off->on，[[文本颜色,...],[背景色,...]]
         button = self.create_text(pos, text=text, fill=fg, font=font, anchor="nw")
         uid = TinUIString(f"togglebutton-{button}")
         self.itemconfig(button, tags=uid)
         x1, y1, x2, y2 = self.bbox(button)
-        linew -= 1
+        linew -= scale_1
         outline = self.__ui_polygon(
             ((x1 - linew, y1 - linew), (x2 + linew, y2 + linew)),
             width=self.TINUI_RADIUS_SMALL,
@@ -6104,9 +6112,11 @@ class BasicTinUI(Canvas):
             outline=line,
         )
         back = self.__ui_polygon(
-            ((x1 + 1, y1 + 1), (x2 - 1, y2 - 1)), width=self.TINUI_RADIUS_SMALL, tags=uid, fill=bg, outline=bg
+            ((x1 + scale_1, y1 + scale_1), (x2 - scale_1, y2 - scale_1)), width=self.TINUI_RADIUS_SMALL, tags=uid, fill=bg, outline=bg
         )
         self.tag_bind(uid, "<Button-1>", on_click)
+        self.tag_bind(uid, "<Enter>", in_button)
+        self.tag_bind(uid, "<Leave>", out_button)
         self.tkraise(button)
         funcs = FuncList(5)
         funcs.change_command = change_command
@@ -6115,8 +6125,8 @@ class BasicTinUI(Canvas):
         funcs.on = __on
         funcs.off = __off
         # 处理渐变色
-        colors.append(get_color_change(fg, activefg))  # 文本颜色
-        colors.append(get_color_change(bg, activebg))  # 背景颜色
+        colors.append(get_color_change(fg, onfg))  # 文本颜色
+        colors.append(get_color_change(bg, onbg))  # 背景颜色
         self.__auto_anchor(uid, pos, anchor)
         del x1, y1, x2, y2, linew
         uid.layout = lambda x1, y1, x2, y2, expand=False: self.__auto_layout(

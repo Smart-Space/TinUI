@@ -377,7 +377,9 @@ class TinUIDark(TinUITheme):
         return self.ui.add_togglebutton(pos,*arg,**{
             **{
                 'fg':'#ffffff','bg':'#2d2d2d','line':"#303030",
-                'activefg':'#000000','activebg':self.accent_color,'activeline':self.accent_light,
+                'activefg':'#ffffff','activebg':'#323232','activeline':'#303030',
+                'onfg':'#000000','onbg':self.accent_color,'online':self.accent_dark,
+                'onactivefg':'#000000','onactivebg':self.accentb_ab,'onactiveline':self.accentb_al,
             },**kw})
 
     def add_picker(self,pos,*arg,**kw):

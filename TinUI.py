@@ -3362,7 +3362,7 @@ class BasicTinUI(Canvas):
         def repaint_back():
             for v in choices.values():
                 bbox = box.coords(v[2])
-                box.coords(v[2], 3, bbox[1], maxwidth + 1, bbox[3])
+                box.coords(v[2], 3, bbox[1], maxwidth + 4, bbox[3])
 
         def in_mouse(t):
             if choices[t][-1] == True:  # 已被选中

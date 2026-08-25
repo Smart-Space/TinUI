@@ -4,6 +4,8 @@
 基于GPLv3和额外的LPGLv3许可发布
 """
 
+import math
+import time
 from tkinter import (
     Tk,
     Toplevel,
@@ -3003,208 +3005,218 @@ class BasicTinUI(Canvas):
             if not leave_width_state:
                 leave_target()
 
+        def set_thumb(da, db): # 最终画布坐标，已含渲染偏移
+            nonlocal thumb_a, thumb_b
+            thumb_a, thumb_b = da, db
+            if mode == "y":
+                self.coords(sc, (pos[0] + scale_5, da, pos[0] + scale_5, db))
+            else:
+                self.coords(sc, (da, pos[1] + scale_5, db, pos[1] + scale_5))
+
         def widget_move(sp, ep):  # 控件控制滚动条滚动
             nonlocal target_y
             if not use_widget:
                 return
+            _update_cache(sp, ep)
             if not is_animation:
-                if mode == "y":
-                    view_start, _ = widget.yview()
-                else:
-                    view_start, _ = widget.xview()
                 target_y = view_start
-            startp = start + canmove * float(sp)
-            endp = start + canmove * float(ep)
-            if mode == "y":
-                self.coords(sc, (pos[0] + scale_5, startp + scale_5, pos[0] + scale_5, endp - scale_5))
-            else:
-                self.coords(sc, (startp + scale_5, pos[1] + scale_5, endp - scale_5, pos[1] + scale_5))
+            set_thumb(
+                start + canmove * view_start + scale_5,
+                start + canmove * (view_start + view_distance) - scale_5,
+            )
 
         def mousedown(event):
-            nonlocal use_widget  # 当该值为真，才允许响应widget_move函数
+            nonlocal use_widget, drag_start
             use_widget = False
             if mode == "y":
-                scroll.start = self.canvasy(event.y)  # 定义起始纵坐标
+                drag_start = self.canvasy(event.y)  # 定义起始纵坐标
             elif mode == "x":
-                scroll.start = self.canvasx(event.x)  # 横坐标
+                drag_start = self.canvasx(event.x)  # 横坐标
 
         def mouseup(_):
-            nonlocal use_widget
+            nonlocal use_widget, view_cached
             use_widget = True
+            view_cached = False
 
         def drag(event):
-            bbox = self.bbox(sc)
-            if mode == "y":  # 纵向
-                move = self.canvasy(event.y) - scroll.start  # 将窗口坐标转化为画布坐标
-                # 防止被拖出范围
-                if bbox[1] + move < start - self.scale_value(1) or bbox[3] + move > end + self.scale_value(1):
-                    return
-                self.move(sc, 0, move)
-            elif mode == "x":  # 横向
-                move = self.canvasx(event.x) - scroll.start
-                if bbox[0] + move < start - self.scale_value(1) or bbox[2] + move > end + self.scale_value(1):
-                    return
-                self.move(sc, move, 0)
-            # 重新定义画布中的起始拖动位置
-            scroll.start += move
+            nonlocal drag_start
+            cursor = self.canvasy(event.y) if mode == "y" else self.canvasx(event.x)
+            move = cursor - drag_start
+            tol = self.scale_value(1)
+            # thumb_a/b 沿轴存储，横纵判断合一；界限与 widget_move 的绘制范围一致
+            if (
+                thumb_a + move < start + scale_5 - tol
+                or thumb_b + move > end - scale_5 + tol
+            ):
+                return
+            set_thumb(thumb_a + move, thumb_b + move)
+            drag_start = cursor
             sc_move()
 
         def topmove(_):  # top
-            bbox = self.bbox(sc)
-            if mode == "y":
-                move = -(bbox[3] - bbox[1]) / 2
-                if bbox[1] + move < start:
-                    move = -(bbox[1] - start)
-                self.move(sc, 0, move)
-            elif mode == "x":
-                move = -(bbox[2] - bbox[0]) / 2
-                if bbox[0] + move < start:
-                    move = -(bbox[0] - start)
-                self.move(sc, move, 0)
+            half = thumb_b - thumb_a
+            move = -half / 2
+            if thumb_a + move < start + scale_5:
+                move = start + scale_5 - thumb_a
+            set_thumb(thumb_a + move, thumb_b + move)
             sc_move()
 
         def bottommove(_):  # bottom
-            bbox = self.bbox(sc)
-            if mode == "y":
-                move = (bbox[3] - bbox[1]) / 2
-                if bbox[3] + move > end:
-                    move = end - bbox[3]
-                self.move(sc, 0, move)
-            elif mode == "x":
-                move = (bbox[2] - bbox[0]) / 2
-                if bbox[2] + move > end:
-                    move = end - bbox[2]
-                self.move(sc, move, 0)
+            half = thumb_b - thumb_a
+            move = half / 2
+            if thumb_b + move > end - scale_5:
+                move = end - scale_5 - thumb_b
+            set_thumb(thumb_a + move, thumb_b + move)
             sc_move()
 
         def backmove(event):  # back
-            bbox = self.bbox(sc)
-            if mode == "y":
-                center = (bbox[1]+bbox[3]) // 2
-                half = (bbox[3]-bbox[1]) // 2
-                posy = self.canvasy(event.y)
-                move = posy - center
-                if move > 0 and posy + half > end:
-                    move = end - half - center
-                elif move < 0 and posy - half < start:
-                    move = start + half - center
-                self.move(sc, 0, move)
-            elif mode == "x":
-                center = (bbox[0]+bbox[2]) // 2
-                half = (bbox[2]-bbox[0]) // 2
-                posx = self.canvasx(event.x)
-                move = posx - center
-                if move > 0 and posx + half > end:
-                    move = end - half - center
-                elif move < 0 and posx - half < start:
-                    move = start + half - center
-                self.move(sc, move, 0)
+            cursor = self.canvasy(event.y) if mode == "y" else self.canvasx(event.x)
+            center = (thumb_a + thumb_b) / 2
+            half = (thumb_b - thumb_a) / 2
+            move = cursor - center
+            if move > 0 and cursor + half > end - scale_5:
+                move = end - scale_5 - half - center
+            elif move < 0 and cursor - half < start + scale_5:
+                move = start + scale_5 + half - center
+            set_thumb(thumb_a + move, thumb_b + move)
             sc_move()
 
         def sc_move():  # 滚动条控制控件滚动
             nonlocal target_y, current_y
-            bbox = self.bbox(sc)
-            effective = canmove - self.scale_value(10)
-            if mode == "y":
-                startp = (bbox[1] - start) / effective
-            elif mode == "x":
-                startp = (bbox[0] - start) / effective
+            if effective <= 0:
+                return # 极小尺寸防御
+            startp = (thumb_a - start - scale_5) / effective
+            startp = min(1.0, max(0.0, startp))
             widget_viewto(startp)
             target_y = current_y = startp
 
-        def animate():# 动画
-            nonlocal is_animation, target_y, current_y
-            view_first, view_last = widget_view()
-            # 如果内容没有超出可视区域，不滚动
-            if view_last - view_first >= 1.0:
+        def anim_frame():
+            nonlocal anim_last, is_animation, current_y, target_y
+            if not is_overflow: # 内容未溢出，复位并停止
+                current_y = target_y = 0.0
                 is_animation = False
-                current_y = 0.0
-                target_y = 0.0
                 return
-            # 当前位置与目标的距离
+            now = time.perf_counter()
+            dt = min(now - anim_last, 0.05) # 钳制 50ms，防后台切回产生大量时间差
+            anim_last = now
             distance = target_y - current_y
-            # 吸附并停止
-            if abs(distance) < 0.001:
+            if abs(distance) < 0.001: # 吸附并停止
                 current_y = target_y
                 widget_viewto(current_y)
                 is_animation = False
                 return
-            # 指数缓动公式：当前位置 += (目标 - 当前) * 速度系数
-            current_y += distance * scroll_speed
+            factor = 1.0 - math.exp(-ease_k * dt * 1000.0) # 帧率无关的指数缓动
+            current_y += distance * factor
             widget_viewto(current_y)
-            widget.after(16, animate)
+            widget.after(16, anim_frame)
+        def start_anim():
+            nonlocal is_animation, anim_last
+            if is_animation:
+                return
+            is_animation = True
+            anim_last = time.perf_counter()
+            anim_frame() # 首帧同步执行
         def on_mousewheel(event):# 处理目标控件滚动事件
             nonlocal is_animation, target_y, current_y
             # Shift按下 => 横向滚; 否则 => 纵向滚; 方向不匹配时忽略
-            if ((event.state & 0x1) != 0) == (mode == "y"):
-                return
-            # 判断滚动方向
-            direction = 1 if event.delta < 0 else (-1 if event.delta > 0 else 0)
-            if direction == 0:
+            shift_down = bool(event.state & 0x1)
+            if shift_down == (mode == "y"):
                 return
             # 限制位置
-            view_first, view_last = widget_view()
-            current_y = view_first
-            view_distance = view_last - view_first
-            # 更新目标位置
-            target_y += direction * view_distance * scroll_step
-            target_y = max(0.0, min(1-view_distance, target_y))
-            # 启动动画
-            if not is_animation:
-                is_animation = True
-                animate()
+            steps = - event.delta / 120.0 # 归一化高分辨率滚轮按倍数缩放
+            steps = max(-3.0, min(3.0, steps)) # [-3, 3]
+            if steps == 0.0:
+                return
+            ensure_cache()
+            if not is_overflow:
+                return
+            current_y = view_start # 与实际视图重同步
+            target_y = _clamp(target_y + steps * view_distance * scroll_step)
+            start_anim()
             return "break"
 
         def __move(dx, dy, size):
-            nonlocal start, end, canmove, height
+            nonlocal start, end, canmove, effective, height
             pos[0] += dx
             pos[1] += dy
             if mode == "y":
                 start += dy
                 end = start + size - 2*baseheigth - self.scale_value(10)
-                canmove = end - start
                 self.move(bottom, 0, size - height)
                 coord = self.coords(back)
                 coord[3] += size - height
             elif mode == "x":
                 start += dx
                 end = start + size - 2*basewidth - self.scale_value(10)
-                canmove = end - start
                 self.move(bottom, size - height, 0)
                 coord = self.coords(back)
                 coord[2] += size - height
+            canmove = end - start
+            effective = canmove
             height = size
             self.coords(back, coord)
+            set_thumb(
+                start + canmove * view_start + scale_5,
+                start + canmove * min(view_start + view_distance, 1.0) - scale_5,
+            )
 
+        def _update_cache(sp, ep):
+            nonlocal view_start, view_distance, is_overflow, view_cached
+            sp, ep = float(sp), float(ep)
+            view_start = sp
+            view_distance = max(ep - sp, 0.0)
+            is_overflow = view_distance < 1.0
+            view_cached = True
+        def ensure_cache():
+            # 从未收到回调时（理论上极少发生）惰性查询一次
+            if not view_cached:
+                _update_cache(*widget_view())
+
+        def _clamp(value):
+            upper = max(0.0, 1.0 - view_distance)
+            if value < 0.0:
+                return 0.0
+            if value > upper:
+                return upper
+            return value
         def set_speed(speed):
-            nonlocal scroll_speed
-            scroll_speed = speed
+            nonlocal scroll_speed, ease_k
+            scroll_speed = float(speed)
+            ease_k = -math.log(1 - scroll_speed) / 16.0 # 同步推导衰减率
         def set_step(step):
             nonlocal scroll_step
             scroll_step = step
         def moveto(target):
-            nonlocal is_animation, target_y, current_y
-            view_first, _ = widget_view()
-            current_y = view_first
-            target_y = target
-            if not is_animation:
-                is_animation = True
-                animate()
+            nonlocal target_y, current_y
+            ensure_cache()
+            current_y = view_start
+            target_y = _clamp(target)
+            start_anim()
         pos = list(pos)
         scale_5 = self.scale_value(5, True)
         leave_handle = None # 鼠标离开动画计时器
         is_animation = False # 是否正在动画中
+        anim_last = 0.0 # 上一次动画的时间戳
         scroll_speed = 0.15 # 缓动系数
+        ease_k = -math.log(1 - 0.15) / 16.0 # 每毫秒衰减率
         scroll_step = 0.15 # 滚动增量
         current_y = 0.0 # 当前位置
         target_y = 0.0 # 目标位置
+        view_start = 0.0 # 视图起始位置
+        view_distance = 1.0 # 最近一次回调的可视比例
+        is_overflow = False # 内容是否溢出可视区
+        view_cached = False # 是否收到过回调
+        thumb_a = 0.0
+        thumb_b = 0.0 # 滑块位置缓存
+        effective = 0.0 # 在 mode 分支计算 canmove 后赋值，effective = canmove（与 widget_move 的映射一致）
+        drag_start = 0.0 # 替代 scroll.start
         if direction.upper() == "X":
             mode = "x"
         elif direction.upper() == "Y":
             mode = "y"
         else:
             return None
-        use_widget = True  # 是否允许控件控制滚动条
+        use_widget = True  # 是否允许控件控制滚动条，当该值为真，才允许响应widget_move函数
         if mode == "y":
             back = self.create_polygon(
                 (
@@ -3249,6 +3261,7 @@ class BasicTinUI(Canvas):
             start = pos[1] + baseheigth + scale_5
             end = pos[1] + height - baseheigth - scale_5
             canmove = end - start
+            effective = canmove
             # 绑定组件
             widget.config(yscrollcommand=widget_move)
             widget_view = widget.yview
@@ -3296,11 +3309,10 @@ class BasicTinUI(Canvas):
             start = pos[0] + basewidth + scale_5
             end = pos[0] + height - basewidth - scale_5
             canmove = end - start
+            effective = canmove
             widget.config(xscrollcommand=widget_move)
             widget_view = widget.xview
             widget_viewto = widget.xview_moveto
-        scroll = TinUINum()
-        scroll.__move = False
         self.tag_bind(uid, "<Enter>", all_enter)
         self.tag_bind(uid, "<Leave>", all_leave)
         all_leave(None)

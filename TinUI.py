@@ -7148,33 +7148,67 @@ class BasicTinUI(Canvas):
             self.itemconfig(button, fill=activebg, outline=activebg)
             self.itemconfig(cid, fill=activefg)
 
-        def on_leave(e):
+        def on_leave(_):
             self.itemconfig(button, fill="", outline="")
+
+        def __slide_to(target, target_line):
+            # 线性滑动动画
+            nonlocal slide_id
+            if slide_id is not None: # 取消上一次尚未完成的动画
+                self.after_cancel(slide_id)
+                slide_id = None
+            start = self.coords(button2)
+            start_line = self.coords(line)
+            if len(start) != len(target) or len(start_line) != len(target_line):
+                self.coords(button2, target)
+                self.coords(line, target_line)
+                return
+            frame = 0
+
+            def animate():
+                nonlocal slide_id, frame
+                frame += 1
+                t = min(frame / slide_steps, 1.0)
+                self.coords(
+                    button2, tuple(s + (e - s) * t for s, e in zip(start, target))
+                )
+                self.coords(
+                    line,
+                    tuple(s + (e - s) * t for s, e in zip(start_line, target_line)),
+                )
+                if t < 1.0:
+                    slide_id = self.after(slide_interval, animate)
+                else:
+                    slide_id = None
+
+            animate()
 
         def __click(cid):
             nonlocal index
-            if index == -1:
+            first = index == -1
+            if first:
                 self.itemconfig(button2, state="normal")
                 self.itemconfig(line, state="normal")
             if cid == index:
                 return
             index = cid
             bbox = self.bbox(cid)
-            centerx = (bbox[0] + bbox[2]) // 2
+            centerx = (bbox[0] + bbox[2]) / 2
             halfwidth = maxwidth / 2
             x1 = centerx - halfwidth
             x2 = centerx + halfwidth
-            coord = (x1, bbox[1], x2, bbox[1], x2, bbox[3], x1, bbox[3])
-            self.coords(button2, coord)
-            self.coords(
-                line,
-                (
-                    (bbox[0] + bbox[2]) / 2 - maxwidth / 4,
-                    bbox[3] + 2,
-                    (bbox[0] + bbox[2]) / 2 + maxwidth / 4,
-                    bbox[3] + 2,
-                ),
+            target = (x1, bbox[1], x2, bbox[1], x2, bbox[3], x1, bbox[3])
+            target_line = (
+                centerx - maxwidth / 4,
+                bbox[3] + 2,
+                centerx + maxwidth / 4,
+                bbox[3] + 2,
             )
+            if first: # 首次选中直接定位，避免从原点滑入
+                self.coords(button2, target)
+                self.coords(line, target_line)
+            else:
+                __slide_to(target, target_line)
             if command:
                 command(self.itemcget(cid, "text"))
 
@@ -7182,6 +7216,9 @@ class BasicTinUI(Canvas):
             __click(texts[index])
         font = font or self.__get_font()
         index = -1
+        slide_id = None # 滑动动画计时器
+        slide_steps = 12 # 动画总帧数
+        slide_interval = 12 # 每帧间隔（毫秒）
         outline = self.__ui_polygon(((0, 0), (0, 0)), fill=line, outline=line, width=self.TINUI_RADIUS_SMALL)
         uid = TinUIString(f"segmentbutton-{outline}")
         buttonid = f"{uid}-button"

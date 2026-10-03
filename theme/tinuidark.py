@@ -443,8 +443,8 @@ class TinUIDark(TinUITheme):
         return self.ui.add_navigation(pos,*arg,**{
             **{
                 'fg':'#FFFFFF','bg':'#202020',
-                'activefg':'#FFFFFF','activebg':'#2C2C2C',
-                'onfg':'#FFFFFF','onbg':'#2C2C2C','oncolor':self.accent_color
+                'activefg':'#FFFFFF','activebg':'#2d2d2d',
+                'onfg':'#FFFFFF','onbg':'#2d2d2d','oncolor':self.accent_color
             },**kw})
 
     def add_labels(self,pos,*arg,**kw):

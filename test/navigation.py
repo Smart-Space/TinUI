@@ -1,7 +1,7 @@
 from window import win
 import sys
 sys.path.append('..')
-from TinUI import ExpandPanel, HorizonPanel
+from TinUIPanel import ExpandPanel, HorizonPanel
 
 def callback(tag):
     if isinstance(tag, bool):

@@ -7334,6 +7334,75 @@ class BasicTinUI(Canvas):
             if self.type(menus[index][0]) == 'text':
                 self.itemconfig(menus[index][0], fill=fg)
             self.itemconfig(menus[index][2], fill=bg, outline=bg)
+        def __slide_line(index, target_x, target_top, target_bottom):
+            # 先向目标方向延展，快速移动到目标项，再恢复长度
+            nonlocal slide_id
+            if slide_id is not None: # 取消上一次尚未完成的动画
+                self.after_cancel(slide_id)
+                slide_id = None
+            cur = self.coords(line)
+            if len(cur) != 4:
+                return
+            spacing = font_height + self.scale_value(15)
+            cur_top, cur_bottom = cur[1], cur[3]
+            half = font_height / 2
+            # 以距当前提示线最近的选项为延展基准，兼容动画中途再次切换
+            from_index = round(((cur_top + cur_bottom) / 2 - y) / spacing)
+            from_index = min(max(from_index, 0), len(menus) - 1)
+            # 延展 -> 快速移动 -> 恢复
+            if index == from_index: # 同一选项
+                return
+            elif index > from_index: # 向下：下侧延展到当前项底边，再对齐目标项顶边
+                mid1_top = cur_top
+                mid1_bottom = max(cur_bottom, y + spacing * from_index + half)
+                mid2_top = y + spacing * index - half
+                mid2_bottom = mid2_top + mid1_bottom - mid1_top
+                keyframes = (
+                    (mid1_top, mid1_bottom),
+                    (mid2_top, mid2_bottom),
+                    (target_top, target_bottom),
+                )
+            else: # 向上：上侧延展到当前项顶边，再对齐目标项底边
+                mid1_bottom = cur_bottom
+                mid1_top = min(cur_top, y + spacing * from_index - half)
+                mid2_bottom = y + spacing * index + half
+                mid2_top = mid2_bottom - mid1_bottom + mid1_top
+                keyframes = (
+                    (mid1_top, mid1_bottom),
+                    (mid2_top, mid2_bottom),
+                    (target_top, target_bottom),
+                )
+            # 预计算每帧坐标
+            tbs = []
+            prev_top, prev_bottom = cur_top, cur_bottom
+            for top, bottom in keyframes:
+                for s in range(1, 5):
+                    t = s / 4
+                    tbs.append((
+                        prev_top + (top - prev_top) * t,
+                        prev_bottom + (bottom - prev_bottom) * t,
+                    ))
+                prev_top, prev_bottom = top, bottom
+            total = len(tbs)
+            start_x = cur[0]
+            dx = target_x - start_x
+            frames = [
+                (start_x + dx * (i + 1) / total, tb[0], start_x + dx * (i + 1) / total, tb[1])
+                for i, tb in enumerate(tbs)
+            ]
+            frame = 0
+
+            def animate():
+                nonlocal slide_id, frame
+                self.coords(line, frames[frame])
+                frame += 1
+                if frame < total:
+                    slide_id = self.after(slide_interval, animate)
+                else:
+                    slide_id = None
+
+            animate()
+
         def navigate(index):
             nonlocal nowselect
             if index == nowselect:
@@ -7345,7 +7414,13 @@ class BasicTinUI(Canvas):
             if self.type(menus[index][0]) == 'text':
                 self.itemconfig(menus[index][0], fill=onfg)
             self.itemconfig(menus[index][2], fill=onbg, outline=onbg)
-            self.moveto(line, x-self.scale_value(8), y+(font_height+self.scale_value(15))*(index-1/4))
+            dest_x = x - self.scale_value(8) + line_offx
+            dest_y = y + (font_height+self.scale_value(15))*(index-1/4) + line_offy
+            dest_bottom = dest_y + font_height / 2
+            if old_index == -1: # 首次选中直接定位，避免从原点滑入
+                self.coords(line, dest_x, dest_y, dest_x, dest_bottom)
+            else:
+                __slide_line(index, dest_x, dest_y, dest_bottom)
             if command:
                 command(self.itemcget(menus[index][1], "text"))
         def __layout(x1, y1, x2, y2, expand=False):
@@ -7363,6 +7438,8 @@ class BasicTinUI(Canvas):
         menus = [] # (icon, text, back)
         nowselect = -1
         expanding = True # 展开状态
+        slide_id = None # 提示线滑动动画计时器
+        slide_interval = 20 # 每帧间隔（毫秒）
         topicon = self.create_text(pos, text="\uE700", font=segoe_font, fill=fg, anchor="w")
         uid = TinUIString(f"navigation-{topicon}")
         self.itemconfig(topicon, tags=uid)
@@ -7412,6 +7489,9 @@ class BasicTinUI(Canvas):
         x += dx
         y = pos[1] + font_height + self.scale_value(15) + dy if widget else pos[1] + dy
         self.itemconfig(line, state='normal')
+        self.moveto(line, 0, 0) # 测量线段描边造成的坐标偏移
+        _line_off = self.coords(line)
+        line_offx, line_offy = _line_off[0], _line_off[1]
         navigate(0)
         uid.layout = __layout
         funcs = FuncList(1)

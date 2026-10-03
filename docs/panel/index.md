@@ -27,6 +27,52 @@ class BasePanel:
 
 ---
 
+## 尺寸过渡动画（所有面板通用）
+
+面板基类 `BasePanel` 内置了尺寸变动的线性过渡动画。它只对**调用动画的那个面板**（动画根）做插值，每帧用插值后的矩形调用该面板的 `update_layout`，子树随之重新布局，因此整棵面板树会平滑过渡而不会各自动画导致抖动。
+
+动画是可选的：`update_layout` 仍保持即时布局语义，只有显式调用 `animate_layout` 才会过渡。
+
+### animate_layout(x1, y1, x2, y2, duration=None)
+
+从面板**当前矩形**线性过渡到目标矩形 `(x1, y1, x2, y2)`。`duration` 为过渡时长（毫秒），默认使用面板的 `animation_duration`。
+
+```python
+rp = ExpandPanel(b)
+hp = HorizonPanel(b)
+rp.set_child(hp)
+# ... 添加子面板 ...
+
+# 由外向内收拢
+rp.animate_layout(60, 60, width - 60, height - 60)
+
+# 或指定时长
+rp.animate_layout(5, 5, width - 5, height - 5, duration=120)
+```
+
+### stop_animation()
+
+立即停止当前正在进行的过渡，并停留在当前尺寸。
+
+### 动画配置
+
+以下属性可在面板实例上调整，对所有面板生效：
+
+- `animation_enabled`::是否允许动画，默认 `True`。设为 `False` 时 `animate_layout` 会退化为即时 `update_layout`。
+- `animation_duration`::默认动画时长，单位毫秒，默认 `180`。
+- `animation_interval`::目标帧间隔，单位毫秒，默认 `16`（约 60fps）。
+- `animation_adaptive`::是否启用自适应帧率，默认 `True`。
+- `animation_interval_max`::自适应时的帧间隔上限，单位毫秒，默认 `66`（约 15fps）。
+
+```python
+rp.animation_duration = 160      # 动画时长
+rp.animation_interval = 16       # 目标帧间隔
+rp.animation_adaptive = True     # 单帧布局超预算时自动降帧
+rp.animation_enabled = False     # 关闭该面板动画
+```
+
+---
+
 ## ExpandPanel
 
 ```python

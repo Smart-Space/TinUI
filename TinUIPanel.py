@@ -1,7 +1,14 @@
+import time
+
 try:
     from .TinUI import BasicTinUI, TinUIString
 except Exception as err:
     from TinUI import BasicTinUI, TinUIString
+
+# 动画进行中标记
+_ANIMATING = False
+# 动画代次
+_ANIM_GEN = 0
 
 
 class BasePanel:
@@ -19,13 +26,116 @@ class BasePanel:
         self.rect = f'panel-{self.bg1}'
         self.canvas.addtag_withtag(self.rect, self.bg1)
         self.bg2 = self.canvas.create_polygon(0, 0, 0, 0, fill=bg, outline=bg, width=self.bd, tags=self.rect) # back
+        # 记录最近一次外框，供动画获取当前矩形（bg 为空时 fix_bg 不写 coords）
+        self._last_rect = None
+        self._bg_cache = None
+        # 尺寸过渡动画配置
+        self.animation_enabled = True
+        self.animation_duration = 180  # 毫秒
+        self.animation_interval = 16   # 目标帧间隔（毫秒）
+        # 自适应帧率。单帧布局超预算时临时拉长间隔，有余量时缓慢回落
+        # 时长始终由 perf_counter 决定
+        self.animation_adaptive = True
+        self.animation_interval_max = 66  # 帧间隔上限
+        self._anim_cur_interval = self.animation_interval
+        self._anim_id = None
+        self._anim_start = None
+        self._anim_target = None
+        self._anim_duration = 0
+        self._anim_t0 = 0.0
 
     def fix_bg(self, x1, y1, x2, y2):
-        if self.bg:
-            coords = (x1+self.bd/2, y1+self.bd/2, x2-self.bd/2, y1+self.bd/2, x2-self.bd/2, y2-self.bd/2, x1+self.bd/2, y2-self.bd/2)
-            backcoords = tuple(x+y for x, y in zip(coords, self.linew_mask))
-            self.canvas.coords(self.bg2, backcoords)
-            self.canvas.coords(self.bg1, coords)
+        self._last_rect = (x1, y1, x2, y2)
+        if not self.bg:
+            return
+        coords = (x1+self.bd/2, y1+self.bd/2, x2-self.bd/2, y1+self.bd/2, x2-self.bd/2, y2-self.bd/2, x1+self.bd/2, y2-self.bd/2)
+        if coords == self._bg_cache:  # 坐标未变则跳过两次 coords 调用
+            return
+        self._bg_cache = coords
+        backcoords = tuple(x+y for x, y in zip(coords, self.linew_mask))
+        self.canvas.coords(self.bg2, backcoords)
+        self.canvas.coords(self.bg1, coords)
+
+    def destroy(self):
+        self.stop_animation()
+        self.canvas.delete(self.rect)
+
+    def get_rect(self):
+        """返回当前外框 (x1, y1, x2, y2)。"""
+        if self._last_rect is not None:
+            return self._last_rect
+        coords = self.canvas.coords(self.bg1)
+        if coords:
+            return (coords[0]-self.bd/2, coords[1]-self.bd/2, coords[4]+self.bd/2, coords[5]+self.bd/2)
+        return (0, 0, 0, 0)
+
+    def stop_animation(self):
+        if self._anim_id is not None:
+            self.canvas.after_cancel(self._anim_id)
+            self._anim_id = None
+        self._anim_target = None
+
+    def animate_layout(self, x1, y1, x2, y2, duration=None):
+        """将面板尺寸从当前矩形线性过渡到目标矩形，每帧调用 update_layout。"""
+        global _ANIM_GEN
+        target = (x1, y1, x2, y2)
+        start = self.get_rect()
+        if duration is None:
+            duration = self.animation_duration
+        if (not self.animation_enabled) or duration <= 0 or start == target:
+            self.stop_animation()
+            self.update_layout(*target)
+            return
+        if self._anim_id is not None:
+            self.canvas.after_cancel(self._anim_id)
+            self._anim_id = None
+        _ANIM_GEN += 1  # 新一段动画
+        self._anim_start = start
+        self._anim_target = target
+        self._anim_duration = duration
+        self._anim_cur_interval = self.animation_interval
+        self._anim_t0 = time.perf_counter()
+        self._anim_tick()  # 首帧同步执行，避免闪烁
+
+    def _adapt_interval(self, cost):
+        """按单帧布局耗时自适应帧间隔"""
+        base = self.animation_interval
+        if not self.animation_adaptive:
+            self._anim_cur_interval = base
+            return
+        hi = min(self.animation_interval_max, max(base, self._anim_duration))
+        cost_ms = cost * 1000.0
+        if cost_ms > base:
+            # 布局耗时已超过一帧预算：按实测耗时拉长，避免帧堆积
+            target = cost_ms * 1.3
+            self._anim_cur_interval = min(hi, max(self._anim_cur_interval * 1.25, target))
+        else:
+            # 有富余：缓慢向目标帧间隔回落
+            self._anim_cur_interval = max(base, self._anim_cur_interval * 0.85)
+
+    def _anim_tick(self):
+        global _ANIMATING
+        if self._anim_target is None:
+            return
+        t = (time.perf_counter() - self._anim_t0) / (self._anim_duration / 1000.0)
+        final = t >= 1.0
+        if final:
+            t = 1.0
+        s, e = self._anim_start, self._anim_target
+        cur = tuple(round(a + (b - a) * t) for a, b in zip(s, e))
+        _ANIMATING = not final
+        t_frame = time.perf_counter()
+        try:
+            self.update_layout(*cur)
+        finally:
+            _ANIMATING = False
+        self._adapt_interval(time.perf_counter() - t_frame)
+        if final:
+            self._anim_id = None
+            self._anim_target = None
+        else:
+            interval = max(1, int(self._anim_cur_interval))
+            self._anim_id = self.canvas.after(interval, self._anim_tick)
 
 
 class ExpandablePanel(BasePanel):
@@ -38,6 +148,21 @@ class ExpandablePanel(BasePanel):
         self.min_width = self._scale(min_width)
         self.min_height = self._scale(min_height)
         self.spacing = 0
+        # Tier 2：动画期间冻结子元素固有尺寸，避免每帧重复 bbox / get_max_size
+        # 形如 {id(child): (_ANIM_GEN, size)}，非动画期间不使用
+        self._metric_cache = {}
+
+    def _measure_cached(self, child, measure):
+        """动画帧内缓存子元素的固有尺寸；最后一帧（_ANIMATING=False）总是重新测量。"""
+        if not _ANIMATING:
+            return measure(child)
+        key = id(child)
+        entry = self._metric_cache.get(key)
+        if entry is not None and entry[0] == _ANIM_GEN:
+            return entry[1]
+        value = measure(child)
+        self._metric_cache[key] = (_ANIM_GEN, value)
+        return value
 
     def set_padding(self, padding):
         self.padding = tuple(self._scale(i) for i in padding)
@@ -58,6 +183,7 @@ class ExpandablePanel(BasePanel):
         self.children.clear()
     
     def destroy(self):
+        self.stop_animation()
         self.clear_children()
         self.canvas.delete(self.rect)
 
@@ -121,6 +247,7 @@ class ExpandPanel(BasePanel):
                 self.canvas.delete(self.child)
     
     def destroy(self):
+        self.stop_animation()
         self.clear_children()
         self.canvas.delete(self.rect)
 
@@ -142,10 +269,14 @@ class ExpandPanel(BasePanel):
         if self.child:
             if issubclass(self.child.__class__, BasePanel):
                 self.child.update_layout(content_x1, content_y1, content_x2, content_y2)
-                self.canvas.tag_raise(self.child.rect, self.rect)
+                if not _ANIMATING:
+                    self.canvas.tag_raise(self.child.rect, self.rect)
             elif isinstance(self.child, TinUIString):
+                # 注意：expand=True 不是文本重排，而是控件的填充/居中布局（entry、button 等
+                # 在 expand=False 时会锚到左上角），因此动画中间帧也必须传 True。
                 self.child.layout(content_x1, content_y1, content_x2, content_y2, True)
-                self.canvas.tag_raise(self.child, self.rect)
+                if not _ANIMATING:
+                    self.canvas.tag_raise(self.child, self.rect)
 
 
 class VerticalPanel(ExpandablePanel):
@@ -165,6 +296,18 @@ class VerticalPanel(ExpandablePanel):
                 max_size = max(max_size, bbox[2] - bbox[0])
         return max_size+self.padding[1]+self.padding[3]
 
+    def _child_height(self, child):
+        """子元素固有高度"""
+        return self._measure_cached(child, self._measure_child_height)
+
+    def _measure_child_height(self, child):
+        if isinstance(child, TinUIString):
+            bbox = self.canvas.bbox(child)
+            return (bbox[3] - bbox[1]) if bbox else 0
+        if isinstance(child, HorizonPanel):
+            return child.get_max_size()
+        return self._scale(100)
+
     def update_layout(self, x1, y1, x2, y2):
         top, right, bottom, left = self.padding
         content_x1 = x1 + left
@@ -180,41 +323,23 @@ class VerticalPanel(ExpandablePanel):
         # 计算总权重和固定尺寸
         total_weight = 0
         fixed_size = 0
+        last = len(self.children) - 1
+        items = []
         for i, (child, height, min_height, weight) in enumerate(self.children):
-            # 计算间距（最后一个元素不加间距）
-            spacing = self.spacing if i < len(self.children) - 1 else 0
-
+            spacing = self.spacing if i < last else 0
             if not height:
-                if isinstance(child, TinUIString):
-                    bbox = self.canvas.bbox(child)
-                    height = bbox[3] - bbox[1]
-                elif isinstance(child, HorizonPanel):
-                    height = child.get_max_size()
-                else:
-                    height = self._scale(100)
-
+                height = self._child_height(child)
+            items.append((child, height, min_height, weight, spacing))
             if weight > 0:
                 total_weight += weight
             else:
-                actual_height = max(height, min_height)
-                fixed_size += actual_height + spacing
+                fixed_size += max(height, min_height) + spacing
         # 计算剩余空间
         remaining_height = max(0, content_height - fixed_size)
         current_y = content_y1
-        total_children = len(self.children)
-        for i, (child, height, min_height, weight) in enumerate(self.children):
-            # 计算间距（最后一个元素不加间距）
-            spacing = self.spacing if i < total_children - 1 else 0
-            if not height:
-                if isinstance(child, TinUIString):
-                    bbox = self.canvas.bbox(child)
-                    height = bbox[3] - bbox[1]
-                elif isinstance(child, HorizonPanel):
-                    height = child.get_max_size()
-                else:
-                    height = self._scale(100)
+        for child, height, min_height, weight, spacing in items:
             # 计算元素高度
-            if weight > 0:
+            if weight > 0 and total_weight > 0:
                 # 按权重分配剩余空间
                 proportional_height = remaining_height * weight / total_weight
                 actual_height = max(proportional_height, min_height)
@@ -227,10 +352,12 @@ class VerticalPanel(ExpandablePanel):
             # 更新子元素位置
             if issubclass(child.__class__, BasePanel):
                 child.update_layout(content_x1, current_y, content_x2, child_y2)
-                self.canvas.tag_raise(child.rect, self.rect)
+                if not _ANIMATING:
+                    self.canvas.tag_raise(child.rect, self.rect)
             elif isinstance(child, TinUIString):
                 child.layout(content_x1, current_y, content_x2, child_y2)
-                self.canvas.tag_raise(child, self.rect)
+                if not _ANIMATING:
+                    self.canvas.tag_raise(child, self.rect)
             current_y += actual_height + spacing
             # 如果已经超出面板底部，停止布局
             if current_y >= content_y2:
@@ -254,6 +381,18 @@ class HorizonPanel(ExpandablePanel):
                 max_size = max(max_size, bbox[3] - bbox[1])
         return max_size+self.padding[0]+self.padding[2]
 
+    def _child_width(self, child):
+        """子元素固有宽度（仅在 width 缺省时调用一次；动画帧内走缓存）。"""
+        return self._measure_cached(child, self._measure_child_width)
+
+    def _measure_child_width(self, child):
+        if isinstance(child, TinUIString):
+            bbox = self.canvas.bbox(child)
+            return (bbox[2] - bbox[0]) if bbox else 0
+        if isinstance(child, VerticalPanel):
+            return child.get_max_size()
+        return self._scale(100)
+
     def update_layout(self, x1, y1, x2, y2):
         top, right, bottom, left = self.padding
         content_x1 = x1 + left
@@ -266,37 +405,24 @@ class HorizonPanel(ExpandablePanel):
         content_y2 = content_y1 + content_height
         # 更新背景位置
         self.fix_bg(x1, y1, x2, y2)
+        # 计算总权重和固定尺寸
         total_weight = 0
         fixed_size = 0
+        last = len(self.children) - 1
+        items = []
         for i, (child, width, min_width, weight) in enumerate(self.children):
-            spacing = self.spacing if i < len(self.children) - 1 else 0
+            spacing = self.spacing if i < last else 0
             if not width:
-                if isinstance(child, TinUIString):
-                    bbox = self.canvas.bbox(child)
-                    width = bbox[2] - bbox[0]
-                elif isinstance(child, VerticalPanel):
-                    width = child.get_max_size()
-                else:
-                    width = self._scale(100)
+                width = self._child_width(child)
+            items.append((child, width, min_width, weight, spacing))
             if weight > 0:
                 total_weight += weight
             else:
-                actual_width = max(width, min_width)
-                fixed_size += actual_width + spacing
+                fixed_size += max(width, min_width) + spacing
         remaining_width = max(0, content_width - fixed_size)
         current_x = content_x1
-        total_children = len(self.children)
-        for i, (child, width, min_width, weight) in enumerate(self.children):
-            spacing = self.spacing if i < total_children - 1 else 0
-            if not width:
-                if isinstance(child, TinUIString):
-                    bbox = self.canvas.bbox(child)
-                    width = bbox[2] - bbox[0]
-                elif isinstance(child, VerticalPanel):
-                    width = child.get_max_size()
-                else:
-                    width = self._scale(100)
-            if weight > 0:
+        for child, width, min_width, weight, spacing in items:
+            if weight > 0 and total_weight > 0:
                 proportional_width = remaining_width * weight / total_weight
                 actual_width = max(proportional_width, min_width)
             else:
@@ -306,10 +432,12 @@ class HorizonPanel(ExpandablePanel):
                 child_x2 = content_x2
             if issubclass(child.__class__, BasePanel):
                 child.update_layout(current_x, content_y1, child_x2, content_y2)
-                self.canvas.tag_raise(child.rect, self.rect)
+                if not _ANIMATING:
+                    self.canvas.tag_raise(child.rect, self.rect)
             elif isinstance(child, TinUIString):
                 child.layout(current_x, content_y1, child_x2, content_y2)
-                self.canvas.tag_raise(child, self.rect)
+                if not _ANIMATING:
+                    self.canvas.tag_raise(child, self.rect)
             current_x += actual_width + spacing
             if current_x >= content_x2:
                 break
@@ -369,10 +497,12 @@ class CardPanel(ExpandablePanel):
 
             if issubclass(child.__class__, BasePanel):
                 child.update_layout(child_x1, child_y1, child_x2, child_y2)
-                self.canvas.tag_raise(child.rect, self.rect)
+                if not _ANIMATING:
+                    self.canvas.tag_raise(child.rect, self.rect)
             elif isinstance(child, TinUIString):
                 child.layout(child_x1, child_y1, child_x2, child_y2)
-                self.canvas.tag_raise(child, self.rect)
+                if not _ANIMATING:
+                    self.canvas.tag_raise(child, self.rect)
 
 
 class PanelSash(BasePanel):
@@ -588,6 +718,16 @@ if __name__ == "__main__":
         vp.add_child(button)
         vp.add_child(b.add_paragraph((0,0), text=f"Paragraph{i}", anchor='center'))
         card.add_child(vp)
+
+    # 尺寸过渡演示：在“充满画布”与“内缩”之间线性过渡整棵面板树
+    def toggle_anim():
+        w, h = b.winfo_width(), b.winfo_height()
+        if rp.get_rect() != (5, 5, w - 5, h - 5):
+            rp.animate_layout(5, 5, w - 5, h - 5)
+        else:
+            rp.animate_layout(60, 60, w - 60, h - 60)
+
+    b.add_button2((10, 10), text="尺寸过渡动画", anchor='center', command=lambda e: toggle_anim())
 
     def update(e):
         rp.update_layout(5, 5, e.width - 5, e.height - 5)

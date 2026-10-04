@@ -3367,9 +3367,16 @@ class BasicTinUI(Canvas):
         command=None,
     ):  # 绘制列表框
         def repaint_back():
+            # 根据文本实际范围确定背景宽度：内容未超出视图时只填充至视图宽度，
+            # 避免背景元素超出视图而被误判为需要水平滚动条
+            tbbox = box.bbox("textcid")
+            if tbbox and tbbox[2] > width:
+                right = tbbox[2] + 4
+            else:
+                right = width
             for v in choices.values():
                 bbox = box.coords(v[2])
-                box.coords(v[2], 3, bbox[1], maxwidth + 4, bbox[3])
+                box.coords(v[2], 3, bbox[1], right, bbox[3])
 
         def in_mouse(t):
             if choices[t][-1] == True:  # 已被选中
@@ -3427,7 +3434,7 @@ class BasicTinUI(Canvas):
             box.config(scrollregion=bbox)
 
         def _add(item:str="new item", index:int=-1):  # 添加元素
-            nonlocal maxwidth, selected_index
+            nonlocal selected_index
             total = len(all_keys)
             if index < 0 or index >= total: index = total
             # 确定绘制位置的 Y 坐标
@@ -3477,18 +3484,12 @@ class BasicTinUI(Canvas):
                 box.dtag("tag_move", "tag_move")
             if selected_index >= index:
                 selected_index += 1
-            # 更新最大宽度和滚动条
-            tbbox = box.bbox("textcid")
-            if tbbox:
-                twidth = tbbox[2] - tbbox[0]
-                maxwidth = twidth
-                if maxwidth < width:
-                    maxwidth = width
-                repaint_back()
+            # 更新背景和滚动条
+            repaint_back()
             __re_scroll()
 
         def _delete(index: int = 0):  # 删除元素，默认第一个
-            nonlocal maxwidth, selected_index
+            nonlocal selected_index
             total = len(all_keys)
             if index + 1 > total:  # 序数超出总数
                 return
@@ -3507,22 +3508,17 @@ class BasicTinUI(Canvas):
                 selected_index -= 1
             elif selected_index == index:
                 selected_index = -1
-            tbbox = box.bbox("textcid")
-            maxwidth = tbbox[2] - tbbox[0]
-            if maxwidth < width:
-                maxwidth = width
             repaint_back()
             __re_scroll()
 
         def _clear():  # 清空元素
-            nonlocal maxwidth, selected_index
+            nonlocal selected_index
             selected_index = -1
             for key in choices.keys():
                 for cid in choices[key][1:3]:
                     box.delete(cid)
             choices.clear()
             all_keys.clear()
-            maxwidth = 0
             self.itemconfig(cavui, height=height)
             self.itemconfig(vscroll, state="hidden")
             self.itemconfig(cavui, width=width)
@@ -3537,12 +3533,11 @@ class BasicTinUI(Canvas):
             return selected_text, selected_index
 
         def load_data(datas):  # 导入元素
-            nonlocal maxwidth
             for i in datas:
                 _add(i)
 
         def __layout(x1, y1, x2, y2, expand=False):
-            nonlocal width, height, maxwidth
+            nonlocal width, height
             if not expand:
                 dx, dy = self.__auto_layout(uid, (x1, y1, x2, y2), anchor)
                 hscroll.move(dx, dy, height)
@@ -3564,10 +3559,6 @@ class BasicTinUI(Canvas):
                 coord[5] = coord[7] = y2 - self.scale_value(4)
                 self.coords(allback, coord)
                 self.itemconfig(cavui, width=width, height=height)
-                bbox = box.bbox("textcid")
-                if bbox == None:
-                    bbox = (0, 0, 0, 0)
-                maxwidth = max(bbox[2]-bbox[0], width)
                 repaint_back()
                 __re_scroll()
 
@@ -3579,7 +3570,7 @@ class BasicTinUI(Canvas):
         def select(index: int = 0):  # 选中元素，默认第一个
             if index > len(all_keys) - 1:
                 return None
-            key = choices[index]
+            key = all_keys[index]
             sel_it(key)
 
         font = font or self.__get_font()
@@ -3615,7 +3606,6 @@ class BasicTinUI(Canvas):
         # choices不返回，避免编写者直接操作选项
         all_keys = []  # [a-id,b-id,...]
         choices = {}  #'a-id':[a,a_text,a_back,is_sel:bool]
-        maxwidth = 0  # 最大宽度
         load_data(data)  # 重复使用元素添加
         box.bind("<Destroy>", clean)
         del x1, y1, x2, y2

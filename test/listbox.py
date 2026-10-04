@@ -1,7 +1,7 @@
 from window import win
 
 def additem(e):
-    funcs.add('new item new item new item new item new item', 2)
+    funcs.add('new item', 2)
 def getitem(e):
     print(funcs.get())
 def deleteitem(e):

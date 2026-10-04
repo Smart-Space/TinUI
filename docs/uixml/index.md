@@ -7,6 +7,8 @@ nav_order: 6
 
 > `menubar`不支持使用xml布局。
 
+> `TinUIXml` 实现位于 `TinUIXml.py`，可从`TinUI`包或`TinUI.TinUI`模块导入。
+
 ```python
 class TinUIXml():#TinUI的xml渲染方式
     '''为TinUI提供更加方便的平面方式，使用xml

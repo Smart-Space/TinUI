@@ -799,9 +799,21 @@ class BasicTinUI(Canvas):
             self.itemconfig(back, fill=bg, outline=bg)
             entry.config(background=bg, foreground=fg)
 
+        def __align(align_anchor):
+            # 底部提示线等装饰元素在 tkinter 中的 bbox 会被整体放大（且基本只向下方多出一截），
+            # 这里以可见外框 outl 的 bbox 为基准补正一次对齐偏移。
+            ub = self.bbox(uid)
+            vb = self.bbox(outl)
+            if ub is None or vb is None:
+                return
+            ex, ey = self.__layout_dict[align_anchor](ub, vb)
+            if ex or ey:
+                self.move(uid, ex, ey)
+
         def __layout(x1, y1, x2, y2, expand=False):
             if not expand:
                 self.__auto_layout(uid, (x1, y1, x2, y2), anchor)
+                __align(anchor)
             else:
                 self.itemconfig(funce, width=x2 - x1 - dwidth - self.scale_value(6))
                 bbox1 = self.bbox(funce)
@@ -821,6 +833,7 @@ class BasicTinUI(Canvas):
                     entrybutton, (bbox1[2], (bbox1[1] + bbox1[3]) / 2), "w"
                 )
                 self.__auto_layout(uid, (x1, y1, x2, y2), "center")
+                __align("center")
 
         def entry_bind():
             entry.bind("<FocusIn>", focus_in)
@@ -944,6 +957,7 @@ class BasicTinUI(Canvas):
         del bbox1, bbox2, bubbox, bbox
         self.tkraise(entrybutton)
         self.__auto_anchor(uid, pos, anchor)
+        __align(anchor)
         if_empty(None)
         trace_id = var.trace_add(
             "write", lambda name, index, mode, var=var: if_empty(None)
@@ -5831,9 +5845,20 @@ class BasicTinUI(Canvas):
             self.itemconfig(back, fill=bg, outline=bg)
             entry.config(background=bg, foreground=fg)
 
+        def __align(align_anchor):
+            # 见entry说明
+            ub = self.bbox(uid)
+            vb = self.bbox(outl)
+            if ub is None or vb is None:
+                return
+            ex, ey = self.__layout_dict[align_anchor](ub, vb)
+            if ex or ey:
+                self.move(uid, ex, ey)
+
         def __layout(x1, y1, x2, y2, expand=False):
             if not expand:
                 self.__auto_layout(uid, (x1, y1, x2, y2), anchor)
+                __align(anchor)
             else:
                 self.itemconfig(funce, width=x2 - x1 - dwidth - self.scale_value(6))
                 bbox1 = self.bbox(funce)
@@ -5853,6 +5878,7 @@ class BasicTinUI(Canvas):
                     entrybutton, (bbox1[2], (bbox1[1] + bbox1[3]) / 2), "w"
                 )
                 self.__auto_layout(uid, (x1, y1, x2, y2), "center")
+                __align("center")
 
         def entry_bind():
             entry.bind("<FocusIn>", focus_in)
@@ -5943,6 +5969,7 @@ class BasicTinUI(Canvas):
         self.tkraise(funcw)
         if_empty(None)
         self.__auto_anchor(uid, pos, anchor)
+        __align(anchor)
         funcs = FuncList(4)
         funcs.get = get_entry
         funcs.error = __error

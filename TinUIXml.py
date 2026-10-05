@@ -148,6 +148,33 @@ class TinUIXml:  # TinUI的xml渲染方式
             "offset",
         )
     )
+    # ===== 面板模式（根节点 <tinui layout='panel'>）=====
+    # 面板标签集合
+    panel_tags = frozenset(
+        ("expandpanel", "verticalpanel", "horizonpanel", "cardpanel", "sash")
+    )
+    # 各面板标签允许的构造参数；数值只做类型转换，缩放交由面板内部完成
+    panel_attrs = {
+        "expandpanel": ("padding", "min_width", "min_height", "bg", "bd", "line", "linew"),
+        "verticalpanel": ("padding", "spacing", "min_width", "min_height", "bg", "bd", "line", "linew"),
+        "horizonpanel": ("padding", "spacing", "min_width", "min_height", "bg", "bd", "line", "linew"),
+        "cardpanel": ("card_width", "card_height", "padding", "h_spacing", "v_spacing", "min_width", "bg", "bd", "line", "linew"),
+        "sash": ("bg", "bd", "line", "linew", "draggable"),
+    }
+    panel_number_args = frozenset(
+        ("bd", "linew", "spacing", "min_width", "min_height", "card_width", "card_height", "h_spacing", "v_spacing")
+    )
+    panel_tuple_args = frozenset(("padding",))
+    panel_bool_args = frozenset(("draggable",))
+    # 根面板类型映射
+    panel_root_types = {
+        "expand": "expandpanel",
+        "vertical": "verticalpanel",
+        "horizon": "horizonpanel",
+        "card": "cardpanel",
+    }
+    # 面板模式暂不支持的流式标签
+    panel_flow_tags = frozenset(("line", "back", "labelframe", "flyout", "tooltip"))
 
     def __init__(self, ui: Union["BasicTinUI", "TinUI", "TinUITheme"]):
         self.ui = ui
@@ -161,6 +188,12 @@ class TinUIXml:  # TinUI的xml渲染方式
         origin = self.__origin()
         self.xendx, self.xendy = origin, origin  # 横向最宽原点
         self.yendx, self.yendy = origin, origin  # 纵向最低原点
+        # 面板模式状态
+        self._panel_root = None  # 隐式根面板
+        self._panel_bind_id = None  # <Configure>绑定id
+        self._panel_margin = origin  # 根面板距画布边缘
+        self._panel_animate = False  # 是否使用尺寸过渡动画
+        self._panel_duration = 0  # 动画时长（毫秒）
 
     def __scale_value(self, value: Union[int, float]):
         return self.realui.scale_value(value)
@@ -359,7 +392,217 @@ class TinUIXml:  # TinUI的xml渲染方式
         self.realui.dtag(ftag)
         return x, y, last_y, xendx
 
+    # ===== 面板模式实现 =====
+    def __panel_classes(self):
+        # 运行期惰性导入，避免 TinUI模块 -> TinUIXml模块 -> TinUIPanel模块 -> TinUI模块 的循环导入
+        try:
+            from .TinUIPanel import (
+                ExpandPanel,
+                VerticalPanel,
+                HorizonPanel,
+                CardPanel,
+                PanelSash,
+            )
+        except ImportError:
+            from TinUIPanel import (
+                ExpandPanel,
+                VerticalPanel,
+                HorizonPanel,
+                CardPanel,
+                PanelSash,
+            )
+        return ExpandPanel, VerticalPanel, HorizonPanel, CardPanel, PanelSash
+
+    def __panel_number(self, value):
+        value = value.strip()
+        return float(value) if ("." in value or "e" in value.lower()) else int(value)
+
+    def __panel_kwargs(self, elem, key):
+        """提取面板构造参数。数值仅做类型转换，缩放由面板内部完成，避免二次缩放。"""
+        kwargs = {}
+        for name in self.panel_attrs.get(key, ()):
+            if name not in elem.attrib:
+                continue
+            raw = elem.attrib[name]
+            if name in self.panel_tuple_args:
+                kwargs[name] = tuple(
+                    int(p) for p in re.split(r"[,\s]+", raw.strip()) if p
+                )
+            elif name in self.panel_bool_args:
+                kwargs[name] = raw.strip().lower() in ("true", "1", "yes", "on")
+            elif name in self.panel_number_args:
+                kwargs[name] = self.__panel_number(raw)
+            else:
+                kwargs[name] = raw
+        return kwargs
+
+    def __split_child(self, elem):
+        """解析<child>包装，返回(内层元素, size, min_size, weight, index)。
+
+        未使用<child>包装时，直接返回该元素本身与默认约束。
+        注意：ExpandablePanel.add_child 会缩放 size，但不缩放 min_size，
+        因此 min_size 需在此按缩放后的画布单位传入。
+        """
+        if elem.tag != "child":
+            return elem, None, 0, 0, -1
+        inner = list(elem)
+        if len(inner) != 1:
+            raise ValueError("TinUIXml 面板布局：<child> 必须且只能包含一个元素")
+        _size = elem.get("size")
+        size = int(_size) if _size is not None else None
+        _min = elem.get("min_size")
+        min_size = self.__scale_value(int(_min)) if _min is not None else 0
+        weight = float(elem.get("weight", "0"))
+        index = int(elem.get("index", "-1"))
+        return inner[0], size, min_size, weight, index
+
+    def __build_control(self, elem):
+        """在面板子树中创建一个普通控件，返回可作为面板子项的uid。"""
+        attrib = dict(elem.attrib)
+        attrib["pos"] = (0, 0)  # 实际位置由面板 update_layout 决定
+        attrib = self.__attrib2kws(attrib, False)
+        add = getattr(self.ui, "add_" + elem.tag, None)
+        if add is None:
+            raise ValueError(f"TinUIXml 面板布局：未知控件标签 <{elem.tag}>")
+        tagall = add(**attrib)
+        uid = tagall[-1] if isinstance(tagall, tuple) else tagall
+        if not hasattr(uid, "layout"):
+            raise ValueError(f"TinUIXml 面板布局：<{elem.tag}> 不支持作为面板子项")
+        if elem.text is not None:
+            name = elem.text.strip()
+            if name:
+                self.tags[name] = tagall
+        return uid
+
+    def __build_item(self, elem, parent_panel):
+        if elem.tag in self.panel_tags:
+            return self.__build_panel(elem, parent_panel)
+        if elem.tag in self.panel_flow_tags:
+            raise ValueError(f"TinUIXml 面板布局暂不支持流式标签 <{elem.tag}>")
+        return self.__build_control(elem)
+
+    def __build_panel(self, elem, parent_panel):
+        """递归构建面板节点；parent_panel 供 PanelSash 定位，可为 None。"""
+        ExpandPanel, VerticalPanel, HorizonPanel, CardPanel, PanelSash = (
+            self.__panel_classes()
+        )
+        tag = elem.tag
+        if tag == "sash":
+            if len(elem) != 0:
+                raise ValueError("TinUIXml 面板布局：<sash> 不能包含子元素")
+            if parent_panel is None:
+                raise ValueError("TinUIXml 面板布局：<sash> 必须位于面板内部")
+            kwargs = self.__panel_kwargs(elem, "sash")
+            kwargs["parent_panel"] = parent_panel
+            return PanelSash(**kwargs)
+        cls = {
+            "expandpanel": ExpandPanel,
+            "verticalpanel": VerticalPanel,
+            "horizonpanel": HorizonPanel,
+            "cardpanel": CardPanel,
+        }[tag]
+        panel = cls(self.realui, **self.__panel_kwargs(elem, tag))
+        children = list(elem)
+        if tag == "expandpanel":
+            if len(children) != 1:
+                raise ValueError(
+                    "TinUIXml 面板布局：<expandpanel> 必须且只能包含一个子项"
+                )
+            inner, _, _, _, _ = self.__split_child(children[0])
+            panel.set_child(self.__build_item(inner, panel))
+            return panel
+        for child_elem in children:
+            inner, size, min_size, weight, index = self.__split_child(child_elem)
+            item = self.__build_item(inner, panel)
+            if tag == "cardpanel":
+                panel.add_child(item, index=index)
+            else:
+                panel.add_child(
+                    item, size=size, min_size=min_size, weight=weight, index=index
+                )
+        return panel
+
+    def __layout_panels(self):
+        """按当前画布尺寸重新排布根面板。"""
+        if self._panel_root is None:
+            return
+        margin = self._panel_margin
+        rect = (
+            margin,
+            margin,
+            self.realui.winfo_width() - margin,
+            self.realui.winfo_height() - margin,
+        )
+        if self._panel_animate:
+            self._panel_root.animate_layout(*rect, duration=self._panel_duration)
+        else:
+            self._panel_root.update_layout(*rect)
+
+    def __on_panel_configure(self, _=None):
+        self.__layout_panels()
+
+    def __load_panel_root(self, root):
+        """加载 <tinui layout='panel'>：构建一个铺满画布的隐式根面板。"""
+        ExpandPanel, VerticalPanel, HorizonPanel, CardPanel, PanelSash = (
+            self.__panel_classes()
+        )
+        root_type = root.get("root", "expand").strip().lower()
+        if root_type not in self.panel_root_types:
+            raise ValueError(f"TinUIXml 面板布局：未知的 root 类型 '{root_type}'")
+        key = self.panel_root_types[root_type]
+        cls = {
+            "expandpanel": ExpandPanel,
+            "verticalpanel": VerticalPanel,
+            "horizonpanel": HorizonPanel,
+            "cardpanel": CardPanel,
+        }[key]
+        panel = cls(self.realui, **self.__panel_kwargs(root, key))
+        children = list(root)
+        if key == "expandpanel":
+            if len(children) != 1:
+                raise ValueError(
+                    "TinUIXml 面板布局：root='expand' 必须且只能包含一个子项"
+                )
+            inner, _, _, _, _ = self.__split_child(children[0])
+            panel.set_child(self.__build_item(inner, panel))
+        else:
+            for child_elem in children:
+                inner, size, min_size, weight, index = self.__split_child(child_elem)
+                item = self.__build_item(inner, panel)
+                if key == "cardpanel":
+                    panel.add_child(item, index=index)
+                else:
+                    panel.add_child(
+                        item, size=size, min_size=min_size, weight=weight, index=index
+                    )
+        self._panel_root = panel
+        self._panel_margin = self.__scale_value(int(root.get("margin", "5")))
+        animate = root.get("animate", "false").strip().lower()
+        self._panel_animate = animate in ("true", "1", "yes", "on")
+        self._panel_duration = int(root.get("duration", "180"))
+        self._panel_bind_id = self.realui.bind(
+            "<Configure>", self.__on_panel_configure, add="+"
+        )
+        self.realui.update_idletasks()
+        self.__layout_panels()
+
+    def __destroy_panels(self):
+        """销毁当前面板树并解除尺寸监听。"""
+        if self._panel_root is not None:
+            try:
+                self._panel_root.stop_animation()
+                self._panel_root.destroy()
+            finally:
+                self._panel_root = None
+        if self._panel_bind_id is not None:
+            try:
+                self.realui.unbind("<Configure>", self._panel_bind_id)
+            except Exception:
+                pass
+            self._panel_bind_id = None
+
     def loadxml(self, xml: str):  # 从xml字符串载入窗口组件
+        self.__destroy_panels()
         origin = self.__origin()
         # xendx/xendy:横向最宽一行的左起点与右边缘
         # yendx/yendy:纵向最低一行的上起点与下边缘，yendy同时作为下一行的y起点
@@ -367,6 +610,9 @@ class TinUIXml:  # TinUI的xml渲染方式
         self.yendx, self.yendy = origin, origin
         root = ET.fromstring(xml)
         if root.tag != "tinui":  # 严格控制规范
+            return
+        if root.get("layout", "").strip().lower() == "panel":  # 面板模式分支
+            self.__load_panel_root(root)
             return
         for line in root.findall("line"):
             startx, starty, bottomy, rightx = self.__load_line(line, y=self.yendy)
@@ -390,6 +636,7 @@ class TinUIXml:  # TinUI的xml渲染方式
         self.datas.update(dict_item)
 
     def clean(self):  # 清空TinUI
+        self.__destroy_panels()
         self.realui.clean_windows()
         self.funcs.clear()
         self.datas.clear()

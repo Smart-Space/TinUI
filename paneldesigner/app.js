@@ -4,9 +4,9 @@
  * （<tinui layout='panel' root='...'> / <child ...> / <panel> / <control>）。
  *
  * 功能：
- *   · 左侧：面板与控件面板（点击或拖拽加入），结构树（可选中被控件覆盖的面板）
+ *   · 左侧：面板与控件面板（点击或拖拽加入）
  *   · 中间：模拟窗口，按 TinUIPanel 的布局算法实时排布
- *   · 右侧：属性（尺寸 size / 最小尺寸 min_size / 权重 weight / 序号 index / anchor 等）
+ *   · 右侧：结构树（可选中被控件覆盖的面板）+ 属性（尺寸 size / 最小尺寸 min_size / 权重 weight / 序号 index / anchor 等）
  *   · 导出：生成可直接被 TinUIXml.loadxml() 解析的 XML
  * ========================================================================== */
 (function () {
@@ -1143,7 +1143,7 @@
     if (!state.selectedId) {
       const e = document.createElement("div");
       e.className = "empty";
-      e.innerHTML = "未选中任何节点<br><small>在画布或左侧结构树中选择</small>";
+      e.innerHTML = "未选中任何节点<br><small>在画布或右侧结构树中选择</small>";
       els.props.appendChild(e);
       return;
     }
@@ -1512,6 +1512,8 @@
     els.ovHandleV = $("ovHandleV");
     els.ovHandleH = $("ovHandleH");
     els.outline = $("outline");
+    els.outlineBlock = $("outlineBlock");
+    els.outlineSplitter = $("outlineSplitter");
     els.breadcrumb = $("breadcrumb");
     els.props = $("props");
     els.palettePanels = $("palettePanels");
@@ -1650,6 +1652,29 @@
     // 尺寸拖拽
     els.ovHandleV.addEventListener("mousedown", startDrag);
     els.ovHandleH.addEventListener("mousedown", startDrag);
+
+    // 结构树高度分割线
+    let splitDrag = null;
+    els.outlineSplitter.addEventListener("mousedown", function (e) {
+      e.preventDefault();
+      splitDrag = { start: e.clientY, base: els.outlineBlock.offsetHeight };
+      document.body.classList.add("dragging");
+      els.outlineSplitter.classList.add("on");
+    });
+    document.addEventListener("mousemove", function (e) {
+      if (!splitDrag) return;
+      const max = els.outlineBlock.parentElement.clientHeight - 120;
+      // 结构树在分割线下方：向上拖增大高度，向下拖减小高度
+      const h = Math.max(90, Math.min(max, Math.round(splitDrag.base + (splitDrag.start - e.clientY))));
+      els.outlineBlock.style.height = h + "px";
+    });
+    document.addEventListener("mouseup", function () {
+      if (!splitDrag) return;
+      splitDrag = null;
+      document.body.classList.remove("dragging");
+      els.outlineSplitter.classList.remove("on");
+    });
+
     document.addEventListener("mousemove", function (e) {
       if (!drag) return;
       const cur = drag.vertical ? e.clientY : e.clientX;

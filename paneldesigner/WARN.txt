@@ -1,0 +1,1 @@
+tinui/paneldesigner 不随包发布，本目录下内容几乎完全由AI生成，许可证与TinUI一致。

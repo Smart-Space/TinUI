@@ -38,10 +38,6 @@
         <h3>控件 <small>Control</small></h3>
         <div id="paletteControls" class="palette"></div>
       </div>
-      <div class="panel-block grow">
-        <h3>结构树 <small>覆盖的面板在这里选</small></h3>
-        <div id="outline" class="outline"></div>
-      </div>
     </aside>
 
     <section class="stage">
@@ -64,7 +60,7 @@
         <div class="breadcrumb" id="breadcrumb"></div>
         <div class="hint">
           提示：点击选中控件/面板；按住 <kbd>Alt</kbd> 点击可循环选中被控件覆盖的面板；
-          也可直接在左侧结构树中选择。拖动选中框上的方块可调整 <b>size</b>。
+          也可直接在右侧结构树中选择。拖动选中框上的方块可调整 <b>size</b>。
           右侧属性面板可增删控件参数；画布中虚线矩形表示该控件仅作占位示意。
         </div>
       </div>
@@ -72,6 +68,11 @@
 
     <aside class="sidebar right">
       <div class="props" id="props"></div>
+      <div class="splitter-h" id="outlineSplitter" title="拖动调节高度"></div>
+      <div class="panel-block outline-block" id="outlineBlock">
+        <h3>结构树 <small>覆盖的面板在这里选</small></h3>
+        <div id="outline" class="outline"></div>
+      </div>
     </aside>
 
   </div>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TinUI 面板设计器 · panel mode</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="toolbar">
+    <div class="brand">
+      <span class="logo">▦</span>
+      <span class="brand-text">TinUI 面板设计器<small>tinui layout='panel'</small></span>
+    </div>
+    <div class="tools">
+      <label class="canvas-size">
+        画布
+        <input id="canvasW" type="number" min="120" step="10">
+        <span>×</span>
+        <input id="canvasH" type="number" min="120" step="10">
+      </label>
+      <button id="btnExample" class="btn ghost">示例</button>
+      <button id="btnClear" class="btn ghost">清空</button>
+      <button id="btnExport" class="btn primary">导出 XML</button>
+    </div>
+  </header>
+
+  <div class="workspace">
+
+    <aside class="sidebar left">
+      <div class="panel-block">
+        <h3>面板 <small>Panel</small></h3>
+        <div id="palettePanels" class="palette"></div>
+      </div>
+      <div class="panel-block">
+        <h3>控件 <small>Control</small></h3>
+        <div id="paletteControls" class="palette"></div>
+      </div>
+      <div class="panel-block grow">
+        <h3>结构树 <small>覆盖的面板在这里选</small></h3>
+        <div id="outline" class="outline"></div>
+      </div>
+    </aside>
+
+    <section class="stage">
+      <div class="stage-inner">
+        <div class="window-frame" id="windowFrame">
+          <div class="window-bar">
+            <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+            <span class="window-title">模拟窗口 · TinUI Canvas</span>
+          </div>
+          <div class="canvas-wrap" id="canvasWrap">
+            <div class="canvas" id="canvas"></div>
+            <div class="overlay" id="overlay">
+              <div class="ov-sel" id="ovSel"></div>
+              <div class="ov-cell" id="ovCell"></div>
+              <div class="ov-handle ov-handle-v" id="ovHandleV" data-dir="v"></div>
+              <div class="ov-handle ov-handle-h" id="ovHandleH" data-dir="h"></div>
+            </div>
+          </div>
+        </div>
+        <div class="breadcrumb" id="breadcrumb"></div>
+        <div class="hint">
+          提示：点击选中控件/面板；按住 <kbd>Alt</kbd> 点击可循环选中被控件覆盖的面板；
+          也可直接在左侧结构树中选择。拖动选中框上的方块可调整 <b>size</b>。
+          右侧属性面板可增删控件参数；画布中虚线矩形表示该控件仅作占位示意。
+        </div>
+      </div>
+    </section>
+
+    <aside class="sidebar right">
+      <div class="props" id="props"></div>
+    </aside>
+
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <strong>导出 TinUI 面板 XML</strong>
+      <button id="modalClose" class="icon-btn" title="关闭">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="exportWarn" class="warn"></div>
+      <textarea id="exportText" spellcheck="false"></textarea>
+      <div class="modal-tip">
+        将该内容保存为 <code>.xml</code> 后，用 <code>TinUIXml.loadxml(text)</code> 载入即可。
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button id="btnCopy" class="btn ghost">复制</button>
+      <button id="btnDownload" class="btn primary">下载 .xml</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

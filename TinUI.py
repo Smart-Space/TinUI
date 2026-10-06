@@ -2411,23 +2411,6 @@ class BasicTinUI(Canvas):
         uid.layout = __layout
         return name, back, button, funcs, uid
 
-    # def add_info(self,pos:tuple,info='info',font='微软雅黑 9',fg='#0078d4',bg='white',info_text='',info_font=('微软雅黑','12'),info_width=200,info_fg='black',width=400,anchor='nw'):#绘制提示框
-    #     text=self.create_text(pos,anchor='nw',text=info,font=font,fill=fg)
-    #     uid=f'info-{text}'
-    #     self.itemconfig(text,tags=uid)
-    #     bbox=self.bbox(text)
-    #     font_size=self.__get_text_size(text)#字体大小
-    #     info=self.create_text((bbox[2],(bbox[1]+bbox[3])/2),anchor='w',text='\uF167',fill=bg,font='{Segoe Fluent Icons}'+font_size,tags=uid)
-    #     infoback=self.create_text((bbox[2],(bbox[1]+bbox[3])/2),anchor='w',text='\uE946',fill=fg,font='{Segoe Fluent Icons}'+font_size,tags=uid)
-    #     bbox=self.bbox(uid)
-    #     back=self.create_rectangle((bbox[0]-2,bbox[1]-2,bbox[2]+2,bbox[3]+2),fill=bg,outline=fg,width=2,tags=uid)
-    #     self.tkraise(text)
-    #     self.tkraise(info)
-    #     self.tkraise(infoback)
-    #     self.add_tooltip(uid,text=info_text,fg=info_fg,bg=bg,outline=fg,font=info_font,width=width)
-    #     self.__auto_anchor(uid,pos,anchor)
-    #     return text,back,uid
-
     def add_menubar(
         self,
         cid="all",
@@ -3669,6 +3652,29 @@ class BasicTinUI(Canvas):
                 tinui = itui[0]
                 tinui.itemconfig(tinui.background, fill="", outline="")
 
+        def __slide_to(target):
+            # 选中线先收缩到目标中点，再展开到目标位置
+            nonlocal slide_id
+            if slide_id is not None:
+                ui.after_cancel(slide_id)
+                slide_id = None
+            center = (target[1] + target[3]) / 2
+            ui.coords(line, target[0], center, target[2], center)
+            start = ui.coords(line)
+            frame = 0
+
+            def animate():
+                nonlocal slide_id, frame
+                frame += 1
+                t = min(frame / slide_steps, 1.0)
+                ui.coords(line, tuple(s + (e - s) * t for s, e in zip(start, target)))
+                if t < 1.0:
+                    slide_id = ui.after(slide_interval, animate)
+                else:
+                    slide_id = None
+
+            animate()
+
         def click(itui, send=True):
             nonlocal nowon
             if itui not in items:
@@ -3676,19 +3682,23 @@ class BasicTinUI(Canvas):
                 # 而这仍然会触发此click事件，因此需要判断该元素是否被删除
                 return
             index = items.index(itui)
-            if nowon <= len(items) - 1:
+            first = nowon == -1
+            if nowon != -1 and nowon <= len(items) - 1:
                 tinui = items[nowon][0]
                 tinui.itemconfig(tinui.background, fill="", outline="")
             nowon = index
             tinui = itui[0]
             tinui.itemconfig(tinui.background, fill=activebg, outline=activebg)
-            ui.coords(
-                line,
+            target = (
                 self.scale_value(1,True),
                 index * (linew + self.scale_value(2)) + lineheight,
                 self.scale_value(1,True),
                 index * (linew + self.scale_value(2)) + lineheight * 2,
             )
+            if first:
+                ui.coords(line, target)
+            else:
+                __slide_to(target)
             if command != None and send:
                 command(nowon)
 
@@ -3831,19 +3841,22 @@ class BasicTinUI(Canvas):
             nowon = index
             tinui = items[nowon][0]
             tinui.itemconfig(tinui.background, fill=activebg, outline=activebg)
-            ui.coords(
-                line,
+            target = (
                 self.scale_value(1,True),
                 index * (linew + self.scale_value(2)) + lineheight,
                 self.scale_value(1,True),
                 index * (linew + self.scale_value(2)) + lineheight * 2,
             )
+            __slide_to(target)
             rank = (
                 index + 0.5 - ui.winfo_height() / (2 * (linew + 2))
             ) / items.__len__()
             ui.yview_moveto(max(0, rank))
 
         nowon = -1
+        slide_id = None  # 选中线动画计时器
+        slide_steps = 8  # 动画总帧数
+        slide_interval = 12  # 每帧间隔（毫秒）
         ui = BasicTinUI(self, bg=bg)
         ui.set_scale(self.TINUISCALE)
         ui.TINUIFONT = self.TINUIFONT
@@ -3893,22 +3906,6 @@ class BasicTinUI(Canvas):
         funcs.select = select
         uid.layout = __layout
         return ui, scro, items, funcs, uid
-
-    # def add_canvas(self,pos:tuple,width:int=200,height:int=200,bg='white',outline='#808080',scrollbg='#f0f0f0',scrollcolor='#999999',scrollon='#89898b',linew=1,scrollbar=False,anchor='nw'):#绘制画布
-    #     def re_scrollregion():#更新滚动范围
-    #         canvas.config(scrollregion=canvas.bbox('all'))
-    #     canvas=Canvas(self,bg=bg,highlightthickness=linew,highlightbackground=outline,highlightcolor=outline,relief='flat')
-    #     cavui=self.create_window(pos,window=canvas,width=width,height=height,anchor=anchor)
-    #     self.windows.append(canvas)
-    #     uid=f'canvas-{cavui}'
-    #     self.addtag_withtag(uid,cavui)
-    #     if scrollbar==True:
-    #         bbox=self.bbox(uid)
-    #         cid2=self.add_scrollbar((bbox[0],bbox[3]+5),canvas,bbox[2]-bbox[0],'x',bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
-    #         cid1=self.add_scrollbar((bbox[2]+5,bbox[1]),canvas,bbox[3]-bbox[1],bg=scrollbg,color=scrollcolor,oncolor=scrollon)[-1]
-    #         self.addtag_withtag(uid,cid1)
-    #         self.addtag_withtag(uid,cid2)
-    #     return canvas,re_scrollregion,uid
 
     def add_ui(
         self,
@@ -5461,6 +5458,29 @@ class BasicTinUI(Canvas):
             if cid != nowid:
                 box.itemconfig(cid, fill=bg, outline=bg)
 
+        def __slide_to(target):
+            # 选中线先收缩到目标中点，再展开到目标位置
+            nonlocal slide_id
+            if slide_id is not None:
+                box.after_cancel(slide_id)
+                slide_id = None
+            center = (target[1] + target[3]) / 2
+            box.coords(line, target[0], center, target[2], center)
+            start = box.coords(line)
+            frame = 0
+
+            def animate():
+                nonlocal slide_id, frame
+                frame += 1
+                t = min(frame / slide_steps, 1.0)
+                box.coords(line, tuple(s + (e - s) * t for s, e in zip(start, target)))
+                if t < 1.0:
+                    slide_id = box.after(slide_interval, animate)
+                else:
+                    slide_id = None
+
+            animate()
+
         def click(cid, send=False):
             nonlocal nowid
             if nowid is not None:
@@ -5476,7 +5496,8 @@ class BasicTinUI(Canvas):
             else:
                 box.itemconfig(line, state="normal")
                 posi = posi[1]
-            box.coords(line, self.scale_value(1), posi+linewt, self.scale_value(1), posi+linewb)
+            target = (self.scale_value(1), posi + linewt, self.scale_value(1), posi + linewb)
+            __slide_to(target)
             if command != None and send:
                 father_link.clear()
                 father_link.append(cid)
@@ -5688,6 +5709,9 @@ class BasicTinUI(Canvas):
         font = tkfont.Font(font=font)
         font_size = font.cget("size")
         nowid = None
+        slide_id = None  # 选中线动画计时器
+        slide_steps = 8  # 动画总帧数
+        slide_interval = 12  # 每帧间隔（毫秒）
         father_link = []  # 用于父级关系
         box = BasicTinUI(self, bg=bg, width=width, height=height)  # 显示选择内容
         box.TINUIFONTSIZE = self.TINUIFONTSIZE

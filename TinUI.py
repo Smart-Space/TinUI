@@ -3752,7 +3752,11 @@ class BasicTinUI(Canvas):
             return items[index]
 
         def delete(index):  # 删除 add_ui uid
-            nonlocal endy, nowon
+            nonlocal endy, nowon, slide_id
+            if slide_id is not None:
+                # 取消进行中的选中线动画：否则删除后动画会把标识线拉回原位
+                ui.after_cancel(slide_id)
+                slide_id = None
             if index >= len(items):
                 return
             if index == nowon:
@@ -3780,7 +3784,11 @@ class BasicTinUI(Canvas):
             ui.config(scrollregion=bbox)
 
         def clear():  # 清空所有元素
-            nonlocal endy, nowon
+            nonlocal endy, nowon, slide_id
+            if slide_id is not None:
+                # 取消进行中的选中线动画
+                ui.after_cancel(slide_id)
+                slide_id = None
             num = len(items)
             if num == 0:
                 return

@@ -282,8 +282,8 @@ class TinUIXml:  # TinUI的xml渲染方式
                 _, _, liney, newlinex = self.__load_line(
                     i, xendx, xendy, padx, pady, allanchor, ftags, ignorecmd
                 )
-                if liney > last_y:  # 在同一位置判断纵向大小
-                    last_y = xendy = liney
+                xendy = max(xendy, liney)
+                last_y = max(last_y, liney)
                 if linex == None:  # 判断是否是该纵块的第一个<line>
                     linex = 0
                 linex = max(linex, newlinex + padx)

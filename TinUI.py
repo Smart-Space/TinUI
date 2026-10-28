@@ -1274,13 +1274,13 @@ class BasicTinUI(Canvas):
             ey = ney if ney > ey else ey
         bg = self["background"] if bg == "" else bg
         back = self.__ui_polygon(
-            ((sx + 3, sy - 9), (ex - 3, ey - 3)), fill=bg, outline=bg, width=self.TINUI_RADIUS_LARGE
+            ((sx + self.scale_value(3), sy - self.scale_value(9)), (ex - self.scale_value(3), ey - self.scale_value(3))), fill=bg, outline=bg, width=self.TINUI_RADIUS_LARGE
         )
         uid = f"labelframe-{back}"
         self.itemconfig(back, tags=uid)
         self.lower(back)
         outline = self.__ui_polygon(
-            ((sx + 2, sy - 10), (ex - 2, ey - 2)),
+            ((sx + self.scale_value(2), sy - self.scale_value(10)), (ex - self.scale_value(2), ey - self.scale_value(2))),
             fill=fg,
             outline=fg,
             width=self.TINUI_RADIUS_LARGE,
@@ -1289,14 +1289,22 @@ class BasicTinUI(Canvas):
         self.lower(outline)
         if title:
             label = self.create_text(
-                ((sx + ex) // 2, sy - 20),
+                ((sx + ex) // 2, sy - self.scale_value(20)),
                 font=font,
                 text=title,
                 fill=fg,
                 anchor="center",
                 tags=uid,
             )
-            self.create_rectangle(self.bbox(label), fill=bg, outline=bg, tags=uid)
+            lbbox = self.bbox(label)
+            mask = self.create_line(
+                (lbbox[0], sy - self.scale_value(10), lbbox[2], sy - self.scale_value(10)),
+                fill=bg,
+                width=self.TINUI_RADIUS_LARGE,
+                capstyle="butt",
+                tags=uid,
+            )
+            self.tag_raise(mask, back)
             self.tag_raise(label)
         else:
             label = None
@@ -7951,7 +7959,7 @@ if __name__ == "__main__":
     b.add_button((500,270),'停止等待动画',activefg='cyan',activebg='black',command=lambda _: wait1.stop())
     bu2 = b.add_button((700, 250), "nothing button 2")[1]
     bu3 = b.add_button((700, 300), "nothing button 3")[1]
-    b.add_labelframe((bu2, bu3), "")
+    b.add_labelframe((bu2, bu3), "labelframe",bg='red')
     b.add_combobox(
         (600, 550),
         text="你有多大可能去珠穆朗玛峰",

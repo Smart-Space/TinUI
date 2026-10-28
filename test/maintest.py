@@ -92,7 +92,7 @@ ep1.set_child(listbox)
 vp.add_child(ep1,weight=1)
  
 displayui,_,duixml,uid=ui.add_ui((0,0),bg='#F9F9F9',width=610,height=575,scrollbar="True",region='auto')
-ep=ExpandPanel(ui,bg='#F9F9F9',padding=(5,5,5,5))
+ep=ExpandPanel(ui,bg='#F9F9F9',line='#e5e5e5',linew=1,padding=(5,5,5,5))
 ep.set_child(uid)
 hp.add_child(ep,500,weight=1)
 

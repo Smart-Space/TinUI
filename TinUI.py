@@ -3010,12 +3010,56 @@ class BasicTinUI(Canvas):
                 leave_target()
 
         def set_thumb(da, db): # 最终画布坐标，已含渲染偏移
-            nonlocal thumb_a, thumb_b
-            thumb_a, thumb_b = da, db
+            nonlocal thumb_a
+            thumb_a = da
             if mode == "y":
                 self.coords(sc, (pos[0] + scale_5, da, pos[0] + scale_5, db))
             else:
                 self.coords(sc, (da, pos[1] + scale_5, db, pos[1] + scale_5))
+
+        def _init_track():  # 计算轨道范围，滑块在此区间内活动
+            nonlocal track_a, track_b, track_len
+            track_a = start + scale_5
+            track_b = end - scale_5
+            track_len = track_b - track_a
+            if track_len < 0:
+                track_len = 0.0
+
+        def _refresh_geometry():  # 依据当前可视比例重算滑块长度与行程
+            nonlocal thumb_h, travel
+            thumb_h = track_len * view_distance
+            if thumb_h < min_thumb:
+                thumb_h = min_thumb
+            elif thumb_h > track_len:
+                thumb_h = track_len
+            travel = track_len - thumb_h
+
+        def _view_to_pos(vs):  # 可视比例 -> 滑块顶端坐标
+            span = 1.0 - view_distance
+            if travel <= 0 or span <= 1e-9:
+                return track_a
+            return track_a + travel * (vs / span)
+
+        def _pos_to_view(top):  # 滑块顶端坐标 -> 可视比例
+            span = 1.0 - view_distance
+            if travel <= 0 or span <= 1e-9:
+                return 0.0
+            vs = (top - track_a) / travel * span
+            if vs < 0.0:
+                return 0.0
+            if vs > span:
+                vs = span
+            return vs
+
+        def set_thumb_by_view(vs):  # 按可视比例重绘滑块
+            top = _view_to_pos(vs)
+            set_thumb(top, top + thumb_h)
+
+        def _apply_view(vs):  # 立即跳转到指定可视比例
+            nonlocal target_y, current_y
+            set_thumb_by_view(vs)
+            widget_viewto(vs)
+            target_y = current_y = vs
 
         def widget_move(sp, ep):  # 控件控制滚动条滚动
             nonlocal target_y
@@ -3024,10 +3068,7 @@ class BasicTinUI(Canvas):
             _update_cache(sp, ep)
             if not is_animation:
                 target_y = view_start
-            set_thumb(
-                start + canmove * view_start + scale_5,
-                start + canmove * (view_start + view_distance) - scale_5,
-            )
+            set_thumb_by_view(view_start)
 
         def mousedown(event):
             nonlocal use_widget, drag_start
@@ -3046,73 +3087,68 @@ class BasicTinUI(Canvas):
             nonlocal drag_start
             cursor = self.canvasy(event.y) if mode == "y" else self.canvasx(event.x)
             move = cursor - drag_start
-            tol = self.scale_value(1)
-            # thumb_a/b 沿轴存储，横纵判断合一；界限与 widget_move 的绘制范围一致
-            if (
-                thumb_a + move < start + scale_5 - tol
-                or thumb_b + move > end - scale_5 + tol
-            ):
-                return
-            set_thumb(thumb_a + move, thumb_b + move)
+            # 滑块顶端位置沿轴存储，横纵判断合一；越界时贴边而非整段放弃
+            new_top = thumb_a + move
+            if new_top < track_a:
+                new_top = track_a
+            elif new_top + thumb_h > track_b:
+                new_top = track_b - thumb_h
+            set_thumb(new_top, new_top + thumb_h)
             drag_start = cursor
             sc_move()
 
         def topmove(_):  # top
-            half = thumb_b - thumb_a
-            move = -half / 2
-            if thumb_a + move < start + scale_5:
-                move = start + scale_5 - thumb_a
-            set_thumb(thumb_a + move, thumb_b + move)
-            sc_move()
+            _page_move(-1)
 
         def bottommove(_):  # bottom
-            half = thumb_b - thumb_a
-            move = half / 2
-            if thumb_b + move > end - scale_5:
-                move = end - scale_5 - thumb_b
-            set_thumb(thumb_a + move, thumb_b + move)
-            sc_move()
+            _page_move(1)
+
+        def _page_move(sign):  # 上下箭头按钮：翻页
+            ensure_cache()
+            _apply_view(_clamp(view_start + sign * view_distance))
 
         def backmove(event):  # back
             cursor = self.canvasy(event.y) if mode == "y" else self.canvasx(event.x)
-            center = (thumb_a + thumb_b) / 2
-            half = (thumb_b - thumb_a) / 2
-            move = cursor - center
-            if move > 0 and cursor + half > end - scale_5:
-                move = end - scale_5 - half - center
-            elif move < 0 and cursor - half < start + scale_5:
-                move = start + scale_5 + half - center
-            set_thumb(thumb_a + move, thumb_b + move)
+            # 点击轨道：滑块中心跟随鼠标
+            new_top = cursor - thumb_h / 2
+            if new_top < track_a:
+                new_top = track_a
+            elif new_top + thumb_h > track_b:
+                new_top = track_b - thumb_h
+            set_thumb(new_top, new_top + thumb_h)
             sc_move()
 
         def sc_move():  # 滚动条控制控件滚动
             nonlocal target_y, current_y
-            if effective <= 0:
+            if travel <= 0:
                 return # 极小尺寸防御
-            startp = (thumb_a - start - scale_5) / effective
-            startp = min(1.0, max(0.0, startp))
+            startp = _pos_to_view(thumb_a)
             widget_viewto(startp)
             target_y = current_y = startp
 
         def anim_frame():
-            nonlocal anim_last, is_animation, current_y, target_y
+            nonlocal anim_last, is_animation, current_y, target_y, anim_id
             if not is_overflow: # 内容未溢出，复位并停止
                 current_y = target_y = 0.0
                 is_animation = False
+                anim_id = None
                 return
             now = time.perf_counter()
             dt = min(now - anim_last, 0.05) # 钳制 50ms，防后台切回产生大量时间差
             anim_last = now
             distance = target_y - current_y
-            if abs(distance) < 0.001: # 吸附并停止
+            # 停止阈值随可视比例自适应（约 1 个屏幕像素）
+            eps = max(1e-9, view_distance * anim_eps_ratio)
+            if abs(distance) <= eps: # 吸附并停止
                 current_y = target_y
                 widget_viewto(current_y)
                 is_animation = False
+                anim_id = None
                 return
             factor = 1.0 - math.exp(-ease_k * dt * 1000.0) # 帧率无关的指数缓动
             current_y += distance * factor
             widget_viewto(current_y)
-            widget.after(16, anim_frame)
+            anim_id = widget.after(anim_interval, anim_frame)
         def start_anim():
             nonlocal is_animation, anim_last
             if is_animation:
@@ -3140,7 +3176,7 @@ class BasicTinUI(Canvas):
             return "break"
 
         def __move(dx, dy, size):
-            nonlocal start, end, canmove, effective, height
+            nonlocal start, end, height
             pos[0] += dx
             pos[1] += dy
             if mode == "y":
@@ -3155,14 +3191,11 @@ class BasicTinUI(Canvas):
                 self.move(bottom, size - height, 0)
                 coord = self.coords(back)
                 coord[2] += size - height
-            canmove = end - start
-            effective = canmove
             height = size
             self.coords(back, coord)
-            set_thumb(
-                start + canmove * view_start + scale_5,
-                start + canmove * min(view_start + view_distance, 1.0) - scale_5,
-            )
+            _init_track()
+            _refresh_geometry()
+            set_thumb_by_view(view_start)
 
         def _update_cache(sp, ep):
             nonlocal view_start, view_distance, is_overflow, view_cached
@@ -3171,6 +3204,7 @@ class BasicTinUI(Canvas):
             view_distance = max(ep - sp, 0.0)
             is_overflow = view_distance < 1.0
             view_cached = True
+            _refresh_geometry()
         def ensure_cache():
             # 从未收到回调时（理论上极少发生）惰性查询一次
             if not view_cached:
@@ -3201,18 +3235,25 @@ class BasicTinUI(Canvas):
         leave_handle = None # 鼠标离开动画计时器
         is_animation = False # 是否正在动画中
         anim_last = 0.0 # 上一次动画的时间戳
-        scroll_speed = 0.15 # 缓动系数
-        ease_k = -math.log(1 - 0.15) / 16.0 # 每毫秒衰减率
-        scroll_step = 0.15 # 滚动增量
+        anim_id = None # 动画计时器句柄
+        scroll_speed = 0.21 # 缓动系数（每 16ms 收敛的比例）。
+        ease_k = -math.log(1 - 0.21) / 16.0 # 每毫秒衰减率
+        scroll_step = 0.15 # 滚动增量（可视比例）
+        anim_interval = 12 # 动画帧间隔(ms)
+        anim_eps_ratio = 0.002 # 动画停止阈值 = view_distance * anim_eps_ratio（约 1 屏幕像素）
         current_y = 0.0 # 当前位置
         target_y = 0.0 # 目标位置
         view_start = 0.0 # 视图起始位置
         view_distance = 1.0 # 最近一次回调的可视比例
         is_overflow = False # 内容是否溢出可视区
         view_cached = False # 是否收到过回调
-        thumb_a = 0.0
-        thumb_b = 0.0 # 滑块位置缓存
-        effective = 0.0 # 在 mode 分支计算 canmove 后赋值，effective = canmove（与 widget_move 的映射一致）
+        thumb_a = 0.0 # 滑块顶端位置缓存
+        thumb_h = 0.0 # 滑块长度（沿轴向）
+        track_a = 0.0 # 轨道起点
+        track_b = 0.0 # 轨道终点
+        track_len = 0.0 # 轨道长度
+        travel = 0.0 # 滑块顶端可移动范围
+        min_thumb = self.scale_value(12) # 滑块最小可见长度，避免大内容下高度为负而反转
         drag_start = 0.0 # 替代 scroll.start
         if direction.upper() == "X":
             mode = "x"
@@ -3264,8 +3305,8 @@ class BasicTinUI(Canvas):
             # 起始和终止位置
             start = pos[1] + baseheigth + scale_5
             end = pos[1] + height - baseheigth - scale_5
-            canmove = end - start
-            effective = canmove
+            _init_track()
+            _refresh_geometry()
             # 绑定组件
             widget.config(yscrollcommand=widget_move)
             widget_view = widget.yview
@@ -3312,8 +3353,8 @@ class BasicTinUI(Canvas):
             )
             start = pos[0] + basewidth + scale_5
             end = pos[0] + height - basewidth - scale_5
-            canmove = end - start
-            effective = canmove
+            _init_track()
+            _refresh_geometry()
             widget.config(xscrollcommand=widget_move)
             widget_view = widget.xview
             widget_viewto = widget.xview_moveto
@@ -3330,6 +3371,25 @@ class BasicTinUI(Canvas):
         # 绑定滚轮事件
         mousewheel_bind = widget.bind("<MouseWheel>", on_mousewheel, True)
         def __cleanup_scroll(_):
+            nonlocal anim_id, leave_handle, leave_animation
+            try:
+                if anim_id:
+                    widget.after_cancel(anim_id)
+                    anim_id = None
+            except:
+                pass
+            try:
+                if leave_handle:
+                    self.after_cancel(leave_handle)
+                    leave_handle = None
+            except:
+                pass
+            try:
+                if leave_animation:
+                    self.after_cancel(leave_animation)
+                    leave_animation = None
+            except:
+                pass
             try:
                 if mousewheel_bind:
                     widget.unbind("<MouseWheel>", mousewheel_bind)

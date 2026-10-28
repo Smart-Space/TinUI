@@ -12,6 +12,7 @@
 2. 修复listview删除栏目时动画仍在进行的错误
 3. 优化scrollbar的滚动稳定性
 4. 改进labelframe标题背景为单线
+5. 修复TinUIXml中environment()绑定的函数在loadxml后无法通过funcs.update()更新的问题
 
 ==========6.38==========
 2026-10-7

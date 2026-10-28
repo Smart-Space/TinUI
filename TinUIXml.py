@@ -30,13 +30,19 @@ class TinUIThemeBase:
 
 
 class TinUIXmlFunc:
-    def __init__(self, function):
+    def __init__(self, function=None, namespace: Optional[dict] = None, key=None):
         self.function = function
+        self.namespace = namespace
+        self.key = key
 
     def __call__(self, *args, **kwargs):
-        if self.function is None:
+        if self.namespace is not None:  # 绑定字典时始终取字典当前值
+            fun = self.namespace.get(self.key)
+        else:
+            fun = self.function
+        if fun is None:
             return None
-        return self.function(*args, **kwargs)
+        return fun(*args, **kwargs)
 
 
 class TinUIXmlFuncDict:
@@ -48,7 +54,11 @@ class TinUIXmlFuncDict:
 
     def __setitem__(self, key, fun):
         if key in self.data:
-            self.data[key].function = fun
+            item = self.data[key]
+            item.function = fun
+            # 显式赋值优先，解除对environment字典的绑定
+            item.namespace = None
+            item.key = None
         else:
             self.data[key] = TinUIXmlFunc(fun)
 
@@ -57,17 +67,18 @@ class TinUIXmlFuncDict:
             return self.data[key]
         for namespace in reversed(self.defaults):
             if key in namespace:
-                return namespace[key]
+                wrapper = TinUIXmlFunc(namespace[key], namespace, key)
+                self.data[key] = wrapper
+                return wrapper
         raise KeyError(key)
 
     def __delitem__(self, key):
-        if key in self.data:
-            self.data.pop(key)
-        elif key in self:
+        if key not in self.data and key not in self:
+            raise KeyError(key)
+        self.data.pop(key, None)
+        if any(key in namespace for namespace in self.defaults):
             # 绑定的字典不可删改，用空实现遮蔽该名
             self.data[key] = TinUIXmlFunc(None)
-        else:
-            raise KeyError(key)
 
     def __contains__(self, key):
         if key in self.data:
@@ -625,6 +636,8 @@ class TinUIXml:  # TinUI的xml渲染方式
         self, dict_item: dict
     ):  # 在funcs和datas中加入默认标识内容，一般为globals()或locals()
         # funcs按引用绑定dict_item，不复制其中的条目，多次调用叠加且后者优先；
+        # 条目在首次读取时才物化为TinUIXmlFunc（见TinUIXmlFuncDict.__getitem__），
+        # 因此字典后续的赋值可见，loadxml后的funcs.update()也能原地生效；
         # datas允许开发者写入（datas.update等），故仍持有其浅拷贝
         if isinstance(self.funcs, TinUIXmlFuncDict):
             self.funcs.defaults = [

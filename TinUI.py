@@ -3963,7 +3963,8 @@ class BasicTinUI(Canvas):
         line = ui.create_line(
             (self.scale_value(1,True), linew / 3, self.scale_value(1,True), linew * 2 / 3), fill=oncolor, width=self.scale_value(3,True), capstyle="round"
         )
-        ui.config(scrollregion=ui.bbox("all"))
+        all_bbox = ui.bbox("all")
+        ui.config(scrollregion=(0, 0, all_bbox[2], all_bbox[3]))
         ui.move(line, 0, -linew - height)
         allback = self.add_back((), (view, scro[-1]), fg=bg, bg=bg, linew=self.scale_value(8))
         self.lower(allback, view)

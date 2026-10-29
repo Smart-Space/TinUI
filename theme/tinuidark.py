@@ -435,7 +435,7 @@ class TinUIDark(TinUITheme):
             **{
                 'fg':'#FFFFFF','bg':'#1D1D1D',
                 'activefg':'#FFFFFF','activebg':'#2A2A2A',
-                'onbg':'#3A3A3A',
+                'onbg':'#2A2A2A',
                 'line':'#303030','sign':self.accent_color
         },**kw})
 

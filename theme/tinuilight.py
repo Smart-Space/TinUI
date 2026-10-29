@@ -432,10 +432,10 @@ class TinUILight(TinUITheme):
     def add_segmentbutton(self,pos,*arg,**kw):
         return self.ui.add_segmentbutton(pos,*arg,**{
             **{
-                'fg':'#191919','bg':'#EDEDED',
-                'activefg':'#181818','activebg':'#E5E5E5',
-                'onbg':'#FAFAFA',
-                'line':'#E5E5E5','sign':self.accent_color
+                'fg':'#191919','bg':'#f3f3f3',
+                'activefg':'#191919','activebg':'#eaeaea',
+                'onbg':'#fbfbfb',
+                'line':'#eaeaea','sign':self.accent_color
         },**kw})
 
     def add_navigation(self,pos,*arg,**kw):

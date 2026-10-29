@@ -7261,61 +7261,62 @@ class BasicTinUI(Canvas):
         command=None,
         anchor="nw",
     ):  # 绘制一个选项按钮
-        def mouse_in(cid):
-            bbox = self.bbox(cid)
-            centerx = (bbox[0] + bbox[2]) / 2
-            halfwidth = maxwidth / 2
-            x1 = centerx - halfwidth
-            x2 = centerx + halfwidth
-            coord = (x1, bbox[1], x2, bbox[1], x2, bbox[3], x1, bbox[3])
-            self.coords(button, coord)
-            self.itemconfig(button, fill=activebg, outline=activebg)
-            self.itemconfig(cid, fill=activefg)
+        def __refresh(num):
+            if hovered == num:
+                self.itemconfig(buttons[num], fill=activebg, outline=activebg)
+                self.itemconfig(texts[num], fill=activefg)
+            else:
+                self.itemconfig(buttons[num], fill=bg, outline=bg)
+                self.itemconfig(texts[num], fill=fg)
 
-        def on_leave(_):
-            self.itemconfig(button, fill="", outline="")
+        def mouse_in(num, _=None):
+            nonlocal hovered
+            hovered = num
+            __refresh(num)
 
-        def __slide_to(target, target_line):
-            # 线性滑动动画
-            nonlocal slide_id
-            if slide_id is not None: # 取消上一次尚未完成的动画
-                self.after_cancel(slide_id)
-                slide_id = None
-            start = self.coords(button2)
-            start_line = self.coords(line)
-            if len(start) != len(target) or len(start_line) != len(target_line):
-                self.coords(button2, target)
-                self.coords(line, target_line)
-                return
+        def mouse_out(num, _=None):
+            nonlocal hovered
+            if hovered == num:
+                hovered = -1
+            __refresh(num)
+
+        def __grow_line(target_line):
+            nonlocal grow_id
+            if grow_id is not None:
+                self.after_cancel(grow_id)
+                grow_id = None
+            centerx = (target_line[0] + target_line[2]) / 2
+            liney = target_line[1]
             frame = 0
 
             def animate():
-                nonlocal slide_id, frame
+                nonlocal grow_id, frame
                 frame += 1
-                t = min(frame / slide_steps, 1.0)
-                self.coords(
-                    button2, tuple(s + (e - s) * t for s, e in zip(start, target))
-                )
+                t = min(frame / grow_steps, 1.0)
                 self.coords(
                     line,
-                    tuple(s + (e - s) * t for s, e in zip(start_line, target_line)),
+                    centerx + (target_line[0] - centerx) * t,
+                    liney,
+                    centerx + (target_line[2] - centerx) * t,
+                    liney,
                 )
                 if t < 1.0:
-                    slide_id = self.after(slide_interval, animate)
+                    grow_id = self.after(grow_interval, animate)
                 else:
-                    slide_id = None
+                    grow_id = None
 
             animate()
 
-        def __click(cid):
-            nonlocal index
-            first = index == -1
-            if first:
+        def __click(num):
+            nonlocal selected
+            if num == selected:
+                return
+            old = selected
+            selected = num
+            if old == -1: # 首次选中，显示标识框与标识线
                 self.itemconfig(button2, state="normal")
                 self.itemconfig(line, state="normal")
-            if cid == index:
-                return
-            index = cid
+            cid = texts[num]
             bbox = self.bbox(cid)
             centerx = (bbox[0] + bbox[2]) / 2
             halfwidth = maxwidth / 2
@@ -7328,30 +7329,29 @@ class BasicTinUI(Canvas):
                 centerx + maxwidth / 4,
                 bbox[3] + 2,
             )
-            if first: # 首次选中直接定位，避免从原点滑入
-                self.coords(button2, target)
-                self.coords(line, target_line)
-            else:
-                __slide_to(target, target_line)
+            # 标识框直接显示，标识线从中间一点快速线性变为正常长度
+            self.coords(button2, target)
+            __grow_line(target_line)
+            if old >= 0: # 刷新原选中项的响应背景
+                __refresh(old)
+            __refresh(num)
             if command:
                 command(self.itemcget(cid, "text"))
 
-        def select(index: int):
-            __click(texts[index])
+        def select(num: int):
+            __click(num)
         font = font or self.__get_font()
-        index = -1
-        slide_id = None # 滑动动画计时器
-        slide_steps = 12 # 动画总帧数
-        slide_interval = 12 # 每帧间隔（毫秒）
+        selected = -1 # 当前选中的选项序号
+        hovered = -1 # 当前鼠标响应的选项序号
+        grow_id = None # 标识线动画计时器
+        grow_steps = 6 # 动画总帧数
+        grow_interval = 10 # 每帧间隔（毫秒）
         outline = self.__ui_polygon(((0, 0), (0, 0)), fill=line, outline=line, width=self.TINUI_RADIUS_SMALL)
         uid = TinUIString(f"segmentbutton-{outline}")
         buttonid = f"{uid}-button"
         self.itemconfig(outline, tags=uid)
         back = self.__ui_polygon(
             ((0, 0), (0, 0)), fill=bg, outline=bg, width=self.TINUI_RADIUS_SMALL, tags=uid
-        )
-        button = self.__ui_polygon(
-            ((0, 0), (0, 0)), fill="", outline="", width=self.TINUI_RADIUS_SMALL, tags=uid
         )
         button2 = self.__ui_polygon(
             ((0, 0), (0, 0)), fill=onbg, outline=onbg, width=self.TINUI_RADIUS_SMALL, tags=uid
@@ -7369,15 +7369,38 @@ class BasicTinUI(Canvas):
             texts.append(text)
             bbox = self.bbox(text)
             maxwidth = max(maxwidth, bbox[2] - bbox[0])
-            self.tag_bind(text, "<Enter>", lambda _, text=text: mouse_in(text))
-            self.tag_bind(
-                text, "<Leave>", lambda _, text=text: self.itemconfig(text, fill=fg)
-            )
-            self.tag_bind(text, "<Button-1>", lambda _, text=text: __click(text))
         endx = maxwidth / 2
-        for i in texts:
-            self.coords(i, endx, 0)
+        bbox = self.bbox(buttonid)
+        buttons = []
+        for num, text in enumerate(texts):
+            self.coords(text, endx, 0)
+            hoverid = f"{uid}-hover-{num}"
+            bbox = self.bbox(text)
+            hov = self.create_polygon(
+                (
+                    endx - maxwidth/2 + self.scale_value(2),
+                    bbox[1] + self.scale_value(2),
+                    endx + maxwidth/2 - self.scale_value(2),
+                    bbox[1] + self.scale_value(2),
+                    endx + maxwidth/2 - self.scale_value(2),
+                    bbox[3] - self.scale_value(2),
+                    endx - maxwidth/2 + self.scale_value(2),
+                    bbox[3] - self.scale_value(2),
+                ),
+                fill=bg,
+                outline=bg,
+                width=self.TINUI_RADIUS_SMALL,
+                joinstyle="round",
+                tags=(uid, hoverid),
+            )
+            buttons.append(hov)
+            self.tag_lower(hov, button2) # 响应背景位于选中背景之下，选中时不显示
+            self.addtag_withtag(hoverid, text) # 文本与响应背景共享交互事件
+            self.tag_bind(hoverid, "<Enter>", lambda _, num=num: mouse_in(num))
+            self.tag_bind(hoverid, "<Leave>", lambda _, num=num: mouse_out(num))
+            self.tag_bind(hoverid, "<Button-1>", lambda _, num=num: __click(num))
             endx += maxwidth + self.scale_value(10)
+        self.tag_raise(line)
         bbox = self.bbox(buttonid)
         width = (maxwidth + self.scale_value(10)) * content.__len__() - self.scale_value(10)
         coord = (0, bbox[1], width, bbox[1], width, bbox[3], 0, bbox[3])
@@ -7393,7 +7416,6 @@ class BasicTinUI(Canvas):
             bbox[3] + 1,
         )
         self.coords(outline, coord)
-        self.tag_bind(uid, "<Leave>", on_leave)
         self.__auto_anchor(uid, pos, anchor)
         del endx, coord, bbox
         uid.layout = lambda x1, y1, x2, y2, _=False: self.__auto_layout(
@@ -7401,7 +7423,7 @@ class BasicTinUI(Canvas):
         )
         funcs = FuncList(1)
         funcs.select = select
-        return back, outline, button, button2, line, texts, funcs, uid
+        return back, outline, buttons, button2, line, texts, funcs, uid
     
     def add_navigation(
         self,

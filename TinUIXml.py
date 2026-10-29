@@ -30,16 +30,27 @@ class TinUIThemeBase:
 
 
 class TinUIXmlFunc:
-    def __init__(self, function=None, namespace: Optional[dict] = None, key=None):
+    def __init__(
+        self,
+        function=None,
+        owner: Optional["TinUIXmlFuncDict"] = None,
+        key=None,
+        explicit=False,
+    ):
         self.function = function
-        self.namespace = namespace
+        self.owner = owner
         self.key = key
+        # True表示由funcs['k']=...显式赋值，优先于environment()绑定的字典
+        self.explicit = explicit
+
+    def resolve(self):
+        """解析当前应当被调用的对象，可能是None"""
+        if self.owner is not None and not self.explicit:
+            return self.owner.resolve(self.key)
+        return self.function
 
     def __call__(self, *args, **kwargs):
-        if self.namespace is not None:  # 绑定字典时始终取字典当前值
-            fun = self.namespace.get(self.key)
-        else:
-            fun = self.function
+        fun = self.resolve()
         if fun is None:
             return None
         return fun(*args, **kwargs)
@@ -52,22 +63,34 @@ class TinUIXmlFuncDict:
         # 后绑定者优先，同一对象重复绑定只保留最后一次
         self.defaults = [default] if default is not None else []
 
-    def __setitem__(self, key, fun):
-        if key in self.data:
-            item = self.data[key]
-            item.function = fun
-            # 显式赋值优先，解除对environment字典的绑定
-            item.namespace = None
-            item.key = None
-        else:
-            self.data[key] = TinUIXmlFunc(fun)
-
-    def __getitem__(self, key):
-        if key in self.data:
-            return self.data[key]
+    def resolve(self, key):
+        wrapper = self.data.get(key)
+        if wrapper is not None and wrapper.explicit:
+            return wrapper.function
         for namespace in reversed(self.defaults):
             if key in namespace:
-                wrapper = TinUIXmlFunc(namespace[key], namespace, key)
+                return namespace[key]
+        return None
+
+    def __setitem__(self, key, fun):
+        wrapper = self.data.get(key)
+        if wrapper is not None:
+            # 原地修改包装，已持有该包装的控件立即生效
+            wrapper.function = fun
+            # 显式赋值优先，解除对environment字典的绑定
+            wrapper.explicit = True
+            wrapper.owner = self
+            wrapper.key = key
+        else:
+            self.data[key] = TinUIXmlFunc(fun, self, key, explicit=True)
+
+    def __getitem__(self, key):
+        wrapper = self.data.get(key)
+        if wrapper is not None:
+            return wrapper
+        for namespace in reversed(self.defaults):
+            if key in namespace:
+                wrapper = TinUIXmlFunc(namespace[key], self, key)
                 self.data[key] = wrapper
                 return wrapper
         raise KeyError(key)
@@ -78,7 +101,7 @@ class TinUIXmlFuncDict:
         self.data.pop(key, None)
         if any(key in namespace for namespace in self.defaults):
             # 绑定的字典不可删改，用空实现遮蔽该名
-            self.data[key] = TinUIXmlFunc(None)
+            self.data[key] = TinUIXmlFunc(None, self, key, explicit=True)
 
     def __contains__(self, key):
         if key in self.data:
@@ -91,7 +114,11 @@ class TinUIXmlFuncDict:
         # 创建一个新的TinUIXmlFuncDict实例，合并self和other的内容
         new_dict = TinUIXmlFuncDict()
         new_dict.defaults = list(self.defaults)
-        new_dict.update(self.data)
+        for key, wrapper in self.data.items():
+            # 复制为独立包装，避免合并结果与原字典互相影响
+            new_dict.data[key] = TinUIXmlFunc(
+                wrapper.resolve(), new_dict, key, explicit=wrapper.explicit
+            )
         new_dict.update(other)
         return new_dict
 
@@ -637,7 +664,8 @@ class TinUIXml:  # TinUI的xml渲染方式
     ):  # 在funcs和datas中加入默认标识内容，一般为globals()或locals()
         # funcs按引用绑定dict_item，不复制其中的条目，多次调用叠加且后者优先；
         # 条目在首次读取时才物化为TinUIXmlFunc（见TinUIXmlFuncDict.__getitem__），
-        # 因此字典后续的赋值可见，loadxml后的funcs.update()也能原地生效；
+        # 包装持有funcs自身，故绑定字典后续的赋值、再次environment()后的优先级变化
+        # 对已存在的包装同样可见，loadxml后的funcs.update()也能原地生效；
         # datas允许开发者写入（datas.update等），故仍持有其浅拷贝
         if isinstance(self.funcs, TinUIXmlFuncDict):
             self.funcs.defaults = [

@@ -3750,6 +3750,11 @@ class BasicTinUI(Canvas):
                 # 而这仍然会触发此click事件，因此需要判断该元素是否被删除
                 return
             index = items.index(itui)
+            if index == nowon:
+                # 选中的就是当前项，不运行选中线动画逻辑
+                if command != None and send:
+                    command(nowon)
+                return
             first = nowon == -1
             if nowon != -1 and nowon <= len(items) - 1:
                 tinui = items[nowon][0]

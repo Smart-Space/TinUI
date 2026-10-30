@@ -5055,10 +5055,9 @@ class BasicTinUI(Canvas):
     def add_pivot(
         self,
         pos: tuple,
-        fg="#959595",
-        bg="",
-        activefg="#525252",
-        activecolor="#5969e0",
+        fg="#959595",bg="",
+        activefg="#525252",activecolor="#5969e0",
+        onfg="#868686",onbg="",
         content=(("a-title", "tag1"), ("b-title", "tag2"), "", ("c-title", "tag3")),
         font=None,
         padx=10,
@@ -5066,23 +5065,55 @@ class BasicTinUI(Canvas):
         anchor="nw",
         command=None,
     ):  # 绘制支点标题
-        def button_in(num, text_uid):
-            if num != select:
-                self.itemconfig(text_uid, fill=activefg)
+        def button_in(text_uid):
+            self.itemconfig(text_uid, fill=activefg)
 
-        def button_out(num, text_uid):
-            if num != select:
-                self.itemconfig(text_uid, fill=fg)
+        def button_out(text_uid):
+            self.itemconfig(text_uid, fill=fg)
+
+        def button_down(num, text_uid, tagname):
+            sel_it(num, text_uid, tagname)
+            self.itemconfig(text_uid, fill=onfg)
+
+        def button_up(text_uid):
+            self.itemconfig(text_uid, fill=activefg)
+
+        def __slide_to(target):
+            nonlocal slide_id
+            if slide_id is not None:
+                self.after_cancel(slide_id)
+                slide_id = None
+            center = (target[0] + target[2]) / 2
+            self.coords(line, center, target[1], center, target[1])
+            start = self.coords(line)
+            frame = 0
+
+            def animate():
+                nonlocal slide_id, frame
+                frame += 1
+                t = min(frame / slide_steps, 1.0)
+                self.coords(line, tuple(s + (e - s) * t for s, e in zip(start, target)))
+                if t < 1.0:
+                    slide_id = self.after(slide_interval, animate)
+                else:
+                    slide_id = None
+
+            animate()
 
         def sel_it(num, text_uid, tag, send=True):
             nonlocal select
+            if text_uid is None:  # 空行不可选定
+                return
             if num == select:
                 return
-            self.itemconfig(texts[select][2], fill=fg)
+            old = select
             select = num
-            self.itemconfig(text_uid, fill=activefg)
             bbox = self.bbox(text_uid)
-            self.coords(line, (bbox[0], bbox[3] + 2, bbox[2], bbox[3] + 2))
+            target = (bbox[0], bbox[3] + 2, bbox[2], bbox[3] + 2)
+            if old == -1:  # 首次定位直接就位
+                self.coords(line, target)
+            else:
+                __slide_to(target)
             if command != None and send:
                 command(tag)
 
@@ -5095,6 +5126,9 @@ class BasicTinUI(Canvas):
         texts = []  # [(text,tag,text-uid),...]
         count = -1
         select = -1  # 当前选定
+        slide_id = None  # 提示线动画计时器
+        slide_steps = 8  # 动画总帧数
+        slide_interval = 12  # 每帧间隔（毫秒）
         t_bbox = None
         nowx, nowy = pos  # x坐标为左上角插入坐标，y坐标为底部坐标
         uid = TinUIString(f"pivot-{uuid.uuid1().hex}")
@@ -5123,20 +5157,28 @@ class BasicTinUI(Canvas):
             nowx = nowx + width + padx
             texts.append((i[0], i[1], text))
             self.tag_bind(
-                text, "<Enter>", lambda _, num=count, tag=text: button_in(num, tag)
+                text, "<Enter>", lambda _, tag=text: button_in(tag)
             )
             self.tag_bind(
-                text, "<Leave>", lambda _, num=count, tag=text: button_out(num, tag)
+                text, "<Leave>", lambda _, tag=text: button_out(tag)
             )
             self.tag_bind(
                 text,
                 "<Button-1>",
-                lambda _, num=count, tag=text, tagname=i[1]: sel_it(
+                lambda _, num=count, tag=text, tagname=i[1]: button_down(
                     num, tag, tagname
                 ),
             )
+            self.tag_bind(
+                text,
+                "<ButtonRelease-1>",
+                lambda _, tag=text: button_up(tag),
+            )
         self.__auto_anchor(uid, pos, anchor)
-        sel_it(0, texts[0][2], texts[0][1], False)
+        for i in range(len(texts)):
+            if texts[i][2] != None:
+                sel_it(i, texts[i][2], texts[i][1], False)
+                break
         funcs = FuncList(1)
         funcs.select = _select
         uid.layout = lambda x1, y1, x2, y2, expand=False: self.__auto_layout(

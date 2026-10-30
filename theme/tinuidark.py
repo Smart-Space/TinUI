@@ -302,8 +302,9 @@ class TinUIDark(TinUITheme):
     def add_pivot(self,pos,*arg,**kw):
         return self.ui.add_pivot(pos,*arg,**{
             **{
-                'fg':'#a6a6a6','bg':'',
-                'activefg':'#ffffff','activecolor':self.accent_color,
+                'fg':'#ffffff','bg':'',
+                'activefg':'#cccccc','activecolor':self.accent_color,
+                'onfg':'#969696','onbg':'',
             },**kw})
 
     def add_button2(self,pos,*arg,**kw):

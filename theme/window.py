@@ -1,6 +1,11 @@
+import os
 import sys
-sys.path.append('..')
-from TinUI import *
+
+try:  #作为tinui包的子模块被导入（pip安装）
+    from .. import *
+except ImportError:  #源码目录
+    sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+    from TinUI import *
 
 from tkinter import Tk
 from tkinter.ttk import Button

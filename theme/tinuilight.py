@@ -1,6 +1,14 @@
 from typing import Union
-from tinui import TinUI, BasicTinUI, TinUITheme
-from tinui.TinUIPanel import ExpandPanel, VerticalPanel, HorizonPanel, CardPanel, PanelSash
+import os
+import sys
+
+try:  #作为tinui包的子模块被导入（pip安装）
+    from .. import TinUI, BasicTinUI, TinUITheme
+    from ..TinUIPanel import ExpandPanel, VerticalPanel, HorizonPanel, CardPanel, PanelSash
+except ImportError:  #源码目录
+    sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+    from TinUI import TinUI, BasicTinUI, TinUITheme
+    from TinUIPanel import ExpandPanel, VerticalPanel, HorizonPanel, CardPanel, PanelSash
 
 class TinUILight(TinUITheme):
     '''
@@ -100,6 +108,16 @@ class TinUILight(TinUITheme):
 
     def add_entry(self,pos,*arg,**kw):
         return self.ui.add_entry(pos,*arg,**{
+            **{
+                'fg':'#1b1b1b','bg':'#fbfbfb',
+                'activefg':'#1a1a1a','activebg':'#f6f6f6',
+                'onfg':'#000000','onbg':'#ffffff',
+                'line':'#e5e5e5','activeline':'#e5e5e5',
+                'outline':'#868686','onoutline':self.accent_color,'insert':'#000000'
+            },**kw})
+
+    def add_passwordbox(self,pos,*arg,**kw):
+        return self.ui.add_passwordbox(pos,*arg,**{
             **{
                 'fg':'#1b1b1b','bg':'#fbfbfb',
                 'activefg':'#1a1a1a','activebg':'#f6f6f6',

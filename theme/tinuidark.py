@@ -1,6 +1,14 @@
 from typing import Union
-from tinui import TinUI, BasicTinUI, TinUITheme
-from tinui.TinUIPanel import ExpandPanel, VerticalPanel, HorizonPanel, CardPanel, PanelSash
+import os
+import sys
+
+try:  #作为tinui包的子模块被导入（pip安装）
+    from .. import TinUI, BasicTinUI, TinUITheme
+    from ..TinUIPanel import ExpandPanel, VerticalPanel, HorizonPanel, CardPanel, PanelSash
+except ImportError:  #源码目录
+    sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+    from TinUI import TinUI, BasicTinUI, TinUITheme
+    from TinUIPanel import ExpandPanel, VerticalPanel, HorizonPanel, CardPanel, PanelSash
 
 class TinUIDark(TinUITheme):
     '''
@@ -109,6 +117,16 @@ class TinUIDark(TinUITheme):
                 'outline':'#9a9a9a','onoutline':self.accent_color,'insert':'#e0e0e0',
             },**kw})
 
+    def add_passwordbox(self,pos,*arg,**kw):
+        return self.ui.add_passwordbox(pos,*arg,**{
+            **{
+                'fg':'#ffffff','bg':'#2d2d2d',
+                'activefg':'#ffffff','activebg':'#323232',
+                'onfg':'#ffffff','onbg':'#1f1f1f',
+                'line':'#303030','activeline':'#303030',
+                'outline':'#9a9a9a','onoutline':self.accent_color,'insert':'#e0e0e0',
+            },**kw})
+
     def add_separate(self,pos,*arg,**kw):
         return self.ui.add_separate(pos,*arg,**{
             **{
@@ -176,7 +194,7 @@ class TinUIDark(TinUITheme):
             },**kw})
 
     def add_spinbox(self,pos,*arg,**kw):
-        return self.ui.add_spinbox(pos,**{
+        return self.ui.add_spinbox(pos,*arg,**{
             **{
               'fg':'#ffffff','bg':'#2d2d2d','line':'#303030',
               'activefg':'#c0c0c0','activebg':'#323232',

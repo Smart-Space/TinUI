@@ -130,6 +130,19 @@
   ]);
   const NUMBER_ATTRS = new Set(["bd", "linew", "spacing", "min_width", "min_height", "card_width", "card_height", "h_spacing", "v_spacing"]);
 
+  /* ===== 导入 XML 用到的标签集合（与 TinUIXml.panel_tags / panel_flow_tags / noload 对齐） ===== */
+  const PANEL_TAGS = new Set(["expandpanel", "verticalpanel", "horizonpanel", "cardpanel", "sash"]);
+  const FLOW_TAGS = new Set(["line", "back", "labelframe", "flyout", "tooltip"]);
+  const NOLOAD_TAGS = new Set(["menubar"]);
+  /* 控件参数编辑器：整型参数（对齐 TinUIXml.intargs）+ 面板数值参数 */
+  const INT_ATTRS = new Set([
+    "width", "linew", "bd", "r", "minwidth", "maxwidth", "start", "padx", "pady",
+    "info_width", "height", "num", "delay", "spacing", "min_width", "min_height",
+    "card_width", "card_height", "h_spacing", "v_spacing",
+  ]);
+  /* 枚举型参数：控件的对齐方向、分隔线方向等 */
+  const ENUM_ATTRS = { anchor: ANCHORS, direction: ["x", "y"] };
+
   const ATTR_LABELS = {
     padding: "内边距 padding", spacing: "间距 spacing", min_width: "最小宽 min_width",
     min_height: "最小高 min_height", card_width: "卡片宽 card_width",
@@ -147,6 +160,7 @@
   let drag = null;
   let toastTimer = null;
   const els = {};
+  els.importMode = "load";
 
   /* =========================================================================
    * 3. 工具函数
@@ -792,9 +806,13 @@
   function controlInner(node) {
     const a = node.attrs;
     const tag = node.tag;
-    const meta = CONTROLS[tag] || {};
-    if (meta.mock) return '<span class="c-mock">' + esc(tag) + "</span>";
+    const meta = CONTROLS[tag];
     const text = a.text == null ? "" : String(a.text);
+    // 未知控件（非 TinUI.add_* 标签）以「标签名 + 文本」占位，便于发现拼写错误
+    if (!meta) {
+      return '<span class="c-mock">' + esc(tag) + (text ? " · " + esc(text) : "") + "</span>";
+    }
+    if (meta.mock) return '<span class="c-mock">' + esc(tag) + "</span>";
     switch (tag) {
       case "title": return '<span>' + esc(text) + "</span>";
       case "paragraph": return '<span>' + esc(text) + "</span>";
@@ -1234,7 +1252,7 @@
     return sec;
   }
 
-  /* 控件属性：只保留设计器自身的排布项，不暴露控件构造参数 */
+  /* 控件属性：名称 / 对齐 + 全部构造参数（可增删改） */
   function controlSection(node) {
     const sec = section("控件");
     sec.appendChild(textField("标签名 name", node.name, function (v) {
@@ -1245,8 +1263,107 @@
       node.attrs.anchor = v;
       rerender({ props: false });
     }));
-    sec.appendChild(note("控件构造参数固定为 " + node.tag + " 的默认值，如需调整请在导出后修改 XML。"));
+
+    const list = section("控件参数");
+    const keys = Object.keys(node.attrs);
+    if (!keys.length) list.appendChild(note("该控件当前没有参数，导出时等同 TinUI 默认值。"));
+    keys.forEach(function (k) { list.appendChild(attrRow(node, k)); });
+    list.appendChild(addAttrRow(node));
+    sec.appendChild(list);
     return sec;
+  }
+
+  /* 参数行：左侧参数名，右侧编辑器，最右 ✕ 移除 */
+  function attrRow(node, key) {
+    const row = document.createElement("div");
+    row.className = "row attr-row";
+    const lab = document.createElement("span");
+    lab.className = "row-label";
+    lab.textContent = key;
+    row.appendChild(lab);
+    row.appendChild(attrEditor(node, key));
+    const rm = document.createElement("button");
+    rm.type = "button";
+    rm.className = "attr-remove";
+    rm.title = "移除参数 " + key;
+    rm.textContent = "✕";
+    rm.addEventListener("click", function () {
+      delete node.attrs[key];
+      rerender();
+    });
+    row.appendChild(rm);
+    return row;
+  }
+
+  /* 参数编辑器：按参数类型自动选择数字 / 颜色 / 枚举 / 布尔 / 文本 */
+  function attrEditor(node, key) {
+    const wrap = document.createElement("span");
+    wrap.className = "attr-ctl";
+    const v = node.attrs[key] == null ? "" : String(node.attrs[key]);
+    const setter = function (nv) { node.attrs[key] = nv; rerender({ props: false }); };
+    const enu = ENUM_ATTRS[key] || (isBoolText(v) ? ["true", "false"] : null);
+    if (enu) {
+      const sel = document.createElement("select");
+      sel.className = "row-input";
+      const values = enu.slice();
+      if (v !== "" && values.indexOf(v) < 0) values.push(v);
+      values.forEach(function (o) {
+        const op = document.createElement("option");
+        op.value = o; op.textContent = o;
+        sel.appendChild(op);
+      });
+      sel.value = v;
+      sel.addEventListener("change", function () { setter(sel.value); });
+      wrap.appendChild(sel);
+      return wrap;
+    }
+    const txt = document.createElement("input");
+    txt.type = "text";
+    txt.className = "row-input";
+    txt.value = v;
+    txt.addEventListener("input", function () { setter(txt.value); });
+    wrap.appendChild(txt);
+    if (isColorText(v)) {
+      const c = document.createElement("input");
+      c.type = "color";
+      c.className = "color-input";
+      c.value = v;
+      c.addEventListener("input", function () { txt.value = c.value; setter(c.value); });
+      wrap.insertBefore(c, txt);
+    }
+    return wrap;
+  }
+
+  /* 添加参数行 */
+  function addAttrRow(node) {
+    const row = document.createElement("div");
+    row.className = "row attr-add";
+    const name = document.createElement("input");
+    name.type = "text";
+    name.className = "row-input";
+    name.placeholder = "参数名";
+    const val = document.createElement("input");
+    val.type = "text";
+    val.className = "row-input";
+    val.placeholder = "参数值";
+    const add = btn("添加", function () {
+      const k = name.value.trim();
+      if (!k) { toast("请先填写参数名"); return; }
+      node.attrs[k] = val.value;
+      rerender();
+    });
+    row.appendChild(name);
+    row.appendChild(val);
+    row.appendChild(add);
+    return row;
+  }
+
+  function isBoolText(v) {
+    const s = String(v == null ? "" : v).trim().toLowerCase();
+    return s === "true" || s === "false";
+  }
+  function isColorText(v) {
+    return /^#[0-9a-fA-F]{6}$/.test(String(v == null ? "" : v).trim());
   }
 
   function rootSection(node) {
@@ -1396,10 +1513,14 @@
     return s;
   }
 
-  /* 控件参数固定为 CONTROLS 中声明的默认值，按声明顺序导出，空值省略 */
+  /* 控件参数：先按 CONTROLS 声明顺序输出，再按写入顺序补上其余参数（如导入的 fg / font / command），
+     空值等同 TinUI 默认，不导出 */
   function orderedControlAttrs(node) {
     const declared = (CONTROLS[node.tag] && CONTROLS[node.tag].attrs) || {};
-    return Object.keys(declared).map(function (k) {
+    const keys = Object.keys(declared).concat(
+      Object.keys(node.attrs).filter(function (k) { return !(k in declared); })
+    );
+    return keys.map(function (k) {
       const v = node.attrs[k];
       if (v === undefined || v === null) return "";
       if (String(v).trim() === "") return ""; // 空值等同 TinUI 默认，不导出
@@ -1500,7 +1621,250 @@
   }
 
   /* =========================================================================
-   * 8. 初始化与事件
+   * 8. 导入 XML（对应 TinUIXml.loadxml 的面板模式分支）
+   * ======================================================================= */
+  /* 直接文本内容（对应 ElementTree 的 elem.text），忽略缩进空白 */
+  function directText(el) {
+    let s = "";
+    for (let i = 0; i < el.childNodes.length; i++) {
+      const n = el.childNodes[i];
+      if (n.nodeType === 3) s += n.nodeValue;
+    }
+    return s.trim();
+  }
+  /* 读取数值属性，缺省或非法返回 null */
+  function xmlNum(el, name) {
+    const raw = el.getAttribute(name);
+    if (raw === null || String(raw).trim() === "") return null;
+    const v = parseFloat(raw);
+    return isNaN(v) ? null : v;
+  }
+  /* index 的插入位置（对齐 Python list.insert 语义；-1 表示追加） */
+  function insertPos(len, index) {
+    if (index == null || index === -1) return len;
+    let i = Math.round(index);
+    if (i < 0) i = Math.max(0, len + i);
+    else i = Math.min(i, len);
+    return i;
+  }
+
+  /* 导入单个元素：面板标签 / 控件标签 */
+  function importNode(el, ctx, path) {
+    const tag = (el.tagName || "").toLowerCase();
+    if (FLOW_TAGS.has(tag)) {
+      ctx.errors.push(path + "：面板模式暂不支持流式标签 <" + tag + ">");
+      return null;
+    }
+    if (NOLOAD_TAGS.has(tag)) {
+      ctx.warnings.push(path + "：TinUIXml 不解析 <" + tag + ">，已跳过");
+      return null;
+    }
+    if (PANEL_TAGS.has(tag)) return importPanelNode(el, ctx, path);
+    const node = newNode("control", tag, {});
+    const attrs = el.attributes;
+    for (let i = 0; i < attrs.length; i++) node.attrs[attrs[i].name] = attrs[i].value;
+    node.name = directText(el);
+    if (!CONTROLS[tag]) {
+      ctx.warnings.push(path + "：未知控件 <" + tag + ">，已按占位控件导入");
+    }
+    return node;
+  }
+
+  /* 导入面板标签 */
+  function importPanelNode(el, ctx, path) {
+    const tag = (el.tagName || "").toLowerCase();
+    const node = newNode("panel", tag, {});
+    (PANEL_ATTR_ORDER[tag] || []).forEach(function (k) {
+      if (el.hasAttribute(k)) node.attrs[k] = el.getAttribute(k);
+    });
+    if (tag === "sash") {
+      if (el.children.length) {
+        ctx.errors.push(path + "：<sash> 不能包含子元素");
+        return null;
+      }
+      return node;
+    }
+    importChildren(el, node, ctx, path + " / " + tag);
+    // 子项本身出错时不再重复报告子项数量
+    if (tag === "expandpanel" && node.children.length !== 1 && !ctx.childFailed) {
+      ctx.errors.push(path + "：<expandpanel> 必须且只能包含一个子项，当前 " + node.children.length + " 个");
+      return null;
+    }
+    return node;
+  }
+
+  /* 导入面板 / 根面板的子项（<child> 包装可省略） */
+  function importChildren(containerEl, parentNode, ctx, path) {
+    const parentTag = panelType(parentNode);
+    const kids = Array.prototype.slice.call(containerEl.children);
+    kids.forEach(function (el, i) {
+      const tag = (el.tagName || "").toLowerCase();
+      const where = path + " 第" + (i + 1) + "项";
+      let target = el;
+      let size = null, minSize = 0, weight = 0, index = null;
+      if (tag === "child") {
+        const inner = Array.prototype.slice.call(el.children);
+        if (inner.length !== 1) {
+          ctx.errors.push(where + "：<child> 必须且只能包含一个元素，当前 " + inner.length + " 个");
+          return;
+        }
+        target = inner[0];
+        size = xmlNum(el, "size");
+        minSize = xmlNum(el, "min_size") || 0;
+        weight = xmlNum(el, "weight") || 0;
+        index = xmlNum(el, "index");
+      }
+      const node = importNode(target, ctx, where);
+      if (!node) { ctx.childFailed = true; return; }
+      node._size = size;
+      node._minSize = minSize;
+      node._weight = weight;
+      // PanelSash 只能挂在纵向 / 横向面板上，否则构造时抛 ValueError
+      if (node.tag === "sash" && parentTag !== "verticalpanel" && parentTag !== "horizonpanel") {
+        ctx.errors.push(where + "：拉伸条 <sash> 只能位于纵向 / 横向面板内");
+        return;
+      }
+      parentNode.children.splice(insertPos(parentNode.children.length, index), 0, node);
+    });
+  }
+
+  /* 导入根面板 <tinui layout='panel'> */
+  function importRootNode(el, ctx) {
+    const rootType = String(el.getAttribute("root") || "expand").trim().toLowerCase();
+    if (!ROOT_TYPES[rootType]) {
+      ctx.errors.push("未知的 root 类型 '" + rootType + "'（可用：" + Object.keys(ROOT_TYPES).join(" / ") + "）");
+      return null;
+    }
+    const root = newNode("root", "tinui", {});
+    root.attrs.root = rootType;
+    const key = ROOT_TYPES[rootType];
+    (PANEL_ATTR_ORDER[key] || []).forEach(function (k) {
+      if (el.hasAttribute(k)) root.attrs[k] = el.getAttribute(k);
+    });
+    const margin = el.getAttribute("margin");
+    if (margin !== null && String(margin).trim() !== "") root.attrs.margin = String(margin).trim();
+    const animate = String(el.getAttribute("animate") || "").trim().toLowerCase();
+    if (animate === "true" || animate === "1" || animate === "yes" || animate === "on") {
+      ctx.warnings.push("根面板 animate='true' 暂不支持导出，导入后被丢弃");
+    }
+    importChildren(el, root, ctx, "根面板");
+    if (key === "expandpanel" && root.children.length !== 1 && !ctx.childFailed) {
+      ctx.errors.push("root='expand' 必须且只能包含一个子项，当前 " + root.children.length + " 个");
+      return null;
+    }
+    return root;
+  }
+
+  /* 清理浏览器 XML 解析器的报错文本 */
+  function cleanParserError(msg) {
+    let s = String(msg == null ? "" : msg).replace(/\s+/g, " ").trim();
+    const i = s.indexOf("error on line");
+    if (i > 0) s = s.slice(i);
+    const j = s.indexOf("Below is a rendering");
+    if (j > 0) s = s.slice(0, j).trim();
+    return s || "无法解析该内容";
+  }
+
+  /* 解析面板 XML：检查根元素与 layout='panel'，返回 {errors, warnings, root} */
+  function parsePanelXML(text) {
+    const ctx = { errors: [], warnings: [], root: null, childFailed: false };
+    const src = String(text == null ? "" : text).trim();
+    if (!src) { ctx.errors.push("XML 内容为空"); return ctx; }
+    let doc = null;
+    try {
+      doc = new DOMParser().parseFromString(src, "text/xml");
+    } catch (e) {
+      ctx.errors.push("XML 解析失败：" + (e && e.message ? e.message : String(e)));
+      return ctx;
+    }
+    const perr = doc.getElementsByTagName("parsererror")[0];
+    const rootName = doc.documentElement ? String(doc.documentElement.nodeName).toLowerCase() : "";
+    if (perr || rootName === "parsererror") {
+      ctx.errors.push("XML 格式错误：" + cleanParserError(perr ? perr.textContent : ""));
+      return ctx;
+    }
+    const el = doc.documentElement;
+    if (!el) { ctx.errors.push("XML 没有根元素"); return ctx; }
+    const tag = String(el.tagName || "").toLowerCase();
+    if (tag !== "tinui") {
+      ctx.errors.push("根元素必须是 <tinui>，当前为 <" + el.tagName + ">");
+      return ctx;
+    }
+    const layout = String(el.getAttribute("layout") || "").trim().toLowerCase();
+    if (layout !== "panel") {
+      ctx.errors.push(layout
+        ? "根元素 layout='" + layout + "' 不是 'panel'，面板设计器仅支持 <tinui layout='panel'>"
+        : "根元素缺少 layout='panel'，当前是流程模式（<line> 布局），不支持导入");
+      return ctx;
+    }
+    idSeq = 1;
+    ctx.root = importRootNode(el, ctx);
+    if (ctx.errors.length) ctx.root = null;
+    return ctx;
+  }
+
+  function applyImportedXML(text) {
+    const ctx = parsePanelXML(text);
+    if (ctx.errors.length || !ctx.root) {
+      showImportMsg(ctx);
+      return false;
+    }
+    state.root = ctx.root;
+    state.selectedId = null;
+    collapsed.clear();
+    rerender();
+    if (!ctx.warnings.length) {
+      closeImport();
+      toast("已导入面板 XML");
+      return true;
+    }
+    // 有提示时保留弹窗，供用户核对后再关闭
+    showImportMsg(ctx, "已导入，以下为提示：");
+    els.importMode = "done";
+    els.btnImportLoad.textContent = "完成";
+    return true;
+  }
+
+  function showImportMsg(ctx, head) {
+    const parts = [];
+    if (ctx.errors.length) {
+      parts.push("<strong>无法导入：</strong><br>" +
+        ctx.errors.map(function (e) { return "· " + esc(e); }).join("<br>"));
+    }
+    if (ctx.warnings.length) {
+      parts.push("<strong>" + esc(head || "提示：") + "</strong><br>" +
+        ctx.warnings.map(function (w) { return "· " + esc(w); }).join("<br>"));
+    }
+    els.importMsg.innerHTML = parts.join(
+      '<div style="border-top:1px solid #f0d9a8;margin:8px 0"></div>'
+    );
+    els.importMsg.classList.toggle("err", ctx.errors.length > 0);
+  }
+
+  function openImport() {
+    els.importMode = "load";
+    els.btnImportLoad.textContent = "载入";
+    els.importMsg.innerHTML = "";
+    els.importMsg.classList.remove("err");
+    els.importFile.value = "";
+    els.importFileName.textContent = "未选择文件";
+    els.importModal.classList.add("show");
+    els.importText.focus();
+  }
+  function closeImport() {
+    els.importModal.classList.remove("show");
+    els.importMode = "load";
+    els.btnImportLoad.textContent = "载入";
+  }
+  function readXmlFile(file, cb) {
+    const r = new FileReader();
+    r.onload = function () { cb(String(r.result == null ? "" : r.result)); };
+    r.onerror = function () { toast("读取文件失败：" + file.name); };
+    r.readAsText(file, "utf-8");
+  }
+
+  /* =========================================================================
+   * 9. 初始化与事件
    * ======================================================================= */
   function $(id) { return document.getElementById(id); }
   function cacheEls() {
@@ -1524,6 +1888,14 @@
     els.modalClose = $("modalClose");
     els.exportWarn = $("exportWarn");
     els.exportText = $("exportText");
+    els.importModal = $("importModal");
+    els.importClose = $("importClose");
+    els.importCancel = $("importCancel");
+    els.importText = $("importText");
+    els.importFile = $("importFile");
+    els.importFileName = $("importFileName");
+    els.importMsg = $("importMsg");
+    els.btnImportLoad = $("btnImportLoad");
     els.toast = $("toast");
   }
 
@@ -1637,9 +2009,20 @@
     });
 
     // 拖拽加入
-    els.canvas.addEventListener("dragover", function (e) { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; });
+    els.canvas.addEventListener("dragover", function (e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "copy";
+    });
     els.canvas.addEventListener("drop", function (e) {
       e.preventDefault();
+      // 拖入 .xml 文件：直接导入面板 XML
+      const files = e.dataTransfer && e.dataTransfer.files;
+      if (files && files.length) {
+        const f = files[0];
+        if (!/\.xml$/i.test(f.name)) { toast("请拖入 .xml 文件"); return; }
+        readXmlFile(f, function (text) { applyImportedXML(text); });
+        return;
+      }
       let data;
       try { data = JSON.parse(e.dataTransfer.getData("text/plain")); } catch (err) { return; }
       if (!data || !data.tag) return;
@@ -1693,7 +2076,7 @@
     document.addEventListener("keydown", function (e) {
       const t = e.target;
       if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT")) return;
-      if (e.key === "Escape") { select(null); closeExport(); return; }
+      if (e.key === "Escape") { select(null); closeExport(); closeImport(); return; }
       if (!state.selectedId) return;
       const node = findNode(state.selectedId);
       if (!node) return;
@@ -1709,6 +2092,7 @@
     });
 
     // 工具栏
+    document.getElementById("btnImport").addEventListener("click", openImport);
     document.getElementById("btnExample").addEventListener("click", function () {
       idSeq = 1;
       state.root = defaultModel();
@@ -1739,6 +2123,28 @@
     els.modal.addEventListener("mousedown", function (e) { if (e.target === els.modal) closeExport(); });
     document.getElementById("btnCopy").addEventListener("click", copyXML);
     document.getElementById("btnDownload").addEventListener("click", downloadXML);
+
+    // 导入弹窗
+    els.importClose.addEventListener("click", closeImport);
+    els.importCancel.addEventListener("click", closeImport);
+    els.importModal.addEventListener("mousedown", function (e) { if (e.target === els.importModal) closeImport(); });
+    els.btnImportLoad.addEventListener("click", function () {
+      if (els.importMode === "done") { closeImport(); return; }
+      applyImportedXML(els.importText.value);
+    });
+    els.importFile.addEventListener("change", function () {
+      const f = els.importFile.files && els.importFile.files[0];
+      if (!f) return;
+      els.importFileName.textContent = f.name;
+      readXmlFile(f, function (text) {
+        els.importText.value = text;
+        els.importMsg.innerHTML = "";
+        els.importMsg.classList.remove("err");
+        els.importMode = "load";
+        els.btnImportLoad.textContent = "载入";
+        toast("已读取 " + f.name + "，点击「载入」导入");
+      });
+    });
   }
 
   function defaultModel() {
@@ -1797,6 +2203,20 @@
     else init();
   }
   if (typeof module !== "undefined" && module.exports) {
-    module.exports = { exportExampleXML: exportExampleXML, buildRootXML: buildRootXML, defaultModel: defaultModel };
+    module.exports = {
+      exportExampleXML: exportExampleXML,
+      buildRootXML: buildRootXML,
+      defaultModel: defaultModel,
+      parsePanelXML: parsePanelXML,
+    };
+  }
+  if (typeof window !== "undefined") {
+    // 浏览器端调试入口，便于在控制台或自动化测试中调用
+    window.__panelDesigner = {
+      exportExampleXML: exportExampleXML,
+      buildRootXML: buildRootXML,
+      defaultModel: defaultModel,
+      parsePanelXML: parsePanelXML,
+    };
   }
 })();

@@ -312,6 +312,23 @@ input[type=number].row-input{text-align:right}
 .color-input{width:30px;height:30px;padding:0;border:1px solid var(--border-strong);border-radius:6px;background:#fff;cursor:pointer}
 .color-wrap .row-input{max-width:118px}
 .note{color:var(--muted);font-size:11.5px;line-height:1.6;background:var(--panel-2);border:1px dashed var(--border-strong);border-radius:6px;padding:8px 10px}
+/* 控件参数行：参数名 + 编辑器 + 移除按钮 */
+.attr-row{gap:6px}
+.attr-row .row-label{
+  flex:0 0 84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-family:"Cascadia Code",Consolas,monospace;font-size:11.5px;color:#4b5566;
+}
+.attr-ctl{flex:1;min-width:0;display:flex;gap:6px;justify-content:flex-end}
+.attr-ctl .row-input{max-width:130px}
+.attr-ctl .color-input{width:28px;height:28px}
+.attr-remove{
+  flex:0 0 auto;border:none;background:transparent;cursor:pointer;color:#a2abbb;
+  font-size:12px;line-height:1;padding:4px 2px;border-radius:5px;
+}
+.attr-remove:hover{background:#fdecec;color:var(--danger)}
+.attr-add{gap:6px}
+.attr-add .row-input{max-width:96px;text-align:left}
+.attr-add .btn{flex:0 0 auto}
 .actions{display:flex;flex-wrap:wrap;gap:7px}
 .btn.small{
   background:var(--panel-2);border:1px solid var(--border-strong);color:var(--text);padding:6px 11px;border-radius:6px;font-size:12px;
@@ -329,13 +346,22 @@ input[type=number].row-input{text-align:right}
 .icon-btn{border:none;background:transparent;cursor:pointer;font-size:14px;color:var(--muted);padding:4px 8px;border-radius:6px}
 .icon-btn:hover{background:var(--panel-2);color:var(--text)}
 .modal-body{padding:16px 18px;display:flex;flex-direction:column;gap:10px;overflow:auto}
-#exportText{
+#exportText,#importText{
   width:100%;height:340px;resize:vertical;border:1px solid var(--border-strong);border-radius:8px;
   padding:12px;font-family:"Cascadia Code",Consolas,"Courier New",monospace;font-size:12px;line-height:1.55;
   background:#0f1420;color:#d8e2f2;white-space:pre;overflow:auto;
 }
+#importText{height:260px}
 .warn{display:none;color:#8a5a00;background:#fff6e5;border:1px solid #f5d9a3;border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.6}
 .warn:not(:empty){display:block}
+.warn.err{color:#8c1d22;background:#fdecec;border-color:#f3c2c4}
+.import-bar{display:flex;align-items:center;gap:10px}
+.file-btn{
+  display:inline-flex;align-items:center;padding:6px 12px;border-radius:6px;cursor:pointer;
+  border:1px solid var(--border-strong);background:var(--panel-2);font-size:12px;
+}
+.file-btn:hover{border-color:var(--accent);color:var(--accent)}
+.file-name{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .modal-tip{color:var(--muted);font-size:11.5px}
 .modal-tip code{background:var(--panel-2);border:1px solid var(--border);border-radius:4px;padding:1px 5px}
 .modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid var(--border);background:var(--panel-2)}

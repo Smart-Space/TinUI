@@ -1,7 +1,8 @@
 # TinUI 面板设计器（panel designer）
 
 纯 HTML + CSS + JavaScript 实现的可视化设计器，用于编辑 TinUI 的**面板模式**布局
-（`<tinui layout='panel'>`），并导出可直接被 `TinUIXml.loadxml()` 解析的 XML。
+（`<tinui layout='panel'>`），可导入已有的面板 XML 进行编辑，
+并导出可直接被 `TinUIXml.loadxml()` 解析的 XML。
 
 无需构建、无需依赖，直接用浏览器打开 `index.html` 即可。
 
@@ -26,8 +27,9 @@
     `treeview` 则按 `content` 的嵌套层级绘制缩进树
 - **右侧**：属性面板
   - 布局约束：`size` / `min_size` / `weight` / `index`
-  - 控件属性：默认参数 + `anchor`，并可通过「添加参数」补充任意参数（如 `fg`、`font`、`command`），
-    每行右侧的 `✕` 可移除参数；数字 / 颜色 / 枚举 / 布尔参数会自动使用对应编辑器
+  - 控件属性：全部构造参数（如 `text`、`fg`、`font`、`command`）逐行列出，可直接改写，
+    每行右侧的 `✕` 可移除参数；数字 / 颜色 / 枚举 / 布尔参数会自动使用对应编辑器；
+    底部的「参数名 + 参数值 + 添加」可补充任意参数
   - 面板属性：`padding`、`spacing`、`min_width`、`card_width` 等；
     `bd` 是**圆角大小**（对齐 `BasePanel` 的 `bd=9`，即 `TinUI` 面板默认圆角），
     `line` + `linew` 才是边框颜色与宽度
@@ -65,6 +67,24 @@
 
 导出时会检查常见非法结构（如 `expandpanel` 子项数量不为 1、`sash` 不在纵向/横向面板内）并给出提示。
 
+## 导入
+
+点击右上角 **导入 XML**，或把 `.xml` 文件直接拖到画布上，即可载入一份已有的面板 XML：
+
+- 可在弹窗中**选择文件**或**直接粘贴** XML 文本，内容会先读入文本框，确认后再点「载入」。
+- 导入会**替换**当前画布内容；载入后可以继续编辑并重新导出（导入 → 导出可往返）。
+- 导入前会按 `TinUIXml.loadxml` 的规则校验，**根元素必须是 `<tinui>` 且 `layout='panel'`**：
+  - 流程模式（`<tinui>` + `<line>`）会被拒绝，提示缺少 `layout='panel'`
+  - `root` 必须是 `expand` / `vertical` / `horizon` / `card` 之一
+  - `<child>` 必须且只能包含一个元素；`expandpanel` 必须且只能包含一个子项
+  - `<sash>` 不能含子元素，且只能位于纵向 / 横向面板内
+  - 面板模式不支持的流式标签（`line` / `back` / `labelframe` / `flyout` / `tooltip`）会被拒绝
+- **错误**会阻止导入并逐条列出；**提示**（如未知控件、`<menubar>` 被跳过、`animate` 不被导出）
+  不阻止导入，导入后弹窗保留供核对。
+- `<child>` 的 `size` / `min_size` / `weight` 会写入子项的布局约束；`index` 表示插入位置
+  （与 `TinUIXml` 的 `add_child(..., index=)` 一致），导入后按该顺序排列。
+- 控件的全部属性（如 `fg`、`font`、`command`）与元素文本（对应 `TinUIXml.tags`）都会保留。
+
 ## 说明
 
 - `padding` 会强制规范为 4 个值（`上,右,下,左`），因为 `TinUIPanel` 解包时要求恰好 4 项。
@@ -86,4 +106,10 @@
 - `treeview` 的 `content` 形如 `(标题, (子项…))` 可嵌套，纯字符串为叶子节点。
 - 留空的数值参数不会导出（沿用 `TinUI` 默认值）；自行添加的非默认参数留空同样不导出。
 - 暂未提供 `animate` / `duration`：当前 `TinUIPanel` 在根面板首次布局时会在
-  `animate_layout → get_rect` 处因背景坐标不足报错，故默认不导出该选项。
+  `animate_layout → get_rect` 处因背景坐标不足报错，故默认不导出该选项；
+  导入时若带有 `animate='true'`，会作为提示丢弃。
+- 面板只保留 `TinUIXml.panel_attrs` 白名单内的属性（与 `TinUIXml` 一致，多余的面板属性被忽略）；
+  控件则保留全部属性（`TinUIXml.__build_control` 会把全部属性传给 `add_*`）。
+- 浏览器控制台可用 `__panelDesigner.parsePanelXML(text)` / `__panelDesigner.buildRootXML(node)`
+  做无界面的解析与导出校验。
+

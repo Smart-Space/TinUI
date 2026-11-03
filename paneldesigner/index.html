@@ -21,6 +21,7 @@
         <span>×</span>
         <input id="canvasH" type="number" min="120" step="10">
       </label>
+      <button id="btnImport" class="btn ghost">导入 XML</button>
       <button id="btnExample" class="btn ghost">示例</button>
       <button id="btnClear" class="btn ghost">清空</button>
       <button id="btnExport" class="btn primary">导出 XML</button>
@@ -94,6 +95,34 @@
     <div class="modal-foot">
       <button id="btnCopy" class="btn ghost">复制</button>
       <button id="btnDownload" class="btn primary">下载 .xml</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="importModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <strong>导入 TinUI 面板 XML</strong>
+      <button id="importClose" class="icon-btn" title="关闭">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="import-bar">
+        <label class="file-btn">
+          选择 .xml 文件
+          <input type="file" id="importFile" accept=".xml,text/xml,application/xml" hidden>
+        </label>
+        <span class="file-name" id="importFileName">未选择文件</span>
+      </div>
+      <textarea id="importText" spellcheck="false" placeholder="&lt;tinui layout='panel' root='horizon'&gt;…&lt;/tinui&gt;"></textarea>
+      <div id="importMsg" class="warn"></div>
+      <div class="modal-tip">
+        仅接受面板模式的根元素 <code>&lt;tinui layout='panel'&gt;</code>；流程模式（<code>&lt;line&gt;</code> 布局）会被拒绝。
+        导入将替换当前画布内容，导入后可继续编辑并重新导出。
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button id="importCancel" class="btn ghost">取消</button>
+      <button id="btnImportLoad" class="btn primary">载入</button>
     </div>
   </div>
 </div>

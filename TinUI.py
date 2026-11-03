@@ -29,7 +29,6 @@ from tkinter import ttk
 from tkinter import font as tkfont
 from webbrowser import open as webopen
 from typing import Union
-import functools
 import collections
 import sys
 import os
@@ -221,10 +220,9 @@ class BasicTinUI(Canvas):
         self.TINUI_RADIUS_SMALL = int(self.TINUISCALE * 9)
         if self.TINUI_RADIUS_SMALL%2 == 0:
             self.TINUI_RADIUS_SMALL += 1
-        self.scale_value.cache_clear()
 
-    @functools.cache
     def scale_value(self, value: Union[int, float], needodd=False):
+        """按缩放系数换算数值"""
         res = int(value * self.TINUISCALE)
         if needodd and res%2 == 0:
             res += 1

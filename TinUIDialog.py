@@ -3,7 +3,6 @@ TinUI风格对话框
 """
 from tkinter import Tk, Toplevel
 from typing import Union
-import functools
 
 try:
     from .TinUI import BasicTinUI, TinUIXml
@@ -25,7 +24,6 @@ class Dialog(Toplevel):
         """
         Dialog.scale_factor = scale
     
-    @functools.cache
     def scale_value(self, value: Union[int, float], needodd=False):
         """
         根据缩放比例缩放值

@@ -5549,8 +5549,12 @@ class BasicTinUI(Canvas):
         pos: tuple,
         fg="#1a1a1a",
         bg="#f3f3f3",
+        activefg="#1a1a1a",
+        activebg="#eaeaea",
         onfg="#1a1a1a",
-        onbg="#eaeaea",
+        onbg="#ededed",
+        selfg="#1a1a1a",
+        selbg="#eaeaea",
         oncolor="#3041d8",
         signcolor="#8a8a8a",
         width=200,
@@ -5576,11 +5580,21 @@ class BasicTinUI(Canvas):
 
         def buttonin(cid):
             if cid != nowid:
-                box.itemconfig(cid, fill=onbg, outline=onbg)
+                box.itemconfig(cid, fill=activebg, outline=activebg)
+                box.itemconfig(items[cid][0], fill=activefg)
 
         def buttonout(cid):
             if cid != nowid:
                 box.itemconfig(cid, fill=bg, outline=bg)
+                box.itemconfig(items[cid][0], fill=fg)
+
+        def buttonup(cid):
+            if cid != nowid:
+                box.itemconfig(cid, fill=activebg, outline=activebg)
+                box.itemconfig(items[cid][0], fill=activefg)
+            else:
+                box.itemconfig(cid, fill=selbg, outline=selbg)
+                box.itemconfig(items[cid][0], fill=selfg)
 
         def __slide_to(target):
             # 选中线先收缩到目标中点，再展开到目标位置
@@ -5688,6 +5702,9 @@ class BasicTinUI(Canvas):
                     )
                     box.tag_bind(
                         item_id, "<Button-1>", lambda _, _id=back: click(_id, True)
+                    )
+                    box.tag_bind(
+                        item_id, "<ButtonRelease-1>", lambda _, _id=back: buttonup(_id)
                     )
                 child_id.append(back)
             if father_id:  # 存在父级

@@ -388,7 +388,9 @@ class TinUIDark(TinUITheme):
         return self.ui.add_treeview(pos,*arg,**{
             **{
                 'fg':'#ffffff','bg':'#202020',
-                'onfg':'#ffffff','onbg':'#2d2d2d',
+                'activefg':'#ffffff','activebg':'#2d2d2d',
+                'onfg':'#cecece','onbg':'#292929',
+                'selfg':'#ffffff','selbg':'#2d2d2d',
                 'oncolor':self.accent_color,'signcolor':'#9f9f9f',
             },**kw})
 

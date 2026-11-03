@@ -6,7 +6,10 @@
 
 from tkinter import Tk
 
-from tinui import TinUI, BasicTinUI, TinUIXml
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from TinUI import TinUI, BasicTinUI, TinUIXml
 
 from tinuilight import TinUILight
 from tinuidark import TinUIDark
